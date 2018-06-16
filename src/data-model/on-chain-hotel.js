@@ -19,9 +19,9 @@ class OnChainHotel implements HotelInterface {
   address: Promise<?string> | ?string;
 
   // provided by eth backed dataset
-  url: Promise<?string> | ?string;
-  manager: Promise<?string> | ?string;
-  
+  _url: Promise<?string> | ?string;
+  _manager: Promise<?string> | ?string;
+
   web3Utils: Utils;
   web3Contracts: Contracts;
   indexContract: Object;
@@ -64,13 +64,13 @@ class OnChainHotel implements HotelInterface {
     this.onChainDataset = RemotelyBackedDataset.createInstance();
     this.onChainDataset.bindProperties({
       fields: {
-        url: {
+        _url: {
           remoteGetter: async (): Promise<?string> => {
             return (await this.__getContractInstance()).methods.url().call();
           },
           remoteSetter: this.__editInfoOnChain.bind(this),
         },
-        manager: {
+        _manager: {
           remoteGetter: async (): Promise<?string> => {
             return (await this.__getContractInstance()).methods.manager().call();
           },
@@ -119,6 +119,49 @@ class OnChainHotel implements HotelInterface {
     })();
   }
 
+  get url (): Promise<?string> | ?string {
+    if (!this._url) return;
+
+    return (async () => {
+      const url = await this._url;
+      return url;
+    })();
+  }
+
+  set url (newUrl: Promise<?string> | ?string) {
+    if (!newUrl) {
+      throw new Error(
+        'Cannot update hotel: Cannot set url when it is not provided'
+      );
+    }
+    if (typeof newUrl === 'string' && !newUrl.match(/([a-z]+):\/\//)) {
+      throw new Error(
+        'Cannot update hotel: Cannot set url with invalid format'
+      );
+    }
+
+    this._url = newUrl;
+  }
+
+  get manager (): Promise<?string> | ?string {
+    if (!this._manager) return;
+
+    return (async () => {
+      const manager = await this._manager;
+      return manager;
+    })();
+  }
+
+  set manager (newManager: Promise<?string> | ?string) {
+    if (!newManager) {
+      throw new Error('Cannot update hotel: Cannot update hotel without manager');
+    }
+    if (this.address) {
+      throw new Error('Cannot update hotel: cannot set manager when it is deployed');
+    }
+    this._manager = newManager;
+  }
+
   /**
    * Update manager and url properties. Url can never be nulled. Manager
    * can never be nulled. Manager can be changed only for an un-deployed
@@ -126,12 +169,8 @@ class OnChainHotel implements HotelInterface {
    * @param {HotelOnChainDataInterface} newData
    */
   async setLocalData (newData: HotelOnChainDataInterface): Promise<void> {
-    if (newData.manager && !this.address) {
-      this.manager = newData.manager;
-    }
-    if (newData.url) {
-      this.url = newData.url;
-    }
+    this.manager = newData.manager;
+    this.url = newData.url;
   }
 
   /**
