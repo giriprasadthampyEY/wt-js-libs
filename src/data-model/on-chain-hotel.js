@@ -278,9 +278,6 @@ class OnChainHotel implements HotelInterface {
   async updateOnChainData (wallet: WalletInterface, transactionOptions: TransactionOptionsInterface): Promise<Array<string>> {
     // pre-check if contract is available at all and fail fast
     await this.__getContractInstance();
-    if (!(await this.url)) {
-      throw new Error('Cannot set url when it is not provided');
-    }
     // We have to clone options for each dataset as they may get modified
     // along the way
     return this.onChainDataset.updateRemoteData(wallet, Object.assign({}, transactionOptions));
