@@ -110,6 +110,18 @@ describe('WTLibs.data-model.OnChainHotel', () => {
       }
     });
 
+    it('should never invalid url', async () => {
+      try {
+        const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
+        await provider.setLocalData({ url: validUrl, manager: validManager });
+        assert.equal(await provider.url, validUrl);
+        await provider.setLocalData({ url: 'invalid-url', manager: validManager });
+      } catch (e) {
+        assert.match(e.message, /cannot update hotel/i);
+        assert.match(e.message, /cannot set url with invalid format/i);
+      }
+    });
+
     it('should set manager only when not yet deployed', async () => {
       try {
         const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
