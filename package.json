@@ -1,6 +1,6 @@
 {
   "name": "@windingtree/wt-js-libs",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Javascript libraries to interact with the Winding Tree contracts",
   "main": "dist/node/wt-js-libs.js",
   "directories": {
@@ -38,8 +38,8 @@
   },
   "dependencies": {
     "@windingtree/lif-token": "^0.1.2-erc827",
-    "@windingtree/off-chain-accessor-in-memory": "^1.0.0",
-    "@windingtree/wt-contracts": "^0.2.0",
+    "@windingtree/off-chain-adapter-in-memory": "^2.0.0",
+    "@windingtree/wt-contracts": "^0.2.2",
     "bignumber.js": "^3.0.1",
     "ethereumjs-util": "^5.1.5",
     "lodash": "^4.17.5",
@@ -90,6 +90,6 @@
     "webpack-node-externals": "^1.7.2"
   },
   "engines": {
-    "node": ">=8.9.4"
+    "node": ">=10.3.0"
   }
 }

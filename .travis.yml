@@ -3,7 +3,7 @@ sudo: false
 group: beta
 language: node_js
 node_js:
-  - "8"
+  - "10.3.0"
 jobs:
   include:
     - stage: test

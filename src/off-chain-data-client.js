@@ -1,13 +1,13 @@
 // @flow
-import type { OffChainDataAccessorInterface } from './interfaces';
+import type { OffChainDataAdapterInterface } from './interfaces';
 
 /**
  * OffChainDataClientOptionsType
  */
 export type OffChainDataClientOptionsType = {
-  accessors: {[schema: string]: {
+  adapters: {[schema: string]: {
     options: Object;
-    create: (options: Object) => OffChainDataAccessorInterface
+    create: (options: Object) => OffChainDataAdapterInterface
   }}
 };
 
@@ -15,46 +15,46 @@ let offChainDataOptions: OffChainDataClientOptionsType;
 
 /**
  * OffChainDataClient is a static factory class that is responsible
- * for creating proper instances of OffChainDataAccessorInterface.
+ * for creating proper instances of OffChainDataAdapterInterface.
  * It is configured during the library initialization.
  *
- * Please bear in mind, that once the accessors are configured, the
+ * Please bear in mind, that once the adapters are configured, the
  * configuration is shared during the whole runtime.
  */
 class OffChainDataClient {
-  accessors: Object;
+  adapters: Object;
 
   /**
-   * Initializes the map of OffChainDataAccessors.
+   * Initializes the map of OffChainDataAdapters.
    *
    * @param  {OffChainDataClientOptionsType}
    */
   static setup (options: OffChainDataClientOptionsType) {
     offChainDataOptions = options || {};
-    if (!offChainDataOptions.accessors) {
-      offChainDataOptions.accessors = {};
+    if (!offChainDataOptions.adapters) {
+      offChainDataOptions.adapters = {};
     }
   }
 
   /**
-   * Drops all pre-configured OffChainDataAccessors. Useful for testing.
+   * Drops all pre-configured OffChainDataAdapters. Useful for testing.
    */
   static __reset () {
-    offChainDataOptions.accessors = {};
+    offChainDataOptions.adapters = {};
   }
 
   /**
-   * Returns a fresh instance of an appropriate OffChainDataAccessor by
-   * calling the `create` function from the accessor's configuration.
+   * Returns a fresh instance of an appropriate OffChainDataAdapter by
+   * calling the `create` function from the adapter's configuration.
    *
-   * @throws {Error} when schema is not defined or accessor for this schema does not exist
+   * @throws {Error} when schema is not defined or adapter for this schema does not exist
    */
-  static async getAccessor (schema: ?string): Promise<OffChainDataAccessorInterface> {
-    if (!schema || !offChainDataOptions.accessors[schema]) {
+  static async getAdapter (schema: ?string): Promise<OffChainDataAdapterInterface> {
+    if (!schema || !offChainDataOptions.adapters[schema]) {
       throw new Error(`Unsupported data storage type: ${schema || 'null'}`);
     }
-    const accessor = offChainDataOptions.accessors[schema];
-    return accessor.create(accessor.options);
+    const adapter = offChainDataOptions.adapters[schema];
+    return adapter.create(adapter.options);
   }
 }
 

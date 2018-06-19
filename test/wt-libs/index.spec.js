@@ -40,7 +40,7 @@ describe('WTLibs', () => {
           random: '1234',
         },
         offChainDataOptions: {
-          accessors: {
+          adapters: {
             json: {
               create: () => {
                 return true;
@@ -49,8 +49,8 @@ describe('WTLibs', () => {
           },
         },
       });
-      const accessor = await libs.getOffChainDataClient('json');
-      assert.isDefined(accessor);
+      const adapter = await libs.getOffChainDataClient('json');
+      assert.isDefined(adapter);
       OffChainDataClient.__reset();
     });
   });

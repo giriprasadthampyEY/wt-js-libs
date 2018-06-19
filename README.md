@@ -23,21 +23,21 @@ under the hood.
 // You need to deploy the index and the hotel first. See test/utils/migrations
 // for inspiration.
 import WTLibs from '@windingtree/wt-js-libs';
-import InMemoryAccessor from '@windingtree/off-chain-accessor-in-memory';
+import InMemoryAdapter from '@windingtree/off-chain-adapter-in-memory';
 
 const libs = WTLibs.createInstance({
   dataModelOptions: {
     provider: 'http://localhost:8545',
   },
   offChainDataOptions: {
-    accessors: {
-      // This is how you plug-in any off-chain data accessor you want.
+    adapters: {
+      // This is how you plug-in any off-chain data adapter you want.
       json: {
         options: {
           // some: options
         }
         create: (options) => {
-          return new InMemoryAccessor(options);
+          return new InMemoryAdapter(options);
         },
       },
     },
@@ -56,24 +56,24 @@ const hotelName = await hotelDescription.contents.name;
 
 The current documentation can be rendered by running `npm run docs`
 
-### Off-chain data accessors
+### Off-chain data adapters
 
 **Existing implementations**
 
-- [In memory](https://github.com/windingtree/off-chain-accessor-in-memory) - Example basic implementation which is not very useful, but should be enough for quick hacking or testing
+- [In memory](https://github.com/windingtree/off-chain-adapter-in-memory) - Example basic implementation which is not very useful, but should be enough for quick hacking or testing
 
-#### Developing your own off-chain data accessor
+#### Developing your own off-chain data adapter
 
-For insipiration, you can have a look at [in-memory accessor](https://github.com/windingtree/off-chain-accessor-in-memory),
+For insipiration, you can have a look at [in-memory adapter](https://github.com/windingtree/off-chain-adapter-in-memory),
 if you'd like to create it all by yourself, here's what you need.
 
-1. Your package has to implement a [simple interface](https://github.com/windingtree/wt-js-libs/blob/proposal/next/docs/reference.md#offchaindataaccessorinterface)
+1. Your package has to implement a [simple interface](https://github.com/windingtree/wt-js-libs/blob/proposal/next/docs/reference.md#offchaindataadapterinterface)
 that provides ways to store, update and retrieve data.
 1. You can also choose how your plugin is instantiated and whether you need any initialization
 options. These will be passed whenever an instance is created.
-1. Off Chain data accessors are used in two places
-    1. `StoragePointer` - The accessor is used to download off-chain data in there
-    1. `OffChainDataClient` - It is responsible for proper instantiation of all off-chain data accessors.
+1. Off Chain data adapters are used in two places
+    1. `StoragePointer` - The adapter is used to download off-chain data in there
+    1. `OffChainDataClient` - It is responsible for proper instantiation of all off-chain data adapters.
 
 The interface is subject to change as we go along and find out what other types
 of storages might require - be it a signature verification, data signing and other non-common

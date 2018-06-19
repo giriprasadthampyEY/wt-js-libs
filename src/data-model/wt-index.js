@@ -45,13 +45,13 @@ class WTIndex implements WTIndexInterface {
    * to be mined, but as fast as possible returns a list of transaction IDs
    * and the new hotel on chain address.
    *
-   * @throws {Error} When hotelData does not contain url property.
+   * @throws {Error} When hotelData does not contain dataUri property.
    * @throws {Error} When anything goes wrong during communication with the network.
    */
   async addHotel (wallet: WalletInterface, hotelData: HotelOnChainDataInterface): Promise<AddHotelResponseInterface> {
-    // TODO validate hotelData.url format schema://more-data
-    if (!await hotelData.url) {
-      throw new Error('Cannot add hotel: Missing url');
+    // TODO validate hotelData.dataUri format schema://more-data
+    if (!await hotelData.dataUri) {
+      throw new Error('Cannot add hotel: Missing dataUri');
     }
     const hotelManager = await hotelData.manager;
     if (!hotelManager) {

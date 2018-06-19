@@ -2,15 +2,15 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 import StoragePointer from '../../src/storage-pointer';
 import OffChainDataClient from '../../src/off-chain-data-client';
-import { accessor as InMemoryAccessor } from '@windingtree/off-chain-accessor-in-memory';
+import { adapter as InMemoryAdapter } from '@windingtree/off-chain-adapter-in-memory';
 
 describe('WTLibs.StoragePointer', () => {
   beforeEach(() => {
     OffChainDataClient.setup({
-      accessors: {
+      adapters: {
         json: {
           create: () => {
-            return new InMemoryAccessor();
+            return new InMemoryAdapter();
           },
         },
       },
@@ -40,19 +40,19 @@ describe('WTLibs.StoragePointer', () => {
     }
   });
 
-  it('should throw on an empty url', () => {
+  it('should throw on an empty uri', () => {
     try {
       StoragePointer.createInstance('');
       throw new Error('should have never been called');
     } catch (e) {
-      assert.match(e.message, /without url/i);
+      assert.match(e.message, /without uri/i);
     }
 
     try {
       StoragePointer.createInstance();
       throw new Error('should have never been called');
     } catch (e) {
-      assert.match(e.message, /without url/i);
+      assert.match(e.message, /without uri/i);
     }
   });
 
@@ -79,21 +79,21 @@ describe('WTLibs.StoragePointer', () => {
     assert.equal(dldSpy.callCount, 1);
   });
 
-  it('should properly instantiate OffChainDataAccessor', async () => {
+  it('should properly instantiate OffChainDataAdapter', async () => {
     const pointer = StoragePointer.createInstance('json://url', ['some', 'fields']);
-    assert.isUndefined(pointer.__accessor);
+    assert.isUndefined(pointer.__adapter);
     await pointer.contents.some;
-    assert.isDefined(pointer.__accessor);
+    assert.isDefined(pointer.__adapter);
   });
 
-  it('should reuse OffChainDataAccessor instance', async () => {
-    const getAccessorSpy = sinon.spy(OffChainDataClient, 'getAccessor');
+  it('should reuse OffChainDataAdapter instance', async () => {
+    const getAdapterSpy = sinon.spy(OffChainDataClient, 'getAdapter');
     const pointer = StoragePointer.createInstance('json://url', ['some', 'fields']);
-    assert.equal(getAccessorSpy.callCount, 0);
+    assert.equal(getAdapterSpy.callCount, 0);
     await pointer.contents.some;
-    assert.equal(getAccessorSpy.callCount, 1);
+    assert.equal(getAdapterSpy.callCount, 1);
     await pointer._getOffChainDataClient();
-    assert.equal(getAccessorSpy.callCount, 1);
+    assert.equal(getAdapterSpy.callCount, 1);
   });
 
   it('should throw when an unsupported schema is encountered', async () => {
@@ -197,7 +197,7 @@ describe('WTLibs.StoragePointer', () => {
     }
   });
 
-  it('should throw if StoragePointer cannot be set up due to bad url format', async () => {
+  it('should throw if StoragePointer cannot be set up due to bad uri format', async () => {
     try {
       const pointer = StoragePointer.createInstance('jsonxxurl', [{
         name: 'sp',

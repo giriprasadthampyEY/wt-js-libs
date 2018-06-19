@@ -23,13 +23,13 @@ export interface AddHotelResponseInterface {
  *
  * - `address` is the network address.
  * - `manager` is the network address of hotel manager.
- * - `url` holds a pointer to the off-chain storage
+ * - `dataUri` holds a pointer to the off-chain storage
  * that is used internally to store data.
  */
 export interface HotelOnChainDataInterface {
   address: Promise<?string> | ?string;
   manager: Promise<?string> | ?string;
-  url: Promise<?string> | ?string
+  dataUri: Promise<?string> | ?string
 }
 
 /**
@@ -81,13 +81,13 @@ export interface WTIndexInterface {
 /**
  * Interface for an off-chain storage read.
  */
-export interface OffChainDataAccessorInterface {
+export interface OffChainDataAdapterInterface {
   // Upload new dataset to an off-chain storage
   upload(data: {[string]: Object}): Promise<string>;
-  // Change data on given url
-  update(url: string, data: {[string]: Object}): Promise<string>;
-  // Download content from given url
-  download(url: string): Promise<?{[string]: Object}>
+  // Change data on given uri
+  update(uri: string, data: {[string]: Object}): Promise<string>;
+  // Download content from given uri
+  download(uri: string): Promise<?{[string]: Object}>
 }
 
 /**

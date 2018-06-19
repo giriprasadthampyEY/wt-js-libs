@@ -31,12 +31,12 @@ describe('WTLibs usage', () => {
           longitude: 'long',
         },
       });
-      const url = await jsonClient.upload({
-        description: descUrl,
+      const dataUri = await jsonClient.upload({
+        descriptionUri: descUrl,
       });
       const result = await index.addHotel(wallet, {
         manager: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
-        url: url,
+        dataUri: dataUri,
       });
       assert.isDefined(result);
       assert.isDefined(result.address);
@@ -48,9 +48,9 @@ describe('WTLibs usage', () => {
       const hotel = await index.getHotel(result.address);
       // Don't bother with checksummed address format
       assert.equal((await hotel.manager).toLowerCase(), '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906');
-      assert.equal((await hotel.url).toLowerCase(), url);
+      assert.equal((await hotel.dataUri).toLowerCase(), dataUri);
       const dataIndex = await hotel.dataIndex;
-      const description = await dataIndex.contents.description;
+      const description = await dataIndex.contents.descriptionUri;
       assert.equal(await description.contents.name, 'Premium hotel');
 
       // We're removing the hotel to ensure clean slate after this test is run.
@@ -63,7 +63,7 @@ describe('WTLibs usage', () => {
     it('should throw when hotel does not have a manager', async () => {
       try {
         await index.addHotel(wallet, {
-          url: 'json://some-data-hash',
+          dataUri: 'json://some-data-hash',
         });
         throw new Error('should not have been called');
       } catch (e) {
@@ -71,7 +71,7 @@ describe('WTLibs usage', () => {
       }
     });
 
-    it('should throw when hotel does not have an url', async () => {
+    it('should throw when hotel does not have a dataUri', async () => {
       try {
         await index.addHotel(wallet, {
           manager: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
@@ -87,7 +87,7 @@ describe('WTLibs usage', () => {
     it('should remove hotel', async () => {
       const manager = '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906';
       const result = await index.addHotel(wallet, {
-        url: 'json://some-data-hash',
+        dataUri: 'json://some-data-hash',
         manager: manager,
       });
       assert.isDefined(result.address);
@@ -123,7 +123,7 @@ describe('WTLibs usage', () => {
       const address = '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769';
       const hotel = await index.getHotel(address);
       assert.isNotNull(hotel);
-      assert.equal(await hotel.url, 'json://urlone');
+      assert.equal(await hotel.dataUri, 'json://urlone');
       assert.equal(await hotel.address, address);
     });
 
@@ -132,9 +132,9 @@ describe('WTLibs usage', () => {
       const hotel = await index.getHotel(address);
       assert.isNotNull(hotel);
       const hotelDataIndex = await hotel.dataIndex;
-      assert.equal(hotelDataIndex.ref, await hotel.url);
+      assert.equal(hotelDataIndex.ref, await hotel.dataUri);
       assert.isDefined(hotelDataIndex.contents);
-      const descriptionContents = await hotelDataIndex.contents.description;
+      const descriptionContents = await hotelDataIndex.contents.descriptionUri;
       assert.isDefined(descriptionContents.contents);
       assert.isDefined(descriptionContents.ref);
       assert.equal(await descriptionContents.contents.name, 'First hotel');
@@ -148,7 +148,7 @@ describe('WTLibs usage', () => {
       const plainHotel = await hotel.toPlainObject();
       assert.isUndefined(plainHotel.toPlainObject);
       assert.equal(plainHotel.address, await hotel.address);
-      assert.equal(plainHotel.url, await hotel.url);
+      assert.equal(plainHotel.dataUri, await hotel.dataUri);
       assert.equal(plainHotel.manager, await hotel.manager);
     });
 
@@ -166,31 +166,31 @@ describe('WTLibs usage', () => {
     const hotelAddress = '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769';
 
     it('should update hotel', async () => {
-      const newUrl = 'json://another-url';
+      const newUri = 'json://another-url';
       const hotel = await index.getHotel(hotelAddress);
-      const oldUrl = await hotel.url;
-      hotel.url = newUrl;
+      const oldUri = await hotel.dataUri;
+      hotel.dataUri = newUri;
       // Change the data
       const updateResult = await index.updateHotel(wallet, hotel);
       assert.isDefined(updateResult);
       // Verify
       const hotel2 = await index.getHotel(hotelAddress);
-      assert.equal(await hotel2.url, newUrl);
+      assert.equal(await hotel2.dataUri, newUri);
       // Change it back to keep data in line
-      hotel.url = oldUrl;
+      hotel.dataUri = oldUri;
       const updateResult2 = await index.updateHotel(wallet, hotel);
       assert.isDefined(updateResult2);
       // Verify it changed properly
       const hotel3 = await index.getHotel(hotelAddress);
-      assert.equal(await hotel3.url, oldUrl);
+      assert.equal(await hotel3.dataUri, oldUri);
     });
 
     it('should throw if hotel has no address', async () => {
       try {
-        const newUrl = 'json://another-random-hash';
+        const newUri = 'json://another-random-hash';
         const hotel = await index.getHotel(hotelAddress);
         hotel.address = undefined;
-        hotel.url = newUrl;
+        hotel.dataUri = newUri;
         await index.updateHotel(wallet, hotel);
         throw new Error('should not have been called');
       } catch (e) {
@@ -201,10 +201,10 @@ describe('WTLibs usage', () => {
 
     it('should throw if hotel has no manager', async () => {
       try {
-        const newUrl = 'json://another-random-hash';
+        const newUri = 'json://another-random-hash';
         const hotel = await index.getHotel(hotelAddress);
         hotel.manager = undefined;
-        hotel.url = newUrl;
+        hotel.dataUri = newUri;
         await index.updateHotel(wallet, hotel);
         throw new Error('should not have been called');
       } catch (e) {
@@ -213,15 +213,15 @@ describe('WTLibs usage', () => {
       }
     });
 
-    it('should throw if hotel has no url', async () => {
+    it('should throw if hotel has no dataUri', async () => {
       try {
         const hotel = await index.getHotel(hotelAddress);
-        hotel.url = undefined;
+        hotel.dataUri = undefined;
         await index.updateHotel(wallet, hotel);
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot update hotel/i);
-        assert.match(e.message, /cannot set url when it is not provided/i);
+        assert.match(e.message, /cannot set dataUri when it is not provided/i);
       }
     });
 
@@ -229,7 +229,7 @@ describe('WTLibs usage', () => {
       try {
         const hotel = {
           address: '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
-          url: 'json://another-random-hash',
+          dataUri: 'json://another-random-hash',
         };
         await index.updateHotel(wallet, hotel);
         throw new Error('should not have been called');
@@ -248,7 +248,7 @@ describe('WTLibs usage', () => {
         assert.isDefined((await hotel.dataIndex).ref);
         const plainHotel = await hotel.toPlainObject();
         assert.equal(plainHotel.address, await hotel.address);
-        assert.equal(plainHotel.url, await hotel.url);
+        assert.equal(plainHotel.dataUri, await hotel.dataUri);
       }
     });
 

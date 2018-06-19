@@ -1,9 +1,9 @@
 {
   "urlone": {
-    "description": "json://descriptionone"
+    "descriptionUri": "json://descriptionone"
   },
   "urltwo": {
-    "description": "json:descriptiontwo"
+    "descriptionUri": "json:descriptiontwo"
   },
   "descriptionone": {
     "name": "First hotel",

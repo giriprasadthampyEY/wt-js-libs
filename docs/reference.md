@@ -47,7 +47,7 @@
 -   [TransactionOptionsInterface][43]
 -   [HotelInterface][44]
 -   [WTIndexInterface][45]
--   [OffChainDataAccessorInterface][46]
+-   [OffChainDataAdapterInterface][46]
 -   [DataModelInterface][47]
 -   [RawLogRecordInterface][48]
 -   [DecodedLogRecordInterface][49]
@@ -62,7 +62,7 @@
 -   [OffChainDataClient][58]
     -   [setup][59]
     -   [\_\_reset][60]
-    -   [getAccessor][61]
+    -   [getAdapter][61]
 -   [RemotelyBackedDataset][62]
     -   [bindProperties][63]
     -   [isObsolete][64]
@@ -628,6 +628,10 @@ about every hotel.
 Ethereum transaction options that are passed from an external user.
 It has to contain `from` and usually would contain `to` as well.
 
+This copies the structure of [https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#contract-estimategas][130]
+as it might be used as a base for gas estimation prior to actually
+sending a transaction.
+
 **Properties**
 
 -   `from` **[string][98]** 
@@ -666,7 +670,7 @@ necessary for interaction with the hotels.\`
 -   `updateHotel` **function (wallet: [WalletInterface][120], hotel: [HotelInterface][124]): [Promise][106]&lt;[Array][101]&lt;[string][98]>>** 
 -   `removeHotel` **function (wallet: [WalletInterface][120], hotel: [HotelInterface][124]): [Promise][106]&lt;[Array][101]&lt;[string][98]>>** 
 
-## OffChainDataAccessorInterface
+## OffChainDataAdapterInterface
 
 Interface for an off-chain storage read.
 
@@ -718,7 +722,7 @@ and act upon.
 ## TransactionDataInterface
 
 Ethereum transaction data used when creating transaction, see for example
-[https://web3js.readthedocs.io/en/1.0/web3-eth-accounts.html#signtransaction][130]
+[https://web3js.readthedocs.io/en/1.0/web3-eth-accounts.html#signtransaction][131]
 
 **Properties**
 
@@ -734,7 +738,7 @@ Ethereum transaction data used when creating transaction, see for example
 ## TxInterface
 
 Ethereum transaction data after TX was accepted by the network, see
-for example [http://web3js.readthedocs.io/en/1.0/web3-eth.html#gettransaction][131]
+for example [http://web3js.readthedocs.io/en/1.0/web3-eth.html#gettransaction][132]
 
 **Properties**
 
@@ -780,7 +784,7 @@ about the transaction status, its age and decoded logs.
 -   `transactionHash` **[string][98]** 
 -   `blockAge` **[number][105]** 
 -   `decodedLogs` **[Array][101]&lt;[DecodedLogRecordInterface][103]>** 
--   `raw` **[TxReceiptInterface][132]** 
+-   `raw` **[TxReceiptInterface][133]** 
 
 ## AdaptedTxResultsInterface
 
@@ -791,12 +795,12 @@ assumptions about confirmations). This also contains the raw data.
 
 **Properties**
 
--   `meta` **{total: [number][105], processed: [number][105], minBlockAge: [number][105], maxBlockAge: [number][105], allPassed: [boolean][133]}** 
+-   `meta` **{total: [number][105], processed: [number][105], minBlockAge: [number][105], maxBlockAge: [number][105], allPassed: [boolean][134]}** 
 -   `meta.total` **[number][105]** 
 -   `meta.processed` **[number][105]** 
 -   `meta.minBlockAge` **[number][105]** 
 -   `meta.maxBlockAge` **[number][105]** 
--   `meta.allPassed` **[boolean][133]** 
+-   `meta.allPassed` **[boolean][134]** 
 -   `results` **{}?** 
 
 ## WalletInterface
@@ -814,7 +818,7 @@ Wallet abstraction interface. It assumes the following workflow:
 **Properties**
 
 -   `unlock` **function (password: [string][98]): void** 
--   `signAndSendTransaction` **function (transactionData: [TransactionDataInterface][134], onReceipt: function (receipt: [TxReceiptInterface][132]): void?): [Promise][106]&lt;[string][98]>** 
+-   `signAndSendTransaction` **function (transactionData: [TransactionDataInterface][135], onReceipt: function (receipt: [TxReceiptInterface][133]): void?): [Promise][106]&lt;[string][98]>** 
 -   `lock` **function (): void** 
 -   `destroy` **function (): void** 
 -   `getAddress` **function (): [string][98]** 
@@ -823,9 +827,9 @@ Wallet abstraction interface. It assumes the following workflow:
 
 Interface for Ethereum keystore
 
-Description: [https://medium.com/@julien.m./what-is-an-ethereum-keystore-file-86c8c5917b97][135]
+Description: [https://medium.com/@julien.m./what-is-an-ethereum-keystore-file-86c8c5917b97][136]
 
-Specification: [https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition][136]
+Specification: [https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition][137]
 
 **Properties**
 
@@ -850,24 +854,24 @@ Specification: [https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Defini
 
 OffChainDataClientOptionsType
 
-Type: {accessors: {}}
+Type: {adapters: {}}
 
 **Properties**
 
--   `accessors` **{}** 
+-   `adapters` **{}** 
 
 ## OffChainDataClient
 
 OffChainDataClient is a static factory class that is responsible
-for creating proper instances of OffChainDataAccessorInterface.
+for creating proper instances of OffChainDataAdapterInterface.
 It is configured during the library initialization.
 
-Please bear in mind, that once the accessors are configured, the
+Please bear in mind, that once the adapters are configured, the
 configuration is shared during the whole runtime.
 
 ### setup
 
-Initializes the map of OffChainDataAccessors.
+Initializes the map of OffChainDataAdapters.
 
 **Parameters**
 
@@ -876,21 +880,21 @@ Initializes the map of OffChainDataAccessors.
 
 ### \_\_reset
 
-Drops all pre-configured OffChainDataAccessors. Useful for testing.
+Drops all pre-configured OffChainDataAdapters. Useful for testing.
 
-### getAccessor
+### getAdapter
 
-Returns a fresh instance of an appropriate OffChainDataAccessor by
-calling the `create` function from the accessor's configuration.
+Returns a fresh instance of an appropriate OffChainDataAdapter by
+calling the `create` function from the adapter's configuration.
 
 **Parameters**
 
 -   `schema` **[string][98]?** 
 
 
--   Throws **[Error][100]** when schema is not defined or accessor for this schema does not exist
+-   Throws **[Error][100]** when schema is not defined or adapter for this schema does not exist
 
-Returns **[Promise][106]&lt;[OffChainDataAccessorInterface][137]>** 
+Returns **[Promise][106]&lt;[OffChainDataAdapterInterface][138]>** 
 
 ## RemotelyBackedDataset
 
@@ -951,7 +955,7 @@ be synced from the remote storage (if the dataset is marked as deployed).
 
 Is dataset marked as obsolete?
 
-Returns **[Boolean][133]** 
+Returns **[Boolean][134]** 
 
 ### markObsolete
 
@@ -963,7 +967,7 @@ but merely serves as a flag to prevent further interaction with this object.
 
 Is dataset deployed to the remote storage?
 
-Returns **[Boolean][133]** 
+Returns **[Boolean][134]** 
 
 ### markDeployed
 
@@ -1018,13 +1022,13 @@ Generic factory method.
 Definition of a data field that is stored off-chain.
 This may be recursive.
 
-Type: {name: [string][98], isStoragePointer: [boolean][133]?, fields: [Array][101]&lt;([FieldDefType][138] \| [string][98])>?}
+Type: {name: [string][98], isStoragePointer: [boolean][134]?, fields: [Array][101]&lt;([FieldDefType][139] \| [string][98])>?}
 
 **Properties**
 
 -   `name` **[string][98]** 
--   `isStoragePointer` **[boolean][133]?** 
--   `fields` **[Array][101]&lt;([FieldDefType][138] \| [string][98])>?** 
+-   `isStoragePointer` **[boolean][134]?** 
+-   `fields` **[Array][101]&lt;([FieldDefType][139] \| [string][98])>?** 
 
 ## StoragePointer
 
@@ -1066,7 +1070,7 @@ field above may contain a complex JSON object.
 **Parameters**
 
 -   `url` **[string][98]** where to look for the data
--   `fields` **[Array][101]&lt;[FieldDefType][138]>** definition from which are generated getters
+-   `fields` **[Array][101]&lt;[FieldDefType][139]>** definition from which are generated getters
 
 ### \_genericGetter
 
@@ -1099,14 +1103,14 @@ Returns **[string][98]?**
 
 ### \_getOffChainDataClient
 
-Returns appropriate implementation of `OffChainDataAccessorInterface`
-based on schema. Uses `OffChainDataClient.getAccessor` factory method.
+Returns appropriate implementation of `OffChainDataAdapterInterface`
+based on schema. Uses `OffChainDataClient.getAdapter` factory method.
 
-Returns **[Promise][106]&lt;[OffChainDataAccessorInterface][137]>** 
+Returns **[Promise][106]&lt;[OffChainDataAdapterInterface][138]>** 
 
 ### \_downloadFromStorage
 
-Gets the data document via `OffChainDataAccessorInterface`.
+Gets the data document via `OffChainDataAdapterInterface`.
 If nothing is returned, might return an empty object.
 
 Returns **[Promise][106]&lt;{}>** 
@@ -1121,7 +1125,7 @@ instance
 **Parameters**
 
 -   `url` **[string][98]** where to look for data document. It has to include schema, i. e. `https://example.com/data`
--   `fields` **[Array][101]&lt;([FieldDefType][138] \| [string][98])>** list of top-level fields in the referred document
+-   `fields` **[Array][101]&lt;([FieldDefType][139] \| [string][98])>** list of top-level fields in the referred document
 
 Returns **[StoragePointer][118]** 
 
@@ -1143,7 +1147,7 @@ Is address a zero address? Uses a bignumber.js test
 
 -   `address` **[string][98]** 
 
-Returns **[boolean][133]** 
+Returns **[boolean][134]** 
 
 ### applyGasCoefficient
 
@@ -1202,7 +1206,7 @@ Proxy method for `web3.eth.getTransactionReceipt`
 
 -   `txHash` **[string][98]** 
 
-Returns **[TxReceiptInterface][132]** 
+Returns **[TxReceiptInterface][133]** 
 
 ### getTransaction
 
@@ -1212,7 +1216,7 @@ Proxy method for `web3.eth.getTransaction`
 
 -   `txHash` **[string][98]** 
 
-Returns **[Promise][106]&lt;[TxInterface][139]>** 
+Returns **[Promise][106]&lt;[TxInterface][140]>** 
 
 ### createInstance
 
@@ -1246,7 +1250,7 @@ Sets up an initialized Web3 instance for later use
 It is not possible to do any operations on a destroyed
 wallet. Wallet is destroyed by calling the `destroy()` method.
 
-Returns **[boolean][133]** 
+Returns **[boolean][134]** 
 
 ### getAddress
 
@@ -1280,8 +1284,8 @@ may run an `onReceipt` callback after receiving the `receipt` event.
 
 **Parameters**
 
--   `transactionData` **[TransactionDataInterface][134]** 
--   `onReceipt` **function (receipt: [TxReceiptInterface][132]): void?** 
+-   `transactionData` **[TransactionDataInterface][135]** 
+-   `onReceipt` **function (receipt: [TxReceiptInterface][133]): void?** 
 
 
 -   Throws **[Error][100]** When wallet was destroyed.
@@ -1413,7 +1417,7 @@ Returns **[Wallet][115]**
 
 [45]: #wtindexinterface
 
-[46]: #offchaindataaccessorinterface
+[46]: #offchaindataadapterinterface
 
 [47]: #datamodelinterface
 
@@ -1443,7 +1447,7 @@ Returns **[Wallet][115]**
 
 [60]: #__reset
 
-[61]: #getaccessor
+[61]: #getadapter
 
 [62]: #remotelybackeddataset
 
@@ -1581,22 +1585,24 @@ Returns **[Wallet][115]**
 
 [129]: #wtlibs
 
-[130]: https://web3js.readthedocs.io/en/1.0/web3-eth-accounts.html#signtransaction
+[130]: https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#contract-estimategas
 
-[131]: http://web3js.readthedocs.io/en/1.0/web3-eth.html#gettransaction
+[131]: https://web3js.readthedocs.io/en/1.0/web3-eth-accounts.html#signtransaction
 
-[132]: #txreceiptinterface
+[132]: http://web3js.readthedocs.io/en/1.0/web3-eth.html#gettransaction
 
-[133]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[133]: #txreceiptinterface
 
-[134]: #transactiondatainterface
+[134]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
-[135]: https://medium.com/@julien.m./what-is-an-ethereum-keystore-file-86c8c5917b97
+[135]: #transactiondatainterface
 
-[136]: https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition
+[136]: https://medium.com/@julien.m./what-is-an-ethereum-keystore-file-86c8c5917b97
 
-[137]: #offchaindataaccessorinterface
+[137]: https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition
 
-[138]: #fielddeftype
+[138]: #offchaindataadapterinterface
 
-[139]: #txinterface
+[139]: #fielddeftype
+
+[140]: #txinterface

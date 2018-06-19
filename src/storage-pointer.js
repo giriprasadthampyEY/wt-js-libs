@@ -1,5 +1,5 @@
 // @flow
-import type { OffChainDataAccessorInterface } from './interfaces';
+import type { OffChainDataAdapterInterface } from './interfaces';
 import OffChainDataClient from './off-chain-data-client';
 
 /**
@@ -59,7 +59,7 @@ class StoragePointer {
   __downloaded: boolean;
   __data: ?{[string]: Object};
   __fields: Array<FieldDefType>;
-  __accessor: OffChainDataAccessorInterface;
+  __adapter: OffChainDataAdapterInterface;
 
   /**
    * Returns a new instance of StoragePointer.
@@ -67,13 +67,13 @@ class StoragePointer {
    * Normalizes the `fields` format before creating the actual
    * instance
    *
-   * @param {string} url where to look for data document. It has to include schema, i. e. `https://example.com/data`
+   * @param {string} uri where to look for data document. It has to include schema, i. e. `https://example.com/data`
    * @param {Array<FieldDefType | string>} fields list of top-level fields in the referred document
-   * @throw {Error} if url is not defined
+   * @throw {Error} if uri is not defined
    */
-  static createInstance (url: ?string, fields: ?Array<FieldDefType | string>): StoragePointer {
-    if (!url) {
-      throw new Error('Cannot instantiate StoragePointer without url');
+  static createInstance (uri: ?string, fields: ?Array<FieldDefType | string>): StoragePointer {
+    if (!uri) {
+      throw new Error('Cannot instantiate StoragePointer without uri');
     }
     fields = fields || [];
     const normalizedFieldDef = [];
@@ -87,19 +87,19 @@ class StoragePointer {
         normalizedFieldDef.push(fieldDef);
       }
     }
-    return new StoragePointer(url, normalizedFieldDef);
+    return new StoragePointer(uri, normalizedFieldDef);
   }
 
   /**
-   * Detects schema from the url, based on that instantiates an appropriate
-   * `OffChainDataAccessorInterface` implementation and sets up all data
+   * Detects schema from the uri, based on that instantiates an appropriate
+   * `OffChainDataAdapterInterface` implementation and sets up all data
    * getters.
    *
-   * @param  {string} url where to look for the data
+   * @param  {string} uri where to look for the data
    * @param  {Array<FieldDefType>} fields definition from which are generated getters
    */
-  constructor (url: string, fields: Array<FieldDefType>) {
-    this.ref = url;
+  constructor (uri: string, fields: Array<FieldDefType>) {
+    this.ref = uri;
     this.contents = {};
     this.__storagePointers = {};
     this.__downloaded = false;
@@ -123,7 +123,7 @@ class StoragePointer {
    * once any data field is accessed for the first time. Also
    * the recursive `StoragePointer`s are created here only
    * after the contents of the data is known, because we need
-   * to know the url to be able to instantiate the appropariate
+   * to know the uri to be able to instantiate the appropariate
    * `StoragePointer`.
    *
    * This behaviour might change in a way that we are able to
@@ -150,32 +150,32 @@ class StoragePointer {
   }
 
   /**
-   * Detects schema from an url, i. e.
+   * Detects schema from an uri, i. e.
    * from `json://some-data`, detects `json`.
    */
-  _detectSchema (url: string): ?string {
-    const matchResult = url.match(/([a-z]+):\/\//i);
+  _detectSchema (uri: string): ?string {
+    const matchResult = uri.match(/([a-z]+):\/\//i);
     return matchResult ? matchResult[1] : null;
   }
 
   /**
-   * Returns appropriate implementation of `OffChainDataAccessorInterface`
-   * based on schema. Uses `OffChainDataClient.getAccessor` factory method.
+   * Returns appropriate implementation of `OffChainDataAdapterInterface`
+   * based on schema. Uses `OffChainDataClient.getAdapter` factory method.
    */
-  async _getOffChainDataClient (): Promise<OffChainDataAccessorInterface> {
-    if (!this.__accessor) {
-      this.__accessor = await OffChainDataClient.getAccessor(this._detectSchema(this.ref));
+  async _getOffChainDataClient (): Promise<OffChainDataAdapterInterface> {
+    if (!this.__adapter) {
+      this.__adapter = await OffChainDataClient.getAdapter(this._detectSchema(this.ref));
     }
-    return this.__accessor;
+    return this.__adapter;
   }
 
   /**
-   * Gets the data document via `OffChainDataAccessorInterface`.
+   * Gets the data document via `OffChainDataAdapterInterface`.
    * If nothing is returned, might return an empty object.
    */
   async _downloadFromStorage (): Promise<{[string]: Object}> {
-    const accessor = await this._getOffChainDataClient();
-    const result = await accessor.download(this.ref);
+    const adapter = await this._getOffChainDataClient();
+    const result = await adapter.download(this.ref);
     this.__downloaded = true;
     return result || {};
   }

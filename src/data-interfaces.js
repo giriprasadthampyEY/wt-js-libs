@@ -1,10 +1,10 @@
 // @flow
 /**
- * Index file for more data urls. This is the
+ * Index file for more data URIs. This is the
  * initial document that blockchain is pointing to.
  */
 export interface HotelDataIndex {
-  descriptionUrl: string
+  descriptionUri: string
 }
 
 /**
@@ -16,32 +16,41 @@ export interface LocationInterface {
 }
 
 /**
+ * Generic additional contact.
+ */
+export interface AdditionalContact {
+  title: string;
+  value: string
+}
+
+/**
  * Generic contact.
  */
 export interface ContactInterface {
   email?: Promise<?string> | ?string;
   phone?: Promise<?string> | ?string;
   url?: Promise<?string> | ?string;
-  ethereum?: Promise<?string> | ?string
+  ethereum?: Promise<?string> | ?string;
+  additionalContacts?: Promise<?Array<AdditionalContact>> | ?Array<AdditionalContact>
 }
 
 /**
  * A map of hotel contacts.
  */
 export interface ContactsInterface {
-  general: ?ContactInterface
+  general: ContactInterface
 }
 
 /**
  * Generic address interface.
  */
 export interface AddressInterface {
-  line1?: Promise<?string> | ?string;
+  line1?: Promise<string> | string;
   line2?: Promise<?string> | ?string;
-  zip?: Promise<?string> | ?string;
-  city?: Promise<?string> | ?string;
+  postalCode?: Promise<?string> | ?string;
+  city?: Promise<string> | string;
   state?: Promise<?string> | ?string;
-  country?: Promise<?string> | ?string
+  country?: Promise<string> | string
 }
 
 /**
@@ -49,15 +58,14 @@ export interface AddressInterface {
  * @see https://github.com/windingtree/wt-js-libs/issues/125
  */
 export interface HotelDescriptionInterface {
-  name?: Promise<?string> | ?string;
-  description?: Promise<?string> | ?string;
-  contacts?: Promise<?ContactsInterface> | ?ContactsInterface;
-  address?: Promise<?AddressInterface> | ?AddressInterface;
+  name?: Promise<string> | string;
+  description?: Promise<string> | string;
+  contacts?: Promise<ContactsInterface> | ContactsInterface;
+  address?: Promise<AddressInterface> | AddressInterface;
   location?: Promise<?LocationInterface> | ?LocationInterface;
-  timezone?: Promise<?string> | ?string;
-  currency?: Promise<?string> | ?string;
+  timezone?: Promise<string> | string;
+  currency?: Promise<string> | string;
   images?: Promise<?Array<string>> | ?Array<string>;
   amenities?: Promise<?Array<string>> | ?Array<string>;
-  createdAt: Promise<?string> | ?string;
-  updatedAt: Promise<?string> | ?string
+  updatedAt: Promise<string> | string
 }

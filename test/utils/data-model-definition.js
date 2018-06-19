@@ -1,5 +1,5 @@
 import offChainData from './data/off-chain-data.json';
-import { accessor as InMemoryAccessor, storageInstance } from '@windingtree/off-chain-accessor-in-memory';
+import { adapter as InMemoryAdapter, storageInstance } from '@windingtree/off-chain-adapter-in-memory';
 
 export const Web3UriBackedDataModel = {
   emptyConfig: {},
@@ -8,10 +8,10 @@ export const Web3UriBackedDataModel = {
       provider: 'http://localhost:8545',
     },
     offChainDataOptions: {
-      accessors: {
+      adapters: {
         json: {
           create: () => {
-            return new InMemoryAccessor();
+            return new InMemoryAdapter();
           },
         },
       },

@@ -2,7 +2,7 @@
 
 import type { DataModelOptionsType } from './data-model';
 import type { OffChainDataClientOptionsType } from './off-chain-data-client';
-import type { WTIndexInterface, AdaptedTxResultsInterface, OffChainDataAccessorInterface, WalletInterface, KeystoreV3Interface } from './interfaces';
+import type { WTIndexInterface, AdaptedTxResultsInterface, OffChainDataAdapterInterface, WalletInterface, KeystoreV3Interface } from './interfaces';
 import DataModel from './data-model';
 import OffChainDataClient from './off-chain-data-client';
 
@@ -61,8 +61,8 @@ class WTLibs {
     return this.dataModel.createWallet(jsonWallet);
   }
 
-  async getOffChainDataClient (schema: string): Promise<OffChainDataAccessorInterface> {
-    return OffChainDataClient.getAccessor(schema);
+  async getOffChainDataClient (schema: string): Promise<OffChainDataAdapterInterface> {
+    return OffChainDataClient.getAdapter(schema);
   }
 }
 
