@@ -82,6 +82,9 @@ class WTIndex implements WTIndexInterface {
    */
   async updateHotel (wallet: WalletInterface, hotel: HotelInterface): Promise<Array<string>> {
     try {
+      if (!hotel.address) {
+        throw new Error('Cannot update hotel without address.');
+      }
       const hotelManager = await hotel.manager;
       if (!hotelManager) {
         throw new Error('Cannot update hotel without manager.');
@@ -108,9 +111,12 @@ class WTIndex implements WTIndexInterface {
    */
   async removeHotel (wallet: WalletInterface, hotel: HotelInterface): Promise<Array<string>> {
     try {
+      if (!hotel.address) {
+        throw new Error('Cannot remove hotel without address.');
+      }
       const hotelManager = await hotel.manager;
       if (!hotelManager) {
-        throw new Error('Cannot update hotel without manager.');
+        throw new Error('Cannot remove hotel without manager.');
       }
       // We need to separate calls to be able to properly catch exceptions
       const result = await hotel.removeOnChainData(wallet, { // eslint-disable-line flowtype/no-weak-types

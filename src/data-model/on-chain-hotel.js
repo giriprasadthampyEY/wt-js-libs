@@ -157,7 +157,7 @@ class OnChainHotel implements HotelInterface {
 
   set manager (newManager: Promise<?string> | ?string) {
     if (!newManager) {
-      throw new Error('Cannot update hotel: Cannot update hotel without manager');
+      throw new Error('Cannot update hotel: Cannot set manager to null');
     }
     if (this.address) {
       throw new Error('Cannot update hotel: Cannot set manager when hotel is deployed');
