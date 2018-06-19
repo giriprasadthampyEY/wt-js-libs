@@ -142,8 +142,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
         assert.equal(await provider.manager, validManager);
         await provider.setLocalData({ manager: null, dataUri: validUri });
       } catch (e) {
-        assert.match(e.message, /cannot update hotel/i);
-        assert.match(e.message, /cannot update hotel without manager/i);
+        assert.match(e.message, /cannot set manager to null/i);
       }
     });
   });

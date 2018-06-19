@@ -116,6 +116,18 @@ describe('WTLibs usage', () => {
         assert.match(e.message, /cannot remove hotel/i);
       }
     });
+
+    it('should throw if hotel has no address', async () => {
+      try {
+        const hotel = await index.getHotel('0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
+        hotel.address = undefined;
+        await index.removeHotel(wallet, hotel);
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /cannot remove hotel/i);
+        assert.match(e.message, /without address/i);
+      }
+    });
   });
 
   describe('getHotel', () => {
@@ -196,20 +208,6 @@ describe('WTLibs usage', () => {
       } catch (e) {
         assert.match(e.message, /cannot update hotel/i);
         assert.match(e.message, /without address/i);
-      }
-    });
-
-    it('should throw if hotel has no manager', async () => {
-      try {
-        const newUri = 'json://another-random-hash';
-        const hotel = await index.getHotel(hotelAddress);
-        hotel.manager = undefined;
-        hotel.dataUri = newUri;
-        await index.updateHotel(wallet, hotel);
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot update hotel/i);
-        assert.match(e.message, /without manager/i);
       }
     });
 
