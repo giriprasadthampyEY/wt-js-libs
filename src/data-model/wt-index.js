@@ -49,7 +49,6 @@ class WTIndex implements WTIndexInterface {
    * @throws {Error} When anything goes wrong during communication with the network.
    */
   async addHotel (wallet: WalletInterface, hotelData: HotelOnChainDataInterface): Promise<AddHotelResponseInterface> {
-    // TODO validate hotelData.dataUri format schema://more-data
     if (!await hotelData.dataUri) {
       throw new Error('Cannot add hotel: Missing dataUri');
     }

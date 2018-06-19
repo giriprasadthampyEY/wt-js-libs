@@ -94,8 +94,6 @@ describe('WTLibs.RemotelyBackedDataset', () => {
     });
   });
 
-  // TODO dirty, unsynced, synced state transitions regarding updates
-
   describe('deployed state', () => {
     it('should not allow remote getting if object is not marked as deployed', async () => {
       try {

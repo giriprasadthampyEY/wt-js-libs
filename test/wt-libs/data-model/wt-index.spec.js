@@ -41,7 +41,6 @@ describe('WTLibs.data-models.WTIndexDataProvider', () => {
     });
 
     it('should throw if hotel cannot be added due to network issues', async () => {
-      // TODO this might probably be emulated in another way
       const myIndexDataProvider = await WTIndexDataProvider.createInstance('some-other-address', dataModel.web3Utils, dataModel.web3Contracts);
       try {
         await myIndexDataProvider.addHotel({}, { manager: 'b', dataUri: 'aaa' });
