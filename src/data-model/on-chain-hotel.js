@@ -19,9 +19,9 @@ class OnChainHotel implements HotelInterface {
   address: Promise<?string> | ?string;
 
   // provided by eth backed dataset
-  dataUri: Promise<?string> | ?string;
-  manager: Promise<?string> | ?string;
-  
+  _dataUri: Promise<?string> | ?string;
+  _manager: Promise<?string> | ?string;
+
   web3Utils: Utils;
   web3Contracts: Contracts;
   indexContract: Object;
@@ -64,13 +64,13 @@ class OnChainHotel implements HotelInterface {
     this.onChainDataset = RemotelyBackedDataset.createInstance();
     this.onChainDataset.bindProperties({
       fields: {
-        dataUri: {
+        _dataUri: {
           remoteGetter: async (): Promise<?string> => {
             return (await this.__getContractInstance()).methods.dataUri().call();
           },
           remoteSetter: this.__editInfoOnChain.bind(this),
         },
-        manager: {
+        _manager: {
           remoteGetter: async (): Promise<?string> => {
             return (await this.__getContractInstance()).methods.manager().call();
           },
@@ -118,6 +118,53 @@ class OnChainHotel implements HotelInterface {
     })();
   }
 
+  get dataUri (): Promise<?string> | ?string {
+    if (!this._dataUri) {
+      return;
+    }
+
+    return (async () => {
+      const dataUri = await this._dataUri;
+      return dataUri;
+    })();
+  }
+
+  set dataUri (newDataUri: Promise<?string> | ?string) {
+    if (!newDataUri) {
+      throw new Error(
+        'Cannot update hotel: Cannot set dataUri when it is not provided'
+      );
+    }
+    if (typeof newDataUri === 'string' && !newDataUri.match(/([a-z]+):\/\//)) {
+      throw new Error(
+        'Cannot update hotel: Cannot set dataUri with invalid format'
+      );
+    }
+
+    this._dataUri = newDataUri;
+  }
+
+  get manager (): Promise<?string> | ?string {
+    if (!this._manager) {
+      return;
+    }
+
+    return (async () => {
+      const manager = await this._manager;
+      return manager;
+    })();
+  }
+
+  set manager (newManager: Promise<?string> | ?string) {
+    if (!newManager) {
+      throw new Error('Cannot update hotel: Cannot update hotel without manager');
+    }
+    if (this.address) {
+      throw new Error('Cannot update hotel: Cannot set manager when hotel is deployed');
+    }
+    this._manager = newManager;
+  }
+
   /**
    * Update manager and dataUri properties. dataUri can never be nulled. Manager
    * can never be nulled. Manager can be changed only for an un-deployed
@@ -125,12 +172,8 @@ class OnChainHotel implements HotelInterface {
    * @param {HotelOnChainDataInterface} newData
    */
   async setLocalData (newData: HotelOnChainDataInterface): Promise<void> {
-    if (newData.manager && !this.address) {
-      this.manager = newData.manager;
-    }
-    if (newData.dataUri) {
-      this.dataUri = newData.dataUri;
-    }
+    this.manager = newData.manager;
+    this.dataUri = newData.dataUri;
   }
 
   /**
@@ -238,9 +281,6 @@ class OnChainHotel implements HotelInterface {
   async updateOnChainData (wallet: WalletInterface, transactionOptions: TransactionOptionsInterface): Promise<Array<string>> {
     // pre-check if contract is available at all and fail fast
     await this.__getContractInstance();
-    if (!(await this.dataUri)) {
-      throw new Error('Cannot set dataUri when it is not provided');
-    }
     // We have to clone options for each dataset as they may get modified
     // along the way
     return this.onChainDataset.updateRemoteData(wallet, Object.assign({}, transactionOptions));
