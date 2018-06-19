@@ -110,7 +110,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
       }
     });
 
-    it('should never invalid url', async () => {
+    it('should never set invalid url', async () => {
       try {
         const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
         await provider.setLocalData({ url: validUrl, manager: validManager });
@@ -131,7 +131,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
         await provider.setLocalData({ manager: 'another-manager', url: validUrl });
       } catch (e) {
         assert.match(e.message, /cannot update hotel/i);
-        assert.match(e.message, /cannot set manager when it is deployed/i);
+        assert.match(e.message, /Cannot set manager when hotel is deployed/i);
       }
     });
 

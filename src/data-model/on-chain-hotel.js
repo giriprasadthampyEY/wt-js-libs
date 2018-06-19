@@ -120,7 +120,9 @@ class OnChainHotel implements HotelInterface {
   }
 
   get url (): Promise<?string> | ?string {
-    if (!this._url) return;
+    if (!this._url) {
+      return;
+    }
 
     return (async () => {
       const url = await this._url;
@@ -144,7 +146,9 @@ class OnChainHotel implements HotelInterface {
   }
 
   get manager (): Promise<?string> | ?string {
-    if (!this._manager) return;
+    if (!this._manager) {
+      return;
+    }
 
     return (async () => {
       const manager = await this._manager;
@@ -157,7 +161,7 @@ class OnChainHotel implements HotelInterface {
       throw new Error('Cannot update hotel: Cannot update hotel without manager');
     }
     if (this.address) {
-      throw new Error('Cannot update hotel: cannot set manager when it is deployed');
+      throw new Error('Cannot update hotel: Cannot set manager when hotel is deployed');
     }
     this._manager = newManager;
   }
