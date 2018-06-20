@@ -13,6 +13,11 @@ describe('WTLibs.StoragePointer', () => {
             return new InMemoryAdapter();
           },
         },
+        'bzz-raw': {
+          create: () => {
+            return new InMemoryAdapter();
+          },
+        },
       },
     });
   });
@@ -104,6 +109,13 @@ describe('WTLibs.StoragePointer', () => {
     } catch (e) {
       assert.match(e.message, /unsupported data storage type/i);
     }
+  });
+
+  it('should not panic on schema with a dash in it', async () => {
+    const pointer = StoragePointer.createInstance('bzz-raw://url', ['some', 'fields']);
+    assert.isUndefined(pointer.__adapter);
+    await pointer.contents.some;
+    assert.isDefined(pointer.__adapter);
   });
 
   it('should recursively instantiate another StoragePointer', async () => {

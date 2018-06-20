@@ -110,7 +110,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
       }
     });
 
-    it('should never set invalid url', async () => {
+    it('should never set invalid dataUri', async () => {
       try {
         const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
         await provider.setLocalData({ dataUri: validUri, manager: validManager });
@@ -120,6 +120,14 @@ describe('WTLibs.data-model.OnChainHotel', () => {
         assert.match(e.message, /cannot update hotel/i);
         assert.match(e.message, /cannot set dataUri with invalid format/i);
       }
+    });
+
+    it('should allow dash in dataUri', async () => {
+      const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
+      await provider.setLocalData({ dataUri: validUri, manager: validManager });
+      assert.equal(await provider.dataUri, validUri);
+      await provider.setLocalData({ dataUri: 'bzz-raw://valid-url', manager: validManager });
+      assert.equal(await provider.dataUri, 'bzz-raw://valid-url');
     });
 
     it('should set manager only when not yet deployed', async () => {
