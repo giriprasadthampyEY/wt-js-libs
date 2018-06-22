@@ -154,7 +154,7 @@ class StoragePointer {
    * from `json://some-data`, detects `json`.
    */
   _detectSchema (uri: string): ?string {
-    const matchResult = uri.match(/([a-z]+):\/\//i);
+    const matchResult = uri.match(/([a-z-]+):\/\//i);
     return matchResult ? matchResult[1] : null;
   }
 

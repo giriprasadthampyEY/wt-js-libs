@@ -135,7 +135,7 @@ class OnChainHotel implements HotelInterface {
         'Cannot update hotel: Cannot set dataUri when it is not provided'
       );
     }
-    if (typeof newDataUri === 'string' && !newDataUri.match(/([a-z]+):\/\//)) {
+    if (typeof newDataUri === 'string' && !newDataUri.match(/([a-z-]+):\/\//)) {
       throw new Error(
         'Cannot update hotel: Cannot set dataUri with invalid format'
       );
