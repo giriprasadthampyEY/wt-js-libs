@@ -45,10 +45,11 @@ const libs = WTLibs.createInstance({
 });
 const index = await libs.getWTIndex('0x...');
 const hotel = await index.getHotel('0x...');
+const dataIndex = await hotel.dataIndex;
 // Accessing off-chain data - url is actually stored on chain
-const hotelDescriptionUrl = await (await hotel.dataIndex).ref;
+const hotelDescriptionUrl = dataIndex.ref;
 // This data is fetched from some off-chain storage
-const hotelDescription = await (await hotel.dataIndex).contents.description;
+const hotelDescription = await dataIndex.contents.description;
 const hotelName = await hotelDescription.contents.name;
 ```
 
@@ -61,6 +62,8 @@ The current documentation can be rendered by running `npm run docs`
 **Existing implementations**
 
 - [In memory](https://github.com/windingtree/off-chain-adapter-in-memory) - Example basic implementation which is not very useful, but should be enough for quick hacking or testing
+- [Swarm](https://github.com/windingtree/off-chain-adapter-swarm) - Uses Ethereum Swarm for off-chain storage.
+- [HTTPS](https://github.com/windingtree/off-chain-adapter-http) - Retrieves data from arbitrary HTTPS locations.
 
 #### Developing your own off-chain data adapter
 
