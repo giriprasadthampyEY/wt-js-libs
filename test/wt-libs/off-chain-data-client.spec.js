@@ -25,6 +25,22 @@ describe('WTLibs.OffChainDataClient', () => {
     assert.isDefined(adapter._getHash);
   });
 
+  it('should be case insensitive', async () => {
+    const adapter = await OffChainDataClient.getAdapter('JSON');
+    assert.isDefined(adapter);
+    assert.isDefined(adapter._getHash);
+  });
+
+  it('should throw when adapter schemas are ambiguous', async () => {
+    assert.throws(() =>
+      OffChainDataClient.setup({
+        adapters: {
+          json: { create: () => { return new InMemoryAdapter(); } },
+          JSON: { create: () => { return new InMemoryAdapter(); } },
+        },
+      }), /Adapter declared twice/);
+  });
+
   it('should throw when no adapter is found for given schema', async () => {
     try {
       await OffChainDataClient.getAdapter('non-existent');
