@@ -31,9 +31,16 @@ class OffChainDataClient {
    */
   static setup (options: OffChainDataClientOptionsType) {
     offChainDataOptions = options || {};
-    if (!offChainDataOptions.adapters) {
-      offChainDataOptions.adapters = {};
+    let adapters = {};
+    // Convert all adapter keys (i.e. URL schemes) to lowercase.
+    for (let key of Object.keys(offChainDataOptions.adapters || {})) {
+      let normalizedKey = key.toLowerCase();
+      if (normalizedKey in adapters) {
+        throw new Error(`Adapter declared twice: ${normalizedKey}`);
+      }
+      adapters[normalizedKey] = offChainDataOptions.adapters[key];
     }
+    offChainDataOptions.adapters = adapters;
   }
 
   /**
@@ -50,6 +57,7 @@ class OffChainDataClient {
    * @throws {Error} when schema is not defined or adapter for this schema does not exist
    */
   static async getAdapter (schema: ?string): Promise<OffChainDataAdapterInterface> {
+    schema = schema && schema.toLowerCase();
     if (!schema || !offChainDataOptions.adapters[schema]) {
       throw new Error(`Unsupported data storage type: ${schema || 'null'}`);
     }
