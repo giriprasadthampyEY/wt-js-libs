@@ -147,7 +147,7 @@ class StoragePointer {
    * swap the StoragePointer implementation during runtime.
    */
   async _genericGetter (field: string): StoragePointer | Object {
-    if (! this.__downloaded) {
+    if (!this.__downloaded) {
       await this._downloadFromStorage();
     }
     if (this.__storagePointers[field]) {
@@ -180,15 +180,15 @@ class StoragePointer {
    * Sets the internal properties (__data, __storagePointers)
    * based on the data retrieved from the storage.
    */
-  _initFromStorage (data: Object): void {
+  _initFromStorage (data: Object) {
     this.__data = data;
     this.__storagePointers = {};
     for (let i = 0; i < this.__fields.length; i++) {
       const fieldDef = this.__fields[i];
       if (fieldDef.isStoragePointer) {
-        if (! this.__data[fieldDef.name] || typeof this.__data[fieldDef.name] !== 'string') {
-            const value = this.__data[fieldDef.name] ? (this.__data[fieldDef.name]).toString() : 'undefined';
-            throw new Error(`Cannot access ${fieldDef.name} under value ${value} which does not appear to be a valid reference.`);
+        if (!this.__data[fieldDef.name] || typeof this.__data[fieldDef.name] !== 'string') {
+          const value = this.__data[fieldDef.name] ? (this.__data[fieldDef.name]).toString() : 'undefined';
+          throw new Error(`Cannot access ${fieldDef.name} under value ${value} which does not appear to be a valid reference.`);
         }
         this.__storagePointers[fieldDef.name] = StoragePointer.createInstance(this.__data[fieldDef.name], fieldDef.fields || []);
       }
@@ -200,7 +200,7 @@ class StoragePointer {
    * and uses it to initialize the internal state.
    */
   async _downloadFromStorage (): Promise<void> {
-    if (! this.__downloading) {
+    if (!this.__downloading) {
       this.__downloading = (async () => {
         const adapter = await this._getOffChainDataClient();
         const data = (await adapter.download(this.ref)) || {};
