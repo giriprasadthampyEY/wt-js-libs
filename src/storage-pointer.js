@@ -120,6 +120,22 @@ class StoragePointer {
   }
 
   /**
+   * Reset the storage pointer, thus forcing it to lazily
+   * download the data again.
+   *
+   * Usable when the the off-chain data might have changed since
+   * the last query and the most recent version of it is needed.
+   */
+  async reset (): Promise<void> {
+    // If the download is still in progress, wait for it to
+    // finish to reduce race condition possibilities.
+    await (this.__downloading || Promise.resolve());
+    // Force repeated download upon the next contents access.
+    delete this.__downloading;
+    this.__downloaded = false;
+  }
+
+  /**
    * Lazy data getter. The contents file gets downloaded only
    * once any data field is accessed for the first time. Also
    * the recursive `StoragePointer`s are created here only
@@ -180,8 +196,8 @@ class StoragePointer {
   }
 
   /**
-   * Gets the data document via `OffChainDataAdapterInterface`.
-   * If nothing is returned, might return an empty object.
+   * Gets the data document via `OffChainDataAdapterInterface`
+   * and uses it to initialize the internal state.
    */
   async _downloadFromStorage (): Promise<void> {
     if (! this.__downloading) {
