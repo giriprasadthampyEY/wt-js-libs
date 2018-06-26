@@ -29,7 +29,7 @@ class OnChainHotel implements HotelInterface {
   onChainDataset: RemotelyBackedDataset;
 
   // Representation of data stored on dataUri
-  _dataIndex: StoragePointer;
+  _dataIndex: ?StoragePointer;
 
   /**
    * Create new configured instance.
@@ -140,6 +140,9 @@ class OnChainHotel implements HotelInterface {
         'Cannot update hotel: Cannot set dataUri with invalid format'
       );
     }
+    if (newDataUri !== this._dataUri) {
+      this._dataIndex = null;
+    }
 
     this._dataUri = newDataUri;
   }
@@ -172,8 +175,14 @@ class OnChainHotel implements HotelInterface {
    * @param {HotelOnChainDataInterface} newData
    */
   async setLocalData (newData: HotelOnChainDataInterface): Promise<void> {
-    this.manager = newData.manager;
-    this.dataUri = newData.dataUri;
+    const newManager = await newData.manager;
+    if (newManager) {
+      this.manager = newManager;
+    }
+    const newDataUri = await newData.dataUri;
+    if (newDataUri) {
+      this.dataUri = newDataUri;
+    }
   }
 
   /**
