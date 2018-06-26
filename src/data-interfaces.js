@@ -8,6 +8,41 @@ export interface HotelDataIndex {
 }
 
 /**
+ * Description of additional descriptive hotel data.
+ * @see https://github.com/windingtree/wt-js-libs/issues/125
+ */
+export interface HotelDescriptionInterface {
+  location?: Promise<?LocationInterface> | ?LocationInterface;
+  name: Promise<string> | string;
+  description: Promise<string> | string;
+  roomTypes?: Promise<?{ [id: string]: RoomTypeInterface }> | ?{ [id: string]: RoomTypeInterface };
+  contacts: Promise<ContactsInterface> | ContactsInterface;
+  address: Promise<AddressInterface> | AddressInterface;
+  timezone: Promise<string> | string;
+  currency: Promise<string> | string;
+  images?: Promise<?Array<string>> | ?Array<string>;
+  amenities?: Promise<?Array<string>> | ?Array<string>;
+  updatedAt: Promise<string> | string
+}
+
+export interface RoomTypeInterface {
+  id: Promise<string> | string;
+  name: Promise<string> | string;
+  description: Promise<string> | string;
+  totalQuantity: Promise<number> | number;
+  occupancy: Promise<OccupancyInterface> | OccupancyInterface;
+  amenities?: Promise<?Array<string>> | ?Array<string>;
+  images?: Promise<?Array<string>> | ?Array<string>;
+  updatedAt: Promise<?Date> | ?Date;
+  properties?: Promise<?Object> | ?Object
+}
+
+export interface OccupancyInterface {
+  min?: ?number;
+  max: number
+}
+
+/**
  * Generic GPS location.
  */
 export interface LocationInterface {
@@ -51,21 +86,4 @@ export interface AddressInterface {
   city?: Promise<string> | string;
   state?: Promise<?string> | ?string;
   country?: Promise<string> | string
-}
-
-/**
- * Description of additional descriptive hotel data.
- * @see https://github.com/windingtree/wt-js-libs/issues/125
- */
-export interface HotelDescriptionInterface {
-  name?: Promise<string> | string;
-  description?: Promise<string> | string;
-  contacts?: Promise<ContactsInterface> | ContactsInterface;
-  address?: Promise<AddressInterface> | AddressInterface;
-  location?: Promise<?LocationInterface> | ?LocationInterface;
-  timezone?: Promise<string> | string;
-  currency?: Promise<string> | string;
-  images?: Promise<?Array<string>> | ?Array<string>;
-  amenities?: Promise<?Array<string>> | ?Array<string>;
-  updatedAt: Promise<string> | string
 }

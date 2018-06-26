@@ -87,6 +87,40 @@ describe('WTLibs.data-model.OnChainHotel', () => {
       assert.equal(storagePointerSpy.callCount, 1);
       storagePointerSpy.restore();
     });
+
+    it('should drop current StoragePointer instance when dataUri changes via setLocalData', async () => {
+      const storagePointerSpy = sinon.spy(StoragePointer, 'createInstance');
+      const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub, 'fake-address');
+      provider.dataUri = 'json://something-new';
+      await provider.dataIndex;
+      assert.equal((await provider.dataIndex).ref, 'json://something-new');
+      assert.equal(storagePointerSpy.callCount, 1);
+      await provider.dataIndex;
+      assert.equal(storagePointerSpy.callCount, 1);
+      await provider.setLocalData({
+        dataUri: 'json://something-completely-different',
+      });
+      await provider.dataIndex;
+      assert.equal(storagePointerSpy.callCount, 2);
+      assert.equal((await provider.dataIndex).ref, 'json://something-completely-different');
+      storagePointerSpy.restore();
+    });
+
+    it('should drop current StoragePointer instance when dataUri changes via direct access', async () => {
+      const storagePointerSpy = sinon.spy(StoragePointer, 'createInstance');
+      const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub, 'fake-address');
+      provider.dataUri = 'json://something-new';
+      await provider.dataIndex;
+      assert.equal((await provider.dataIndex).ref, 'json://something-new');
+      assert.equal(storagePointerSpy.callCount, 1);
+      await provider.dataIndex;
+      assert.equal(storagePointerSpy.callCount, 1);
+      provider.dataUri = 'json://something-completely-different';
+      await provider.dataIndex;
+      assert.equal(storagePointerSpy.callCount, 2);
+      assert.equal((await provider.dataIndex).ref, 'json://something-completely-different');
+      storagePointerSpy.restore();
+    });
   });
 
   describe('setLocalData', () => {
