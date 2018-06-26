@@ -104,6 +104,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
         await provider.setLocalData({ dataUri: validUri, manager: validManager });
         assert.equal(await provider.dataUri, validUri);
         await provider.setLocalData({ dataUri: null, manager: validManager });
+        throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot update hotel/i);
         assert.match(e.message, /cannot set dataUri when it is not provided/i);
@@ -116,6 +117,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
         await provider.setLocalData({ dataUri: validUri, manager: validManager });
         assert.equal(await provider.dataUri, validUri);
         await provider.setLocalData({ dataUri: 'invalid-url', manager: validManager });
+        throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot update hotel/i);
         assert.match(e.message, /cannot set dataUri with invalid format/i);
@@ -137,6 +139,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
         assert.equal(await provider.manager, validManager);
         provider.address = '0xsomething';
         await provider.setLocalData({ manager: 'another-manager', dataUri: validUri });
+        throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot update hotel/i);
         assert.match(e.message, /Cannot set manager when hotel is deployed/i);
@@ -149,6 +152,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
         await provider.setLocalData({ manager: validManager, dataUri: validUri });
         assert.equal(await provider.manager, validManager);
         await provider.setLocalData({ manager: null, dataUri: validUri });
+        throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot set manager to null/i);
       }
