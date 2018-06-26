@@ -60,6 +60,7 @@ class StoragePointer {
   __data: ?{[string]: Object};
   __fields: Array<FieldDefType>;
   __adapter: OffChainDataAdapterInterface;
+  __downloading: ?Promise<void>;
 
   /**
    * Returns a new instance of StoragePointer.
@@ -119,6 +120,22 @@ class StoragePointer {
   }
 
   /**
+   * Reset the storage pointer, thus forcing it to lazily
+   * download the data again.
+   *
+   * Usable when the the off-chain data might have changed since
+   * the last query and the most recent version of it is needed.
+   */
+  async reset (): Promise<void> {
+    // If the download is still in progress, wait for it to
+    // finish to reduce race condition possibilities.
+    await (this.__downloading || Promise.resolve());
+    // Force repeated download upon the next contents access.
+    delete this.__downloading;
+    this.__downloaded = false;
+  }
+
+  /**
    * Lazy data getter. The contents file gets downloaded only
    * once any data field is accessed for the first time. Also
    * the recursive `StoragePointer`s are created here only
@@ -131,17 +148,7 @@ class StoragePointer {
    */
   async _genericGetter (field: string): StoragePointer | Object {
     if (!this.__downloaded) {
-      this.__data = await this._downloadFromStorage();
-      for (let i = 0; i < this.__fields.length; i++) {
-        const fieldDef = this.__fields[i];
-        if (fieldDef.isStoragePointer) {
-          if (!this.__data[fieldDef.name] || typeof this.__data[fieldDef.name] !== 'string') {
-            const value = this.__data[fieldDef.name] ? (this.__data[fieldDef.name]).toString() : 'undefined';
-            throw new Error(`Cannot access ${fieldDef.name} under value ${value} which does not appear to be a valid reference.`);
-          }
-          this.__storagePointers[fieldDef.name] = StoragePointer.createInstance(this.__data[fieldDef.name], fieldDef.fields || []);
-        }
-      }
+      await this._downloadFromStorage();
     }
     if (this.__storagePointers[field]) {
       return this.__storagePointers[field];
@@ -170,14 +177,38 @@ class StoragePointer {
   }
 
   /**
-   * Gets the data document via `OffChainDataAdapterInterface`.
-   * If nothing is returned, might return an empty object.
+   * Sets the internal properties (__data, __storagePointers)
+   * based on the data retrieved from the storage.
    */
-  async _downloadFromStorage (): Promise<{[string]: Object}> {
-    const adapter = await this._getOffChainDataClient();
-    const result = await adapter.download(this.ref);
-    this.__downloaded = true;
-    return result || {};
+  _initFromStorage (data: Object) {
+    this.__data = data;
+    this.__storagePointers = {};
+    for (let i = 0; i < this.__fields.length; i++) {
+      const fieldDef = this.__fields[i];
+      if (fieldDef.isStoragePointer) {
+        if (!this.__data[fieldDef.name] || typeof this.__data[fieldDef.name] !== 'string') {
+          const value = this.__data[fieldDef.name] ? (this.__data[fieldDef.name]).toString() : 'undefined';
+          throw new Error(`Cannot access ${fieldDef.name} under value ${value} which does not appear to be a valid reference.`);
+        }
+        this.__storagePointers[fieldDef.name] = StoragePointer.createInstance(this.__data[fieldDef.name], fieldDef.fields || []);
+      }
+    }
+  }
+
+  /**
+   * Gets the data document via `OffChainDataAdapterInterface`
+   * and uses it to initialize the internal state.
+   */
+  async _downloadFromStorage (): Promise<void> {
+    if (!this.__downloading) {
+      this.__downloading = (async () => {
+        const adapter = await this._getOffChainDataClient();
+        const data = (await adapter.download(this.ref)) || {};
+        this._initFromStorage(data);
+        this.__downloaded = true;
+      })();
+    }
+    return this.__downloading;
   }
 }
 

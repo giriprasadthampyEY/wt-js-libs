@@ -218,4 +218,34 @@ describe('WTLibs.StoragePointer', () => {
       assert.match(e.message, /unsupported data storage type/i);
     }
   });
+
+  describe('reset()', () => {
+    it('should force repeated download', async () => {
+      const pointer = StoragePointer.createInstance('json://url', ['some', 'fields']);
+      const adapter = await pointer._getOffChainDataClient();
+      const dldSpy = sinon.spy(adapter, 'download');
+      assert.equal(dldSpy.callCount, 0);
+      await pointer.contents.some;
+      assert.equal(dldSpy.callCount, 1);
+      await pointer.contents.fields;
+      assert.equal(dldSpy.callCount, 1);
+      await pointer.reset();
+      assert.equal(dldSpy.callCount, 1);
+      await pointer.contents.some;
+      assert.equal(dldSpy.callCount, 2);
+    });
+
+    it('should allow repeated reset', async () => {
+      const pointer = StoragePointer.createInstance('json://url', ['some', 'fields']);
+      const adapter = await pointer._getOffChainDataClient();
+      const dldSpy = sinon.spy(adapter, 'download');
+      await pointer.contents.some;
+      assert.equal(dldSpy.callCount, 1);
+      await pointer.reset();
+      await pointer.reset();
+      await pointer.reset();
+      await pointer.contents.some;
+      assert.equal(dldSpy.callCount, 2);
+    });
+  });
 });
