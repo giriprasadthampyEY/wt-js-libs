@@ -138,21 +138,17 @@ describe('WTLibs.StoragePointer', () => {
   });
 
   it('should not panic if recursive StoragePointer does not have fields defined', async () => {
-    try {
-      const pointer = StoragePointer.createInstance('json://url', [{
-        name: 'sp',
-        isStoragePointer: true,
-      }]);
-      sinon.stub(pointer, '_getOffChainDataClient').resolves({
-        download: sinon.stub().returns({
-          'sp': 'json://point',
-        }),
-      });
-      assert.equal(pointer.ref, 'json://url');
-      await pointer.contents.sp;
-    } catch (e) {
-      throw new Error('should have never been called');
-    }
+    const pointer = StoragePointer.createInstance('json://url', [{
+      name: 'sp',
+      isStoragePointer: true,
+    }]);
+    sinon.stub(pointer, '_getOffChainDataClient').resolves({
+      download: sinon.stub().returns({
+        'sp': 'json://point',
+      }),
+    });
+    assert.equal(pointer.ref, 'json://url');
+    await pointer.contents.sp;
   });
 
   it('should throw if recursive StoragePointer cannot be set up due to null pointer value', async () => {

@@ -201,8 +201,8 @@ describe('WTLibs usage', () => {
       try {
         const newUri = 'json://another-random-hash';
         const hotel = await index.getHotel(hotelAddress);
-        hotel.address = undefined;
         hotel.dataUri = newUri;
+        hotel.address = undefined;
         await index.updateHotel(wallet, hotel);
         throw new Error('should not have been called');
       } catch (e) {
