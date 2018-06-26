@@ -133,16 +133,11 @@ describe('WTLibs.data-model.OnChainHotel', () => {
     });
 
     it('should never null dataUri', async () => {
-      try {
-        const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
-        await provider.setLocalData({ dataUri: validUri, manager: validManager });
-        assert.equal(await provider.dataUri, validUri);
-        await provider.setLocalData({ dataUri: null, manager: validManager });
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot update hotel/i);
-        assert.match(e.message, /cannot set dataUri when it is not provided/i);
-      }
+      const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
+      await provider.setLocalData({ dataUri: validUri, manager: validManager });
+      assert.equal(await provider.dataUri, validUri);
+      await provider.setLocalData({ dataUri: null, manager: validManager });
+      assert.equal(await provider.dataUri, validUri);
     });
 
     it('should never set invalid dataUri', async () => {
@@ -181,15 +176,11 @@ describe('WTLibs.data-model.OnChainHotel', () => {
     });
 
     it('should never null manager', async () => {
-      try {
-        const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
-        await provider.setLocalData({ manager: validManager, dataUri: validUri });
-        assert.equal(await provider.manager, validManager);
-        await provider.setLocalData({ manager: null, dataUri: validUri });
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot set manager to null/i);
-      }
+      const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
+      await provider.setLocalData({ manager: validManager, dataUri: validUri });
+      assert.equal(await provider.manager, validManager);
+      await provider.setLocalData({ manager: null, dataUri: validUri });
+      assert.equal(await provider.manager, validManager);
     });
   });
 
