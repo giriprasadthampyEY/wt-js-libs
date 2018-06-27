@@ -2,7 +2,6 @@
 
 import type { TxReceiptInterface, TxInterface } from './interfaces';
 import Web3 from 'web3';
-import BigNumber from 'bignumber.js';
 import ethJsUtil from 'ethereumjs-util';
 
 /**
@@ -30,7 +29,8 @@ class Utils {
   }
 
   /**
-   * Is address a zero address? Uses a bignumber.js test
+   * Is address a zero address? Uses a string comparison.
+   * Returns true also for strings that are not a valid address.
    *
    * @return {boolean}
    */
@@ -38,8 +38,7 @@ class Utils {
     if (!address || !this.web3.utils.isAddress(address)) {
       return true;
     }
-    const addrAsBn = new BigNumber(address);
-    return addrAsBn.isZero();
+    return String(address) === '0x0000000000000000000000000000000000000000';
   }
 
   /**
