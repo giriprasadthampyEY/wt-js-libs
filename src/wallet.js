@@ -1,6 +1,5 @@
 // @flow
 import Web3 from 'web3';
-import ethJsUtil from 'ethereumjs-util';
 import type { WalletInterface, TxReceiptInterface, KeystoreV3Interface, TransactionDataInterface } from './interfaces';
 
 /**
@@ -54,7 +53,7 @@ class Wallet implements WalletInterface {
     if (!this.__jsonWallet || !this.__jsonWallet.address) {
       throw new Error('Cannot get address from a non existing keystore.');
     }
-    return ethJsUtil.toChecksumAddress(this.__jsonWallet.address);
+    return this.web3.utils.toChecksumAddress(this.__jsonWallet.address);
   }
 
   /**

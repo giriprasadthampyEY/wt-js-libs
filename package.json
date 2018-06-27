@@ -40,11 +40,8 @@
     "@windingtree/lif-token": "^0.1.2-erc827",
     "@windingtree/wt-contracts": "^0.2.2",
     "bignumber.js": "^7.2.1",
-    "ethereumjs-util": "^5.2.0",
     "lodash.clonedeep": "^4.5.0",
-    "moment": "^2.22.2",
-    "number-to-bn": "^1.7.0",
-    "truffle-contract": "^3.0.6",
+    "rlp": "^2.0.0",
     "web3": "^1.0.0-beta.34"
   },
   "devDependencies": {
@@ -84,6 +81,7 @@
     "rimraf": "^2.6.2",
     "sinon": "^6.0.1",
     "truffle": "^4.1.12",
+    "truffle-contract": "^3.0.6",
     "web3-eth-abi": "^1.0.0-beta.34",
     "webpack": "^4.12.2",
     "webpack-bundle-size-analyzer": "^2.7.0",
