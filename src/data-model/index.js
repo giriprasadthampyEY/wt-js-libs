@@ -19,7 +19,7 @@ import Wallet from '../wallet';
  */
 export type DataModelOptionsType = {
   // URL of currently used RPC provider for Web3.
-  provider?: string | Object;
+  provider?: string | Object,
   // Gas coefficient that is used as a multiplier when setting
   // a transaction gas.
   gasCoefficient?: number
@@ -101,7 +101,7 @@ class DataModel implements DataModelInterface {
         maxBlockAge: Math.max(...(resultsValues.map((a) => a.blockAge))),
         // TODO Possibly improve error codes
         // https://ethereum.stackexchange.com/questions/28077/how-do-i-detect-a-failed-transaction-after-the-byzantium-fork-as-the-revert-opco
-        allPassed: Math.min(...(resultsValues.map((a) => parseInt(a.raw.status)))) === 1 && txHashes.length === resultsValues.length,
+        allPassed: (resultsValues.map((a) => a.raw.status)).every((x) => x) && txHashes.length === resultsValues.length,
       },
       results: results,
     };

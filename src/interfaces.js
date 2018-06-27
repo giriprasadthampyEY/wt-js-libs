@@ -181,7 +181,7 @@ export interface TxReceiptInterface {
   gasUsed: number;
   logs: Array<RawLogRecordInterface>;
   // https://github.com/ethereum/EIPs/pull/658
-  status: number
+  status: boolean
 }
 
 /**

@@ -1,6 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import Utils from '../../src/utils';
+import Web3 from 'web3';
 
 describe('WTLibs.Utils', () => {
   let utils;
@@ -11,15 +12,22 @@ describe('WTLibs.Utils', () => {
       eth: {
         getTransactionCount: sinon.stub().returns(6),
       },
+      utils: {
+        isAddress: sinon.stub().returns(true),
+      },
     });
   });
 
   describe('isZeroAddress', () => {
     it('should behave as expected', () => {
       assert.equal(utils.isZeroAddress(), true);
-      assert.equal(utils.isZeroAddress('random-address'), true);
       assert.equal(utils.isZeroAddress('0x0000000000000000000000000000000000000000'), true);
       assert.equal(utils.isZeroAddress('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA'), false);
+    });
+
+    it('should catch malformed addresses', () => {
+      const localUtils = Utils.createInstance(3, new Web3());
+      assert.equal(localUtils.isZeroAddress('random-address'), true);
     });
   });
 
