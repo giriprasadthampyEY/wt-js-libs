@@ -13,7 +13,7 @@ import OffChainDataClient from './off-chain-data-client';
  * @type WtLibsOptionsType
  */
 type WtLibsOptionsType = {
-  dataModelOptions: DataModelOptionsType;
+  dataModelOptions: DataModelOptionsType,
   offChainDataOptions: OffChainDataClientOptionsType
 };
 

@@ -13,7 +13,7 @@ import StoragePointer from './storage-pointer';
  *   use these ids to check on the asynchronous operation state.
  */
 export interface AddHotelResponseInterface {
-  address: ?string;
+  address: ?string,
   transactionIds: Array<string>
 }
 
@@ -27,8 +27,8 @@ export interface AddHotelResponseInterface {
  * that is used internally to store data.
  */
 export interface HotelOnChainDataInterface {
-  address: Promise<?string> | ?string;
-  manager: Promise<?string> | ?string;
+  address: Promise<?string> | ?string,
+  manager: Promise<?string> | ?string,
   dataUri: Promise<?string> | ?string
 }
 
@@ -41,9 +41,9 @@ export interface HotelOnChainDataInterface {
  * sending a transaction.
  */
 export interface TransactionOptionsInterface {
-  from: string;
-  to?: string;
-  gas?: number;
+  from: string,
+  to?: string,
+  gas?: number,
   value?: number | string | BigNumber
 }
 
@@ -55,12 +55,12 @@ export interface TransactionOptionsInterface {
  *
  */
 export interface HotelInterface extends HotelOnChainDataInterface {
-  +dataIndex: Promise<StoragePointer>;
+  +dataIndex: Promise<StoragePointer>,
 
-  toPlainObject(): Promise<Object>;
-  setLocalData(newData: HotelOnChainDataInterface): Promise<void>;
-  createOnChainData(wallet: WalletInterface, transactionOptions: TransactionOptionsInterface): Promise<Array<string>>;
-  updateOnChainData(wallet: WalletInterface, transactionOptions: TransactionOptionsInterface): Promise<Array<string>>;
+  toPlainObject(): Promise<Object>,
+  setLocalData(newData: HotelOnChainDataInterface): Promise<void>,
+  createOnChainData(wallet: WalletInterface, transactionOptions: TransactionOptionsInterface): Promise<Array<string>>,
+  updateOnChainData(wallet: WalletInterface, transactionOptions: TransactionOptionsInterface): Promise<Array<string>>,
   removeOnChainData(wallet: WalletInterface, transactionOptions: TransactionOptionsInterface): Promise<Array<string>>
 }
 
@@ -69,11 +69,11 @@ export interface HotelInterface extends HotelOnChainDataInterface {
  * necessary for interaction with the hotels.`
  */
 export interface WTIndexInterface {
-  addHotel(wallet: WalletInterface, hotel: HotelOnChainDataInterface): Promise<AddHotelResponseInterface>;
-  getHotel(address: string): Promise<?HotelInterface>;
-  getAllHotels(): Promise<Array<HotelInterface>>;
+  addHotel(wallet: WalletInterface, hotel: HotelOnChainDataInterface): Promise<AddHotelResponseInterface>,
+  getHotel(address: string): Promise<?HotelInterface>,
+  getAllHotels(): Promise<Array<HotelInterface>>,
   // It is possible that this operation generates multiple transactions in the future
-  updateHotel(wallet: WalletInterface, hotel: HotelInterface): Promise<Array<string>>;
+  updateHotel(wallet: WalletInterface, hotel: HotelInterface): Promise<Array<string>>,
   // It is possible that this operation generates multiple transactions in the future
   removeHotel(wallet: WalletInterface, hotel: HotelInterface): Promise<Array<string>>
 }
@@ -83,9 +83,9 @@ export interface WTIndexInterface {
  */
 export interface OffChainDataAdapterInterface {
   // Upload new dataset to an off-chain storage
-  upload(data: {[string]: Object}): Promise<string>;
+  upload(data: {[string]: Object}): Promise<string>,
   // Change data on given uri
-  update(uri: string, data: {[string]: Object}): Promise<string>;
+  update(uri: string, data: {[string]: Object}): Promise<string>,
   // Download content from given uri
   download(uri: string): Promise<?{[string]: Object}>
 }
@@ -94,8 +94,8 @@ export interface OffChainDataAdapterInterface {
  * Formalization of DataModel's public interface.
  */
 export interface DataModelInterface {
-  getWindingTreeIndex(address: string): Promise<WTIndexInterface>;
-  getTransactionsStatus(transactionHashes: Array<string>): Promise<AdaptedTxResultsInterface>;
+  getWindingTreeIndex(address: string): Promise<WTIndexInterface>,
+  getTransactionsStatus(transactionHashes: Array<string>): Promise<AdaptedTxResultsInterface>,
   createWallet(jsonWallet: Object): Promise<WalletInterface>
 }
 
@@ -105,13 +105,13 @@ export interface DataModelInterface {
  * Sometimes you might need the raw data to do some additional processing.
  */
 export interface RawLogRecordInterface {
-  address: string;
-  data: string;
-  topics: Array<string>;
-  logIndex: number;
-  transactionIndex: number;
-  transactionHash: number;
-  blockHash: number;
+  address: string,
+  data: string,
+  topics: Array<string>,
+  logIndex: number,
+  transactionIndex: number,
+  transactionHash: number,
+  blockHash: number,
   blockNumber: number
 }
 
@@ -121,11 +121,11 @@ export interface RawLogRecordInterface {
  * and act upon.
  */
 export interface DecodedLogRecordInterface {
-  address: string;
-  event: string;
+  address: string,
+  event: string,
   attributes: Array<{
-    name: string;
-    type: string;
+    name: string,
+    type: string,
     value: string
   }>
 }
@@ -135,13 +135,13 @@ export interface DecodedLogRecordInterface {
  * https://web3js.readthedocs.io/en/1.0/web3-eth-accounts.html#signtransaction
  */
 export interface TransactionDataInterface {
-  nonce?: string | number;
-  chainId?: string;
-  from?: string;
-  to: string;
-  data: string;
-  value?: string;
-  gasPrice?: string;
+  nonce?: string | number,
+  chainId?: string,
+  from?: string,
+  to: string,
+  data: string,
+  value?: string,
+  gasPrice?: string,
   gas: string | number
 }
 
@@ -150,16 +150,16 @@ export interface TransactionDataInterface {
  * for example http://web3js.readthedocs.io/en/1.0/web3-eth.html#gettransaction
  */
 export interface TxInterface {
-  hash?: string;
-  nonce?: string | number;
-  blockHash?: string;
-  blockNumber?: number;
-  transactionIndex?: number;
-  from?: string;
-  to?: string;
-  value?: string;
-  gasPrice?: string;
-  gas?: number;
+  hash?: string,
+  nonce?: string | number,
+  blockHash?: string,
+  blockNumber?: number,
+  transactionIndex?: number,
+  from?: string,
+  to?: string,
+  value?: string,
+  gasPrice?: string,
+  gas?: number,
   input?: string
 }
 
@@ -169,17 +169,17 @@ export interface TxInterface {
  * This raw data might be sometimes needed for additional processing.
  */
 export interface TxReceiptInterface {
-  transactionHash: string;
-  blockNumber: number;
-  blockHash: string;
-  transactionIndex: number;
-  from: string;
-  to: string;
+  transactionHash: string,
+  blockNumber: number,
+  blockHash: string,
+  transactionIndex: number,
+  from: string,
+  to: string,
   // For some reason ?string does not work here
-  contractAddress: any; // eslint-disable-line flowtype/no-weak-types
-  cumulativeGasUsed: number;
-  gasUsed: number;
-  logs: Array<RawLogRecordInterface>;
+  contractAddress: any, // eslint-disable-line flowtype/no-weak-types
+  cumulativeGasUsed: number,
+  gasUsed: number,
+  logs: Array<RawLogRecordInterface>,
   // https://github.com/ethereum/EIPs/pull/658
   status: boolean
 }
@@ -189,9 +189,9 @@ export interface TxReceiptInterface {
  * about the transaction status, its age and decoded logs.
  */
 export interface AdaptedTxResultInterface {
-  transactionHash: string;
-  blockAge: number;
-  decodedLogs: Array<DecodedLogRecordInterface>;
+  transactionHash: string,
+  blockAge: number,
+  decodedLogs: Array<DecodedLogRecordInterface>,
   raw: TxReceiptInterface
 }
 
@@ -203,12 +203,12 @@ export interface AdaptedTxResultInterface {
  */
 export interface AdaptedTxResultsInterface {
   meta: {
-    total: number;
-    processed: number;
-    minBlockAge: number;
-    maxBlockAge: number;
+    total: number,
+    processed: number,
+    minBlockAge: number,
+    maxBlockAge: number,
     allPassed: boolean
-  };
+  },
   results?: {[string]: AdaptedTxResultInterface}
 }
 
@@ -224,10 +224,10 @@ export interface AdaptedTxResultsInterface {
  * `destroy` on the other hand should clean all data that may be exploited from memory
  */
 export interface WalletInterface {
-  unlock(password: string): void;
-  signAndSendTransaction(transactionData: TransactionDataInterface, onReceipt: ?(receipt: TxReceiptInterface) => void): Promise<string>;
-  lock(): void;
-  destroy(): void;
+  unlock(password: string): void,
+  signAndSendTransaction(transactionData: TransactionDataInterface, onReceipt: ?(receipt: TxReceiptInterface) => void): Promise<string>,
+  lock(): void,
+  destroy(): void,
   getAddress(): string
 }
 
@@ -239,21 +239,21 @@ export interface WalletInterface {
  * Specification: https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition
  */
 export interface KeystoreV3Interface {
-  version: number;
-  id: string;
-  address: string;
+  version: number,
+  id: string,
+  address: string,
   crypto: {
-    ciphertext: string;
+    ciphertext: string,
     cipherparams: {
       iv: string
     },
-    cipher: string;
-    kdf: string;
+    cipher: string,
+    kdf: string,
     kdfparams: {
-      dklen: number;
-      salt: string;
-      n: number;
-      r: number;
+      dklen: number,
+      salt: string,
+      n: number,
+      r: number,
       p: number
     },
     mac: string
