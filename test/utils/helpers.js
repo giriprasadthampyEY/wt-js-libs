@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import isFunction from 'lodash.isfunction';
 import sinon from 'sinon';
 
 function stubPromiEvent (sendSetup = { txHash: true, receipt: true, error: false, catch: false }) {
@@ -26,7 +26,7 @@ function stubPromiEvent (sendSetup = { txHash: true, receipt: true, error: false
 function stubContractMethodResult (callResult, sendSetup = { txHash: true, receipt: true, error: false, catch: false }, estimatedGas = 33) {
   let methodParams = arguments;
   let finalCallResult = callResult;
-  if (_.isFunction(callResult)) {
+  if (isFunction(callResult)) {
     finalCallResult = callResult({
       methodParams: methodParams,
       callParams: arguments,

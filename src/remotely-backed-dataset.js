@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import cloneDeep from 'lodash.clonedeep';
 
 /**
  * Dataset ready to use various strategies for storing the data
@@ -237,7 +237,7 @@ class RemotelyBackedDataset {
         let setterHashCode = this.__hashCode(remoteSetter.toString());
         if (!remoteSettersHashCodes[setterHashCode]) {
           remoteSettersHashCodes[setterHashCode] = true;
-          remoteSetters.push(remoteSetter(wallet, _.cloneDeep(transactionOptions)).then((result) => {
+          remoteSetters.push(remoteSetter(wallet, cloneDeep(transactionOptions)).then((result) => {
             this.__fieldStates[this.__fieldKeys[i]] = 'synced';
             return result;
           }));
