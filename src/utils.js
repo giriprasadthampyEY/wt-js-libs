@@ -35,13 +35,11 @@ class Utils {
    * @return {boolean}
    */
   isZeroAddress (address: string): boolean {
-    if (!address || !this.web3.utils.isAddress(address)) { return true; }
-    try {
-      const addrAsBn = new BigNumber(address);
-      return addrAsBn.isZero();
-    } catch (e) {
+    if (!address || !this.web3.utils.isAddress(address)) {
       return true;
     }
+    const addrAsBn = new BigNumber(address);
+    return addrAsBn.isZero();
   }
 
   /**
