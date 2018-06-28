@@ -2,8 +2,7 @@
 
 import type { TxReceiptInterface, TxInterface } from './interfaces';
 import Web3 from 'web3';
-import BigNumber from 'bignumber.js';
-import ethJsUtil from 'ethereumjs-util';
+import RLP from 'rlp';
 
 /**
  * Collection of utility methods useful during
@@ -30,18 +29,16 @@ class Utils {
   }
 
   /**
-   * Is address a zero address? Uses a bignumber.js test
+   * Is address a zero address? Uses a string comparison.
+   * Returns true also for strings that are not a valid address.
    *
    * @return {boolean}
    */
   isZeroAddress (address: string): boolean {
-    if (!address) { return true; }
-    try {
-      const addrAsBn = new BigNumber(address);
-      return addrAsBn.isZero();
-    } catch (e) {
+    if (!address || !this.web3.utils.isAddress(address)) {
       return true;
     }
+    return String(address) === '0x0000000000000000000000000000000000000000';
   }
 
   /**
@@ -59,8 +56,8 @@ class Utils {
   /**
    * Determines the future address of a deployed contact if such
    * contact is deployed in a transaction originating from `sender`
-   * with `nonce`. Uses `ethereumjs-util` implementation
-   * and always returns a checksum formatted Ethereum address.
+   * with `nonce`. Uses a direct RLP implementation based on
+   * https://ethereum.stackexchange.com/a/32736.
    *
    * @param {string} sender
    * @param {number} nonce
@@ -69,10 +66,9 @@ class Utils {
   determineDeployedContractFutureAddress (sender: string, nonce: number): string {
     // web3js stores checksummed addresses by default
     // (@see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-55.md)
-    return ethJsUtil.toChecksumAddress(ethJsUtil.bufferToHex(ethJsUtil.generateAddress(
-      sender,
-      nonce
-    )));
+    return this.web3.utils.toChecksumAddress(
+      this.web3.utils.sha3(RLP.encode([sender, nonce])).slice(12).substring(14)
+    );
   }
 
   /**

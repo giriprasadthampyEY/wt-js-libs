@@ -7,8 +7,8 @@ import OffChainDataClient from './off-chain-data-client';
  * This may be recursive.
  */
 type FieldDefType = {
-  name: string;
-  isStoragePointer?: boolean;
+  name: string,
+  isStoragePointer?: boolean,
   fields?: Array<FieldDefType | string>
 };
 

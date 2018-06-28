@@ -12,33 +12,33 @@ export interface HotelDataIndex {
  * @see https://github.com/windingtree/wt-js-libs/issues/125
  */
 export interface HotelDescriptionInterface {
-  location?: Promise<?LocationInterface> | ?LocationInterface;
-  name: Promise<string> | string;
-  description: Promise<string> | string;
-  roomTypes?: Promise<?{ [id: string]: RoomTypeInterface }> | ?{ [id: string]: RoomTypeInterface };
-  contacts: Promise<ContactsInterface> | ContactsInterface;
-  address: Promise<AddressInterface> | AddressInterface;
-  timezone: Promise<string> | string;
-  currency: Promise<string> | string;
-  images?: Promise<?Array<string>> | ?Array<string>;
-  amenities?: Promise<?Array<string>> | ?Array<string>;
+  location?: Promise<?LocationInterface> | ?LocationInterface,
+  name: Promise<string> | string,
+  description: Promise<string> | string,
+  roomTypes?: Promise<?{ [id: string]: RoomTypeInterface }> | ?{ [id: string]: RoomTypeInterface },
+  contacts: Promise<ContactsInterface> | ContactsInterface,
+  address: Promise<AddressInterface> | AddressInterface,
+  timezone: Promise<string> | string,
+  currency: Promise<string> | string,
+  images?: Promise<?Array<string>> | ?Array<string>,
+  amenities?: Promise<?Array<string>> | ?Array<string>,
   updatedAt: Promise<string> | string
 }
 
 export interface RoomTypeInterface {
-  id: Promise<string> | string;
-  name: Promise<string> | string;
-  description: Promise<string> | string;
-  totalQuantity: Promise<number> | number;
-  occupancy: Promise<OccupancyInterface> | OccupancyInterface;
-  amenities?: Promise<?Array<string>> | ?Array<string>;
-  images?: Promise<?Array<string>> | ?Array<string>;
-  updatedAt: Promise<?Date> | ?Date;
+  id: Promise<string> | string,
+  name: Promise<string> | string,
+  description: Promise<string> | string,
+  totalQuantity: Promise<number> | number,
+  occupancy: Promise<OccupancyInterface> | OccupancyInterface,
+  amenities?: Promise<?Array<string>> | ?Array<string>,
+  images?: Promise<?Array<string>> | ?Array<string>,
+  updatedAt: Promise<?Date> | ?Date,
   properties?: Promise<?Object> | ?Object
 }
 
 export interface OccupancyInterface {
-  min?: ?number;
+  min?: ?number,
   max: number
 }
 
@@ -46,7 +46,7 @@ export interface OccupancyInterface {
  * Generic GPS location.
  */
 export interface LocationInterface {
-  latitude?: ?number;
+  latitude?: ?number,
   longitude?: ?number
 }
 
@@ -54,7 +54,7 @@ export interface LocationInterface {
  * Generic additional contact.
  */
 export interface AdditionalContact {
-  title: string;
+  title: string,
   value: string
 }
 
@@ -62,10 +62,10 @@ export interface AdditionalContact {
  * Generic contact.
  */
 export interface ContactInterface {
-  email?: Promise<?string> | ?string;
-  phone?: Promise<?string> | ?string;
-  url?: Promise<?string> | ?string;
-  ethereum?: Promise<?string> | ?string;
+  email?: Promise<?string> | ?string,
+  phone?: Promise<?string> | ?string,
+  url?: Promise<?string> | ?string,
+  ethereum?: Promise<?string> | ?string,
   additionalContacts?: Promise<?Array<AdditionalContact>> | ?Array<AdditionalContact>
 }
 
@@ -80,10 +80,10 @@ export interface ContactsInterface {
  * Generic address interface.
  */
 export interface AddressInterface {
-  line1?: Promise<string> | string;
-  line2?: Promise<?string> | ?string;
-  postalCode?: Promise<?string> | ?string;
-  city?: Promise<string> | string;
-  state?: Promise<?string> | ?string;
+  line1?: Promise<string> | string,
+  line2?: Promise<?string> | ?string,
+  postalCode?: Promise<?string> | ?string,
+  city?: Promise<string> | string,
+  state?: Promise<?string> | ?string,
   country?: Promise<string> | string
 }

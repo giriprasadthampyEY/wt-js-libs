@@ -6,7 +6,7 @@ import type { OffChainDataAdapterInterface } from './interfaces';
  */
 export type OffChainDataClientOptionsType = {
   adapters: {[schema: string]: {
-    options: Object;
+    options: Object,
     create: (options: Object) => OffChainDataAdapterInterface
   }}
 };
