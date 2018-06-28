@@ -188,10 +188,23 @@ describe('WTLibs.data-model.OnChainHotel', () => {
     it('should return a plain JS object', async () => {
       const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
       await provider.setLocalData({ dataUri: validUri, manager: validManager });
+      // initialize dataIndex so we're able to mock it later
+      await provider.dataIndex;
+      sinon.stub(provider._dataIndex, 'toPlainObject').resolves({
+        ref: validUri,
+        contents: {
+          descriptionUri: {
+            ref: validUri,
+            contents: {},
+          },
+        },
+      });
       const plainHotel = await provider.toPlainObject();
-      assert.equal(plainHotel.dataUri, validUri);
       assert.equal(plainHotel.manager, validManager);
       assert.isUndefined(plainHotel.toPlainObject);
+      assert.equal(plainHotel.dataUri.ref, validUri);
+      assert.isDefined(plainHotel.dataUri.contents);
+      assert.isDefined(plainHotel.dataUri.contents.descriptionUri);
     });
   });
 

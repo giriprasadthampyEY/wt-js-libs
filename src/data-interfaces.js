@@ -1,4 +1,11 @@
 // @flow
+
+export interface PlainHotelInterface {
+  address: Promise<?string> | ?string,
+  manager: Promise<?string> | ?string,
+  dataUri: Promise<{ref: string, contents: Object}> | {ref: string, contents: Object}
+}
+
 /**
  * Index file for more data URIs. This is the
  * initial document that blockchain is pointing to.
