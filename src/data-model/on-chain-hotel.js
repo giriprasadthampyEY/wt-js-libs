@@ -194,7 +194,8 @@ class OnChainHotel implements HotelInterface {
    * By default, all off-chain data is resolved recurisvely. If you want to
    * limit off-chain data only to a certain subtree, use the resolvedFields
    * parameter that accepts an array of paths in dot notation (`father.son.child`).
-   * Every last piece of every path will be resolved recursively as well.
+   * Every last piece of every path will be resolved recursively as well. An empty
+   * list means no fields will be resolved.
    *
    * Properties that represent an actual separate document have a format of
    * ```

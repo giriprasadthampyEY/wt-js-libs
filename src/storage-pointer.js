@@ -245,34 +245,37 @@ class StoragePointer {
    *  @param {resolvedFields} list of fields that limit the resulting dataset in dot notation (`father.child.son`)
    */
   async toPlainObject (resolvedFields: ?Array<string>): Promise<{ref: string, contents: Object}> {
-    resolvedFields = resolvedFields || [];
     // Download data
     await this._downloadFromStorage();
-    const result = {};
+    let result = {};
     let currentFieldDef = {};
     // Prepare subtrees that will possibly be resolved later by splitting the dot notation.
-    for (let field of resolvedFields) {
-      let currentLevelName, remainingPath;
-      if (field.indexOf('.') === -1) {
-        currentLevelName = field;
-      } else {
-        currentLevelName = field.substring(0, field.indexOf('.'));
-        remainingPath = field.substring(field.indexOf('.') + 1);
-      }
-
-      if (!currentFieldDef[currentLevelName]) {
-        currentFieldDef[currentLevelName] = [];
-      }
-      if (remainingPath) {
-        currentFieldDef[currentLevelName].push(remainingPath);
+    if (resolvedFields) {
+      for (let field of resolvedFields) {
+        let currentLevelName, remainingPath;
+        if (field.indexOf('.') === -1) {
+          currentLevelName = field;
+        } else {
+          currentLevelName = field.substring(0, field.indexOf('.'));
+          remainingPath = field.substring(field.indexOf('.') + 1);
+        }
+        if (remainingPath) {
+          if (!currentFieldDef[currentLevelName]) {
+            currentFieldDef[currentLevelName] = [];
+          }
+          currentFieldDef[currentLevelName].push(remainingPath);
+        } else {
+          currentFieldDef[currentLevelName] = undefined;
+        }
       }
     }
+
     // Put everything together
     for (let field of this.__fields) {
       if (this.__storagePointers[field.name]) {
         // Storage pointer that the user wants to get resolved - call again for a subtree
         // OR resolve the whole subrtree if no special field is requested
-        if (Object.keys(currentFieldDef).length === 0 || currentFieldDef[field.name]) {
+        if (!resolvedFields || currentFieldDef.hasOwnProperty(field.name)) {
           result[field.name] = await (await this.contents[field.name]).toPlainObject(currentFieldDef[field.name]);
         } else { // Unresolved storage pointer, return a URI
           result[field.name] = this.__storagePointers[field.name].ref;

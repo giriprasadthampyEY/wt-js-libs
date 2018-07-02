@@ -367,5 +367,13 @@ describe('WTLibs.StoragePointer', () => {
       assert.equal(pojo.contents.eight.contents.five.contents.below.contents.below, 'cows');
       assert.equal(pojo.contents.eight.contents.five.contents.below.contents.above, 'sheep');
     });
+
+    it('should allow the user to not resolve any field', async () => {
+      const pojo = await pointer.toPlainObject([]);
+      assert.equal(pojo.contents.six, 'horses');
+      assert.equal(pojo.contents.seven, 'cats');
+      assert.equal(pojo.contents.eight, `json://${hashLevelOne}`);
+      assert.equal(pojo.contents.nine, `json://${hashLevelTwo}`);
+    });
   });
 });
