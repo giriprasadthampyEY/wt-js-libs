@@ -220,7 +220,8 @@ class StoragePointer {
    * Every child will then get resolved recursively.
    *
    * If you don't want some paths to get downloaded, just provide at least one sibling
-   * field on that level which is not a `StoragePointer`.
+   * field on that level which is not a `StoragePointer`. An empty list means no fields
+   * will be resolved.
    *
    * Data always gets downloaded if this method is called.
    *
@@ -242,14 +243,15 @@ class StoragePointer {
    * }
    * ```
    *
-   *  @param {resolvedFields} list of fields that limit the resulting dataset in dot notation (`father.child.son`)
+   *  @param {resolvedFields} list of fields that limit the resulting dataset in dot notation (`father.child.son`).
+   *  If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
    */
   async toPlainObject (resolvedFields: ?Array<string>): Promise<{ref: string, contents: Object}> {
     // Download data
     await this._downloadFromStorage();
     let result = {};
-    let currentFieldDef = {};
     // Prepare subtrees that will possibly be resolved later by splitting the dot notation.
+    let currentFieldDef = {};
     if (resolvedFields) {
       for (let field of resolvedFields) {
         let currentLevelName, remainingPath;
@@ -274,7 +276,7 @@ class StoragePointer {
     for (let field of this.__fields) {
       if (this.__storagePointers[field.name]) {
         // Storage pointer that the user wants to get resolved - call again for a subtree
-        // OR resolve the whole subrtree if no special field is requested
+        // OR resolve the whole subtree if no special fields are requested
         if (!resolvedFields || currentFieldDef.hasOwnProperty(field.name)) {
           result[field.name] = await (await this.contents[field.name]).toPlainObject(currentFieldDef[field.name]);
         } else { // Unresolved storage pointer, return a URI

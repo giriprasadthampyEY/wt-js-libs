@@ -191,7 +191,7 @@ class OnChainHotel implements HotelInterface {
    * Helper method that transforms the whole hotel into a sync simple
    * JavaScript object only with data properties.
    *
-   * By default, all off-chain data is resolved recurisvely. If you want to
+   * By default, all off-chain data is resolved recursively. If you want to
    * limit off-chain data only to a certain subtree, use the resolvedFields
    * parameter that accepts an array of paths in dot notation (`father.son.child`).
    * Every last piece of every path will be resolved recursively as well. An empty
@@ -208,6 +208,7 @@ class OnChainHotel implements HotelInterface {
    * ```
    *
    * @param {resolvedFields} List of fields to be resolved from off chain data, in dot notation.
+   * If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
    */
   async toPlainObject (resolvedFields: ?Array<string>): Promise<PlainHotelInterface> {
     const dataIndex = (await this.dataIndex);
