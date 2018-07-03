@@ -1,5 +1,6 @@
 // @flow
 import type { TransactionOptionsInterface, WalletInterface, HotelInterface, HotelOnChainDataInterface } from '../interfaces';
+import type { PlainHotelInterface } from '../data-interfaces';
 import Utils from '../utils';
 import Contracts from '../contracts';
 import RemotelyBackedDataset from '../remotely-backed-dataset';
@@ -187,18 +188,37 @@ class OnChainHotel implements HotelInterface {
   }
 
   /**
-   * Helper method that returns a plain object only
-   * with properties with data.
+   * Helper method that transforms the whole hotel into a sync simple
+   * JavaScript object only with data properties.
    *
-   * It is not recursive for now, i. e. all off-chain data
-   * has to be accessed separately. Subject to change.
+   * By default, all off-chain data is resolved recursively. If you want to
+   * limit off-chain data only to a certain subtree, use the resolvedFields
+   * parameter that accepts an array of paths in dot notation (`father.son.child`).
+   * Every last piece of every path will be resolved recursively as well. An empty
+   * list means no fields will be resolved.
+   *
+   * Properties that represent an actual separate document have a format of
+   * ```
+   * {
+   *   'ref': 'schema://original-url',
+   *   'contents': {
+   *     'actual': 'data'
+   *   }
+   * }
+   * ```
+   *
+   * @param {resolvedFields} List of fields to be resolved from off chain data, in dot notation.
+   * If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
    */
-  async toPlainObject (): Promise<HotelOnChainDataInterface> {
-    return {
+  async toPlainObject (resolvedFields: ?Array<string>): Promise<PlainHotelInterface> {
+    const dataIndex = (await this.dataIndex);
+    const offChainData = await dataIndex.toPlainObject(resolvedFields);
+    let result = {
       manager: await this.manager,
-      dataUri: await this.dataUri,
       address: this.address,
+      dataUri: offChainData,
     };
+    return result;
   }
 
   async __getContractInstance (): Promise<Object> {

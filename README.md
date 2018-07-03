@@ -45,12 +45,22 @@ const libs = WTLibs.createInstance({
 });
 const index = await libs.getWTIndex('0x...');
 const hotel = await index.getHotel('0x...');
+
+// You can get all the off-chain data at once
+// This approach might be a little slow as all off-chain data gets downloaded
+const plainHotel = await hotel.toPlainObject();
+// You get a synced plain javascript object you can traverse in any way you want
+const hotelName2 = plainHotel.descriptionUri.contents.name;
+
+// OR you can be picky but faster
+
+// Accessing off-chain data - the entry point url is actually stored on chain
 const dataIndex = await hotel.dataIndex;
-// Accessing off-chain data - url is actually stored on chain
-const hotelDescriptionUrl = dataIndex.ref;
+const hotelDataIndexUrl = dataIndex.ref;
 // This data is fetched from some off-chain storage
-const hotelDescription = await dataIndex.contents.description;
-const hotelName = await hotelDescription.contents.name;
+const hotelDescriptionDocument = await dataIndex.contents.descriptionUri;
+// This data is fetched from another off-chain document
+const hotelName = await hotelDescriptionDocument.contents.name;
 ```
 
 ## Documentation

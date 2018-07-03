@@ -3,7 +3,7 @@
     "descriptionUri": "json://descriptionone"
   },
   "urltwo": {
-    "descriptionUri": "json:descriptiontwo"
+    "descriptionUri": "json://descriptiontwo"
   },
   "descriptionone": {
     "name": "First hotel",

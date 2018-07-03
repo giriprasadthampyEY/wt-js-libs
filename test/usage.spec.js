@@ -160,8 +160,11 @@ describe('WTLibs usage', () => {
       const plainHotel = await hotel.toPlainObject();
       assert.isUndefined(plainHotel.toPlainObject);
       assert.equal(plainHotel.address, await hotel.address);
-      assert.equal(plainHotel.dataUri, await hotel.dataUri);
       assert.equal(plainHotel.manager, await hotel.manager);
+      assert.isDefined(plainHotel.dataUri.contents.descriptionUri);
+      assert.isDefined(plainHotel.dataUri.contents.descriptionUri.contents);
+      assert.isDefined(plainHotel.dataUri.contents.descriptionUri.contents.location);
+      assert.equal(plainHotel.dataUri.contents.descriptionUri.contents.name, 'First hotel');
     });
 
     it('should throw if no hotel is found on given address', async () => {
@@ -246,7 +249,9 @@ describe('WTLibs usage', () => {
         assert.isDefined((await hotel.dataIndex).ref);
         const plainHotel = await hotel.toPlainObject();
         assert.equal(plainHotel.address, await hotel.address);
-        assert.equal(plainHotel.dataUri, await hotel.dataUri);
+        assert.equal(plainHotel.manager, await hotel.manager);
+        assert.isDefined(plainHotel.dataUri.ref);
+        assert.isDefined(plainHotel.dataUri.contents);
       }
     });
 
