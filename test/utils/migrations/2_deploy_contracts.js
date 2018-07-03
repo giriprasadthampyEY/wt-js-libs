@@ -2,7 +2,7 @@ const TruffleContract = require('truffle-contract');
 const Web3 = require('web3');
 const provider = new Web3.providers.HttpProvider('http://localhost:8545');
 
-// dirty hack for web3@1.0.0 support for localhost testrpc, see
+// dirty hack for web3@1.0.0 support for localhost ganache-cli, see
 // https://github.com/trufflesuite/truffle-contract/issues/56#issuecomment-331084530
 function hackInSendAsync (instance) {
   if (typeof instance.currentProvider.sendAsync !== 'function') {
