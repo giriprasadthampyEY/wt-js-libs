@@ -237,7 +237,6 @@ class RemotelyBackedDataset {
         let setterHashCode = this.__hashCode(remoteSetter.toString());
         if (!remoteSettersHashCodes[setterHashCode]) {
           remoteSettersHashCodes[setterHashCode] = true;
-
           remoteSetters.push(remoteSetter(cloneDeep(transactionOptions)).then((result) => {
             result.eventCallbacks = result.eventCallbacks || {};
             const originalOnRcptCallback = result.eventCallbacks.onReceipt;
