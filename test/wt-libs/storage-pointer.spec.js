@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 import StoragePointer from '../../src/storage-pointer';
 import OffChainDataClient from '../../src/off-chain-data-client';
-import { adapter as InMemoryAdapter, storageInstance } from '@windingtree/off-chain-adapter-in-memory';
+import InMemoryAdapter from '@windingtree/off-chain-adapter-in-memory';
 
 describe('WTLibs.StoragePointer', () => {
   beforeEach(() => {
@@ -258,10 +258,10 @@ describe('WTLibs.StoragePointer', () => {
   describe('toPlainObject', () => {
     let pointer, hashLevelZero, hashLevelOne, hashLevelTwo, hashLevelThree;
     before(() => {
-      hashLevelThree = storageInstance.create({ below: 'cows', above: 'sheep' });
-      hashLevelTwo = storageInstance.create({ one: 'bunny', two: 'frogs', below: `json://${hashLevelThree}` });
-      hashLevelOne = storageInstance.create({ three: 'dogs', four: 'donkeys', five: `json://${hashLevelTwo}` });
-      hashLevelZero = storageInstance.create({ six: 'horses', seven: 'cats', eight: `json://${hashLevelOne}`, nine: `json://${hashLevelTwo}` });
+      hashLevelThree = InMemoryAdapter.storageInstance.create({ below: 'cows', above: 'sheep' });
+      hashLevelTwo = InMemoryAdapter.storageInstance.create({ one: 'bunny', two: 'frogs', below: `json://${hashLevelThree}` });
+      hashLevelOne = InMemoryAdapter.storageInstance.create({ three: 'dogs', four: 'donkeys', five: `json://${hashLevelTwo}` });
+      hashLevelZero = InMemoryAdapter.storageInstance.create({ six: 'horses', seven: 'cats', eight: `json://${hashLevelOne}`, nine: `json://${hashLevelTwo}` });
       pointer = StoragePointer.createInstance(`json://${hashLevelZero}`, [
         'six', 'seven', {
           name: 'eight',
