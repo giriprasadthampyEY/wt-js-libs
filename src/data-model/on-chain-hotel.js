@@ -276,7 +276,7 @@ class OnChainHotel implements HotelInterface {
       gas: this.web3Utils.applyGasCoefficient(estimate),
     };
     const eventCallbacks: TransactionCallbacksInterface = {
-      onReceipt: (receipt: ?TxReceiptInterface) => {
+      onReceipt: (receipt: TxReceiptInterface) => {
         this.onChainDataset.markDeployed();
         if (receipt && receipt.logs) {
           let decodedLogs = this.web3Contracts.decodeLogs(receipt.logs);
@@ -329,7 +329,7 @@ class OnChainHotel implements HotelInterface {
       gas: this.web3Utils.applyGasCoefficient(estimate),
     };
     const eventCallbacks: TransactionCallbacksInterface = {
-      onReceipt: (receipt: ?TxReceiptInterface): void => {
+      onReceipt: (receipt: TxReceiptInterface) => {
         this.onChainDataset.markObsolete();
       },
     };

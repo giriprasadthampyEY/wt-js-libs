@@ -113,16 +113,6 @@ describe('WTLibs usage', () => {
       assert.notInclude(list.map(async (a) => a.address), await hotel.address);
     });
 
-    // TODO FIXME bad data format
-    xit('should throw if no hotel is found on given address', async () => {
-      try {
-        await index.removeHotel('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA');
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot remove hotel/i);
-      }
-    });
-
     it('should throw if hotel has no address', async () => {
       try {
         const hotel = await index.getHotel('0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');

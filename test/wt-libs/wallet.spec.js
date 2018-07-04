@@ -200,7 +200,7 @@ describe('WTLibs.Wallet', () => {
     it('should sign and send a transaction', async () => {
       wallet.unlock(correctPassword);
       sinon.stub(wallet.__account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
-      const result = await wallet.signAndSendTransaction({
+      await wallet.signAndSendTransaction({
         from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
         to: 'bbb',
         data: 'data',
@@ -231,7 +231,7 @@ describe('WTLibs.Wallet', () => {
         data: 'data',
         gas: 1234,
       }, {
-        onReceipt: receiptCallback
+        onReceipt: receiptCallback,
       });
       assert.isDefined(result);
       assert.equal(result.some, 'receipt');
@@ -248,7 +248,7 @@ describe('WTLibs.Wallet', () => {
         data: 'data',
         gas: 1234,
       }, {
-        onTransactionHash: txHashCallback
+        onTransactionHash: txHashCallback,
       });
       assert.equal(result, 'tx-hash');
       assert.equal(txHashCallback.callCount, 1);
@@ -265,13 +265,13 @@ describe('WTLibs.Wallet', () => {
         data: 'data',
         gas: 1234,
       }, {
-        onReceipt: receiptCallback, onTransactionHash: txHashCallback
+        onReceipt: receiptCallback, onTransactionHash: txHashCallback,
       });
       assert.isDefined(result);
       assert.equal(result.some, 'receipt');
       assert.equal(receiptCallback.callCount, 1);
       assert.equal(txHashCallback.callCount, 1);
-    })
+    });
 
     it('should reject on error event', async () => {
       wallet.unlock(correctPassword);

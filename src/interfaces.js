@@ -39,8 +39,8 @@ export interface TransactionOptionsInterface {
  * will be signed and sent through our Wallet abstraction.
  */
 export interface TransactionCallbacksInterface {
-  onReceipt?: (receipt: ?TxReceiptInterface) => void,
-  onTransactionHash?: (hash?: string) => void
+  onReceipt?: (receipt: TxReceiptInterface) => void,
+  onTransactionHash?: (hash: string) => void
 }
 
 /**

@@ -10,11 +10,11 @@ describe('WTLibs.RemotelyBackedDataset', () => {
     bbbInstance = new RemotelyBackedDataset();
     onReceiptStub = sinon.stub();
     remoteGetterStub = sinon.stub().resolves('field name');
-    remoteSetterStub = sinon.stub().resolves({'setter1': 'result'});
+    remoteSetterStub = sinon.stub().resolves({ 'setter1': 'result' });
     remoteGetterStub2 = sinon.stub().resolves('field name');
-    remoteSetterStub2 = sinon.stub().resolves({'setter2': 'result', eventCallbacks: {'onReceipt': onReceiptStub}});
+    remoteSetterStub2 = sinon.stub().resolves({ 'setter2': 'result', eventCallbacks: { 'onReceipt': onReceiptStub } });
     remoteSetterStub2.toString = () => 'stub2'; // to fix possible hashing conflicts
-    commonRemoteSetterStub = sinon.stub().resolves({'commonsetter': 'object'});
+    commonRemoteSetterStub = sinon.stub().resolves({ 'commonsetter': 'object' });
     commonRemoteSetterStub.toString = () => 'commonStub'; // to fix possible hashing conflicts
     bbbInstance.bindProperties({
       fields: {

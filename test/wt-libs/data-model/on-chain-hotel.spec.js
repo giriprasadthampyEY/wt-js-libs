@@ -5,7 +5,7 @@ import OnChainHotel from '../../../src/data-model/on-chain-hotel';
 import StoragePointer from '../../../src/storage-pointer';
 
 describe('WTLibs.data-model.OnChainHotel', () => {
-  let contractsStub, utilsStub, indexContractStub, walletStub, urlStub, managerStub;
+  let contractsStub, utilsStub, indexContractStub, urlStub, managerStub;
   const validUri = 'schema://new-url';
   const validManager = 'manager';
 
@@ -26,6 +26,9 @@ describe('WTLibs.data-model.OnChainHotel', () => {
           editInfo: helpers.stubContractMethodResult('info-edited'),
         },
       }),
+      decodeLogs: sinon.stub().returns([{
+        attributes: [{ value: '0xnew-hotel-address' }],
+      }]),
     };
     indexContractStub = {
       options: {
@@ -36,14 +39,6 @@ describe('WTLibs.data-model.OnChainHotel', () => {
         registerHotel: helpers.stubContractMethodResult('registered-hotel'),
         deleteHotel: helpers.stubContractMethodResult('deleted-hotel'),
       },
-    };
-    walletStub = {
-      signAndSendTransaction: sinon.spy((txOpts, callback) => {
-        if (callback) {
-          callback();
-        }
-        return Promise.resolve('tx-hash');
-      }),
     };
   });
 
@@ -184,6 +179,51 @@ describe('WTLibs.data-model.OnChainHotel', () => {
     });
   });
 
+  describe('setters', () => {
+    it('should never null manager', async () => {
+      try {
+        const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
+        provider.manager = null;
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /cannot set manager to null/i);
+      }
+    });
+
+    it('should never null dataUri', async () => {
+      try {
+        const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
+        provider.dataUri = null;
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /cannot set dataUri when it is not provided/i);
+      }
+    });
+
+    it('should never set dataUri in a bad format', async () => {
+      try {
+        const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
+        provider.dataUri = 'some-weird-uri';
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /cannot set dataUri with invalid format/i);
+      }
+    });
+
+    it('should reset dataIndex if dataUri changes', async () => {
+      const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
+      provider.dataUri = 'json://something-else';
+      assert.isNull(provider._dataIndex);
+    });
+
+    it('should not reset dataIndex if dataUri remains the same', async () => {
+      const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
+      await provider.setLocalData({ dataUri: validUri, manager: validManager });
+      provider.dataUri = await provider.dataUri;
+      assert.isNull(provider._dataIndex);
+    });
+  });
+
   describe('toPlainObject', () => {
     it('should return a plain JS object', async () => {
       const provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
@@ -231,42 +271,36 @@ describe('WTLibs.data-model.OnChainHotel', () => {
     beforeEach(async () => {
       provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
     });
-    it('should precompute address', async () => {
-      const result = await provider.createOnChainData(walletStub, {});
-      assert.deepEqual(result, ['tx-hash']);
-      // index nonce + caller nonce
-      assert.equal(utilsStub.determineCurrentAddressNonce.callCount, 2);
-      assert.equal(utilsStub.determineDeployedContractFutureAddress.callCount, 1);
-      assert.equal(walletStub.signAndSendTransaction.callCount, 1);
+
+    it('should return transaction metadata', async () => {
+      const result = await provider.createOnChainData({ from: 'xx' });
+      assert.isDefined(result.transactionData);
+      assert.isDefined(result.instance);
+      assert.isDefined(result.eventCallbacks);
+      assert.isDefined(result.eventCallbacks.onReceipt);
     });
 
-    // TODO test cross hotel.manager vs. wallet.account
-
-    it('should call registerHotel with applied gasCoefficient', async () => {
-      const result = await provider.createOnChainData(walletStub, { from: 'xx' });
-      assert.deepEqual(result, ['tx-hash']);
+    it('should apply gasCoefficient', async () => {
+      await provider.createOnChainData({ from: 'xx' });
       assert.equal(utilsStub.applyGasCoefficient.callCount, 1);
       assert.equal(indexContractStub.methods.registerHotel().estimateGas.callCount, 1);
       assert.equal(indexContractStub.methods.registerHotel().encodeABI.callCount, 1);
       assert.equal(indexContractStub.methods.registerHotel().estimateGas.firstCall.args[0].from, 'xx');
-      assert.equal(walletStub.signAndSendTransaction.callCount, 1);
-      assert.equal(walletStub.signAndSendTransaction.firstCall.args[0].from, 'xx');
     });
 
-    it('should mark dataset as deployed on success', async () => {
+    it('should return eventCallback that will mark dataset as deployed', async () => {
       assert.isFalse(provider.onChainDataset.isDeployed());
-      await provider.createOnChainData(walletStub, { from: 'xx' });
+      const result = await provider.createOnChainData({ from: 'xx' });
+      result.eventCallbacks.onReceipt();
       assert.isTrue(provider.onChainDataset.isDeployed());
     });
 
-    it('should throw on transaction error', async () => {
-      walletStub.signAndSendTransaction = sinon.stub().rejects(new Error('Cannot send signed transaction'));
-      try {
-        await provider.createOnChainData(walletStub, { from: 'xx' });
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot create hotel/i);
-      }
+    it('should return eventCallback that will parse receipt logs for contract address', async () => {
+      assert.isFalse(provider.onChainDataset.isDeployed());
+      const result = await provider.createOnChainData({ from: 'xx' });
+      assert.isUndefined(await result.instance.address);
+      result.eventCallbacks.onReceipt({ logs: [{ some: 'logs' }] });
+      assert.equal(await result.instance.address, '0xnew-hotel-address');
     });
   });
 
@@ -280,7 +314,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
     it('should throw on an undeployed contract', async () => {
       try {
         let provider = await OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
-        await provider.updateOnChainData(walletStub, {});
+        await provider.updateOnChainData({});
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot get hotel/i);
@@ -290,32 +324,28 @@ describe('WTLibs.data-model.OnChainHotel', () => {
     it('should throw when updating hotel without dataUri', async () => {
       try {
         provider.dataUri = null;
-        await provider.updateOnChainData(walletStub, {});
+        await provider.updateOnChainData({});
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot set dataUri when it is not provided/i);
       }
     });
 
-    it('should call callHotel with applied gasCoefficient', async () => {
-      const result = await provider.updateOnChainData(walletStub, { from: 'xx' });
-      assert.deepEqual(result, ['tx-hash']);
+    it('should return transactions metadata', async () => {
+      const result = await provider.updateOnChainData({ from: 'xx' });
+      assert.equal(result.length, 1);
+      assert.isDefined(result[0].transactionData);
+      assert.isDefined(result[0].instance);
+      assert.isDefined(result[0].eventCallbacks);
+      assert.isDefined(result[0].eventCallbacks.onReceipt);
+    });
+
+    it('should apply gasCoefficient', async () => {
+      await provider.updateOnChainData({ from: 'xx' });
       assert.equal(utilsStub.applyGasCoefficient.callCount, 1);
       assert.equal(indexContractStub.methods.callHotel().estimateGas.callCount, 1);
       assert.equal(indexContractStub.methods.callHotel().encodeABI.callCount, 1);
       assert.equal(indexContractStub.methods.callHotel().estimateGas.firstCall.args[0].from, 'xx');
-      assert.equal(walletStub.signAndSendTransaction.callCount, 1);
-      assert.equal(walletStub.signAndSendTransaction.firstCall.args[0].from, 'xx');
-    });
-
-    it('should throw on error', async () => {
-      walletStub.signAndSendTransaction = sinon.stub().rejects(new Error('Cannot send signed transaction'));
-      try {
-        await provider.updateOnChainData(walletStub, { from: 'xx' });
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot update hotel/i);
-      }
     });
   });
 
@@ -328,38 +358,34 @@ describe('WTLibs.data-model.OnChainHotel', () => {
     it('should throw on an undeployed contract', async () => {
       try {
         provider.onChainDataset.__deployedFlag = false;
-        await provider.removeOnChainData(walletStub, {});
+        await provider.removeOnChainData({});
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot remove hotel/i);
       }
     });
 
-    it('should call deleteHotel with applied gasCoefficient', async () => {
-      const result = await provider.removeOnChainData(walletStub, { from: 'xx' });
-      assert.deepEqual(result, ['tx-hash']);
+    it('should return transaction metadata', async () => {
+      const result = await provider.removeOnChainData({ from: 'xx' });
+      assert.isDefined(result.transactionData);
+      assert.isDefined(result.instance);
+      assert.isDefined(result.eventCallbacks);
+      assert.isDefined(result.eventCallbacks.onReceipt);
+    });
+
+    it('should apply gasCoefficient', async () => {
+      await provider.removeOnChainData({ from: 'xx' });
       assert.equal(utilsStub.applyGasCoefficient.callCount, 1);
       assert.equal(indexContractStub.methods.deleteHotel().estimateGas.callCount, 1);
       assert.equal(indexContractStub.methods.deleteHotel().encodeABI.callCount, 1);
       assert.equal(indexContractStub.methods.deleteHotel().estimateGas.firstCall.args[0].from, 'xx');
-      assert.equal(walletStub.signAndSendTransaction.callCount, 1);
-      assert.equal(walletStub.signAndSendTransaction.firstCall.args[0].from, 'xx');
     });
 
-    it('should mark dataset as obsolete on success', async () => {
+    it('should return eventCallback that will mark dataset as obsolete', async () => {
       assert.isFalse(provider.onChainDataset.isObsolete());
-      await provider.removeOnChainData(walletStub, { from: 'xx' });
+      const result = await provider.removeOnChainData({ from: 'xx' });
+      result.eventCallbacks.onReceipt({ logs: [{ some: 'logs' }] });
       assert.isTrue(provider.onChainDataset.isObsolete());
-    });
-
-    it('should throw on error', async () => {
-      walletStub.signAndSendTransaction = sinon.stub().rejects(new Error('Cannot send signed transaction'));
-      try {
-        await provider.removeOnChainData(walletStub, { from: 'xx' });
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot remove hotel/i);
-      }
     });
   });
 });
