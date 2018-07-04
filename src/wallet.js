@@ -1,6 +1,6 @@
 // @flow
 import Web3 from 'web3';
-import type { WalletInterface, KeystoreV3Interface, TransactionDataInterface, TransactionCallbacksInterface } from './interfaces';
+import type { WalletInterface, KeystoreV3Interface, TransactionDataInterface, TransactionCallbacksInterface, TxReceiptInterface } from './interfaces';
 
 /**
  * Web3 based wallet implementation
@@ -75,18 +75,19 @@ class Wallet implements WalletInterface {
   
   /**
    * Takes transaction data, signs them with an unlocked private key and sends them to
-   * the network. Resolves immediately after receiving a `transactionHash` event and optionally
-   * may run an `onReceipt` callback after receiving the `receipt` event.
+   * the network. Resolves either immediately after receiving a `transactionHash` (with hash) or after
+   * a `receipt` event (with raw receipt object). This depends on passed eventCallbacks.
+   * When onReceipt callback is present, Promise is resolved after `receipt` event
    *
    * @throws {Error} When wallet was destroyed.
    * @throws {Error} When there is no web3 instance configured.
    * @throws {Error} When wallet is not unlocked.
    * @throws {Error} When transaction.from does not match the wallet account.
    * @param  {TransactionDataInterface} transactionData
-   * @param  {(receipt: TxReceiptInterface) => void} onReceipt optional callback called when receipt event comes back from the network node
-   * @return {Promise<string>} transaction hash
+   * @param  {TransactionCallbacksInterface} optional callbacks called when events come back from the network
+   * @return {Promise<string|TxReceiptInterface>} transaction hash
    */
-  async signAndSendTransaction (transactionData: TransactionDataInterface, eventCallbacks: ?TransactionCallbacksInterface): Promise<string> {
+  async signAndSendTransaction (transactionData: TransactionDataInterface, eventCallbacks: ?TransactionCallbacksInterface): Promise<string | TxReceiptInterface> {
     if (this.isDestroyed()) {
       throw new Error('Cannot use destroyed wallet.');
     }
@@ -106,9 +107,9 @@ class Wallet implements WalletInterface {
         .on('transactionHash', (hash) => {
           if (eventCallbacks && eventCallbacks.onTransactionHash) {
             eventCallbacks.onTransactionHash(hash);
-            if (!eventCallbacks.onReceipt) {
-              resolve(hash);
-            }
+          }
+          if (!eventCallbacks || !eventCallbacks.onReceipt) {
+            resolve(hash);
           }
         }).on('receipt', (receipt) => {
           if (eventCallbacks && eventCallbacks.onReceipt) {

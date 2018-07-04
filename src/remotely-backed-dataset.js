@@ -223,7 +223,8 @@ class RemotelyBackedDataset {
    * to update multiple fields, it is called only once.
    *
    * @param  {Object} transactionOptions passed to every remoteSetter, typically something like `{from: address, to: address}`
-   * @return {Array<any>} Results of remoteSetters, it would typically contain transaction IDs
+   * @return {Array<any>} Results of remoteSetters, it would typically contain transaction metadata. In any case, an eventCallbacks
+   * object is appended to every result and onReceipt callback is added to ensure that data fields would eventually be properly marked as 'synced'.
    */
   async updateRemoteData (transactionOptions) {
     await this.__syncRemoteData();

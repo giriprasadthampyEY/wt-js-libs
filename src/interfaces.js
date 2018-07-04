@@ -34,11 +34,23 @@ export interface TransactionOptionsInterface {
   value?: number | string | BigNumber
 }
 
+/**
+ * Callback options that can be passed to a transaction that
+ * will be signed and sent through our Wallet abstraction.
+ */
 export interface TransactionCallbacksInterface {
   onReceipt?: (receipt: ?TxReceiptInterface) => void,
   onTransactionHash?: (hash?: string) => void
 }
 
+/**
+ * Format of generated transaction data and metadata
+ * that contains a related hotel instance, transactionData
+ * itself (ready for signing) and optionally eventCallbacks
+ * that should be passed to our Wallet abstraction with
+ * transactionData itself to ensure a consistent internal state
+ * after the transaction is mined.
+ */
 export interface PreparedTransactionMetadataInterface {
   instance: HotelInterface,
   transactionData: TransactionDataInterface,
@@ -222,7 +234,7 @@ export interface AdaptedTxResultsInterface {
  */
 export interface WalletInterface {
   unlock(password: string): void,
-  signAndSendTransaction(transactionData: TransactionDataInterface, eventCallBacks: TransactionCallbacksInterface): Promise<string>,
+  signAndSendTransaction(transactionData: TransactionDataInterface, eventCallBacks: TransactionCallbacksInterface): Promise<string | TxReceiptInterface>,
   lock(): void,
   destroy(): void,
   getAddress(): string

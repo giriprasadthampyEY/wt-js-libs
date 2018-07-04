@@ -41,12 +41,13 @@ class WTIndex implements WTIndexInterface {
   }
 
   /**
-   * Adds a totally new hotel on chain. Does not wait for the transactions
-   * to be mined, but as fast as possible returns a list of transaction IDs
-   * and the new hotel on chain address.
+   * Generates transaction data required for adding a totally new hotel
+   * and more metadata required for sucessful mining of that transaction.
+   * Does not sign or send the transaction.
    *
    * @throws {Error} When hotelData does not contain dataUri property.
-   * @throws {Error} When anything goes wrong during communication with the network.
+   * @throws {Error} When hotelData does not contain a manager property.
+   * @throws {Error} When anything goes wrong during data preparation phase.
    */
   async addHotel (hotelData: HotelOnChainDataInterface): Promise<PreparedTransactionMetadataInterface> {
     if (!await hotelData.dataUri) {
@@ -68,12 +69,13 @@ class WTIndex implements WTIndexInterface {
   }
 
   /**
-   * Updates a hotel on chain. Does not wait for the transactions
-   * to be mined, but as fast as possible returns a list of transaction
-   * IDs so you can keep track of the progress.
+   * Generates a list of transaction data required for updating a hotel
+   * and more metadata required for sucessful mining of those transactions.
+   * Does not sign or send any of the transactions.
    *
    * @throws {Error} When hotel does not have a manager field.
-   * @throws {Error} When anything goes wrong during communication with the network.
+   * @throws {Error} When hotel does not contain a manager property.
+   * @throws {Error} When anything goes wrong during data preparation phase.
    */
   async updateHotel (hotel: HotelInterface): Promise<Array<PreparedTransactionMetadataInterface>> {
     try {
@@ -93,14 +95,13 @@ class WTIndex implements WTIndexInterface {
   }
 
   /**
-   * Removes the hotel from chain. Does not wait for the transactions
-   * to be mined, but as fast as possible returns a list of transaction
-   * IDs so you can keep track of the progress.
+   * Generates transaction data required for removing a hotel
+   * and more metadata required for successful mining of that transaction.
+   * Does not sign or send the transaction.
    *
-   * @throws {Error} When anything goes wrong such as
-   *   - hotel does not exist
-   *   - hotel does not belong to the calling manager
-   *   - not enough gas
+   * @throws {Error} When hotel does not contain dataUri property.
+   * @throws {Error} When hotel does not contain a manager property.
+   * @throws {Error} When anything goes wrong during data preparation phase.
    */
   async removeHotel (hotel: HotelInterface): Promise<PreparedTransactionMetadataInterface> {
     try {

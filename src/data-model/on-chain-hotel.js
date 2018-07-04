@@ -232,11 +232,12 @@ class OnChainHotel implements HotelInterface {
   }
 
   /**
-   * Updates dataUri on-chain. Used internally as a remoteSetter for `dataUri` property.
+   * Generates transaction data and metadata for updating dataUri on-chain.
+   * Used internally as a remoteSetter for `dataUri` property.
+   * Transaction is not signed nor sent here.
    *
-   * @param {WalletInterface} wallet that signs the transaction
    * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
-   * @return {Promise<string>} resulting transaction hash
+   * @return {Promise<PreparedTransactionMetadataInterface>} resulting transaction metadata
    */
   async __editInfoOnChain (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
     const data = (await this.__getContractInstance()).methods.editInfo(await this.dataUri).encodeABI();
@@ -256,15 +257,11 @@ class OnChainHotel implements HotelInterface {
   }
 
   /**
-   * Creates new hotel contract on-chain.
-   *
-   * Precomputes the deployed hotel on-chain address, so even if
-   * the resulting transaction is not yet mined, the address is already known.
-   *
-   * Returns once the transaction is signed and sent to network by `wallet`.
+   * Generates transaction data and metadata for creating new hotel contract on-chain.
+   * Transaction is not signed nor sent here.
    *
    * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
-   * @return {Promise<Array<string>>} list of resulting transaction hashes
+   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created hotel instance.
    */
   async createOnChainData (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
     // Create hotel on-network
@@ -295,13 +292,13 @@ class OnChainHotel implements HotelInterface {
   }
 
   /**
-   * Updates all hotel-related data by calling `updateRemoteData` on a `RemotelyBackedDataset`
-   * dataset.
+   * Generates transaction data and metadata required for all hotel-related data modification
+   * by calling `updateRemoteData` on a `RemotelyBackedDataset`.
    *
    * @param {TransactionOptionsInterface} options object that is passed to all remote data setters
    * @throws {Error} When the underlying contract is not yet deployed.
    * @throws {Error} When dataUri is empty.
-   * @return {Promise<Array<string>>} List of transaction hashes
+   * @return {Promise<Array<PreparedTransactionMetadataInterface>>} List of transaction metadata
    */
   async updateOnChainData (transactionOptions: TransactionOptionsInterface): Promise<Array<PreparedTransactionMetadataInterface>> {
     // pre-check if contract is available at all and fail fast
@@ -312,12 +309,11 @@ class OnChainHotel implements HotelInterface {
   }
 
   /**
-   * Destroys the object on network, in this case, calls a `deleteHotel` on
-   * Winding Tree index contract.
+   * Generates transaction data and metadata required for destroying the hotel object on network.
    *
    * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
    * @throws {Error} When the underlying contract is not yet deployed.
-   * @return {Promise<Array<string>>} List of transaction hashes
+   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created hotel instance.
    */
   async removeOnChainData (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
     if (!this.onChainDataset.isDeployed()) {
