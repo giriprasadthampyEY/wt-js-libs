@@ -14,7 +14,6 @@ describe('WTLibs.data-model.OnChainHotel', () => {
       getCurrentWeb3Provider: sinon.stub().returns('current-provider'),
       applyGasCoefficient: sinon.stub().returns(12),
       determineCurrentAddressNonce: sinon.stub().resolves(3),
-      determineDeployedContractFutureAddress: sinon.stub().returns('future-address'),
     };
     urlStub = helpers.stubContractMethodResult('some-remote-url');
     managerStub = helpers.stubContractMethodResult('some-remote-manager');

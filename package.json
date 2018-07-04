@@ -41,7 +41,6 @@
     "@windingtree/wt-contracts": "^0.2.2",
     "bignumber.js": "^7.2.1",
     "lodash.clonedeep": "^4.5.0",
-    "rlp": "^2.0.0",
     "web3": "^1.0.0-beta.34"
   },
   "devDependencies": {
