@@ -222,11 +222,10 @@ class RemotelyBackedDataset {
    * Calls are deduplicated, so if the same method would be used
    * to update multiple fields, it is called only once.
    *
-   * @param {WalletInterface} wallet that signs the transaction
    * @param  {Object} transactionOptions passed to every remoteSetter, typically something like `{from: address, to: address}`
    * @return {Array<any>} Results of remoteSetters, it would typically contain transaction IDs
    */
-  async updateRemoteData (wallet, transactionOptions) {
+  async updateRemoteData (transactionOptions) {
     await this.__syncRemoteData();
     const remoteSetters = [];
     const remoteSettersHashCodes = {};
@@ -237,8 +236,17 @@ class RemotelyBackedDataset {
         let setterHashCode = this.__hashCode(remoteSetter.toString());
         if (!remoteSettersHashCodes[setterHashCode]) {
           remoteSettersHashCodes[setterHashCode] = true;
-          remoteSetters.push(remoteSetter(wallet, cloneDeep(transactionOptions)).then((result) => {
-            this.__fieldStates[this.__fieldKeys[i]] = 'synced';
+
+          remoteSetters.push(remoteSetter(cloneDeep(transactionOptions)).then((result) => {
+            result.eventCallbacks = result.eventCallbacks || {};
+            const originalOnRcptCallback = result.eventCallbacks.onReceipt;
+            const onRcptCallback = (receipt) => {
+              this.__fieldStates[this.__fieldKeys[i]] = 'synced';
+              if (originalOnRcptCallback) {
+                return originalOnRcptCallback(receipt);
+              }
+            };
+            result.eventCallbacks.onReceipt = onRcptCallback;
             return result;
           }));
         }

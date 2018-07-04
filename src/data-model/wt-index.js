@@ -1,5 +1,5 @@
 // @flow
-import type { WTIndexInterface, HotelOnChainDataInterface, HotelInterface, AddHotelResponseInterface, WalletInterface } from '../interfaces';
+import type { WTIndexInterface, HotelOnChainDataInterface, HotelInterface, PreparedTransactionMetadataInterface } from '../interfaces';
 import Utils from '../utils';
 import Contracts from '../contracts';
 import OnChainHotel from './on-chain-hotel';
@@ -48,7 +48,7 @@ class WTIndex implements WTIndexInterface {
    * @throws {Error} When hotelData does not contain dataUri property.
    * @throws {Error} When anything goes wrong during communication with the network.
    */
-  async addHotel (wallet: WalletInterface, hotelData: HotelOnChainDataInterface): Promise<AddHotelResponseInterface> {
+  async addHotel (hotelData: HotelOnChainDataInterface): Promise<PreparedTransactionMetadataInterface> {
     if (!await hotelData.dataUri) {
       throw new Error('Cannot add hotel: Missing dataUri');
     }
@@ -59,13 +59,9 @@ class WTIndex implements WTIndexInterface {
     try {
       const hotel: HotelInterface = await this.__createHotelInstance();
       await hotel.setLocalData(hotelData);
-      const transactionIds = await hotel.createOnChainData(wallet, {
+      return hotel.createOnChainData({
         from: hotelManager,
       });
-      return {
-        address: await hotel.address,
-        transactionIds: transactionIds,
-      };
     } catch (err) {
       throw new Error('Cannot add hotel: ' + err.message);
     }
@@ -79,7 +75,7 @@ class WTIndex implements WTIndexInterface {
    * @throws {Error} When hotel does not have a manager field.
    * @throws {Error} When anything goes wrong during communication with the network.
    */
-  async updateHotel (wallet: WalletInterface, hotel: HotelInterface): Promise<Array<string>> {
+  async updateHotel (hotel: HotelInterface): Promise<Array<PreparedTransactionMetadataInterface>> {
     try {
       if (!hotel.address) {
         throw new Error('Cannot update hotel without address.');
@@ -88,11 +84,9 @@ class WTIndex implements WTIndexInterface {
       if (!hotelManager) {
         throw new Error('Cannot update hotel without manager.');
       }
-      // We need to separate calls to be able to properly catch exceptions
-      const updatedHotel = await hotel.updateOnChainData(wallet, { // eslint-disable-line flowtype/no-weak-types
+      return hotel.updateOnChainData({
         from: hotelManager,
       });
-      return updatedHotel;
     } catch (err) {
       throw new Error('Cannot update hotel:' + err.message);
     }
@@ -108,7 +102,7 @@ class WTIndex implements WTIndexInterface {
    *   - hotel does not belong to the calling manager
    *   - not enough gas
    */
-  async removeHotel (wallet: WalletInterface, hotel: HotelInterface): Promise<Array<string>> {
+  async removeHotel (hotel: HotelInterface): Promise<PreparedTransactionMetadataInterface> {
     try {
       if (!hotel.address) {
         throw new Error('Cannot remove hotel without address.');
@@ -117,11 +111,9 @@ class WTIndex implements WTIndexInterface {
       if (!hotelManager) {
         throw new Error('Cannot remove hotel without manager.');
       }
-      // We need to separate calls to be able to properly catch exceptions
-      const result = await hotel.removeOnChainData(wallet, { // eslint-disable-line flowtype/no-weak-types
+      return hotel.removeOnChainData({
         from: hotelManager,
       });
-      return result;
     } catch (err) {
       // invalid opcode -> non-existent hotel
       // invalid opcode -> failed check for manager

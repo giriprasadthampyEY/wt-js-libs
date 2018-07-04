@@ -1,6 +1,6 @@
 // @flow
 import Web3 from 'web3';
-import type { WalletInterface, TxReceiptInterface, KeystoreV3Interface, TransactionDataInterface } from './interfaces';
+import type { WalletInterface, KeystoreV3Interface, TransactionDataInterface, TransactionCallbacksInterface } from './interfaces';
 
 /**
  * Web3 based wallet implementation
@@ -86,7 +86,7 @@ class Wallet implements WalletInterface {
    * @param  {(receipt: TxReceiptInterface) => void} onReceipt optional callback called when receipt event comes back from the network node
    * @return {Promise<string>} transaction hash
    */
-  async signAndSendTransaction (transactionData: TransactionDataInterface, onReceipt: ?(receipt: TxReceiptInterface) => void): Promise<string> {
+  async signAndSendTransaction (transactionData: TransactionDataInterface, eventCallbacks: ?TransactionCallbacksInterface): Promise<string> {
     if (this.isDestroyed()) {
       throw new Error('Cannot use destroyed wallet.');
     }
@@ -104,11 +104,17 @@ class Wallet implements WalletInterface {
     return new Promise(async (resolve, reject) => {
       return this.web3.eth.sendSignedTransaction(signedTx.rawTransaction)
         .on('transactionHash', (hash) => {
-          resolve(hash);
-        }).on('receipt', (receipt) => {
-          if (onReceipt) {
-            onReceipt(receipt);
+          if (eventCallbacks && eventCallbacks.onTransactionHash) {
+            eventCallbacks.onTransactionHash(hash);
+            if (!eventCallbacks.onReceipt) {
+              resolve(hash);
+            }
           }
+        }).on('receipt', (receipt) => {
+          if (eventCallbacks && eventCallbacks.onReceipt) {
+            eventCallbacks.onReceipt(receipt);
+          }
+          resolve(receipt);
         }).on('error', (err) => {
           reject(new Error('Cannot send transaction: ' + err));
         }).catch((err) => {
