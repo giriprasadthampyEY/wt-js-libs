@@ -61,6 +61,23 @@ const hotelDataIndexUrl = dataIndex.ref;
 const hotelDescriptionDocument = await dataIndex.contents.descriptionUri;
 // This data is fetched from another off-chain document
 const hotelName = await hotelDescriptionDocument.contents.name;
+
+
+// How about creating a hotel?
+wallet = await libs.createWallet({/*...Your wallet in a JSON format..*/});
+wallet.unlock('with-password');
+try {
+  const { hotel, transactionData, eventCallbacks } = await index.addHotel({
+    manager: wallet.getAddress(),
+    dataUri: 'https://example.com/my-hotel-data.json',
+  });
+  const result = await wallet.signAndSendTransaction(transactionData, eventCallbacks);
+  // After the transaction is confirmed, one of the callbacks
+  // will set the address of the hotel.
+  const newHotelAddress = hotel.address;
+} finally {
+  wallet.lock();
+}
 ```
 
 ## Documentation

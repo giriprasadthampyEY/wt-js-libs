@@ -1,5 +1,5 @@
 // @flow
-import type { TransactionOptionsInterface, WalletInterface, HotelInterface, HotelOnChainDataInterface } from '../interfaces';
+import type { TransactionOptionsInterface, TransactionCallbacksInterface, PreparedTransactionMetadataInterface, TxReceiptInterface, HotelInterface, HotelOnChainDataInterface } from '../interfaces';
 import type { PlainHotelInterface } from '../data-interfaces';
 import Utils from '../utils';
 import Contracts from '../contracts';
@@ -232,13 +232,14 @@ class OnChainHotel implements HotelInterface {
   }
 
   /**
-   * Updates dataUri on-chain. Used internally as a remoteSetter for `dataUri` property.
+   * Generates transaction data and metadata for updating dataUri on-chain.
+   * Used internally as a remoteSetter for `dataUri` property.
+   * Transaction is not signed nor sent here.
    *
-   * @param {WalletInterface} wallet that signs the transaction
    * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
-   * @return {Promise<string>} resulting transaction hash
+   * @return {Promise<PreparedTransactionMetadataInterface>} resulting transaction metadata
    */
-  async __editInfoOnChain (wallet: WalletInterface, transactionOptions: TransactionOptionsInterface): Promise<string> {
+  async __editInfoOnChain (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
     const data = (await this.__getContractInstance()).methods.editInfo(await this.dataUri).encodeABI();
     const estimate = await this.indexContract.methods.callHotel(this.address, data).estimateGas(transactionOptions);
     const txData = this.indexContract.methods.callHotel(this.address, data).encodeABI();
@@ -249,33 +250,20 @@ class OnChainHotel implements HotelInterface {
       to: this.indexContract.options.address,
       gas: this.web3Utils.applyGasCoefficient(estimate),
     };
-    return wallet.signAndSendTransaction(transactionData)
-      .then((hash) => {
-        return hash;
-      })
-      .catch((err) => {
-        throw new Error('Cannot update hotel: ' + err);
-      });
+    return {
+      hotel: (this: HotelInterface),
+      transactionData: transactionData,
+    };
   }
 
   /**
-   * Creates new hotel contract on-chain.
+   * Generates transaction data and metadata for creating new hotel contract on-chain.
+   * Transaction is not signed nor sent here.
    *
-   * Precomputes the deployed hotel on-chain address, so even if
-   * the resulting transaction is not yet mined, the address is already known.
-   *
-   * Returns once the transaction is signed and sent to network by `wallet`.
-   *
-   * @param {WalletInterface} wallet that signs the transaction
    * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
-   * @return {Promise<Array<string>>} list of resulting transaction hashes
+   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created hotel instance.
    */
-  async createOnChainData (wallet: WalletInterface, transactionOptions: TransactionOptionsInterface): Promise<Array<string>> {
-    // Pre-compute hotel address, we need to use index for it's creating the contract
-    this.address = this.web3Utils.determineDeployedContractFutureAddress(
-      this.indexContract.options.address,
-      await this.web3Utils.determineCurrentAddressNonce(this.indexContract.options.address)
-    );
+  async createOnChainData (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
     // Create hotel on-network
     const dataUri = await this.dataUri;
     const estimate = await this.indexContract.methods.registerHotel(dataUri).estimateGas(transactionOptions);
@@ -287,45 +275,47 @@ class OnChainHotel implements HotelInterface {
       to: this.indexContract.options.address,
       gas: this.web3Utils.applyGasCoefficient(estimate),
     };
-    return wallet.signAndSendTransaction(transactionData, () => {
-      this.onChainDataset.markDeployed();
-    })
-      .then((hash) => {
-        return [hash];
-      })
-      .catch((err) => {
-        throw new Error('Cannot create hotel: ' + err);
-      });
+    const eventCallbacks: TransactionCallbacksInterface = {
+      onReceipt: (receipt: TxReceiptInterface) => {
+        this.onChainDataset.markDeployed();
+        if (receipt && receipt.logs) {
+          let decodedLogs = this.web3Contracts.decodeLogs(receipt.logs);
+          this.address = decodedLogs[0].attributes[0].value;
+        }
+      },
+    };
+    return {
+      hotel: (this: HotelInterface),
+      transactionData: transactionData,
+      eventCallbacks: eventCallbacks,
+    };
   }
 
   /**
-   * Updates all hotel-related data by calling `updateRemoteData` on a `RemotelyBackedDataset`
-   * dataset.
+   * Generates transaction data and metadata required for all hotel-related data modification
+   * by calling `updateRemoteData` on a `RemotelyBackedDataset`.
    *
-   * @param {WalletInterface} wallet that signs the transaction
    * @param {TransactionOptionsInterface} options object that is passed to all remote data setters
    * @throws {Error} When the underlying contract is not yet deployed.
    * @throws {Error} When dataUri is empty.
-   * @return {Promise<Array<string>>} List of transaction hashes
+   * @return {Promise<Array<PreparedTransactionMetadataInterface>>} List of transaction metadata
    */
-  async updateOnChainData (wallet: WalletInterface, transactionOptions: TransactionOptionsInterface): Promise<Array<string>> {
+  async updateOnChainData (transactionOptions: TransactionOptionsInterface): Promise<Array<PreparedTransactionMetadataInterface>> {
     // pre-check if contract is available at all and fail fast
     await this.__getContractInstance();
     // We have to clone options for each dataset as they may get modified
     // along the way
-    return this.onChainDataset.updateRemoteData(wallet, Object.assign({}, transactionOptions));
+    return this.onChainDataset.updateRemoteData(Object.assign({}, transactionOptions));
   }
 
   /**
-   * Destroys the object on network, in this case, calls a `deleteHotel` on
-   * Winding Tree index contract.
+   * Generates transaction data and metadata required for destroying the hotel object on network.
    *
-   * @param {WalletInterface} wallet that signs the transaction
    * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
    * @throws {Error} When the underlying contract is not yet deployed.
-   * @return {Promise<Array<string>>} List of transaction hashes
+   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created hotel instance.
    */
-  async removeOnChainData (wallet: WalletInterface, transactionOptions: TransactionOptionsInterface): Promise<Array<string>> {
+  async removeOnChainData (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
     if (!this.onChainDataset.isDeployed()) {
       throw new Error('Cannot remove hotel: not deployed');
     }
@@ -338,15 +328,16 @@ class OnChainHotel implements HotelInterface {
       to: this.indexContract.options.address,
       gas: this.web3Utils.applyGasCoefficient(estimate),
     };
-    return wallet.signAndSendTransaction(transactionData, () => {
-      this.onChainDataset.markObsolete();
-    })
-      .then((hash) => {
-        return [hash];
-      })
-      .catch((err) => {
-        throw new Error('Cannot remove hotel: ' + err);
-      });
+    const eventCallbacks: TransactionCallbacksInterface = {
+      onReceipt: (receipt: TxReceiptInterface) => {
+        this.onChainDataset.markObsolete();
+      },
+    };
+    return {
+      hotel: (this: HotelInterface),
+      transactionData: transactionData,
+      eventCallbacks: eventCallbacks,
+    };
   }
 }
 

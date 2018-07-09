@@ -40,13 +40,6 @@ describe('WTLibs.Utils', () => {
     });
   });
 
-  describe('determineDeployedContractFutureAddress', () => {
-    it('should compute proper address', () => {
-      const expectedAddress = '0x0C4c734F0Ecb92270D1ebE7b04aEC4440EB05CAa';
-      assert.equal(utils.determineDeployedContractFutureAddress('0x8c2373842d5ea4ce4baf53f4175e5e42a364c59c', 3), expectedAddress);
-    });
-  });
-
   describe('determineCurrentAddressNonce', () => {
     it('should return transaction count', async () => {
       sinon.stub(utils.web3.eth, 'getTransactionCount').returns(6);

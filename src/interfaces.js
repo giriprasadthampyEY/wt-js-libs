@@ -5,19 +5,6 @@ import BigNumber from 'bignumber.js';
 import StoragePointer from './storage-pointer';
 
 /**
- * Response of the addHotel operation.
- *
- *   - `address` holds the projected address of newly created hotel.
- *   - `transactionIds` contains an array of ids of related transactions
- *   that had to be sent to the underlying networks. You can
- *   use these ids to check on the asynchronous operation state.
- */
-export interface AddHotelResponseInterface {
-  address: ?string,
-  transactionIds: Array<string>
-}
-
-/**
  * Shape of data that is stored on-chain
  * about every hotel.
  *
@@ -48,6 +35,29 @@ export interface TransactionOptionsInterface {
 }
 
 /**
+ * Callback options that can be passed to a transaction that
+ * will be signed and sent through our Wallet abstraction.
+ */
+export interface TransactionCallbacksInterface {
+  onReceipt?: (receipt: TxReceiptInterface) => void,
+  onTransactionHash?: (hash: string) => void
+}
+
+/**
+ * Format of generated transaction data and metadata
+ * that contains a related hotel instance, transactionData
+ * itself (ready for signing) and optionally eventCallbacks
+ * that should be passed to our Wallet abstraction with
+ * transactionData itself to ensure a consistent internal state
+ * after the transaction is mined.
+ */
+export interface PreparedTransactionMetadataInterface {
+  hotel: HotelInterface,
+  transactionData: TransactionDataInterface,
+  eventCallbacks?: TransactionCallbacksInterface
+}
+
+/**
  * Represents a hotel instance that can
  * communicate with on-chain hotel representation
  * and provides an access to offChain data via `dataIndex`
@@ -59,9 +69,9 @@ export interface HotelInterface extends HotelOnChainDataInterface {
 
   toPlainObject(): Promise<Object>,
   setLocalData(newData: HotelOnChainDataInterface): Promise<void>,
-  createOnChainData(wallet: WalletInterface, transactionOptions: TransactionOptionsInterface): Promise<Array<string>>,
-  updateOnChainData(wallet: WalletInterface, transactionOptions: TransactionOptionsInterface): Promise<Array<string>>,
-  removeOnChainData(wallet: WalletInterface, transactionOptions: TransactionOptionsInterface): Promise<Array<string>>
+  createOnChainData(transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>,
+  updateOnChainData(transactionOptions: TransactionOptionsInterface): Promise<Array<PreparedTransactionMetadataInterface>>,
+  removeOnChainData(transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>
 }
 
 /**
@@ -69,13 +79,12 @@ export interface HotelInterface extends HotelOnChainDataInterface {
  * necessary for interaction with the hotels.`
  */
 export interface WTIndexInterface {
-  addHotel(wallet: WalletInterface, hotel: HotelOnChainDataInterface): Promise<AddHotelResponseInterface>,
+  addHotel(hotel: HotelOnChainDataInterface): Promise<PreparedTransactionMetadataInterface>,
   getHotel(address: string): Promise<?HotelInterface>,
   getAllHotels(): Promise<Array<HotelInterface>>,
   // It is possible that this operation generates multiple transactions in the future
-  updateHotel(wallet: WalletInterface, hotel: HotelInterface): Promise<Array<string>>,
-  // It is possible that this operation generates multiple transactions in the future
-  removeHotel(wallet: WalletInterface, hotel: HotelInterface): Promise<Array<string>>
+  updateHotel(hotel: HotelInterface): Promise<Array<PreparedTransactionMetadataInterface>>,
+  removeHotel(hotel: HotelInterface): Promise<PreparedTransactionMetadataInterface>
 }
 
 /**
@@ -135,9 +144,9 @@ export interface DecodedLogRecordInterface {
  * https://web3js.readthedocs.io/en/1.0/web3-eth-accounts.html#signtransaction
  */
 export interface TransactionDataInterface {
-  nonce?: string | number,
+  nonce?: ?number,
   chainId?: string,
-  from?: string,
+  from: string,
   to: string,
   data: string,
   value?: string,
@@ -225,7 +234,7 @@ export interface AdaptedTxResultsInterface {
  */
 export interface WalletInterface {
   unlock(password: string): void,
-  signAndSendTransaction(transactionData: TransactionDataInterface, onReceipt: ?(receipt: TxReceiptInterface) => void): Promise<string>,
+  signAndSendTransaction(transactionData: TransactionDataInterface, eventCallBacks: TransactionCallbacksInterface): Promise<string | TxReceiptInterface>,
   lock(): void,
   destroy(): void,
   getAddress(): string

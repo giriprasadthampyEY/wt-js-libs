@@ -145,10 +145,10 @@ describe('WTLibs.Wallet', () => {
   });
 
   describe('signAndSendTransaction', () => {
-    let wallet;
+    let wallet, sendStub;
     beforeEach(async function () {
       wallet = await dataModel.createWallet(jsonWallet);
-      sinon.stub(wallet.web3.eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent());
+      sendStub = sinon.stub(wallet.web3.eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent());
     });
 
     afterEach(() => {
@@ -200,6 +200,18 @@ describe('WTLibs.Wallet', () => {
     it('should sign and send a transaction', async () => {
       wallet.unlock(correctPassword);
       sinon.stub(wallet.__account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
+      await wallet.signAndSendTransaction({
+        from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
+        to: 'bbb',
+        data: 'data',
+        gas: 1234,
+      });
+      assert.equal(sendStub.callCount, 1);
+    });
+
+    it('should resolve with tx hash without callbacks', async () => {
+      wallet.unlock(correctPassword);
+      sinon.stub(wallet.__account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
       const result = await wallet.signAndSendTransaction({
         from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
         to: 'bbb',
@@ -209,7 +221,7 @@ describe('WTLibs.Wallet', () => {
       assert.equal(result, 'tx-hash');
     });
 
-    it('should call onReceipt callback', async () => {
+    it('should call onReceipt callback and resolve with receipt', async () => {
       wallet.unlock(correctPassword);
       sinon.stub(wallet.__account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
       const receiptCallback = sinon.stub().returns(null);
@@ -218,9 +230,47 @@ describe('WTLibs.Wallet', () => {
         to: 'bbb',
         data: 'data',
         gas: 1234,
-      }, receiptCallback);
-      assert.equal(result, 'tx-hash');
+      }, {
+        onReceipt: receiptCallback,
+      });
+      assert.isDefined(result);
+      assert.equal(result.some, 'receipt');
       assert.equal(receiptCallback.callCount, 1);
+    });
+
+    it('should call onTransactionHash callback and resolve with tx hash', async () => {
+      wallet.unlock(correctPassword);
+      sinon.stub(wallet.__account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
+      const txHashCallback = sinon.stub().returns(null);
+      const result = await wallet.signAndSendTransaction({
+        from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
+        to: 'bbb',
+        data: 'data',
+        gas: 1234,
+      }, {
+        onTransactionHash: txHashCallback,
+      });
+      assert.equal(result, 'tx-hash');
+      assert.equal(txHashCallback.callCount, 1);
+    });
+
+    it('should call both callbacks and resolve with receipt', async () => {
+      wallet.unlock(correctPassword);
+      sinon.stub(wallet.__account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
+      const receiptCallback = sinon.stub().returns(null);
+      const txHashCallback = sinon.stub().returns(null);
+      const result = await wallet.signAndSendTransaction({
+        from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
+        to: 'bbb',
+        data: 'data',
+        gas: 1234,
+      }, {
+        onReceipt: receiptCallback, onTransactionHash: txHashCallback,
+      });
+      assert.isDefined(result);
+      assert.equal(result.some, 'receipt');
+      assert.equal(receiptCallback.callCount, 1);
+      assert.equal(txHashCallback.callCount, 1);
     });
 
     it('should reject on error event', async () => {

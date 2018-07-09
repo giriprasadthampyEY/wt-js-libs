@@ -2,7 +2,6 @@
 
 import type { TxReceiptInterface, TxInterface } from './interfaces';
 import Web3 from 'web3';
-import RLP from 'rlp';
 
 /**
  * Collection of utility methods useful during
@@ -51,24 +50,6 @@ class Utils {
       return Math.ceil(gas * this.gasCoefficient);
     }
     return gas;
-  }
-
-  /**
-   * Determines the future address of a deployed contact if such
-   * contact is deployed in a transaction originating from `sender`
-   * with `nonce`. Uses a direct RLP implementation based on
-   * https://ethereum.stackexchange.com/a/32736.
-   *
-   * @param {string} sender
-   * @param {number} nonce
-   * @type {string} Resulting address
-   */
-  determineDeployedContractFutureAddress (sender: string, nonce: number): string {
-    // web3js stores checksummed addresses by default
-    // (@see https://github.com/ethereum/EIPs/blob/master/EIPS/eip-55.md)
-    return this.web3.utils.toChecksumAddress(
-      this.web3.utils.sha3(RLP.encode([sender, nonce])).slice(12).substring(14)
-    );
   }
 
   /**
