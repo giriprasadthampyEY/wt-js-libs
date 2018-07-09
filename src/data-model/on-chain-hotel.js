@@ -251,7 +251,7 @@ class OnChainHotel implements HotelInterface {
       gas: this.web3Utils.applyGasCoefficient(estimate),
     };
     return {
-      instance: (this: HotelInterface),
+      hotel: (this: HotelInterface),
       transactionData: transactionData,
     };
   }
@@ -285,7 +285,7 @@ class OnChainHotel implements HotelInterface {
       },
     };
     return {
-      instance: (this: HotelInterface),
+      hotel: (this: HotelInterface),
       transactionData: transactionData,
       eventCallbacks: eventCallbacks,
     };
@@ -334,7 +334,7 @@ class OnChainHotel implements HotelInterface {
       },
     };
     return {
-      instance: (this: HotelInterface),
+      hotel: (this: HotelInterface),
       transactionData: transactionData,
       eventCallbacks: eventCallbacks,
     };

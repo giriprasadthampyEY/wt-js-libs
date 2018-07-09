@@ -67,13 +67,14 @@ const hotelName = await hotelDescriptionDocument.contents.name;
 wallet = await libs.createWallet({/*...Your wallet in a JSON format..*/});
 wallet.unlock('with-password');
 try {
-  const createHotel = await index.addHotel({
+  const { hotel, transactionData, eventCallbacks } = await index.addHotel({
     manager: wallet.getAddress(),
     dataUri: 'https://example.com/my-hotel-data.json',
   });
-  const resultingHotel = createHotel.instance;
-  const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
-  const newHotelAddress = resultingHotel.address;
+  const result = await wallet.signAndSendTransaction(transactionData, eventCallbacks);
+  // After the transaction is confirmed, one of the callbacks
+  // will set the address of the hotel.
+  const newHotelAddress = hotel.address;
 } finally {
   wallet.lock();
 }

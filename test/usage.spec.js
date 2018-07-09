@@ -38,7 +38,7 @@ describe('WTLibs usage', () => {
         manager: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
         dataUri: dataUri,
       });
-      const hotel = createHotel.instance;
+      const hotel = createHotel.hotel;
       const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
 
       assert.isDefined(result);
@@ -92,7 +92,7 @@ describe('WTLibs usage', () => {
         dataUri: 'json://some-data-hash',
         manager: manager,
       });
-      const origHotel = createHotel.instance;
+      const origHotel = createHotel.hotel;
       await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
       assert.isDefined(origHotel.address);
 

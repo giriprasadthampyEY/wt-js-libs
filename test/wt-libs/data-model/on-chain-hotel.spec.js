@@ -274,7 +274,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
     it('should return transaction metadata', async () => {
       const result = await provider.createOnChainData({ from: 'xx' });
       assert.isDefined(result.transactionData);
-      assert.isDefined(result.instance);
+      assert.isDefined(result.hotel);
       assert.isDefined(result.eventCallbacks);
       assert.isDefined(result.eventCallbacks.onReceipt);
     });
@@ -297,9 +297,9 @@ describe('WTLibs.data-model.OnChainHotel', () => {
     it('should return eventCallback that will parse receipt logs for contract address', async () => {
       assert.isFalse(provider.onChainDataset.isDeployed());
       const result = await provider.createOnChainData({ from: 'xx' });
-      assert.isUndefined(await result.instance.address);
+      assert.isUndefined(await result.hotel.address);
       result.eventCallbacks.onReceipt({ logs: [{ some: 'logs' }] });
-      assert.equal(await result.instance.address, '0xnew-hotel-address');
+      assert.equal(await result.hotel.address, '0xnew-hotel-address');
     });
   });
 
@@ -334,7 +334,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
       const result = await provider.updateOnChainData({ from: 'xx' });
       assert.equal(result.length, 1);
       assert.isDefined(result[0].transactionData);
-      assert.isDefined(result[0].instance);
+      assert.isDefined(result[0].hotel);
       assert.isDefined(result[0].eventCallbacks);
       assert.isDefined(result[0].eventCallbacks.onReceipt);
     });
@@ -367,7 +367,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
     it('should return transaction metadata', async () => {
       const result = await provider.removeOnChainData({ from: 'xx' });
       assert.isDefined(result.transactionData);
-      assert.isDefined(result.instance);
+      assert.isDefined(result.hotel);
       assert.isDefined(result.eventCallbacks);
       assert.isDefined(result.eventCallbacks.onReceipt);
     });

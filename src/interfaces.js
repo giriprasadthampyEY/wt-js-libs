@@ -52,7 +52,7 @@ export interface TransactionCallbacksInterface {
  * after the transaction is mined.
  */
 export interface PreparedTransactionMetadataInterface {
-  instance: HotelInterface,
+  hotel: HotelInterface,
   transactionData: TransactionDataInterface,
   eventCallbacks?: TransactionCallbacksInterface
 }
