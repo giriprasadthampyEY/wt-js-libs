@@ -1,5 +1,5 @@
 import offChainData from './data/off-chain-data.json';
-import { adapter as InMemoryAdapter, storageInstance } from '@windingtree/off-chain-adapter-in-memory';
+import InMemoryAdapter from '@windingtree/off-chain-adapter-in-memory';
 
 export const Web3UriBackedDataModel = {
   emptyConfig: {},
@@ -22,7 +22,7 @@ export const Web3UriBackedDataModel = {
 };
 
 for (let key in offChainData) {
-  storageInstance.update(key, offChainData[key]);
+  InMemoryAdapter.storageInstance.update(key, offChainData[key]);
 }
 
 export default Web3UriBackedDataModel;

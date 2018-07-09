@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import OffChainDataClient from '../../src/off-chain-data-client';
-import { adapter as InMemoryAdapter } from '@windingtree/off-chain-adapter-in-memory';
+import InMemoryAdapter from '@windingtree/off-chain-adapter-in-memory';
 
 describe('WTLibs.OffChainDataClient', () => {
   beforeEach(() => {
