@@ -165,7 +165,6 @@ class WTIndex implements WTIndexInterface {
           // We don't really care why the hotel is inaccessible
           // and we need to catch exceptions here on each individual hotel
           .catch((err: Error): null => {
-            // TODO optional logging/improve error handling.
             if (err) {}
             return null;
           });

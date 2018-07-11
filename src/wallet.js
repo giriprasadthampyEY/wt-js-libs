@@ -1,6 +1,7 @@
 // @flow
 import Web3 from 'web3';
 import type { WalletInterface, KeystoreV3Interface, TransactionDataInterface, TransactionCallbacksInterface, TxReceiptInterface } from './interfaces';
+import { WalletError } from './errors';
 
 /**
  * Web3 based wallet implementation
@@ -43,15 +44,15 @@ class Wallet implements WalletInterface {
    * in a checksummed format, e.g. prefixed with 0x
    * and case-sensitive.
    *
-   * @throws {Error} When wallet was destroyed.
-   * @throws {Error} When there's no keystore
+   * @throws {WalletError} When wallet was destroyed.
+   * @throws {WalletError} When there's no keystore
    */
   getAddress (): string {
     if (this.isDestroyed()) {
-      throw new Error('Cannot get address of a destroyed wallet.');
+      throw new WalletError('Cannot get address of a destroyed wallet.');
     }
     if (!this._jsonWallet || !this._jsonWallet.address) {
-      throw new Error('Cannot get address from a non existing keystore.');
+      throw new WalletError('Cannot get address from a non existing keystore.');
     }
     return this.web3.utils.toChecksumAddress(this._jsonWallet.address);
   }
@@ -60,17 +61,21 @@ class Wallet implements WalletInterface {
    * Unlocks/decrypts the JSON wallet keystore. <strong>From now on
    * there is a readable privateKey stored in memory!</strong>
    *
-   * @throws {Error} When wallet was destroyed.
-   * @throws {Error} When there is no web3 instance configured.
+   * @throws {WalletError} When wallet was destroyed.
+   * @throws {WalletError} When there is no web3 instance configured.
    */
   unlock (password: string) {
     if (this.isDestroyed()) {
-      throw new Error('Cannot unlock destroyed wallet.');
+      throw new WalletError('Cannot unlock destroyed wallet.');
     }
     if (!this.web3) {
-      throw new Error('Cannot unlock wallet without web3 instance.');
+      throw new WalletError('Cannot unlock wallet without web3 instance.');
     }
-    this._account = this.web3.eth.accounts.decrypt(this._jsonWallet, password);
+    try {
+      this.__account = this.web3.eth.accounts.decrypt(this._jsonWallet, password);
+    } catch (e) {
+      throw new WalletError(e);
+    }
   }
   
   /**
@@ -79,27 +84,27 @@ class Wallet implements WalletInterface {
    * a `receipt` event (with raw receipt object). This depends on passed eventCallbacks.
    * When onReceipt callback is present, Promise is resolved after `receipt` event
    *
-   * @throws {Error} When wallet was destroyed.
-   * @throws {Error} When there is no web3 instance configured.
-   * @throws {Error} When wallet is not unlocked.
-   * @throws {Error} When transaction.from does not match the wallet account.
+   * @throws {WalletError} When wallet was destroyed.
+   * @throws {WalletError} When there is no web3 instance configured.
+   * @throws {WalletError} When wallet is not unlocked.
+   * @throws {WalletError} When transaction.from does not match the wallet account.
    * @param  {TransactionDataInterface} transactionData
    * @param  {TransactionCallbacksInterface} optional callbacks called when events come back from the network
    * @return {Promise<string|TxReceiptInterface>} transaction hash
    */
   async signAndSendTransaction (transactionData: TransactionDataInterface, eventCallbacks: ?TransactionCallbacksInterface): Promise<string | TxReceiptInterface> {
     if (this.isDestroyed()) {
-      throw new Error('Cannot use destroyed wallet.');
+      throw new WalletError('Cannot use destroyed wallet.');
     }
     if (!this.web3) {
-      throw new Error('Cannot use wallet without web3 instance.');
+      throw new WalletError('Cannot use wallet without web3 instance.');
     }
     if (!this._account) {
-      throw new Error('Cannot use wallet without unlocking it first.');
+      throw new WalletError('Cannot use wallet without unlocking it first.');
     }
     // Ignore checksummed formatting
     if (transactionData.from && transactionData.from.toLowerCase() !== this.getAddress().toLowerCase()) {
-      throw new Error('Transaction originator does not match the wallet address.');
+      throw new WalletError('Transaction originator does not match the wallet address.');
     }
     const signedTx = await this._account.signTransaction(transactionData);
     return new Promise(async (resolve, reject) => {
@@ -117,9 +122,9 @@ class Wallet implements WalletInterface {
           }
           resolve(receipt);
         }).on('error', (err) => {
-          reject(new Error('Cannot send transaction: ' + err));
+          reject(new WalletError('Cannot send transaction: ' + err));
         }).catch((err) => {
-          reject(new Error('Cannot send transaction: ' + err));
+          reject(new WalletError('Cannot send transaction: ' + err));
         });
     });
   }
@@ -132,11 +137,11 @@ class Wallet implements WalletInterface {
    * This relies on the JS garbage collector, so please do not reference
    * the internal variables of this class elsewhere.
    *
-   * @throws {Error} When wallet was destroyed.
+   * @throws {WalletError} When wallet was destroyed.
    */
   lock () {
     if (this.isDestroyed()) {
-      throw new Error('Cannot lock destroyed wallet.');
+      throw new WalletError('Cannot lock destroyed wallet.');
     }
     this._account = null;
     delete this._account;
@@ -150,11 +155,11 @@ class Wallet implements WalletInterface {
    * This relies on the JS garbage collector, so please do not reference
    * the internal variables of this class elsewhere.
    *
-   * @throws {Error} When wallet was destroyed.
+   * @throws {WalletError} When wallet was destroyed.
    */
   destroy () {
     if (this.isDestroyed()) {
-      throw new Error('Cannot destroy destroyed wallet.');
+      throw new WalletError('Cannot destroy destroyed wallet.');
     }
     this.lock();
     this._jsonWallet = null;
