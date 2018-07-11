@@ -50,7 +50,7 @@ const hotel = await index.getHotel('0x...');
 // This approach might be a little slow as all off-chain data gets downloaded
 const plainHotel = await hotel.toPlainObject();
 // You get a synced plain javascript object you can traverse in any way you want
-const hotelName2 = plainHotel.descriptionUri.contents.name;
+const hotelName2 = plainHotel.dataUri.contents.descriptionUri.contents.name;
 
 // OR you can be picky but faster
 
