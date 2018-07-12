@@ -211,6 +211,8 @@ class OnChainHotel implements HotelInterface {
    *
    * @param {resolvedFields} List of fields to be resolved from off chain data, in dot notation.
    * If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
+   *
+   * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
    */
   async toPlainObject (resolvedFields: ?Array<string>): Promise<PlainHotelInterface> {
     const dataIndex = (await this.dataIndex);

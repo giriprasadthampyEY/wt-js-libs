@@ -205,9 +205,16 @@ class StoragePointer {
     if (!this._downloading) {
       this._downloading = (async () => {
         const adapter = await this._getOffChainDataClient();
-        const data = (await adapter.download(this.ref)) || {};
-        this._initFromStorage(data);
-        this._downloaded = true;
+        try {
+          const data = (await adapter.download(this.ref)) || {};
+          this._initFromStorage(data);
+          this._downloaded = true;
+        } catch (err) {
+          if (err instanceof StoragePointerError) {
+            throw err;
+          }
+          throw new StoragePointerError('Cannot download data: ' + err.message, err);
+        }
       })();
     }
     return this._downloading;
@@ -247,6 +254,8 @@ class StoragePointer {
    *
    *  @param {resolvedFields} list of fields that limit the resulting dataset in dot notation (`father.child.son`).
    *  If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
+   *
+   * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
    */
   async toPlainObject (resolvedFields: ?Array<string>): Promise<{ref: string, contents: Object}> {
     // Download data
