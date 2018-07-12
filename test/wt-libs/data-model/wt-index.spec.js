@@ -80,13 +80,14 @@ describe('WTLibs.data-models.WTIndexDataProvider', () => {
     it('should throw generic error when something does not work during tx data preparation', async () => {
       try {
         const hotel = await indexDataProvider.getHotel('0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
-        sinon.stub(hotel, 'updateOnChainData').rejects();
+        sinon.stub(hotel, 'updateOnChainData').rejects('some original error');
         await indexDataProvider.updateHotel(hotel);
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot update hotel/i);
         assert.instanceOf(e, WTLibsError);
-        console.log(e.originalError);
+        assert.isDefined(e.originalError);
+        assert.equal(e.originalError.name, 'some original error');
       }
     });
   });

@@ -131,7 +131,7 @@ class RemotelyBackedDataset {
    * was modified locally before, the modified value will be returned.
    *
    * @param  {string} property
-   * @throws {Error} When dataset is marked as obsolete
+   * @throws {RemoteDataAccessError} When dataset is marked as obsolete
    * @return {any} property's current value
    */
   async _genericGetter (property) {

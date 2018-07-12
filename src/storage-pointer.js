@@ -72,7 +72,7 @@ class StoragePointer {
    *
    * @param {string} uri where to look for data document. It has to include schema, i. e. `https://example.com/data`
    * @param {Array<FieldDefType | string>} fields list of top-level fields in the referred document
-   * @throw {Error} if uri is not defined
+   * @throw {StoragePointerError} if uri is not defined
    */
   static createInstance (uri: ?string, fields: ?Array<FieldDefType | string>): StoragePointer {
     if (!uri) {
