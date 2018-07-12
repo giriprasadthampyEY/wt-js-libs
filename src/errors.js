@@ -1,7 +1,8 @@
 export class WTLibsError extends Error {
-  constructor (message) {
+  constructor (message, originalError) {
     super(message);
     this.name = this.constructor.name;
+    this.originalError = originalError;
     Error.captureStackTrace(this, this.constructor);
   }
 }
@@ -9,8 +10,6 @@ export class WTLibsError extends Error {
 export class SmartContractInstantiationError extends WTLibsError {}
 
 export class WalletError extends WTLibsError {}
-
-export class EthereumNetworkError extends WTLibsError {}
 
 export class InputDataError extends WTLibsError {}
 
