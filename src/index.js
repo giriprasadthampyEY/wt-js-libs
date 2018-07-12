@@ -6,6 +6,20 @@ import type { WTIndexInterface, AdaptedTxResultsInterface, OffChainDataAdapterIn
 import DataModel from './data-model';
 import OffChainDataClient from './off-chain-data-client';
 
+import {
+  WTLibsError,
+  SmartContractInstantiationError,
+  WalletError,
+  InputDataError,
+  OffChainDataError,
+  OffChainDataConfigurationError,
+  OffChainDataRuntimeError,
+  StoragePointerError,
+  RemotelyBackedDatasetError,
+  RemoteDataAccessError,
+  RemoteDataReadError,
+} from './errors';
+
 /**
  * General options for wt-libs-js. Holds all things necessary
  * for successful setup of Winding Tree network.
@@ -65,5 +79,23 @@ class WTLibs {
     return OffChainDataClient.getAdapter(schema);
   }
 }
+
+/**
+ * A map of errors that WTLibs can throw, useful
+ * for checking what happened in your code.
+ */
+WTLibs.errors = {
+  WTLibsError,
+  SmartContractInstantiationError,
+  WalletError,
+  InputDataError,
+  OffChainDataError,
+  OffChainDataConfigurationError,
+  OffChainDataRuntimeError,
+  StoragePointerError,
+  RemotelyBackedDatasetError,
+  RemoteDataAccessError,
+  RemoteDataReadError,
+};
 
 export default WTLibs;
