@@ -35,6 +35,7 @@ type WtLibsOptionsType = {
  * Main public interface of wt-libs-js.
  */
 class WTLibs {
+  static errors: Object;
   dataModel: DataModel;
   offChainDataClient: OffChainDataClient;
   options: WtLibsOptionsType;
