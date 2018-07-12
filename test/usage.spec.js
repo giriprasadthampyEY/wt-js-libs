@@ -17,7 +17,7 @@ describe('WTLibs usage', () => {
 
   afterEach(() => {
     wallet.destroy();
-    OffChainDataClient.__reset();
+    OffChainDataClient._reset();
   });
 
   describe('addHotel', () => {

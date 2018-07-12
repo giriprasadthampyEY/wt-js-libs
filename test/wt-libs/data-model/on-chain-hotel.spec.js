@@ -356,7 +356,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
 
     it('should throw on an undeployed contract', async () => {
       try {
-        provider.onChainDataset.__deployedFlag = false;
+        provider.onChainDataset._deployedFlag = false;
         await provider.removeOnChainData({});
         throw new Error('should not have been called');
       } catch (e) {

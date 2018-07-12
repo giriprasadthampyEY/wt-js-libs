@@ -46,7 +46,7 @@ class OffChainDataClient {
   /**
    * Drops all pre-configured OffChainDataAdapters. Useful for testing.
    */
-  static __reset () {
+  static _reset () {
     offChainDataOptions.adapters = {};
   }
 

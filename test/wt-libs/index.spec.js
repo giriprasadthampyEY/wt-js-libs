@@ -51,7 +51,7 @@ describe('WTLibs', () => {
       });
       const adapter = await libs.getOffChainDataClient('json');
       assert.isDefined(adapter);
-      OffChainDataClient.__reset();
+      OffChainDataClient._reset();
     });
   });
 });

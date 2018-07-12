@@ -65,9 +65,9 @@ describe('WTLibs.Wallet', () => {
     it('should lock the wallet', async () => {
       const wallet = await dataModel.createWallet(jsonWallet);
       wallet.unlock(correctPassword);
-      assert.isDefined(wallet.__account);
+      assert.isDefined(wallet._account);
       wallet.lock();
-      assert.isUndefined(wallet.__account);
+      assert.isUndefined(wallet._account);
     });
 
     it('should not lock a destroyed wallet', async () => {
@@ -85,19 +85,19 @@ describe('WTLibs.Wallet', () => {
   describe('destroy', () => {
     it('should destroy a wallet', async () => {
       const wallet = await dataModel.createWallet(jsonWallet);
-      assert.isDefined(wallet.__jsonWallet);
+      assert.isDefined(wallet._jsonWallet);
       wallet.destroy();
-      assert.isUndefined(wallet.__jsonWallet);
+      assert.isUndefined(wallet._jsonWallet);
     });
 
     it('should lock a wallet before destroying it', async () => {
       const wallet = await dataModel.createWallet(jsonWallet);
       wallet.unlock(correctPassword);
-      assert.isDefined(wallet.__account);
-      assert.isDefined(wallet.__jsonWallet);
+      assert.isDefined(wallet._account);
+      assert.isDefined(wallet._jsonWallet);
       wallet.destroy();
-      assert.isUndefined(wallet.__jsonWallet);
-      assert.isUndefined(wallet.__account);
+      assert.isUndefined(wallet._jsonWallet);
+      assert.isUndefined(wallet._account);
     });
 
     it('should not destroy an already destroyed wallet', async () => {
@@ -124,7 +124,7 @@ describe('WTLibs.Wallet', () => {
     });
 
     it('should throw when no JSON wallet exists', () => {
-      wallet.__jsonWallet = null;
+      wallet._jsonWallet = null;
       try {
         wallet.getAddress();
         throw new Error('should not have been called');
@@ -199,7 +199,7 @@ describe('WTLibs.Wallet', () => {
 
     it('should sign and send a transaction', async () => {
       wallet.unlock(correctPassword);
-      sinon.stub(wallet.__account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
+      sinon.stub(wallet._account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
       await wallet.signAndSendTransaction({
         from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
         to: 'bbb',
@@ -211,7 +211,7 @@ describe('WTLibs.Wallet', () => {
 
     it('should resolve with tx hash without callbacks', async () => {
       wallet.unlock(correctPassword);
-      sinon.stub(wallet.__account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
+      sinon.stub(wallet._account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
       const result = await wallet.signAndSendTransaction({
         from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
         to: 'bbb',
@@ -223,7 +223,7 @@ describe('WTLibs.Wallet', () => {
 
     it('should call onReceipt callback and resolve with receipt', async () => {
       wallet.unlock(correctPassword);
-      sinon.stub(wallet.__account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
+      sinon.stub(wallet._account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
       const receiptCallback = sinon.stub().returns(null);
       const result = await wallet.signAndSendTransaction({
         from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
@@ -240,7 +240,7 @@ describe('WTLibs.Wallet', () => {
 
     it('should call onTransactionHash callback and resolve with tx hash', async () => {
       wallet.unlock(correctPassword);
-      sinon.stub(wallet.__account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
+      sinon.stub(wallet._account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
       const txHashCallback = sinon.stub().returns(null);
       const result = await wallet.signAndSendTransaction({
         from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
@@ -256,7 +256,7 @@ describe('WTLibs.Wallet', () => {
 
     it('should call both callbacks and resolve with receipt', async () => {
       wallet.unlock(correctPassword);
-      sinon.stub(wallet.__account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
+      sinon.stub(wallet._account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
       const receiptCallback = sinon.stub().returns(null);
       const txHashCallback = sinon.stub().returns(null);
       const result = await wallet.signAndSendTransaction({
@@ -275,7 +275,7 @@ describe('WTLibs.Wallet', () => {
 
     it('should reject on error event', async () => {
       wallet.unlock(correctPassword);
-      sinon.stub(wallet.__account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
+      sinon.stub(wallet._account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
       wallet.web3.eth.sendSignedTransaction.restore();
       sinon.stub(wallet.web3.eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent({ error: true }));
       try {
@@ -293,7 +293,7 @@ describe('WTLibs.Wallet', () => {
 
     it('should reject on unexpected error', async () => {
       wallet.unlock(correctPassword);
-      sinon.stub(wallet.__account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
+      sinon.stub(wallet._account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
       wallet.web3.eth.sendSignedTransaction.restore();
       sinon.stub(wallet.web3.eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent({ catch: true }));
       try {
