@@ -2,6 +2,8 @@
 import type { OffChainDataAdapterInterface } from './interfaces';
 import OffChainDataClient from './off-chain-data-client';
 
+import { StoragePointerError } from './errors';
+
 /**
  * Definition of a data field that is stored off-chain.
  * This may be recursive.
@@ -74,7 +76,7 @@ class StoragePointer {
    */
   static createInstance (uri: ?string, fields: ?Array<FieldDefType | string>): StoragePointer {
     if (!uri) {
-      throw new Error('Cannot instantiate StoragePointer without uri');
+      throw new StoragePointerError('Cannot instantiate StoragePointer without uri');
     }
     fields = fields || [];
     const normalizedFieldDef = [];
@@ -188,7 +190,7 @@ class StoragePointer {
       if (fieldDef.isStoragePointer) {
         if (!this._data[fieldDef.name] || typeof this._data[fieldDef.name] !== 'string') {
           const value = this._data[fieldDef.name] ? (this._data[fieldDef.name]).toString() : 'undefined';
-          throw new Error(`Cannot access ${fieldDef.name} under value ${value} which does not appear to be a valid reference.`);
+          throw new StoragePointerError(`Cannot access field '${fieldDef.name}' on '${value}' which does not appear to be a valid reference.`);
         }
         this._storagePointers[fieldDef.name] = StoragePointer.createInstance(this._data[fieldDef.name], fieldDef.fields || []);
       }

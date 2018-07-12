@@ -6,6 +6,8 @@ import Contracts from '../contracts';
 import RemotelyBackedDataset from '../remotely-backed-dataset';
 import StoragePointer from '../storage-pointer';
 
+import { InputDataError, SmartContractInstantiationError } from '../errors';
+
 /**
  * Wrapper class for a hotel backed by a smart contract on
  * Ethereum that's holding `dataUri` pointer to its data.
@@ -133,12 +135,12 @@ class OnChainHotel implements HotelInterface {
 
   set dataUri (newDataUri: Promise<?string> | ?string) {
     if (!newDataUri) {
-      throw new Error(
+      throw new InputDataError(
         'Cannot update hotel: Cannot set dataUri when it is not provided'
       );
     }
     if (typeof newDataUri === 'string' && !newDataUri.match(/([a-z-]+):\/\//)) {
-      throw new Error(
+      throw new InputDataError(
         'Cannot update hotel: Cannot set dataUri with invalid format'
       );
     }
@@ -162,10 +164,10 @@ class OnChainHotel implements HotelInterface {
 
   set manager (newManager: Promise<?string> | ?string) {
     if (!newManager) {
-      throw new Error('Cannot update hotel: Cannot set manager to null');
+      throw new InputDataError('Cannot update hotel: Cannot set manager to null');
     }
     if (this.address) {
-      throw new Error('Cannot update hotel: Cannot set manager when hotel is deployed');
+      throw new InputDataError('Cannot update hotel: Cannot set manager when hotel is deployed');
     }
     this._manager = newManager;
   }
@@ -223,7 +225,7 @@ class OnChainHotel implements HotelInterface {
 
   async _getContractInstance (): Promise<Object> {
     if (!this.address) {
-      throw new Error('Cannot get hotel instance without address');
+      throw new SmartContractInstantiationError('Cannot get hotel instance without address');
     }
     if (!this.contractInstance) {
       this.contractInstance = await this.web3Contracts.getHotelInstance(this.address, this.web3Utils.getCurrentWeb3Provider());
@@ -317,7 +319,7 @@ class OnChainHotel implements HotelInterface {
    */
   async removeOnChainData (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
     if (!this.onChainDataset.isDeployed()) {
-      throw new Error('Cannot remove hotel: not deployed');
+      throw new SmartContractInstantiationError('Cannot remove hotel: not deployed');
     }
     const estimate = await this.indexContract.methods.deleteHotel(this.address).estimateGas(transactionOptions);
     const data = this.indexContract.methods.deleteHotel(this.address).encodeABI();

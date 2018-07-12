@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import StoragePointer from '../../src/storage-pointer';
 import OffChainDataClient from '../../src/off-chain-data-client';
 import InMemoryAdapter from '@windingtree/off-chain-adapter-in-memory';
+import { StoragePointerError } from '../../src/errors';
 
 describe('WTLibs.StoragePointer', () => {
   beforeEach(() => {
@@ -39,27 +40,19 @@ describe('WTLibs.StoragePointer', () => {
     });
 
     it('should not panic on empty fields list', () => {
-      try {
+      assert.doesNotThrow(() => {
         StoragePointer.createInstance('json://url');
-      } catch (e) {
-        throw new Error(`should have never been called ${e.message}`);
-      }
+      });
     });
 
     it('should throw on an empty uri', () => {
-      try {
+      assert.throws(() => {
         StoragePointer.createInstance('');
-        throw new Error('should have never been called');
-      } catch (e) {
-        assert.match(e.message, /without uri/i);
-      }
+      }, StoragePointerError, /without uri/i);
 
-      try {
+      assert.throws(() => {
         StoragePointer.createInstance();
-        throw new Error('should have never been called');
-      } catch (e) {
-        assert.match(e.message, /without uri/i);
-      }
+      }, StoragePointerError, /without uri/i);
     });
 
     it('should properly set ref and contents', () => {

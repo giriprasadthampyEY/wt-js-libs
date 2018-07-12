@@ -4,6 +4,8 @@ import helpers from '../../utils/helpers';
 import OnChainHotel from '../../../src/data-model/on-chain-hotel';
 import StoragePointer from '../../../src/storage-pointer';
 
+import { InputDataError, RemoteDataAccessError, SmartContractInstantiationError } from '../../../src/errors';
+
 describe('WTLibs.data-model.OnChainHotel', () => {
   let contractsStub, utilsStub, indexContractStub, urlStub, managerStub;
   const validUri = 'schema://new-url';
@@ -144,6 +146,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
       } catch (e) {
         assert.match(e.message, /cannot update hotel/i);
         assert.match(e.message, /cannot set dataUri with invalid format/i);
+        assert.instanceOf(e, InputDataError);
       }
     });
 
@@ -166,6 +169,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
       } catch (e) {
         assert.match(e.message, /cannot update hotel/i);
         assert.match(e.message, /Cannot set manager when hotel is deployed/i);
+        assert.instanceOf(e, InputDataError);
       }
     });
 
@@ -186,6 +190,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot set manager to null/i);
+        assert.instanceOf(e, InputDataError);
       }
     });
 
@@ -196,6 +201,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot set dataUri when it is not provided/i);
+        assert.instanceOf(e, InputDataError);
       }
     });
 
@@ -206,6 +212,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot set dataUri with invalid format/i);
+        assert.instanceOf(e, InputDataError);
       }
     });
 
@@ -317,6 +324,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot get hotel/i);
+        assert.instanceOf(e, SmartContractInstantiationError);
       }
     });
 
@@ -327,6 +335,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot set dataUri when it is not provided/i);
+        assert.instanceOf(e, InputDataError);
       }
     });
 
@@ -361,6 +370,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot remove hotel/i);
+        assert.instanceOf(e, SmartContractInstantiationError);
       }
     });
 

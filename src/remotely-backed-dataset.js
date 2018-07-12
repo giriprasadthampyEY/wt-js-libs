@@ -1,5 +1,7 @@
 import cloneDeep from 'lodash.clonedeep';
 
+import { RemoteDataAccessError, RemoteDataReadError } from './errors';
+
 /**
  * Dataset ready to use various strategies for storing the data
  * in a remote storage. Every field backed by this strategy should
@@ -134,7 +136,7 @@ class RemotelyBackedDataset {
    */
   async _genericGetter (property) {
     if (this.isObsolete()) {
-      throw new Error('This object was destroyed in a remote storage!');
+      throw new RemoteDataAccessError('This object was destroyed in a remote storage!');
     }
     // This is a totally new instance
     // TODO maybe don't init all at once, it might be expensive
@@ -155,7 +157,7 @@ class RemotelyBackedDataset {
    */
   _genericSetter (property, newValue) {
     if (this.isObsolete()) {
-      throw new Error('This object was destroyed in a remote storage!');
+      throw new RemoteDataAccessError('This object was destroyed in a remote storage!');
     }
     // Write local value every time, even when we have nothing to compare it to
     if (this._localData[property] !== newValue || this._fieldStates[property] === 'unsynced') {
@@ -166,7 +168,7 @@ class RemotelyBackedDataset {
 
   async _fetchRemoteData () {
     if (!this.isDeployed()) {
-      throw new Error('Cannot fetch undeployed object');
+      throw new RemoteDataAccessError('Cannot fetch undeployed object');
     }
     const remoteGetters = [];
     for (let i = 0; i < this._fieldKeys.length; i++) {
@@ -202,7 +204,7 @@ class RemotelyBackedDataset {
         }
       }
     } catch (err) {
-      throw new Error('Cannot sync remote data: ' + err.message);
+      throw new RemoteDataReadError('Cannot sync remote data: ' + err.message);
     }
   }
 

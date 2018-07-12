@@ -2,6 +2,8 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 import RemotelyBackedDataset from '../../src/remotely-backed-dataset';
 
+import { RemoteDataAccessError, RemoteDataReadError } from '../../src/errors';
+
 describe('WTLibs.RemotelyBackedDataset', () => {
   let bbbInstance, remoteGetterStub, remoteSetterStub,
     remoteGetterStub2, remoteSetterStub2, commonRemoteSetterStub,
@@ -118,6 +120,7 @@ describe('WTLibs.RemotelyBackedDataset', () => {
       } catch (e) {
         assert.match(e.message, /cannot sync remote data/i);
         assert.match(e.message, /something went south/i);
+        assert.instanceOf(e, RemoteDataReadError);
       }
     });
   });
@@ -129,6 +132,7 @@ describe('WTLibs.RemotelyBackedDataset', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot fetch undeployed/i);
+        assert.instanceOf(e, RemoteDataAccessError);
       }
     });
   });
@@ -141,6 +145,7 @@ describe('WTLibs.RemotelyBackedDataset', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /object was destroyed/i);
+        assert.instanceOf(e, RemoteDataAccessError);
       }
     });
 
@@ -151,6 +156,7 @@ describe('WTLibs.RemotelyBackedDataset', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /object was destroyed/i);
+        assert.instanceOf(e, RemoteDataAccessError);
       }
     });
   });

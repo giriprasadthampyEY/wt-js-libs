@@ -1,6 +1,8 @@
 // @flow
 import type { OffChainDataAdapterInterface } from './interfaces';
 
+import { OffChainDataRuntimeError, OffChainDataConfigurationError } from './errors';
+
 /**
  * OffChainDataClientOptionsType
  */
@@ -28,6 +30,7 @@ class OffChainDataClient {
    * Initializes the map of OffChainDataAdapters.
    *
    * @param  {OffChainDataClientOptionsType}
+   * @throws {OffChainDataConfigurationError} when there are multiple adapters with the same name
    */
   static setup (options: OffChainDataClientOptionsType) {
     offChainDataOptions = options || {};
@@ -36,7 +39,7 @@ class OffChainDataClient {
     for (let key of Object.keys(offChainDataOptions.adapters || {})) {
       let normalizedKey = key.toLowerCase();
       if (normalizedKey in adapters) {
-        throw new Error(`Adapter declared twice: ${normalizedKey}`);
+        throw new OffChainDataConfigurationError(`Adapter declared twice: ${normalizedKey}`);
       }
       adapters[normalizedKey] = offChainDataOptions.adapters[key];
     }
@@ -54,12 +57,12 @@ class OffChainDataClient {
    * Returns a fresh instance of an appropriate OffChainDataAdapter by
    * calling the `create` function from the adapter's configuration.
    *
-   * @throws {Error} when schema is not defined or adapter for this schema does not exist
+   * @throws {OffChainDataRuntimeError} when schema is not defined or adapter for this schema does not exist
    */
   static async getAdapter (schema: ?string): Promise<OffChainDataAdapterInterface> {
     schema = schema && schema.toLowerCase();
     if (!schema || !offChainDataOptions.adapters[schema]) {
-      throw new Error(`Unsupported data storage type: ${schema || 'null'}`);
+      throw new OffChainDataRuntimeError(`Unsupported data storage type: ${schema || 'null'}`);
     }
     const adapter = offChainDataOptions.adapters[schema];
     return adapter.create(adapter.options);

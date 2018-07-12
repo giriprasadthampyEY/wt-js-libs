@@ -1,6 +1,6 @@
 import WTIndexContractMetadata from '@windingtree/wt-contracts/build/contracts/WTIndex';
 import HotelContractMetadata from '@windingtree/wt-contracts/build/contracts/Hotel';
-import { SmartContractError } from './errors';
+import { SmartContractInstantiationError } from './errors';
 
 /**
  * Wrapper class for work with Winding Tree's Ethereum
@@ -27,17 +27,17 @@ class Contracts {
    * @param  {string} name of contract, used in errors
    * @param  {Object} abi specification of contract
    * @param  {string} address on which we should look for the contract
-   * @throws {SmartContractError} When address is invalid
-   * @throws {SmartContractError} When no code is deployed on given address
+   * @throws {SmartContractInstantiationError} When address is invalid
+   * @throws {SmartContractInstantiationError} When no code is deployed on given address
    * @return {web3.eth.Contract} Resulting wrapper contract
    */
   async _getInstance (name, abi, address) {
     if (!this.web3.utils.isAddress(address)) {
-      throw new SmartContractError('Cannot get ' + name + ' instance at an invalid address ' + address);
+      throw new SmartContractInstantiationError('Cannot get ' + name + ' instance at an invalid address ' + address);
     }
     const deployedCode = await this.web3.eth.getCode(address);
     if (deployedCode === '0x0') {
-      throw new SmartContractError('Cannot get ' + name + ' instance at an address with no code on ' + address);
+      throw new SmartContractInstantiationError('Cannot get ' + name + ' instance at an address with no code on ' + address);
     }
     return new this.web3.eth.Contract(abi, address);
   }
