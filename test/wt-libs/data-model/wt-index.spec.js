@@ -117,4 +117,25 @@ describe('WTLibs.data-models.WTIndexDataProvider', () => {
       }
     });
   });
+
+  describe('getAllHotels', () => {
+    it('should not panic when one of many hotels is missing on-chain', async () => {
+      await indexDataProvider.__getDeployedIndex();
+      const getHotelSpy = sinon.spy(indexDataProvider, 'getHotel');
+      sinon.stub(indexDataProvider.deployedIndex.methods, 'getHotels').returns({
+        call: sinon.stub().resolves([
+          '0x0000000000000000000000000000000000000000', // This is an empty address
+          '0xBF18B616aC81830dd0C5D4b771F22FD8144fe769',
+          '0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', // This is not an address of a hotel
+        ]),
+      });
+      const hotels = await indexDataProvider.getAllHotels();
+      // Attempting to get two hotels for two valid addresses
+      assert.equal(getHotelSpy.callCount, 2);
+      // But we know there's only one actual hotel
+      assert.equal(hotels.length, 1);
+      indexDataProvider.deployedIndex.methods.getHotels.restore();
+      getHotelSpy.restore();
+    });
+  });
 });

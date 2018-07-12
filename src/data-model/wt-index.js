@@ -148,8 +148,8 @@ class WTIndex implements WTIndexInterface {
    * Returns a list of all hotels. It will filter out
    * every hotel that is inaccessible for any reason.
    *
-   * Currently does not provide any information on inaccessible
-   * hotels. Subject to change.
+   * Currently any inaccessible hotel is silently ignored.
+   * Subject to change.
    */
   async getAllHotels (): Promise<Array<HotelInterface>> {
     const index = await this._getDeployedIndex();
@@ -161,8 +161,7 @@ class WTIndex implements WTIndexInterface {
         return this.getHotel(addr) // eslint-disable-line promise/no-nesting
           // We don't really care why the hotel is inaccessible
           // and we need to catch exceptions here on each individual hotel
-          .catch((err: Error): null => {
-            if (err) {}
+          .catch((err: Error): null => { // eslint-disable-line
             return null;
           });
       });
