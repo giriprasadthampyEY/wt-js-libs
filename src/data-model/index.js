@@ -74,7 +74,7 @@ class DataModel implements DataModelInterface {
       receiptsPromises.push(this.web3Utils.getTransactionReceipt(hash));
       txDataPromises.push(this.web3Utils.getTransaction(hash));
     }
-    const currentBlockNumber = await this.web3Utils.getCurrentBlockNumber();
+    const currentBlockNumber = this.web3Utils.getCurrentBlockNumber();
     const receipts = await Promise.all(receiptsPromises);
     const txData = await Promise.all(txDataPromises);
 
@@ -85,7 +85,7 @@ class DataModel implements DataModelInterface {
       let originalTxData = txData.find((tx) => tx.hash === receipt.transactionHash);
       results[receipt.transactionHash] = {
         transactionHash: receipt.transactionHash,
-        blockAge: currentBlockNumber - receipt.blockNumber,
+        blockAge: (await currentBlockNumber) - receipt.blockNumber,
         decodedLogs: decodedLogs,
         from: originalTxData && originalTxData.from,
         to: originalTxData && originalTxData.to,

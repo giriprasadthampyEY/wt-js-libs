@@ -44,9 +44,9 @@ class OnChainHotel implements HotelInterface {
    * to be created on chain to behave as expected.
    * @return {OnChainHotel}
    */
-  static async createInstance (web3Utils: Utils, web3Contracts: Contracts, indexContract: Object, address?: string): Promise<OnChainHotel> {
+  static createInstance (web3Utils: Utils, web3Contracts: Contracts, indexContract: Object, address?: string): Promise<OnChainHotel> {
     const hotel = new OnChainHotel(web3Utils, web3Contracts, indexContract, address);
-    await hotel.initialize();
+    hotel.initialize();
     return hotel;
   }
 
@@ -63,7 +63,7 @@ class OnChainHotel implements HotelInterface {
    * in the contsructor, the RemotelyBackedDataset is marked as deployed
    * and can be used instantly.
    */
-  async initialize (): Promise<void> {
+  initialize (): Promise<void> {
     this.onChainDataset = RemotelyBackedDataset.createInstance();
     this.onChainDataset.bindProperties({
       fields: {
@@ -245,14 +245,14 @@ class OnChainHotel implements HotelInterface {
    */
   async _editInfoOnChain (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
     const data = (await this._getContractInstance()).methods.editInfo(await this.dataUri).encodeABI();
-    const estimate = await this.indexContract.methods.callHotel(this.address, data).estimateGas(transactionOptions);
+    const estimate = this.indexContract.methods.callHotel(this.address, data).estimateGas(transactionOptions);
     const txData = this.indexContract.methods.callHotel(this.address, data).encodeABI();
     const transactionData = {
       nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
       data: txData,
       from: transactionOptions.from,
       to: this.indexContract.options.address,
-      gas: this.web3Utils.applyGasCoefficient(estimate),
+      gas: this.web3Utils.applyGasCoefficient(await estimate),
     };
     return {
       hotel: (this: HotelInterface),
@@ -270,14 +270,14 @@ class OnChainHotel implements HotelInterface {
   async createOnChainData (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
     // Create hotel on-network
     const dataUri = await this.dataUri;
-    const estimate = await this.indexContract.methods.registerHotel(dataUri).estimateGas(transactionOptions);
+    const estimate = this.indexContract.methods.registerHotel(dataUri).estimateGas(transactionOptions);
     const data = this.indexContract.methods.registerHotel(dataUri).encodeABI();
     const transactionData = {
       nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
       data: data,
       from: transactionOptions.from,
       to: this.indexContract.options.address,
-      gas: this.web3Utils.applyGasCoefficient(estimate),
+      gas: this.web3Utils.applyGasCoefficient(await estimate),
     };
     const eventCallbacks: TransactionCallbacksInterface = {
       onReceipt: (receipt: TxReceiptInterface) => {
@@ -323,14 +323,14 @@ class OnChainHotel implements HotelInterface {
     if (!this.onChainDataset.isDeployed()) {
       throw new SmartContractInstantiationError('Cannot remove hotel: not deployed');
     }
-    const estimate = await this.indexContract.methods.deleteHotel(this.address).estimateGas(transactionOptions);
+    const estimate = this.indexContract.methods.deleteHotel(this.address).estimateGas(transactionOptions);
     const data = this.indexContract.methods.deleteHotel(this.address).encodeABI();
     const transactionData = {
       nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
       data: data,
       from: transactionOptions.from,
       to: this.indexContract.options.address,
-      gas: this.web3Utils.applyGasCoefficient(estimate),
+      gas: this.web3Utils.applyGasCoefficient(await estimate),
     };
     const eventCallbacks: TransactionCallbacksInterface = {
       onReceipt: (receipt: TxReceiptInterface) => {
