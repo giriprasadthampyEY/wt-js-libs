@@ -88,7 +88,7 @@ class Wallet implements WalletInterface {
       throw new WalletStateError('Cannot unlock wallet without web3 instance.');
     }
     try {
-      this.__account = this.web3.eth.accounts.decrypt(this._jsonWallet, password);
+      this._account = this.web3.eth.accounts.decrypt(this._jsonWallet, password);
     } catch (e) {
       if (e && e.message) {
         // Tihs heavily relies on web3-eth-accounts implementation
@@ -132,7 +132,7 @@ class Wallet implements WalletInterface {
       throw new WalletSigningError('Transaction originator does not match the wallet address.');
     }
     try {
-      const signedTx = await this.__account.signTransaction(transactionData);
+      const signedTx = await this._account.signTransaction(transactionData);
       return new Promise(async (resolve, reject) => {
         return this.web3.eth.sendSignedTransaction(signedTx.rawTransaction)
           .on('transactionHash', (hash) => {

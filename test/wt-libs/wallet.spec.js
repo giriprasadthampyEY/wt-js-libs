@@ -311,7 +311,7 @@ describe('WTLibs.Wallet', () => {
     const _makeErrorTestCase = (errorSetup, expectedErrorType) => {
       return async () => {
         wallet.unlock(correctPassword);
-        sinon.stub(wallet.__account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
+        sinon.stub(wallet._account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
         wallet.web3.eth.sendSignedTransaction.restore();
         sinon.stub(wallet.web3.eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent(errorSetup));
         try {
@@ -368,7 +368,7 @@ describe('WTLibs.Wallet', () => {
 
     it('should handle an inaccessible node during tx signing', async () => {
       wallet.unlock(correctPassword);
-      sinon.stub(wallet.__account, 'signTransaction').rejects({ message: 'Invalid JSON RPC response' });
+      sinon.stub(wallet._account, 'signTransaction').rejects({ message: 'Invalid JSON RPC response' });
       try {
         await wallet.signAndSendTransaction({
           from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
@@ -380,7 +380,7 @@ describe('WTLibs.Wallet', () => {
       } catch (e) {
         assert.instanceOf(e, TransactionMiningError);
       } finally {
-        wallet.__account.signTransaction.restore();
+        wallet._account.signTransaction.restore();
       }
     });
   });

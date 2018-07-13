@@ -48,14 +48,14 @@ describe('WTLibs.data-models.WTIndexDataProvider', () => {
 
     it('should throw if hotel contract cannot be instantiated', async () => {
       try {
-        sinon.stub(indexDataProvider, '__createHotelInstance').rejects();
+        sinon.stub(indexDataProvider, '_createHotelInstance').rejects();
         await indexDataProvider.getHotel('0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot find hotel/i);
         assert.instanceOf(e, WTLibsError);
       } finally {
-        indexDataProvider.__createHotelInstance.restore();
+        indexDataProvider._createHotelInstance.restore();
       }
     });
   });
@@ -63,7 +63,7 @@ describe('WTLibs.data-models.WTIndexDataProvider', () => {
   describe('addHotel', () => {
     it('should throw generic error when something does not work during tx data preparation', async () => {
       try {
-        sinon.stub(indexDataProvider, '__createHotelInstance').resolves({
+        sinon.stub(indexDataProvider, '_createHotelInstance').resolves({
           setLocalData: sinon.stub().resolves(),
           createOnChainData: sinon.stub().rejects(),
         });
@@ -120,7 +120,7 @@ describe('WTLibs.data-models.WTIndexDataProvider', () => {
 
   describe('getAllHotels', () => {
     it('should not panic when one of many hotels is missing on-chain', async () => {
-      await indexDataProvider.__getDeployedIndex();
+      await indexDataProvider._getDeployedIndex();
       const getHotelSpy = sinon.spy(indexDataProvider, 'getHotel');
       sinon.stub(indexDataProvider.deployedIndex.methods, 'getHotels').returns({
         call: sinon.stub().resolves([
