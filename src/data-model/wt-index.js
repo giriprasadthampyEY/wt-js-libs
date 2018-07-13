@@ -4,6 +4,8 @@ import Utils from '../utils';
 import Contracts from '../contracts';
 import OnChainHotel from './on-chain-hotel';
 
+import { InputDataError, WTLibsError } from '../errors';
+
 /**
  * Ethereum smart contract backed implementation of Winding Tree
  * index wrapper. It provides methods for working with hotel
@@ -45,27 +47,25 @@ class WTIndex implements WTIndexInterface {
    * and more metadata required for sucessful mining of that transaction.
    * Does not sign or send the transaction.
    *
-   * @throws {Error} When hotelData does not contain dataUri property.
-   * @throws {Error} When hotelData does not contain a manager property.
-   * @throws {Error} When anything goes wrong during data preparation phase.
+   * @throws {InputDataError} When hotelData does not contain dataUri property.
+   * @throws {InputDataError} When hotelData does not contain a manager property.
+   * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
   async addHotel (hotelData: HotelOnChainDataInterface): Promise<PreparedTransactionMetadataInterface> {
     if (!await hotelData.dataUri) {
-      throw new Error('Cannot add hotel: Missing dataUri');
+      throw new InputDataError('Cannot add hotel: Missing dataUri');
     }
     const hotelManager = await hotelData.manager;
     if (!hotelManager) {
-      throw new Error('Cannot add hotel: Missing manager');
+      throw new InputDataError('Cannot add hotel: Missing manager');
     }
-    try {
-      const hotel: HotelInterface = await this._createHotelInstance();
-      await hotel.setLocalData(hotelData);
-      return hotel.createOnChainData({
-        from: hotelManager,
-      });
-    } catch (err) {
-      throw new Error('Cannot add hotel: ' + err.message);
-    }
+    const hotel: HotelInterface = await this._createHotelInstance();
+    await hotel.setLocalData(hotelData);
+    return hotel.createOnChainData({
+      from: hotelManager,
+    }).catch((err) => {
+      throw new WTLibsError('Cannot add hotel: ' + err.message, err);
+    });
   }
 
   /**
@@ -73,25 +73,23 @@ class WTIndex implements WTIndexInterface {
    * and more metadata required for sucessful mining of those transactions.
    * Does not sign or send any of the transactions.
    *
-   * @throws {Error} When hotel does not have a manager field.
-   * @throws {Error} When hotel does not contain a manager property.
-   * @throws {Error} When anything goes wrong during data preparation phase.
+   * @throws {InputDataError} When hotel does not have a manager field.
+   * @throws {InputDataError} When hotel does not contain a manager property.
+   * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
   async updateHotel (hotel: HotelInterface): Promise<Array<PreparedTransactionMetadataInterface>> {
-    try {
-      if (!hotel.address) {
-        throw new Error('Cannot update hotel without address.');
-      }
-      const hotelManager = await hotel.manager;
-      if (!hotelManager) {
-        throw new Error('Cannot update hotel without manager.');
-      }
-      return hotel.updateOnChainData({
-        from: hotelManager,
-      });
-    } catch (err) {
-      throw new Error('Cannot update hotel:' + err.message);
+    if (!hotel.address) {
+      throw new InputDataError('Cannot update hotel without address.');
     }
+    const hotelManager = await hotel.manager;
+    if (!hotelManager) {
+      throw new InputDataError('Cannot update hotel without manager.');
+    }
+    return hotel.updateOnChainData({
+      from: hotelManager,
+    }).catch((err) => {
+      throw new WTLibsError('Cannot update hotel:' + err.message, err);
+    });
   }
 
   /**
@@ -99,27 +97,25 @@ class WTIndex implements WTIndexInterface {
    * and more metadata required for successful mining of that transaction.
    * Does not sign or send the transaction.
    *
-   * @throws {Error} When hotel does not contain dataUri property.
-   * @throws {Error} When hotel does not contain a manager property.
-   * @throws {Error} When anything goes wrong during data preparation phase.
+   * @throws {InputDataError} When hotel does not contain dataUri property.
+   * @throws {InputDataError} When hotel does not contain a manager property.
+   * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
   async removeHotel (hotel: HotelInterface): Promise<PreparedTransactionMetadataInterface> {
-    try {
-      if (!hotel.address) {
-        throw new Error('Cannot remove hotel without address.');
-      }
-      const hotelManager = await hotel.manager;
-      if (!hotelManager) {
-        throw new Error('Cannot remove hotel without manager.');
-      }
-      return hotel.removeOnChainData({
-        from: hotelManager,
-      });
-    } catch (err) {
+    if (!hotel.address) {
+      throw new InputDataError('Cannot remove hotel without address.');
+    }
+    const hotelManager = await hotel.manager;
+    if (!hotelManager) {
+      throw new InputDataError('Cannot remove hotel without manager.');
+    }
+    return hotel.removeOnChainData({
+      from: hotelManager,
+    }).catch((err) => {
       // invalid opcode -> non-existent hotel
       // invalid opcode -> failed check for manager
-      throw new Error('Cannot remove hotel: ' + err.message);
-    }
+      throw new WTLibsError('Cannot remove hotel: ' + err.message, err);
+    });
   }
 
   /**
@@ -127,8 +123,8 @@ class WTIndex implements WTIndexInterface {
    * on such address is not registered through this Winding Tree index
    * instance, the method throws immediately.
    *
-   * @throws {Error} When hotel does not exist.
-   * @throws {Error} When something breaks in the network communication.
+   * @throws {WTLibsError} When hotel does not exist.
+   * @throws {WTLibsError} When something breaks in the network communication.
    */
   async getHotel (address: string): Promise<?HotelInterface> {
     const index = await this._getDeployedIndex();
@@ -139,11 +135,12 @@ class WTIndex implements WTIndexInterface {
       if (!hotelIndex) {
         throw new Error('Not found in hotel list');
       } else {
-        const hotel = await this._createHotelInstance(address);
-        return hotel;
+        return this._createHotelInstance(address).catch((err) => {
+          throw new WTLibsError('Cannot find hotel at ' + address + ': ' + err.message, err);
+        });
       }
     } catch (err) {
-      throw new Error('Cannot find hotel at ' + address + ': ' + err.message);
+      throw new WTLibsError('Cannot find hotel at ' + address + ': ' + err.message, err);
     }
   }
 
@@ -151,8 +148,8 @@ class WTIndex implements WTIndexInterface {
    * Returns a list of all hotels. It will filter out
    * every hotel that is inaccessible for any reason.
    *
-   * Currently does not provide any information on inaccessible
-   * hotels. Subject to change.
+   * Currently any inaccessible hotel is silently ignored.
+   * Subject to change.
    */
   async getAllHotels (): Promise<Array<HotelInterface>> {
     const index = await this._getDeployedIndex();
@@ -164,9 +161,7 @@ class WTIndex implements WTIndexInterface {
         return this.getHotel(addr) // eslint-disable-line promise/no-nesting
           // We don't really care why the hotel is inaccessible
           // and we need to catch exceptions here on each individual hotel
-          .catch((err: Error): null => {
-            // TODO optional logging/improve error handling.
-            if (err) {}
+          .catch((err: Error): null => { // eslint-disable-line
             return null;
           });
       });

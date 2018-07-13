@@ -5,6 +5,18 @@ import testedDataModel from '../utils/data-model-definition';
 import jsonWallet from '../utils/test-wallet';
 import DataModel from '../../src/data-model/';
 import Web3WTWallet from '../../src/wallet';
+import {
+  MalformedWalletError,
+  WalletStateError,
+  WalletPasswordError,
+  WalletSigningError,
+  TransactionMiningError,
+  OutOfGasError,
+  InsufficientFundsError,
+  TransactionRevertedError,
+  NoReceiptError,
+  InaccessibleEthereumNodeError,
+} from '../../src/errors';
 
 describe('WTLibs.Wallet', () => {
   let dataModel;
@@ -26,6 +38,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /not a valid v3 wallet/i);
+        assert.instanceOf(e, MalformedWalletError);
       }
     });
 
@@ -36,6 +49,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot unlock wallet without web3 instance/i);
+        assert.instanceOf(e, WalletStateError);
       }
     });
 
@@ -46,6 +60,18 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /key derivation failed/i);
+        assert.instanceOf(e, WalletPasswordError);
+      }
+    });
+
+    it('should not unlock a wallet with no password', async () => {
+      const wallet = await dataModel.createWallet(jsonWallet);
+      try {
+        wallet.unlock();
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /no password/i);
+        assert.instanceOf(e, WalletPasswordError);
       }
     });
 
@@ -57,6 +83,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot unlock destroyed wallet/i);
+        assert.instanceOf(e, WalletStateError);
       }
     });
   });
@@ -78,6 +105,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot lock destroyed wallet/i);
+        assert.instanceOf(e, WalletStateError);
       }
     });
   });
@@ -108,6 +136,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot destroy destroyed wallet/i);
+        assert.instanceOf(e, WalletStateError);
       }
     });
   });
@@ -130,6 +159,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot get address/i);
+        assert.instanceOf(e, WalletStateError);
       }
     });
 
@@ -140,6 +170,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot get address/i);
+        assert.instanceOf(e, WalletStateError);
       }
     });
   });
@@ -155,13 +186,14 @@ describe('WTLibs.Wallet', () => {
       wallet.web3.eth.sendSignedTransaction.restore();
     });
 
-    it('should throw when called on a destroyed wallet', async () => {
+    it('should throw on a destroyed wallet', async () => {
       wallet.destroy();
       try {
         await wallet.signAndSendTransaction({});
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot use destroyed wallet/i);
+        assert.instanceOf(e, WalletStateError);
       }
     });
 
@@ -171,6 +203,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot use wallet without unlocking it first/i);
+        assert.instanceOf(e, WalletStateError);
       }
     });
 
@@ -182,6 +215,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot use wallet without web3 instance/i);
+        assert.instanceOf(e, WalletStateError);
       }
     });
 
@@ -194,6 +228,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /transaction originator does not match the wallet address/i);
+        assert.instanceOf(e, WalletSigningError);
       }
     });
 
@@ -273,29 +308,67 @@ describe('WTLibs.Wallet', () => {
       assert.equal(txHashCallback.callCount, 1);
     });
 
-    it('should reject on error event', async () => {
-      wallet.unlock(correctPassword);
-      sinon.stub(wallet._account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
-      wallet.web3.eth.sendSignedTransaction.restore();
-      sinon.stub(wallet.web3.eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent({ error: true }));
-      try {
-        await wallet.signAndSendTransaction({
-          from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
-          to: 'bbb',
-          data: 'data',
-          gas: 1234,
-        });
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot send transaction/i);
-      }
+    const _makeErrorTestCase = (errorSetup, expectedErrorType) => {
+      return async () => {
+        wallet.unlock(correctPassword);
+        sinon.stub(wallet._account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
+        wallet.web3.eth.sendSignedTransaction.restore();
+        sinon.stub(wallet.web3.eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent(errorSetup));
+        try {
+          await wallet.signAndSendTransaction({
+            from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
+            to: 'bbb',
+            data: 'data',
+            gas: 1234,
+          });
+          throw new Error('should not have been called');
+        } catch (e) {
+          assert.instanceOf(e, expectedErrorType);
+        }
+      };
+    };
+
+    it('should reject on random error event', async () => {
+      await _makeErrorTestCase({ error: 'random eth error' }, TransactionMiningError)();
+      await _makeErrorTestCase({ catch: 'random eth error' }, TransactionMiningError)();
     });
 
-    it('should reject on unexpected error', async () => {
+    it('should reject with InsufficientFundsError', async () => {
+      await _makeErrorTestCase({ error: 'insufficient funds for gas' }, InsufficientFundsError)();
+      await _makeErrorTestCase({ catch: 'insufficient funds for gas' }, InsufficientFundsError)();
+    });
+
+    it('should reject with NoReceiptError', async () => {
+      await _makeErrorTestCase({ error: 'Failed to check for transaction receipt' }, NoReceiptError)();
+      await _makeErrorTestCase({ catch: 'Failed to check for transaction receipt' }, NoReceiptError)();
+      await _makeErrorTestCase({ error: 'Receipt missing or blockHash null' }, NoReceiptError)();
+      await _makeErrorTestCase({ catch: 'Receipt missing or blockHash null' }, NoReceiptError)();
+      await _makeErrorTestCase({ error: 'The transaction receipt didn\'t contain a contract address.' }, NoReceiptError)();
+      await _makeErrorTestCase({ catch: 'The transaction receipt didn\'t contain a contract address.' }, NoReceiptError)();
+      await _makeErrorTestCase({ error: 'Transaction was not mined within' }, NoReceiptError)();
+      await _makeErrorTestCase({ catch: 'Transaction was not mined within' }, NoReceiptError)();
+    });
+
+    it('should reject with OutOfGasError', async () => {
+      await _makeErrorTestCase({ error: 'The contract code couldn\'t be stored, please check your gas limit.' }, OutOfGasError)();
+      await _makeErrorTestCase({ catch: 'The contract code couldn\'t be stored, please check your gas limit.' }, OutOfGasError)();
+      await _makeErrorTestCase({ error: 'Transaction ran out of gas. Please provide more gas' }, OutOfGasError)();
+      await _makeErrorTestCase({ catch: 'Transaction ran out of gas. Please provide more gas' }, OutOfGasError)();
+    });
+
+    it('should reject with TransactionRevertedError', async () => {
+      await _makeErrorTestCase({ error: 'Transaction has been reverted by the EVM' }, TransactionRevertedError)();
+      await _makeErrorTestCase({ catch: 'Transaction has been reverted by the EVM' }, TransactionRevertedError)();
+    });
+
+    it('should reject with InaccessibleEthereumNodeError', async () => {
+      await _makeErrorTestCase({ error: 'Invalid JSON RPC response' }, InaccessibleEthereumNodeError)();
+      await _makeErrorTestCase({ catch: 'Invalid JSON RPC response' }, InaccessibleEthereumNodeError)();
+    });
+
+    it('should handle an inaccessible node during tx signing', async () => {
       wallet.unlock(correctPassword);
-      sinon.stub(wallet._account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
-      wallet.web3.eth.sendSignedTransaction.restore();
-      sinon.stub(wallet.web3.eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent({ catch: true }));
+      sinon.stub(wallet._account, 'signTransaction').rejects({ message: 'Invalid JSON RPC response' });
       try {
         await wallet.signAndSendTransaction({
           from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
@@ -305,7 +378,9 @@ describe('WTLibs.Wallet', () => {
         });
         throw new Error('should not have been called');
       } catch (e) {
-        assert.match(e.message, /cannot send transaction/i);
+        assert.instanceOf(e, TransactionMiningError);
+      } finally {
+        wallet._account.signTransaction.restore();
       }
     });
   });

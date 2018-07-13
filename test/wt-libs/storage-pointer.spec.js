@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import StoragePointer from '../../src/storage-pointer';
 import OffChainDataClient from '../../src/off-chain-data-client';
 import InMemoryAdapter from '@windingtree/off-chain-adapter-in-memory';
+import { StoragePointerError, OffChainDataRuntimeError } from '../../src/errors';
 
 describe('WTLibs.StoragePointer', () => {
   beforeEach(() => {
@@ -39,27 +40,19 @@ describe('WTLibs.StoragePointer', () => {
     });
 
     it('should not panic on empty fields list', () => {
-      try {
+      assert.doesNotThrow(() => {
         StoragePointer.createInstance('json://url');
-      } catch (e) {
-        throw new Error(`should have never been called ${e.message}`);
-      }
+      });
     });
 
     it('should throw on an empty uri', () => {
-      try {
+      assert.throws(() => {
         StoragePointer.createInstance('');
-        throw new Error('should have never been called');
-      } catch (e) {
-        assert.match(e.message, /without uri/i);
-      }
+      }, StoragePointerError, /without uri/i);
 
-      try {
+      assert.throws(() => {
         StoragePointer.createInstance();
-        throw new Error('should have never been called');
-      } catch (e) {
-        assert.match(e.message, /without uri/i);
-      }
+      }, StoragePointerError, /without uri/i);
     });
 
     it('should properly set ref and contents', () => {
@@ -116,6 +109,7 @@ describe('WTLibs.StoragePointer', () => {
       assert.equal(getAdapterSpy.callCount, 1);
       await pointer._getOffChainDataClient();
       assert.equal(getAdapterSpy.callCount, 1);
+      getAdapterSpy.restore();
     });
 
     it('should throw when an unsupported schema is encountered', async () => {
@@ -125,6 +119,23 @@ describe('WTLibs.StoragePointer', () => {
         throw new Error('should have never been called');
       } catch (e) {
         assert.match(e.message, /unsupported data storage type/i);
+        assert.instanceOf(e, OffChainDataRuntimeError);
+      }
+    });
+
+    it('should throw when the adapter throws on download', async () => {
+      const pointer = StoragePointer.createInstance('json://url-1234', ['some', 'fields']);
+      sinon.stub(OffChainDataClient, 'getAdapter').resolves({
+        download: sinon.stub().rejects(),
+      });
+      try {
+        await pointer.contents.some;
+        throw new Error('should have never been called');
+      } catch (e) {
+        assert.match(e.message, /cannot download data/i);
+        assert.instanceOf(e, StoragePointerError);
+      } finally {
+        OffChainDataClient.getAdapter.restore();
       }
     });
 

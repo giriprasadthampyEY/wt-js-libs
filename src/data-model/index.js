@@ -99,7 +99,6 @@ class DataModel implements DataModelInterface {
         processed: resultsValues.length,
         minBlockAge: Math.min(...(resultsValues.map((a) => a.blockAge))),
         maxBlockAge: Math.max(...(resultsValues.map((a) => a.blockAge))),
-        // TODO Possibly improve error codes
         // https://ethereum.stackexchange.com/questions/28077/how-do-i-detect-a-failed-transaction-after-the-byzantium-fork-as-the-revert-opco
         allPassed: (resultsValues.map((a) => a.raw.status)).every((x) => x) && txHashes.length === resultsValues.length,
       },

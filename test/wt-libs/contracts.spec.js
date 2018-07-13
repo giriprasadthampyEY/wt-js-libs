@@ -2,6 +2,7 @@ import { assert } from 'chai';
 import sinon from 'sinon';
 import Web3 from 'web3';
 import Contracts from '../../src/contracts';
+import { SmartContractInstantiationError } from '../../src/errors';
 
 describe('WTLibs.Contracts', () => {
   let contracts, getCodeStub, ContractStub;
@@ -22,6 +23,7 @@ describe('WTLibs.Contracts', () => {
       throw new Error('should not have been called');
     } catch (e) {
       assert.match(e.message, /at an invalid address/i);
+      assert.instanceOf(e, SmartContractInstantiationError);
     }
     contracts.web3.utils.isAddress.restore();
   });
@@ -33,6 +35,7 @@ describe('WTLibs.Contracts', () => {
       throw new Error('should not have been called');
     } catch (e) {
       assert.match(e.message, /address with no code/i);
+      assert.instanceOf(e, SmartContractInstantiationError);
     }
   });
 

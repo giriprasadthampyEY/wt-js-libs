@@ -6,6 +6,30 @@ import type { WTIndexInterface, AdaptedTxResultsInterface, OffChainDataAdapterIn
 import DataModel from './data-model';
 import OffChainDataClient from './off-chain-data-client';
 
+import {
+  WTLibsError,
+  SmartContractInstantiationError,
+  WalletError,
+  MalformedWalletError,
+  WalletStateError,
+  WalletPasswordError,
+  WalletSigningError,
+  TransactionMiningError,
+  OutOfGasError,
+  InsufficientFundsError,
+  TransactionRevertedError,
+  NoReceiptError,
+  InputDataError,
+  InaccessibleEthereumNodeError,
+  OffChainDataError,
+  OffChainDataConfigurationError,
+  OffChainDataRuntimeError,
+  StoragePointerError,
+  RemotelyBackedDatasetError,
+  RemoteDataAccessError,
+  RemoteDataReadError,
+} from './errors';
+
 /**
  * General options for wt-libs-js. Holds all things necessary
  * for successful setup of Winding Tree network.
@@ -21,6 +45,7 @@ type WtLibsOptionsType = {
  * Main public interface of wt-libs-js.
  */
 class WTLibs {
+  static errors: Object;
   dataModel: DataModel;
   offChainDataClient: OffChainDataClient;
   options: WtLibsOptionsType;
@@ -65,5 +90,33 @@ class WTLibs {
     return OffChainDataClient.getAdapter(schema);
   }
 }
+
+/**
+ * A map of errors that WTLibs can throw, useful
+ * for checking what happened in your code.
+ */
+WTLibs.errors = {
+  WTLibsError,
+  SmartContractInstantiationError,
+  WalletError,
+  MalformedWalletError,
+  WalletStateError,
+  WalletPasswordError,
+  WalletSigningError,
+  TransactionMiningError,
+  OutOfGasError,
+  InsufficientFundsError,
+  TransactionRevertedError,
+  NoReceiptError,
+  InaccessibleEthereumNodeError,
+  InputDataError,
+  OffChainDataError,
+  OffChainDataConfigurationError,
+  OffChainDataRuntimeError,
+  StoragePointerError,
+  RemotelyBackedDatasetError,
+  RemoteDataAccessError,
+  RemoteDataReadError,
+};
 
 export default WTLibs;

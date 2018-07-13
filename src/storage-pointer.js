@@ -2,6 +2,8 @@
 import type { OffChainDataAdapterInterface } from './interfaces';
 import OffChainDataClient from './off-chain-data-client';
 
+import { StoragePointerError } from './errors';
+
 /**
  * Definition of a data field that is stored off-chain.
  * This may be recursive.
@@ -70,11 +72,11 @@ class StoragePointer {
    *
    * @param {string} uri where to look for data document. It has to include schema, i. e. `https://example.com/data`
    * @param {Array<FieldDefType | string>} fields list of top-level fields in the referred document
-   * @throw {Error} if uri is not defined
+   * @throw {StoragePointerError} if uri is not defined
    */
   static createInstance (uri: ?string, fields: ?Array<FieldDefType | string>): StoragePointer {
     if (!uri) {
-      throw new Error('Cannot instantiate StoragePointer without uri');
+      throw new StoragePointerError('Cannot instantiate StoragePointer without uri');
     }
     fields = fields || [];
     const normalizedFieldDef = [];
@@ -188,7 +190,7 @@ class StoragePointer {
       if (fieldDef.isStoragePointer) {
         if (!this._data[fieldDef.name] || typeof this._data[fieldDef.name] !== 'string') {
           const value = this._data[fieldDef.name] ? (this._data[fieldDef.name]).toString() : 'undefined';
-          throw new Error(`Cannot access ${fieldDef.name} under value ${value} which does not appear to be a valid reference.`);
+          throw new StoragePointerError(`Cannot access field '${fieldDef.name}' on '${value}' which does not appear to be a valid reference.`);
         }
         this._storagePointers[fieldDef.name] = StoragePointer.createInstance(this._data[fieldDef.name], fieldDef.fields || []);
       }
@@ -203,9 +205,16 @@ class StoragePointer {
     if (!this._downloading) {
       this._downloading = (async () => {
         const adapter = await this._getOffChainDataClient();
-        const data = (await adapter.download(this.ref)) || {};
-        this._initFromStorage(data);
-        this._downloaded = true;
+        try {
+          const data = (await adapter.download(this.ref)) || {};
+          this._initFromStorage(data);
+          this._downloaded = true;
+        } catch (err) {
+          if (err instanceof StoragePointerError) {
+            throw err;
+          }
+          throw new StoragePointerError('Cannot download data: ' + err.message, err);
+        }
       })();
     }
     return this._downloading;
@@ -245,6 +254,8 @@ class StoragePointer {
    *
    *  @param {resolvedFields} list of fields that limit the resulting dataset in dot notation (`father.child.son`).
    *  If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
+   *
+   * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
    */
   async toPlainObject (resolvedFields: ?Array<string>): Promise<{ref: string, contents: Object}> {
     // Download data

@@ -4,6 +4,8 @@ import jsonWallet from './utils/test-wallet';
 import testedDataModel from './utils/data-model-definition';
 import OffChainDataClient from '../src/off-chain-data-client';
 
+import { InputDataError, WTLibsError } from '../src/errors';
+
 describe('WTLibs usage', () => {
   let libs, wallet, index, emptyIndex, minedTxHashes = [];
 
@@ -70,6 +72,7 @@ describe('WTLibs usage', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot add hotel/i);
+        assert.instanceOf(e, InputDataError);
       }
     });
 
@@ -81,6 +84,7 @@ describe('WTLibs usage', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot add hotel/i);
+        assert.instanceOf(e, InputDataError);
       }
     });
   });
@@ -122,6 +126,7 @@ describe('WTLibs usage', () => {
       } catch (e) {
         assert.match(e.message, /cannot remove hotel/i);
         assert.match(e.message, /without address/i);
+        assert.instanceOf(e, InputDataError);
       }
     });
   });
@@ -169,6 +174,7 @@ describe('WTLibs usage', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot find hotel/i);
+        assert.instanceOf(e, WTLibsError);
       }
     });
   });
@@ -214,6 +220,7 @@ describe('WTLibs usage', () => {
       } catch (e) {
         assert.match(e.message, /cannot update hotel/i);
         assert.match(e.message, /without address/i);
+        assert.instanceOf(e, InputDataError);
       }
     });
 
@@ -226,6 +233,7 @@ describe('WTLibs usage', () => {
       } catch (e) {
         assert.match(e.message, /cannot update hotel/i);
         assert.match(e.message, /cannot set dataUri when it is not provided/i);
+        assert.instanceOf(e, InputDataError);
       }
     });
 
@@ -239,6 +247,7 @@ describe('WTLibs usage', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot update hotel/i);
+        assert.instanceOf(e, WTLibsError);
       }
     });
   });
