@@ -44,7 +44,7 @@ class OnChainHotel implements HotelInterface {
    * to be created on chain to behave as expected.
    * @return {OnChainHotel}
    */
-  static createInstance (web3Utils: Utils, web3Contracts: Contracts, indexContract: Object, address?: string): Promise<OnChainHotel> {
+  static createInstance (web3Utils: Utils, web3Contracts: Contracts, indexContract: Object, address?: string): OnChainHotel {
     const hotel = new OnChainHotel(web3Utils, web3Contracts, indexContract, address);
     hotel.initialize();
     return hotel;
@@ -63,7 +63,7 @@ class OnChainHotel implements HotelInterface {
    * in the contsructor, the RemotelyBackedDataset is marked as deployed
    * and can be used instantly.
    */
-  initialize (): Promise<void> {
+  initialize () {
     this.onChainDataset = RemotelyBackedDataset.createInstance();
     this.onChainDataset.bindProperties({
       fields: {
