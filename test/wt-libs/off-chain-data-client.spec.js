@@ -16,7 +16,7 @@ describe('WTLibs.OffChainDataClient', () => {
   });
 
   afterEach(() => {
-    OffChainDataClient.__reset();
+    OffChainDataClient._reset();
   });
 
   it('should return proper adapter', async () => {

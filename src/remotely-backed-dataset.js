@@ -33,12 +33,12 @@ class RemotelyBackedDataset {
   }
 
   constructor () {
-    this.__obsoleteFlag = false;
-    this.__deployedFlag = false;
-    this.__localData = {};
-    this.__remoteData = {};
-    this.__fieldStates = {};
-    this.__fieldKeys = [];
+    this._obsoleteFlag = false;
+    this._deployedFlag = false;
+    this._localData = {};
+    this._remoteData = {};
+    this._fieldStates = {};
+    this._fieldKeys = [];
   }
 
   /**
@@ -71,12 +71,12 @@ class RemotelyBackedDataset {
    * Typically the initiator of this operation.
    */
   bindProperties (options, bindTo) {
-    this.__options = options;
-    this.__fieldKeys = Object.keys(options.fields);
+    this._options = options;
+    this._fieldKeys = Object.keys(options.fields);
 
-    for (let i = 0; i < this.__fieldKeys.length; i++) {
-      let fieldName = this.__fieldKeys[i];
-      this.__fieldStates[fieldName] = 'unsynced';
+    for (let i = 0; i < this._fieldKeys.length; i++) {
+      let fieldName = this._fieldKeys[i];
+      this._fieldStates[fieldName] = 'unsynced';
       Object.defineProperty(bindTo, fieldName, {
         configurable: false,
         enumerable: true,
@@ -95,7 +95,7 @@ class RemotelyBackedDataset {
    * @return {Boolean}
    */
   isObsolete () {
-    return this.__obsoleteFlag;
+    return this._obsoleteFlag;
   }
 
   /**
@@ -104,7 +104,7 @@ class RemotelyBackedDataset {
    * but merely serves as a flag to prevent further interaction with this object.
    */
   markObsolete () {
-    this.__obsoleteFlag = true;
+    this._obsoleteFlag = true;
   }
 
   /**
@@ -112,7 +112,7 @@ class RemotelyBackedDataset {
    * @return {Boolean}
    */
   isDeployed () {
-    return this.__deployedFlag;
+    return this._deployedFlag;
   }
 
   /**
@@ -120,7 +120,7 @@ class RemotelyBackedDataset {
    * storage is set up, created or connected to.
    */
   markDeployed () {
-    this.__deployedFlag = true;
+    this._deployedFlag = true;
   }
 
   /**
@@ -138,11 +138,11 @@ class RemotelyBackedDataset {
     }
     // This is a totally new instance
     // TODO maybe don't init all at once, it might be expensive
-    if (this.isDeployed() && this.__fieldStates[property] === 'unsynced') {
-      await this.__syncRemoteData();
+    if (this.isDeployed() && this._fieldStates[property] === 'unsynced') {
+      await this._syncRemoteData();
     }
 
-    return this.__localData[property];
+    return this._localData[property];
   }
 
   /**
@@ -158,22 +158,22 @@ class RemotelyBackedDataset {
       throw new Error('This object was destroyed in a remote storage!');
     }
     // Write local value every time, even when we have nothing to compare it to
-    if (this.__localData[property] !== newValue || this.__fieldStates[property] === 'unsynced') {
-      this.__localData[property] = newValue;
-      this.__fieldStates[property] = 'dirty';
+    if (this._localData[property] !== newValue || this._fieldStates[property] === 'unsynced') {
+      this._localData[property] = newValue;
+      this._fieldStates[property] = 'dirty';
     }
   }
 
-  async __fetchRemoteData () {
+  async _fetchRemoteData () {
     if (!this.isDeployed()) {
       throw new Error('Cannot fetch undeployed object');
     }
     const remoteGetters = [];
-    for (let i = 0; i < this.__fieldKeys.length; i++) {
-      const remoteGetter = this.__options.fields[this.__fieldKeys[i]].remoteGetter;
-      if (remoteGetter && this.__fieldStates[this.__fieldKeys[i]] === 'unsynced') {
+    for (let i = 0; i < this._fieldKeys.length; i++) {
+      const remoteGetter = this._options.fields[this._fieldKeys[i]].remoteGetter;
+      if (remoteGetter && this._fieldStates[this._fieldKeys[i]] === 'unsynced') {
         remoteGetters.push({
-          field: this.__fieldKeys[i],
+          field: this._fieldKeys[i],
           fn: remoteGetter(),
         });
       }
@@ -183,22 +183,22 @@ class RemotelyBackedDataset {
     if (remoteGetterFields.length) {
       const attributes = await (Promise.all(remoteGetterFns));
       for (let i = 0; i < remoteGetterFields.length; i++) {
-        this.__remoteData[remoteGetterFields[i]] = attributes[i];
+        this._remoteData[remoteGetterFields[i]] = attributes[i];
       }
     }
-    return this.__remoteData;
+    return this._remoteData;
   }
 
-  async __syncRemoteData () {
+  async _syncRemoteData () {
     try {
-      await this.__fetchRemoteData();
+      await this._fetchRemoteData();
       // Copy over data from remoteData to local data
-      for (let i = 0; i < this.__fieldKeys.length; i++) {
+      for (let i = 0; i < this._fieldKeys.length; i++) {
         // Do not update user-modified fields
         // TODO deal with 3rd party data modificiation on a remote storage
-        if (this.__remoteData[this.__fieldKeys[i]] !== this.__localData[this.__fieldKeys[i]] && this.__fieldStates[this.__fieldKeys[i]] !== 'dirty') {
-          this.__localData[this.__fieldKeys[i]] = this.__remoteData[this.__fieldKeys[i]];
-          this.__fieldStates[this.__fieldKeys[i]] = 'synced';
+        if (this._remoteData[this._fieldKeys[i]] !== this._localData[this._fieldKeys[i]] && this._fieldStates[this._fieldKeys[i]] !== 'dirty') {
+          this._localData[this._fieldKeys[i]] = this._remoteData[this._fieldKeys[i]];
+          this._fieldStates[this._fieldKeys[i]] = 'synced';
         }
       }
     } catch (err) {
@@ -207,7 +207,7 @@ class RemotelyBackedDataset {
   }
 
   // https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript-jquery
-  __hashCode (text) {
+  _hashCode (text) {
     var hash = 0, i, chr;
     for (i = 0; i < text.length; i++) {
       chr = text.charCodeAt(i);
@@ -227,21 +227,21 @@ class RemotelyBackedDataset {
    * object is appended to every result and onReceipt callback is added to ensure that data fields would eventually be properly marked as 'synced'.
    */
   async updateRemoteData (transactionOptions) {
-    await this.__syncRemoteData();
+    await this._syncRemoteData();
     const remoteSetters = [];
     const remoteSettersHashCodes = {};
-    for (let i = 0; i < this.__fieldKeys.length; i++) {
-      const remoteSetter = this.__options.fields[this.__fieldKeys[i]].remoteSetter;
-      if (remoteSetter && this.__fieldStates[this.__fieldKeys[i]] === 'dirty') {
+    for (let i = 0; i < this._fieldKeys.length; i++) {
+      const remoteSetter = this._options.fields[this._fieldKeys[i]].remoteSetter;
+      if (remoteSetter && this._fieldStates[this._fieldKeys[i]] === 'dirty') {
         // deduplicate equal calls
-        let setterHashCode = this.__hashCode(remoteSetter.toString());
+        let setterHashCode = this._hashCode(remoteSetter.toString());
         if (!remoteSettersHashCodes[setterHashCode]) {
           remoteSettersHashCodes[setterHashCode] = true;
           remoteSetters.push(remoteSetter(cloneDeep(transactionOptions)).then((result) => {
             result.eventCallbacks = result.eventCallbacks || {};
             const originalOnRcptCallback = result.eventCallbacks.onReceipt;
             const onRcptCallback = (receipt) => {
-              this.__fieldStates[this.__fieldKeys[i]] = 'synced';
+              this._fieldStates[this._fieldKeys[i]] = 'synced';
               if (originalOnRcptCallback) {
                 return originalOnRcptCallback(receipt);
               }

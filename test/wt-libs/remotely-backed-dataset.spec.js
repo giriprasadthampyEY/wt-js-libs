@@ -113,7 +113,7 @@ describe('WTLibs.RemotelyBackedDataset', () => {
       }, instance);
       instance.markDeployed();
       try {
-        await instance.__syncRemoteData({});
+        await instance._syncRemoteData({});
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot sync remote data/i);
@@ -125,7 +125,7 @@ describe('WTLibs.RemotelyBackedDataset', () => {
   describe('deployed state', () => {
     it('should not allow remote getting if object is not marked as deployed', async () => {
       try {
-        await bbbInstance.__fetchRemoteData();
+        await bbbInstance._fetchRemoteData();
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot fetch undeployed/i);

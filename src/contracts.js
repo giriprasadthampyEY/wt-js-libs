@@ -30,7 +30,7 @@ class Contracts {
    * @throws {Error} When no code is deployed on given address
    * @return {web3.eth.Contract} Resulting wrapper contract
    */
-  async __getInstance (name, abi, address) {
+  async _getInstance (name, abi, address) {
     if (!this.web3.utils.isAddress(address)) {
       throw new Error('Cannot get ' + name + ' instance at an invalid address ' + address);
     }
@@ -48,7 +48,7 @@ class Contracts {
    * @return {web3.eth.Contract} Instance of an Index
    */
   async getIndexInstance (address) {
-    return this.__getInstance('index', WTIndexContractMetadata.abi, address);
+    return this._getInstance('index', WTIndexContractMetadata.abi, address);
   }
 
   /**
@@ -58,10 +58,10 @@ class Contracts {
    * @return {web3.eth.Contract} Instance of a Hotel
    */
   async getHotelInstance (address) {
-    return this.__getInstance('hotel', HotelContractMetadata.abi, address);
+    return this._getInstance('hotel', HotelContractMetadata.abi, address);
   }
 
-  __initEventRegistry () {
+  _initEventRegistry () {
     function generateEventSignatures (abi, web3) {
       const events = abi.filter((m) => m.type === 'event');
       let indexedEvents = {};
@@ -91,7 +91,7 @@ class Contracts {
    */
   decodeLogs (logs) {
     const result = [];
-    const eventRegistry = this.__initEventRegistry();
+    const eventRegistry = this._initEventRegistry();
     for (let log of logs) {
       if (log.topics && log.topics[0] && eventRegistry[log.topics[0]]) {
         const eventAbi = eventRegistry[log.topics[0]];

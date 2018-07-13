@@ -29,15 +29,15 @@ class WTIndex implements WTIndexInterface {
     this.web3Contracts = web3Contracts;
   }
 
-  async __getDeployedIndex (): Promise<Object> {
+  async _getDeployedIndex (): Promise<Object> {
     if (!this.deployedIndex) {
       this.deployedIndex = await this.web3Contracts.getIndexInstance(this.address);
     }
     return this.deployedIndex;
   }
 
-  async __createHotelInstance (address?: string): Promise<HotelInterface> {
-    return OnChainHotel.createInstance(this.web3Utils, this.web3Contracts, await this.__getDeployedIndex(), address);
+  async _createHotelInstance (address?: string): Promise<HotelInterface> {
+    return OnChainHotel.createInstance(this.web3Utils, this.web3Contracts, await this._getDeployedIndex(), address);
   }
 
   /**
@@ -58,7 +58,7 @@ class WTIndex implements WTIndexInterface {
       throw new Error('Cannot add hotel: Missing manager');
     }
     try {
-      const hotel: HotelInterface = await this.__createHotelInstance();
+      const hotel: HotelInterface = await this._createHotelInstance();
       await hotel.setLocalData(hotelData);
       return hotel.createOnChainData({
         from: hotelManager,
@@ -131,7 +131,7 @@ class WTIndex implements WTIndexInterface {
    * @throws {Error} When something breaks in the network communication.
    */
   async getHotel (address: string): Promise<?HotelInterface> {
-    const index = await this.__getDeployedIndex();
+    const index = await this._getDeployedIndex();
     try {
       // This returns strings
       const hotelIndex = parseInt(await index.methods.hotelsIndex(address).call(), 10);
@@ -139,7 +139,7 @@ class WTIndex implements WTIndexInterface {
       if (!hotelIndex) {
         throw new Error('Not found in hotel list');
       } else {
-        const hotel = await this.__createHotelInstance(address);
+        const hotel = await this._createHotelInstance(address);
         return hotel;
       }
     } catch (err) {
@@ -155,7 +155,7 @@ class WTIndex implements WTIndexInterface {
    * hotels. Subject to change.
    */
   async getAllHotels (): Promise<Array<HotelInterface>> {
-    const index = await this.__getDeployedIndex();
+    const index = await this._getDeployedIndex();
     const hotelsAddressList = await index.methods.getHotels().call();
     let getHotelDetails = hotelsAddressList
       // Filtering null addresses beforehand improves efficiency

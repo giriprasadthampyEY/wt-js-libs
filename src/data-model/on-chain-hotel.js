@@ -67,13 +67,13 @@ class OnChainHotel implements HotelInterface {
       fields: {
         _dataUri: {
           remoteGetter: async (): Promise<?string> => {
-            return (await this.__getContractInstance()).methods.dataUri().call();
+            return (await this._getContractInstance()).methods.dataUri().call();
           },
-          remoteSetter: this.__editInfoOnChain.bind(this),
+          remoteSetter: this._editInfoOnChain.bind(this),
         },
         _manager: {
           remoteGetter: async (): Promise<?string> => {
-            return (await this.__getContractInstance()).methods.manager().call();
+            return (await this._getContractInstance()).methods.manager().call();
           },
         },
       },
@@ -221,7 +221,7 @@ class OnChainHotel implements HotelInterface {
     return result;
   }
 
-  async __getContractInstance (): Promise<Object> {
+  async _getContractInstance (): Promise<Object> {
     if (!this.address) {
       throw new Error('Cannot get hotel instance without address');
     }
@@ -239,8 +239,8 @@ class OnChainHotel implements HotelInterface {
    * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
    * @return {Promise<PreparedTransactionMetadataInterface>} resulting transaction metadata
    */
-  async __editInfoOnChain (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
-    const data = (await this.__getContractInstance()).methods.editInfo(await this.dataUri).encodeABI();
+  async _editInfoOnChain (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
+    const data = (await this._getContractInstance()).methods.editInfo(await this.dataUri).encodeABI();
     const estimate = await this.indexContract.methods.callHotel(this.address, data).estimateGas(transactionOptions);
     const txData = this.indexContract.methods.callHotel(this.address, data).encodeABI();
     const transactionData = {
@@ -302,7 +302,7 @@ class OnChainHotel implements HotelInterface {
    */
   async updateOnChainData (transactionOptions: TransactionOptionsInterface): Promise<Array<PreparedTransactionMetadataInterface>> {
     // pre-check if contract is available at all and fail fast
-    await this.__getContractInstance();
+    await this._getContractInstance();
     // We have to clone options for each dataset as they may get modified
     // along the way
     return this.onChainDataset.updateRemoteData(Object.assign({}, transactionOptions));

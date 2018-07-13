@@ -23,19 +23,19 @@ describe('WTLibs.StoragePointer', () => {
   });
 
   afterEach(() => {
-    OffChainDataClient.__reset();
+    OffChainDataClient._reset();
   });
 
   describe('initialization', () => {
     it('should normalize fields option', () => {
       const pointer = StoragePointer.createInstance('json://url', ['some', 'fields', { name: 'field' }]);
-      assert.equal(pointer.__fields.length, 3);
-      assert.isDefined(pointer.__fields[0].name);
-      assert.isDefined(pointer.__fields[1].name);
-      assert.isDefined(pointer.__fields[2].name);
-      assert.equal(pointer.__fields[0].name, 'some');
-      assert.equal(pointer.__fields[1].name, 'fields');
-      assert.equal(pointer.__fields[2].name, 'field');
+      assert.equal(pointer._fields.length, 3);
+      assert.isDefined(pointer._fields[0].name);
+      assert.isDefined(pointer._fields[1].name);
+      assert.isDefined(pointer._fields[2].name);
+      assert.equal(pointer._fields[0].name, 'some');
+      assert.equal(pointer._fields[1].name, 'fields');
+      assert.equal(pointer._fields[2].name, 'field');
     });
 
     it('should not panic on empty fields list', () => {
@@ -103,9 +103,9 @@ describe('WTLibs.StoragePointer', () => {
 
     it('should properly instantiate OffChainDataAdapter', async () => {
       const pointer = StoragePointer.createInstance('json://url', ['some', 'fields']);
-      assert.isUndefined(pointer.__adapter);
+      assert.isUndefined(pointer._adapter);
       await pointer.contents.some;
-      assert.isDefined(pointer.__adapter);
+      assert.isDefined(pointer._adapter);
     });
 
     it('should reuse OffChainDataAdapter instance', async () => {
@@ -130,9 +130,9 @@ describe('WTLibs.StoragePointer', () => {
 
     it('should not panic on schema with a dash in it', async () => {
       const pointer = StoragePointer.createInstance('bzz-raw://url', ['some', 'fields']);
-      assert.isUndefined(pointer.__adapter);
+      assert.isUndefined(pointer._adapter);
       await pointer.contents.some;
-      assert.isDefined(pointer.__adapter);
+      assert.isDefined(pointer._adapter);
     });
   });
 

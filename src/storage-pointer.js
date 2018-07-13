@@ -55,12 +55,12 @@ type FieldDefType = {
 class StoragePointer {
   ref: string;
   contents: Object;
-  __storagePointers: {[string]: StoragePointer};
-  __downloaded: boolean;
-  __data: ?{[string]: Object};
-  __fields: Array<FieldDefType>;
-  __adapter: OffChainDataAdapterInterface;
-  __downloading: ?Promise<void>;
+  _storagePointers: {[string]: StoragePointer};
+  _downloaded: boolean;
+  _data: ?{[string]: Object};
+  _fields: Array<FieldDefType>;
+  _adapter: OffChainDataAdapterInterface;
+  _downloading: ?Promise<void>;
 
   /**
    * Returns a new instance of StoragePointer.
@@ -102,13 +102,13 @@ class StoragePointer {
   constructor (uri: string, fields: Array<FieldDefType>) {
     this.ref = uri;
     this.contents = {};
-    this.__storagePointers = {};
-    this.__downloaded = false;
-    this.__data = null;
-    this.__fields = fields;
+    this._storagePointers = {};
+    this._downloaded = false;
+    this._data = null;
+    this._fields = fields;
 
-    for (let i = 0; i < this.__fields.length; i++) {
-      let fieldDef = this.__fields[i];
+    for (let i = 0; i < this._fields.length; i++) {
+      let fieldDef = this._fields[i];
       Object.defineProperty(this.contents, fieldDef.name, {
         configurable: false,
         enumerable: true,
@@ -129,10 +129,10 @@ class StoragePointer {
   async reset (): Promise<void> {
     // If the download is still in progress, wait for it to
     // finish to reduce race condition possibilities.
-    await (this.__downloading || Promise.resolve());
+    await (this._downloading || Promise.resolve());
     // Force repeated download upon the next contents access.
-    delete this.__downloading;
-    this.__downloaded = false;
+    delete this._downloading;
+    this._downloaded = false;
   }
 
   /**
@@ -147,13 +147,13 @@ class StoragePointer {
    * swap the StoragePointer implementation during runtime.
    */
   async _genericGetter (field: string): StoragePointer | Object {
-    if (!this.__downloaded) {
+    if (!this._downloaded) {
       await this._downloadFromStorage();
     }
-    if (this.__storagePointers[field]) {
-      return this.__storagePointers[field];
+    if (this._storagePointers[field]) {
+      return this._storagePointers[field];
     }
-    return this.__data && this.__data[field];
+    return this._data && this._data[field];
   }
 
   /**
@@ -170,27 +170,27 @@ class StoragePointer {
    * based on schema. Uses `OffChainDataClient.getAdapter` factory method.
    */
   async _getOffChainDataClient (): Promise<OffChainDataAdapterInterface> {
-    if (!this.__adapter) {
-      this.__adapter = await OffChainDataClient.getAdapter(this._detectSchema(this.ref));
+    if (!this._adapter) {
+      this._adapter = await OffChainDataClient.getAdapter(this._detectSchema(this.ref));
     }
-    return this.__adapter;
+    return this._adapter;
   }
 
   /**
-   * Sets the internal properties (__data, __storagePointers)
+   * Sets the internal properties (_data, _storagePointers)
    * based on the data retrieved from the storage.
    */
   _initFromStorage (data: Object) {
-    this.__data = data;
-    this.__storagePointers = {};
-    for (let i = 0; i < this.__fields.length; i++) {
-      const fieldDef = this.__fields[i];
+    this._data = data;
+    this._storagePointers = {};
+    for (let i = 0; i < this._fields.length; i++) {
+      const fieldDef = this._fields[i];
       if (fieldDef.isStoragePointer) {
-        if (!this.__data[fieldDef.name] || typeof this.__data[fieldDef.name] !== 'string') {
-          const value = this.__data[fieldDef.name] ? (this.__data[fieldDef.name]).toString() : 'undefined';
+        if (!this._data[fieldDef.name] || typeof this._data[fieldDef.name] !== 'string') {
+          const value = this._data[fieldDef.name] ? (this._data[fieldDef.name]).toString() : 'undefined';
           throw new Error(`Cannot access ${fieldDef.name} under value ${value} which does not appear to be a valid reference.`);
         }
-        this.__storagePointers[fieldDef.name] = StoragePointer.createInstance(this.__data[fieldDef.name], fieldDef.fields || []);
+        this._storagePointers[fieldDef.name] = StoragePointer.createInstance(this._data[fieldDef.name], fieldDef.fields || []);
       }
     }
   }
@@ -200,15 +200,15 @@ class StoragePointer {
    * and uses it to initialize the internal state.
    */
   async _downloadFromStorage (): Promise<void> {
-    if (!this.__downloading) {
-      this.__downloading = (async () => {
+    if (!this._downloading) {
+      this._downloading = (async () => {
         const adapter = await this._getOffChainDataClient();
         const data = (await adapter.download(this.ref)) || {};
         this._initFromStorage(data);
-        this.__downloaded = true;
+        this._downloaded = true;
       })();
     }
-    return this.__downloading;
+    return this._downloading;
   }
 
   /**
@@ -273,14 +273,14 @@ class StoragePointer {
     }
 
     // Put everything together
-    for (let field of this.__fields) {
-      if (this.__storagePointers[field.name]) {
+    for (let field of this._fields) {
+      if (this._storagePointers[field.name]) {
         // Storage pointer that the user wants to get resolved - call again for a subtree
         // OR resolve the whole subtree if no special fields are requested
         if (!resolvedFields || currentFieldDef.hasOwnProperty(field.name)) {
           result[field.name] = await (await this.contents[field.name]).toPlainObject(currentFieldDef[field.name]);
         } else { // Unresolved storage pointer, return a URI
-          result[field.name] = this.__storagePointers[field.name].ref;
+          result[field.name] = this._storagePointers[field.name].ref;
         }
       } else {
         result[field.name] = await this.contents[field.name];
