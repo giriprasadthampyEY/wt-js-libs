@@ -5,7 +5,7 @@ import testedDataModel from '../utils/data-model-definition';
 import jsonWallet from '../utils/test-wallet';
 import DataModel from '../../src/data-model/';
 import Web3WTWallet from '../../src/wallet';
-import { WalletError } from '../../src/errors';
+import { WalletError, MalformedWalletError, WalletStateError, WalletPasswordError, WalletSigningError } from '../../src/errors';
 
 describe('WTLibs.Wallet', () => {
   let dataModel;
@@ -27,7 +27,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /not a valid v3 wallet/i);
-        assert.instanceOf(e, WalletError);
+        assert.instanceOf(e, MalformedWalletError);
       }
     });
 
@@ -38,7 +38,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot unlock wallet without web3 instance/i);
-        assert.instanceOf(e, WalletError);
+        assert.instanceOf(e, WalletStateError);
       }
     });
 
@@ -49,7 +49,18 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /key derivation failed/i);
-        assert.instanceOf(e, WalletError);
+        assert.instanceOf(e, WalletPasswordError);
+      }
+    });
+
+    it('should not unlock a wallet with no password', async () => {
+      const wallet = await dataModel.createWallet(jsonWallet);
+      try {
+        wallet.unlock();
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /no password/i);
+        assert.instanceOf(e, WalletPasswordError);
       }
     });
 
@@ -61,7 +72,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot unlock destroyed wallet/i);
-        assert.instanceOf(e, WalletError);
+        assert.instanceOf(e, WalletStateError);
       }
     });
   });
@@ -83,7 +94,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot lock destroyed wallet/i);
-        assert.instanceOf(e, WalletError);
+        assert.instanceOf(e, WalletStateError);
       }
     });
   });
@@ -114,7 +125,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot destroy destroyed wallet/i);
-        assert.instanceOf(e, WalletError);
+        assert.instanceOf(e, WalletStateError);
       }
     });
   });
@@ -137,7 +148,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot get address/i);
-        assert.instanceOf(e, WalletError);
+        assert.instanceOf(e, WalletStateError);
       }
     });
 
@@ -148,7 +159,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot get address/i);
-        assert.instanceOf(e, WalletError);
+        assert.instanceOf(e, WalletStateError);
       }
     });
   });
@@ -164,14 +175,14 @@ describe('WTLibs.Wallet', () => {
       wallet.web3.eth.sendSignedTransaction.restore();
     });
 
-    it('should throw when called on a destroyed wallet', async () => {
+    it('should throw on a destroyed wallet', async () => {
       wallet.destroy();
       try {
         await wallet.signAndSendTransaction({});
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot use destroyed wallet/i);
-        assert.instanceOf(e, WalletError);
+        assert.instanceOf(e, WalletStateError);
       }
     });
 
@@ -181,7 +192,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot use wallet without unlocking it first/i);
-        assert.instanceOf(e, WalletError);
+        assert.instanceOf(e, WalletStateError);
       }
     });
 
@@ -193,7 +204,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot use wallet without web3 instance/i);
-        assert.instanceOf(e, WalletError);
+        assert.instanceOf(e, WalletStateError);
       }
     });
 
@@ -206,7 +217,7 @@ describe('WTLibs.Wallet', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /transaction originator does not match the wallet address/i);
-        assert.instanceOf(e, WalletError);
+        assert.instanceOf(e, WalletSigningError);
       }
     });
 
