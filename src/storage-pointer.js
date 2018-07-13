@@ -171,9 +171,9 @@ class StoragePointer {
    * Returns appropriate implementation of `OffChainDataAdapterInterface`
    * based on schema. Uses `OffChainDataClient.getAdapter` factory method.
    */
-  async _getOffChainDataClient (): Promise<OffChainDataAdapterInterface> {
+  _getOffChainDataClient (): OffChainDataAdapterInterface {
     if (!this._adapter) {
-      this._adapter = await OffChainDataClient.getAdapter(this._detectSchema(this.ref));
+      this._adapter = OffChainDataClient.getAdapter(this._detectSchema(this.ref));
     }
     return this._adapter;
   }
@@ -204,7 +204,7 @@ class StoragePointer {
   async _downloadFromStorage (): Promise<void> {
     if (!this._downloading) {
       this._downloading = (async () => {
-        const adapter = await this._getOffChainDataClient();
+        const adapter = this._getOffChainDataClient();
         try {
           const data = (await adapter.download(this.ref)) || {};
           this._initFromStorage(data);

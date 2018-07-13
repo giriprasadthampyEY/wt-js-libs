@@ -56,7 +56,7 @@ class DataModel implements DataModelInterface {
   /**
    * Returns an Ethereum backed Winding Tree index.
    */
-  async getWindingTreeIndex (address: string): Promise<WTIndexDataProvider> {
+  getWindingTreeIndex (address: string): WTIndexDataProvider {
     return WTIndexDataProvider.createInstance(address, this.web3Utils, this.web3Contracts);
   }
 
@@ -109,10 +109,10 @@ class DataModel implements DataModelInterface {
   /**
    * Returns a wallet instance for given JSON keystore.
    */
-  async createWallet (jsonWallet: KeystoreV3Interface): Promise<Wallet> {
+  createWallet (jsonWallet: KeystoreV3Interface): Wallet {
     const wallet = Wallet.createInstance(jsonWallet);
     wallet.setWeb3(this.web3Instance);
-    return Promise.resolve(wallet);
+    return wallet;
   }
 };
 

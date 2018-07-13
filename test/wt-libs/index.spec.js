@@ -34,7 +34,7 @@ describe('WTLibs', () => {
   });
 
   describe('getOffChainDataClient', () => {
-    it('should return OffChainDataClient', async () => {
+    it('should return OffChainDataClient', () => {
       const libs = WTLibs.createInstance({
         dataModelOptions: {
           random: '1234',
@@ -49,7 +49,7 @@ describe('WTLibs', () => {
           },
         },
       });
-      const adapter = await libs.getOffChainDataClient('json');
+      const adapter = libs.getOffChainDataClient('json');
       assert.isDefined(adapter);
       OffChainDataClient._reset();
     });

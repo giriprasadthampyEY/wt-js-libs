@@ -11,11 +11,11 @@ describe('WTLibs.data-models.WTIndexDataProvider', () => {
 
   beforeEach(async function () {
     dataModel = Web3UriDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions);
-    indexDataProvider = await dataModel.getWindingTreeIndex(testedDataModel.indexAddress);
+    indexDataProvider = dataModel.getWindingTreeIndex(testedDataModel.indexAddress);
   });
 
   it('should throw when we want index from a bad address', async () => {
-    const customIndexDataProvider = await WTIndexDataProvider.createInstance('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', dataModel.web3Utils, dataModel.web3Contracts);
+    const customIndexDataProvider = WTIndexDataProvider.createInstance('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', dataModel.web3Utils, dataModel.web3Contracts);
     try {
       await customIndexDataProvider._getDeployedIndex();
       throw new Error('should not have been called');

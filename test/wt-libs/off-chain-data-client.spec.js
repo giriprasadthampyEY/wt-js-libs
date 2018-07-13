@@ -20,19 +20,19 @@ describe('WTLibs.OffChainDataClient', () => {
     OffChainDataClient._reset();
   });
 
-  it('should return proper adapter', async () => {
-    const adapter = await OffChainDataClient.getAdapter('json');
+  it('should return proper adapter', () => {
+    const adapter = OffChainDataClient.getAdapter('json');
     assert.isDefined(adapter);
     assert.isDefined(adapter._getHash);
   });
 
-  it('should be case insensitive', async () => {
-    const adapter = await OffChainDataClient.getAdapter('JSON');
+  it('should be case insensitive', () => {
+    const adapter = OffChainDataClient.getAdapter('JSON');
     assert.isDefined(adapter);
     assert.isDefined(adapter._getHash);
   });
 
-  it('should throw when adapter schemas are ambiguous', async () => {
+  it('should throw when adapter schemas are ambiguous', () => {
     assert.throws(() =>
       OffChainDataClient.setup({
         adapters: {
@@ -42,9 +42,9 @@ describe('WTLibs.OffChainDataClient', () => {
       }), OffChainDataConfigurationError, /Adapter declared twice/);
   });
 
-  it('should throw when no adapter is found for given schema', async () => {
+  it('should throw when no adapter is found for given schema', () => {
     try {
-      await OffChainDataClient.getAdapter('non-existent');
+      OffChainDataClient.getAdapter('non-existent');
       throw new Error('should have never been called');
     } catch (e) {
       assert.match(e.message, /unsupported data storage type/i);

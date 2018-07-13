@@ -105,7 +105,7 @@ export interface OffChainDataAdapterInterface {
 export interface DataModelInterface {
   getWindingTreeIndex(address: string): Promise<WTIndexInterface>,
   getTransactionsStatus(transactionHashes: Array<string>): Promise<AdaptedTxResultsInterface>,
-  createWallet(jsonWallet: Object): Promise<WalletInterface>
+  createWallet(jsonWallet: Object): WalletInterface
 }
 
 /**
