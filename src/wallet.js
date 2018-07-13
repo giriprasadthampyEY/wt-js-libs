@@ -113,6 +113,12 @@ class Wallet implements WalletInterface {
    * @throws {WalletStateError} When there is no web3 instance configured.
    * @throws {WalletStateError} When wallet is not unlocked.
    * @throws {WalletSigningError} When transaction.from does not match the wallet account.
+   * @throws {NoReceiptError} When there are issues with getting a transaction receipt.
+   * @throws {OutOfGasError} When it seems transaction ran out of gas
+   * @throws {TransactionRevertedError} When it seems transaction was reverted in EVM
+   * @throws {InsufficientFundsError} When it seems there is not enough ETH in this wallet
+   * @throws {InaccessibleEthereumNodeError} When it seems the network is unreachable
+   * @throws {TransactionMiningError} When there's another error during the signing and mining process
    * @param  {TransactionDataInterface} transactionData
    * @param  {TransactionCallbacksInterface} optional callbacks called when events come back from the network
    * @return {Promise<string|TxReceiptInterface>} transaction hash
