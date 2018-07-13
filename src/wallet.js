@@ -1,7 +1,19 @@
 // @flow
 import Web3 from 'web3';
 import type { WalletInterface, KeystoreV3Interface, TransactionDataInterface, TransactionCallbacksInterface, TxReceiptInterface } from './interfaces';
-import { WalletError, MalformedWalletError, WalletStateError, WalletPasswordError, WalletSigningError } from './errors';
+import {
+  WalletError,
+  MalformedWalletError,
+  WalletStateError,
+  WalletPasswordError,
+  WalletSigningError,
+  TransactionMiningError,
+  OutOfGasError,
+  InsufficientFundsError,
+  TransactionRevertedError,
+  NoReceiptError,
+  InaccessibleEthereumNodeError,
+} from './errors';
 
 /**
  * Web3 based wallet implementation
@@ -119,27 +131,53 @@ class Wallet implements WalletInterface {
     if (transactionData.from && transactionData.from.toLowerCase() !== this.getAddress().toLowerCase()) {
       throw new WalletSigningError('Transaction originator does not match the wallet address.');
     }
-    const signedTx = await this._account.signTransaction(transactionData);
-    return new Promise(async (resolve, reject) => {
-      return this.web3.eth.sendSignedTransaction(signedTx.rawTransaction)
-        .on('transactionHash', (hash) => {
-          if (eventCallbacks && eventCallbacks.onTransactionHash) {
-            eventCallbacks.onTransactionHash(hash);
-          }
-          if (!eventCallbacks || !eventCallbacks.onReceipt) {
-            resolve(hash);
-          }
-        }).on('receipt', (receipt) => {
-          if (eventCallbacks && eventCallbacks.onReceipt) {
-            eventCallbacks.onReceipt(receipt);
-          }
-          resolve(receipt);
-        }).on('error', (err) => {
-          reject(new WalletError('Cannot send transaction: ' + err));
-        }).catch((err) => {
-          reject(new WalletError('Cannot send transaction: ' + err));
-        });
-    });
+    try {
+      const signedTx = await this.__account.signTransaction(transactionData);
+      return new Promise(async (resolve, reject) => {
+        return this.web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+          .on('transactionHash', (hash) => {
+            if (eventCallbacks && eventCallbacks.onTransactionHash) {
+              eventCallbacks.onTransactionHash(hash);
+            }
+            if (!eventCallbacks || !eventCallbacks.onReceipt) {
+              resolve(hash);
+            }
+          }).on('receipt', (receipt) => {
+            if (eventCallbacks && eventCallbacks.onReceipt) {
+              eventCallbacks.onReceipt(receipt);
+            }
+            resolve(receipt);
+          }).on('error', (err) => {
+            reject(this._repackageWeb3Error(err));
+          }).catch((err) => {
+            reject(this._repackageWeb3Error(err));
+          });
+      });
+    } catch (err) {
+      throw new this._repackageWeb3Error(err);
+    }
+  }
+
+  _repackageWeb3Error (originalError: Error): WalletError {
+    // This heavily depends on web3.js and EVM implementation
+    if (originalError.message) {
+      if (originalError.message.match(/(Failed to check for transaction receipt)|(Receipt missing or blockHash null)|(The transaction receipt didn't contain a contract address)|(Transaction was not mined within)/i)) {
+        return new NoReceiptError('Cannot get receipt', originalError);
+      }
+      if (originalError.message.match(/(The contract code couldn't be stored, please check your gas limit)|(Transaction ran out of gas. Please provide more gas)/i)) {
+        return new OutOfGasError('Transaction did not finish', originalError);
+      }
+      if (originalError.message.match(/Transaction has been reverted by the EVM/i)) {
+        return new TransactionRevertedError('Transaction reverted', originalError);
+      }
+      if (originalError.message.match(/insufficient funds for gas/i)) {
+        return new InsufficientFundsError('Not enough funds', originalError);
+      }
+      if (originalError.message.match(/Invalid JSON RPC response/i)) {
+        return new InaccessibleEthereumNodeError('ETH node not properly responding', originalError);
+      }
+    }
+    return new TransactionMiningError('Cannot send transaction: ' + originalError.message, originalError);
   }
 
   /**

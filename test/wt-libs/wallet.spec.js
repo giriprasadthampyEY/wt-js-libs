@@ -5,7 +5,18 @@ import testedDataModel from '../utils/data-model-definition';
 import jsonWallet from '../utils/test-wallet';
 import DataModel from '../../src/data-model/';
 import Web3WTWallet from '../../src/wallet';
-import { WalletError, MalformedWalletError, WalletStateError, WalletPasswordError, WalletSigningError } from '../../src/errors';
+import {
+  MalformedWalletError,
+  WalletStateError,
+  WalletPasswordError,
+  WalletSigningError,
+  TransactionMiningError,
+  OutOfGasError,
+  InsufficientFundsError,
+  TransactionRevertedError,
+  NoReceiptError,
+  InaccessibleEthereumNodeError,
+} from '../../src/errors';
 
 describe('WTLibs.Wallet', () => {
   let dataModel;
@@ -297,30 +308,67 @@ describe('WTLibs.Wallet', () => {
       assert.equal(txHashCallback.callCount, 1);
     });
 
-    it('should reject on error event', async () => {
-      wallet.unlock(correctPassword);
-      sinon.stub(wallet._account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
-      wallet.web3.eth.sendSignedTransaction.restore();
-      sinon.stub(wallet.web3.eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent({ error: true }));
-      try {
-        await wallet.signAndSendTransaction({
-          from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
-          to: 'bbb',
-          data: 'data',
-          gas: 1234,
-        });
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot send transaction/i);
-        assert.instanceOf(e, WalletError);
-      }
+    const _makeErrorTestCase = (errorSetup, expectedErrorType) => {
+      return async () => {
+        wallet.unlock(correctPassword);
+        sinon.stub(wallet.__account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
+        wallet.web3.eth.sendSignedTransaction.restore();
+        sinon.stub(wallet.web3.eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent(errorSetup));
+        try {
+          await wallet.signAndSendTransaction({
+            from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
+            to: 'bbb',
+            data: 'data',
+            gas: 1234,
+          });
+          throw new Error('should not have been called');
+        } catch (e) {
+          assert.instanceOf(e, expectedErrorType);
+        }
+      };
+    };
+
+    it('should reject on random error event', async () => {
+      await _makeErrorTestCase({ error: 'random eth error' }, TransactionMiningError)();
+      await _makeErrorTestCase({ catch: 'random eth error' }, TransactionMiningError)();
     });
 
-    it('should reject on unexpected error', async () => {
+    it('should reject with InsufficientFundsError', async () => {
+      await _makeErrorTestCase({ error: 'insufficient funds for gas' }, InsufficientFundsError)();
+      await _makeErrorTestCase({ catch: 'insufficient funds for gas' }, InsufficientFundsError)();
+    });
+
+    it('should reject with NoReceiptError', async () => {
+      await _makeErrorTestCase({ error: 'Failed to check for transaction receipt' }, NoReceiptError)();
+      await _makeErrorTestCase({ catch: 'Failed to check for transaction receipt' }, NoReceiptError)();
+      await _makeErrorTestCase({ error: 'Receipt missing or blockHash null' }, NoReceiptError)();
+      await _makeErrorTestCase({ catch: 'Receipt missing or blockHash null' }, NoReceiptError)();
+      await _makeErrorTestCase({ error: 'The transaction receipt didn\'t contain a contract address.' }, NoReceiptError)();
+      await _makeErrorTestCase({ catch: 'The transaction receipt didn\'t contain a contract address.' }, NoReceiptError)();
+      await _makeErrorTestCase({ error: 'Transaction was not mined within' }, NoReceiptError)();
+      await _makeErrorTestCase({ catch: 'Transaction was not mined within' }, NoReceiptError)();
+    });
+
+    it('should reject with OutOfGasError', async () => {
+      await _makeErrorTestCase({ error: 'The contract code couldn\'t be stored, please check your gas limit.' }, OutOfGasError)();
+      await _makeErrorTestCase({ catch: 'The contract code couldn\'t be stored, please check your gas limit.' }, OutOfGasError)();
+      await _makeErrorTestCase({ error: 'Transaction ran out of gas. Please provide more gas' }, OutOfGasError)();
+      await _makeErrorTestCase({ catch: 'Transaction ran out of gas. Please provide more gas' }, OutOfGasError)();
+    });
+
+    it('should reject with TransactionRevertedError', async () => {
+      await _makeErrorTestCase({ error: 'Transaction has been reverted by the EVM' }, TransactionRevertedError)();
+      await _makeErrorTestCase({ catch: 'Transaction has been reverted by the EVM' }, TransactionRevertedError)();
+    });
+
+    it('should reject with InaccessibleEthereumNodeError', async () => {
+      await _makeErrorTestCase({ error: 'Invalid JSON RPC response' }, InaccessibleEthereumNodeError)();
+      await _makeErrorTestCase({ catch: 'Invalid JSON RPC response' }, InaccessibleEthereumNodeError)();
+    });
+
+    it('should handle an inaccessible node during tx signing', async () => {
       wallet.unlock(correctPassword);
-      sinon.stub(wallet._account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
-      wallet.web3.eth.sendSignedTransaction.restore();
-      sinon.stub(wallet.web3.eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent({ catch: true }));
+      sinon.stub(wallet.__account, 'signTransaction').rejects({ message: 'Invalid JSON RPC response' });
       try {
         await wallet.signAndSendTransaction({
           from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
@@ -330,8 +378,9 @@ describe('WTLibs.Wallet', () => {
         });
         throw new Error('should not have been called');
       } catch (e) {
-        assert.match(e.message, /cannot send transaction/i);
-        assert.instanceOf(e, WalletError);
+        assert.instanceOf(e, TransactionMiningError);
+      } finally {
+        wallet.__account.signTransaction.restore();
       }
     });
   });

@@ -11,14 +11,14 @@ function stubPromiEvent (sendSetup = { txHash: true, receipt: true, error: false
         callback({ some: 'receipt' }); // eslint-disable-line standard/no-callback-literal
       }
       if (evt === 'error' && sendSetup.error) {
-        callback('on error handler fired'); // eslint-disable-line standard/no-callback-literal
+        let message = typeof sendSetup.error === 'string' ? sendSetup.error : 'on error handler fired';
+        callback({ message: message }); // eslint-disable-line standard/no-callback-literal
       }
       return this;
     },
     catch: function (callback) {
-      if (sendSetup.catch) {
-        callback('send catch fired'); // eslint-disable-line standard/no-callback-literal
-      }
+      let message = typeof sendSetup.catch === 'string' ? sendSetup.catch : 'send catch fired';
+      callback({ message: message }); // eslint-disable-line standard/no-callback-literal
     },
   };
 }
