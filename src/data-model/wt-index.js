@@ -21,7 +21,7 @@ class WTIndex implements WTIndexInterface {
    * Returns a configured instance of WTIndex
    * representing a Winding Tree index contract on a given `indexAddress`.
    */
-  static async createInstance (indexAddress: string, web3Utils: Utils, web3Contracts: Contracts): Promise<WTIndex> {
+  static createInstance (indexAddress: string, web3Utils: Utils, web3Contracts: Contracts): WTIndex {
     return new WTIndex(indexAddress, web3Utils, web3Contracts);
   }
 

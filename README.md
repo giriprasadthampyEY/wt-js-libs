@@ -43,7 +43,7 @@ const libs = WTLibs.createInstance({
     },
   },
 });
-const index = await libs.getWTIndex('0x...');
+const index = libs.getWTIndex('0x...');
 const hotel = await index.getHotel('0x...');
 
 // You can get all the off-chain data at once
@@ -64,7 +64,7 @@ const hotelName = await hotelDescriptionDocument.contents.name;
 
 
 // How about creating a hotel?
-wallet = await libs.createWallet({/*...Your wallet in a JSON format..*/});
+wallet = libs.createWallet({/*...Your wallet in a JSON format..*/});
 wallet.unlock('with-password');
 try {
   const { hotel, transactionData, eventCallbacks } = await index.addHotel({

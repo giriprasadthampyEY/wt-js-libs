@@ -59,7 +59,7 @@ class OffChainDataClient {
    *
    * @throws {OffChainDataRuntimeError} when schema is not defined or adapter for this schema does not exist
    */
-  static async getAdapter (schema: ?string): Promise<OffChainDataAdapterInterface> {
+  static getAdapter (schema: ?string): OffChainDataAdapterInterface {
     schema = schema && schema.toLowerCase();
     if (!schema || !offChainDataOptions.adapters[schema]) {
       throw new OffChainDataRuntimeError(`Unsupported data storage type: ${schema || 'null'}`);

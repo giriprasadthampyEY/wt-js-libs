@@ -125,7 +125,7 @@ describe('WTLibs.StoragePointer', () => {
 
     it('should throw when the adapter throws on download', async () => {
       const pointer = StoragePointer.createInstance('json://url-1234', ['some', 'fields']);
-      sinon.stub(OffChainDataClient, 'getAdapter').resolves({
+      sinon.stub(OffChainDataClient, 'getAdapter').returns({
         download: sinon.stub().rejects(),
       });
       try {
@@ -154,7 +154,7 @@ describe('WTLibs.StoragePointer', () => {
         isStoragePointer: true,
         fields: ['some', 'fields'],
       }]);
-      sinon.stub(pointer, '_getOffChainDataClient').resolves({
+      sinon.stub(pointer, '_getOffChainDataClient').returns({
         download: sinon.stub().returns({
           'sp': 'json://point',
         }),
@@ -172,7 +172,7 @@ describe('WTLibs.StoragePointer', () => {
         name: 'sp',
         isStoragePointer: true,
       }]);
-      sinon.stub(pointer, '_getOffChainDataClient').resolves({
+      sinon.stub(pointer, '_getOffChainDataClient').returns({
         download: sinon.stub().returns({
           'sp': 'json://point',
         }),
@@ -202,7 +202,7 @@ describe('WTLibs.StoragePointer', () => {
           isStoragePointer: true,
           fields: ['some', 'fields'],
         }]);
-        sinon.stub(pointer, '_getOffChainDataClient').resolves({
+        sinon.stub(pointer, '_getOffChainDataClient').returns({
           download: sinon.stub().returns({
             'sp': { some: 'field' },
           }),
@@ -221,7 +221,7 @@ describe('WTLibs.StoragePointer', () => {
           isStoragePointer: true,
           fields: ['some', 'fields'],
         }]);
-        sinon.stub(pointer, '_getOffChainDataClient').resolves({
+        sinon.stub(pointer, '_getOffChainDataClient').returns({
           download: sinon.stub().returns({
             'sp': 'random://point',
           }),

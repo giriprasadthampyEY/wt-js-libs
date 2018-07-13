@@ -27,13 +27,13 @@ describe('WTLibs.Wallet', () => {
 
   describe('unlock', () => {
     it('should unlock the wallet', async () => {
-      const wallet = await dataModel.createWallet(jsonWallet);
+      const wallet = dataModel.createWallet(jsonWallet);
       wallet.unlock(correctPassword);
     });
 
     it('should not unlock on a malformed keystore', async () => {
       try {
-        const wallet = await dataModel.createWallet({ random: 'object' });
+        const wallet = dataModel.createWallet({ random: 'object' });
         wallet.unlock('random-pwd');
         throw new Error('should not have been called');
       } catch (e) {
@@ -54,7 +54,7 @@ describe('WTLibs.Wallet', () => {
     });
 
     it('should not unlock a wallet with a bad password', async () => {
-      const wallet = await dataModel.createWallet(jsonWallet);
+      const wallet = dataModel.createWallet(jsonWallet);
       try {
         wallet.unlock('random-password');
         throw new Error('should not have been called');
@@ -65,7 +65,7 @@ describe('WTLibs.Wallet', () => {
     });
 
     it('should not unlock a wallet with no password', async () => {
-      const wallet = await dataModel.createWallet(jsonWallet);
+      const wallet = dataModel.createWallet(jsonWallet);
       try {
         wallet.unlock();
         throw new Error('should not have been called');
@@ -76,7 +76,7 @@ describe('WTLibs.Wallet', () => {
     });
 
     it('should not unlock a destroyed wallet', async () => {
-      const wallet = await dataModel.createWallet(jsonWallet);
+      const wallet = dataModel.createWallet(jsonWallet);
       wallet.destroy();
       try {
         wallet.unlock(correctPassword);
@@ -90,7 +90,7 @@ describe('WTLibs.Wallet', () => {
 
   describe('lock', () => {
     it('should lock the wallet', async () => {
-      const wallet = await dataModel.createWallet(jsonWallet);
+      const wallet = dataModel.createWallet(jsonWallet);
       wallet.unlock(correctPassword);
       assert.isDefined(wallet._account);
       wallet.lock();
@@ -98,7 +98,7 @@ describe('WTLibs.Wallet', () => {
     });
 
     it('should not lock a destroyed wallet', async () => {
-      const wallet = await dataModel.createWallet(jsonWallet);
+      const wallet = dataModel.createWallet(jsonWallet);
       wallet.destroy();
       try {
         wallet.lock();
@@ -112,14 +112,14 @@ describe('WTLibs.Wallet', () => {
 
   describe('destroy', () => {
     it('should destroy a wallet', async () => {
-      const wallet = await dataModel.createWallet(jsonWallet);
+      const wallet = dataModel.createWallet(jsonWallet);
       assert.isDefined(wallet._jsonWallet);
       wallet.destroy();
       assert.isUndefined(wallet._jsonWallet);
     });
 
     it('should lock a wallet before destroying it', async () => {
-      const wallet = await dataModel.createWallet(jsonWallet);
+      const wallet = dataModel.createWallet(jsonWallet);
       wallet.unlock(correctPassword);
       assert.isDefined(wallet._account);
       assert.isDefined(wallet._jsonWallet);
@@ -129,7 +129,7 @@ describe('WTLibs.Wallet', () => {
     });
 
     it('should not destroy an already destroyed wallet', async () => {
-      const wallet = await dataModel.createWallet(jsonWallet);
+      const wallet = dataModel.createWallet(jsonWallet);
       wallet.destroy();
       try {
         wallet.destroy();
@@ -145,7 +145,7 @@ describe('WTLibs.Wallet', () => {
     let wallet;
 
     beforeEach(async function () {
-      wallet = await dataModel.createWallet(jsonWallet);
+      wallet = dataModel.createWallet(jsonWallet);
     });
 
     it('should return the address', () => {
@@ -178,7 +178,7 @@ describe('WTLibs.Wallet', () => {
   describe('signAndSendTransaction', () => {
     let wallet, sendStub;
     beforeEach(async function () {
-      wallet = await dataModel.createWallet(jsonWallet);
+      wallet = dataModel.createWallet(jsonWallet);
       sendStub = sinon.stub(wallet.web3.eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent());
     });
 
@@ -208,7 +208,7 @@ describe('WTLibs.Wallet', () => {
     });
 
     it('should throw on a wallet without web3', async () => {
-      const customWallet = await dataModel.createWallet(jsonWallet);
+      const customWallet = dataModel.createWallet(jsonWallet);
       customWallet.web3 = null;
       try {
         await customWallet.signAndSendTransaction({});

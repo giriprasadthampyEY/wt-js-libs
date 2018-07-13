@@ -9,11 +9,11 @@ import { InputDataError, WTLibsError } from '../src/errors';
 describe('WTLibs usage', () => {
   let libs, wallet, index, emptyIndex, minedTxHashes = [];
 
-  beforeEach(async () => {
+  beforeEach(() => {
     libs = WTLibs.createInstance(testedDataModel.withDataSource());
-    index = await libs.getWTIndex(testedDataModel.indexAddress);
-    wallet = await libs.createWallet(jsonWallet);
-    emptyIndex = await libs.getWTIndex(testedDataModel.emptyIndexAddress);
+    index = libs.getWTIndex(testedDataModel.indexAddress);
+    wallet = libs.createWallet(jsonWallet);
+    emptyIndex = libs.getWTIndex(testedDataModel.emptyIndexAddress);
     wallet.unlock('test123');
   });
 
@@ -24,7 +24,7 @@ describe('WTLibs usage', () => {
 
   describe('addHotel', () => {
     it('should add hotel', async () => {
-      const jsonClient = await libs.getOffChainDataClient('json');
+      const jsonClient = libs.getOffChainDataClient('json');
       const descUrl = await jsonClient.upload({
         name: 'Premium hotel',
         description: 'Great hotel',

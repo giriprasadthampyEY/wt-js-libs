@@ -69,24 +69,32 @@ class WTLibs {
    * Get an instance of Winding Tree index from the underlying `data-model`.
    *
    * @param address of the Winding Tree index
-   * @type Promise<WTIndexInterface>
+   * @type WTIndexInterface
    */
-  async getWTIndex (address: string): Promise<WTIndexInterface> {
+  getWTIndex (address: string): WTIndexInterface {
     return this.dataModel.getWindingTreeIndex(address);
   }
 
   /**
-   * Get a transactions status from the underlying `data-model`
+   * Get a transactions status from the underlying `data-model`.
+   * This method is async because it communicates directly with and EVM node.
    */
   async getTransactionsStatus (transactionHashes: Array<string>): Promise<AdaptedTxResultsInterface> {
     return this.dataModel.getTransactionsStatus(transactionHashes);
   }
 
-  async createWallet (jsonWallet: KeystoreV3Interface): Promise<WalletInterface> {
+  /**
+   * Returns a wallet abstraction that can be used for signing transactions
+   */
+  createWallet (jsonWallet: KeystoreV3Interface): WalletInterface {
     return this.dataModel.createWallet(jsonWallet);
   }
 
-  async getOffChainDataClient (schema: string): Promise<OffChainDataAdapterInterface> {
+  /**
+   * Returns an off-chain data storage client that can be used for uploading
+   * or downloading data stored off-chain.
+   */
+  getOffChainDataClient (schema: string): OffChainDataAdapterInterface {
     return OffChainDataClient.getAdapter(schema);
   }
 }
