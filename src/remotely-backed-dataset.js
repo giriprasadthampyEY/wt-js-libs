@@ -141,7 +141,9 @@ class RemotelyBackedDataset {
     // This is a totally new instance
     // TODO maybe don't init all at once, it might be expensive
     if (this.isDeployed() && this._fieldStates[property] === 'unsynced') {
-      await this._syncRemoteData();
+      return this._syncRemoteData().then(() => {
+        return this._localData[property];
+      });
     }
 
     return this._localData[property];

@@ -4,7 +4,7 @@ import WTIndexDataProvider from '../../../src/data-model/wt-index';
 import Web3UriDataModel from '../../../src/data-model/';
 import testedDataModel from '../../utils/data-model-definition';
 
-import { SmartContractInstantiationError, WTLibsError } from '../../../src/errors';
+import { SmartContractInstantiationError, WTLibsError, RemoteDataReadError } from '../../../src/errors';
 
 describe('WTLibs.data-models.WTIndexDataProvider', () => {
   let dataModel, indexDataProvider;
@@ -56,6 +56,27 @@ describe('WTLibs.data-models.WTIndexDataProvider', () => {
         assert.instanceOf(e, WTLibsError);
       } finally {
         indexDataProvider._createHotelInstance.restore();
+      }
+    });
+
+    it('should throw if accessing off-chain data without resolved on-chain pointer and on-chain pointer cannot be downloaded', async () => {
+      // pre-heat the contract so we can stub it later
+      await indexDataProvider._getDeployedIndex();
+      sinon.stub(indexDataProvider.deployedIndex.methods, 'hotelsIndex').returns({
+        call: sinon.stub().resolves('7'),
+      });
+      // There is not a valid hotel on this address
+      const address = '0x994afd347b160be3973b41f0a144819496d175e9';
+      const hotel = await indexDataProvider.getHotel(address);
+      
+      try {
+        await hotel.dataIndex;
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /cannot sync remote data/i);
+        assert.instanceOf(e, RemoteDataReadError);
+      } finally {
+        indexDataProvider.deployedIndex.methods.hotelsIndex.restore();
       }
     });
   });
@@ -120,6 +141,7 @@ describe('WTLibs.data-models.WTIndexDataProvider', () => {
 
   describe('getAllHotels', () => {
     it('should not panic when one of many hotels is missing on-chain', async () => {
+      // pre-heat the contract so we can stub it later
       await indexDataProvider._getDeployedIndex();
       const getHotelSpy = sinon.spy(indexDataProvider, 'getHotel');
       sinon.stub(indexDataProvider.deployedIndex.methods, 'getHotels').returns({

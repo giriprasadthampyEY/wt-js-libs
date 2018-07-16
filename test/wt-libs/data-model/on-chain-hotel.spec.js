@@ -259,16 +259,14 @@ describe('WTLibs.data-model.OnChainHotel', () => {
       const provider = OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub, 'fake-address');
       assert.equal(urlStub().call.callCount, 0);
       await provider.dataUri;
-      // The getter of url calls twice this._url
-      assert.equal(urlStub().call.callCount, 2);
+      assert.equal(urlStub().call.callCount, 1);
     });
 
     it('should setup remoteGetter for manager', async () => {
       const provider = OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub, 'fake-address');
       assert.equal(managerStub().call.callCount, 0);
       await provider.manager;
-      // The getter of manager calls twice this._manager
-      assert.equal(managerStub().call.callCount, 2);
+      assert.equal(managerStub().call.callCount, 1);
     });
   });
 
