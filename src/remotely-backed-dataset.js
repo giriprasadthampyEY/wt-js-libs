@@ -41,6 +41,7 @@ class RemotelyBackedDataset {
     this._remoteData = {};
     this._fieldStates = {};
     this._fieldKeys = [];
+    this._syncing = null;
   }
 
   /**
@@ -194,20 +195,25 @@ class RemotelyBackedDataset {
   }
 
   async _syncRemoteData () {
-    try {
-      await this._fetchRemoteData();
-      // Copy over data from remoteData to local data
-      for (let i = 0; i < this._fieldKeys.length; i++) {
-        // Do not update user-modified fields
-        // TODO deal with 3rd party data modificiation on a remote storage
-        if (this._remoteData[this._fieldKeys[i]] !== this._localData[this._fieldKeys[i]] && this._fieldStates[this._fieldKeys[i]] !== 'dirty') {
-          this._localData[this._fieldKeys[i]] = this._remoteData[this._fieldKeys[i]];
-          this._fieldStates[this._fieldKeys[i]] = 'synced';
+    if (!this._syncing) {
+      this._syncing = (async () => {
+        try {
+          await this._fetchRemoteData();
+          // Copy over data from remoteData to local data
+          for (let i = 0; i < this._fieldKeys.length; i++) {
+            // Do not update user-modified fields
+            // TODO deal with 3rd party data modificiation on a remote storage
+            if (this._remoteData[this._fieldKeys[i]] !== this._localData[this._fieldKeys[i]] && this._fieldStates[this._fieldKeys[i]] !== 'dirty') {
+              this._localData[this._fieldKeys[i]] = this._remoteData[this._fieldKeys[i]];
+              this._fieldStates[this._fieldKeys[i]] = 'synced';
+            }
+          }
+        } catch (err) {
+          throw new RemoteDataReadError('Cannot sync remote data: ' + err.message);
         }
-      }
-    } catch (err) {
-      throw new RemoteDataReadError('Cannot sync remote data: ' + err.message);
+      })();
     }
+    return this._syncing;
   }
 
   // https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript-jquery
