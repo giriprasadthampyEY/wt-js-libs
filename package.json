@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@windingtree/lif-token": "^0.1.2-erc827",
-    "@windingtree/wt-contracts": "^0.2.2",
+    "@windingtree/wt-contracts": "^0.2.3",
     "bignumber.js": "^7.2.1",
     "lodash.clonedeep": "^4.5.0",
     "web3": "^1.0.0-beta.34"
@@ -46,7 +46,7 @@
   "devDependencies": {
     "@windingtree/off-chain-adapter-in-memory": "^3.1.1",
     "babel-core": "^6.26.3",
-    "babel-eslint": "^8.2.5",
+    "babel-eslint": "^8.2.6",
     "babel-loader": "^7.1.4",
     "babel-plugin-transform-builtin-extend": "^1.1.2",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
@@ -58,7 +58,7 @@
     "chai": "^4.1.2",
     "chai-string": "^1.4.0",
     "coveralls": "^3.0.1",
-    "documentation": "^8.0.0",
+    "documentation": "^8.0.1",
     "esdoc": "^1.1.0",
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "esdoc-node": "^1.0.2",
@@ -70,8 +70,8 @@
     "eslint-plugin-node": "^6.0.1",
     "eslint-plugin-promise": "^3.8.0",
     "eslint-plugin-standard": "^3.1.0",
-    "flow-bin": "^0.75.0",
-    "ganache-cli": "6.1.4",
+    "flow-bin": "^0.76.0",
+    "ganache-cli": "^6.1.6",
     "jsdom": "^11.11.0",
     "jsdom-global": "3.0.2",
     "lodash.isfunction": "^3.0.9",
