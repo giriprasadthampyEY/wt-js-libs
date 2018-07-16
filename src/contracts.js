@@ -1,5 +1,5 @@
-import WTIndexContractMetadata from '@windingtree/wt-contracts/build/contracts/WTIndex';
-import HotelContractMetadata from '@windingtree/wt-contracts/build/contracts/Hotel';
+import WTIndexContractMetadata from '@windingtree/wt-contracts/build/contracts/AbstractWTIndex.json';
+import HotelContractMetadata from '@windingtree/wt-contracts/build/contracts/AbstractHotel.json';
 import { SmartContractInstantiationError } from './errors';
 
 /**
