@@ -33,6 +33,7 @@ class DataModel implements DataModelInterface {
   web3Instance: Web3;
   web3Utils: Utils;
   web3Contracts: Contracts;
+  _wtIndexCache: {[address: string]: WTIndexDataProvider};
 
   /**
    * Creates a configured DataModel instance.
@@ -51,13 +52,17 @@ class DataModel implements DataModelInterface {
     this.web3Instance = new Web3(this.options.provider);
     this.web3Utils = Utils.createInstance(this.options.gasCoefficient, this.web3Instance);
     this.web3Contracts = Contracts.createInstance(this.web3Instance);
+    this._wtIndexCache = {};
   }
 
   /**
    * Returns an Ethereum backed Winding Tree index.
    */
   getWindingTreeIndex (address: string): WTIndexDataProvider {
-    return WTIndexDataProvider.createInstance(address, this.web3Utils, this.web3Contracts);
+    if (!this._wtIndexCache[address]) {
+      this._wtIndexCache[address] = WTIndexDataProvider.createInstance(address, this.web3Utils, this.web3Contracts);
+    }
+    return this._wtIndexCache[address];
   }
 
   /**
