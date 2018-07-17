@@ -15,4 +15,5 @@ assets
 .solcover.js
 .eslintrc.js
 .travis.yml
+.babelrc
 truffle-config.js

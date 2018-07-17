@@ -33,7 +33,6 @@ export interface HotelDescriptionInterface {
 }
 
 export interface RoomTypeInterface {
-  id: Promise<string> | string,
   name: Promise<string> | string,
   description: Promise<string> | string,
   totalQuantity: Promise<number> | number,
