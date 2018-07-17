@@ -33,6 +33,7 @@ class OnChainHotel implements HotelInterface {
 
   // Representation of data stored on dataUri
   _dataIndex: ?StoragePointer;
+  _initialized: boolean;
 
   /**
    * Create new configured instance.
@@ -80,6 +81,7 @@ class OnChainHotel implements HotelInterface {
         },
       },
     }, this);
+    this._initialized = true;
     if (this.address) {
       this.onChainDataset.markDeployed();
     }
@@ -123,10 +125,9 @@ class OnChainHotel implements HotelInterface {
   }
 
   get dataUri (): Promise<?string> | ?string {
-    if (!this._dataUri) {
+    if (!this._initialized) {
       return;
     }
-
     return (async () => {
       const dataUri = await this._dataUri;
       return dataUri;
@@ -152,10 +153,9 @@ class OnChainHotel implements HotelInterface {
   }
 
   get manager (): Promise<?string> | ?string {
-    if (!this._manager) {
+    if (!this._initialized) {
       return;
     }
-
     return (async () => {
       const manager = await this._manager;
       return manager;
