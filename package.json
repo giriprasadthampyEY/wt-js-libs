@@ -17,8 +17,7 @@
     "docs": "rimraf docs && mkdir docs && documentation build src/** -f md -o docs/reference.md"
   },
   "publishConfig": {
-    "access": "public",
-    "tag": "next"
+    "access": "public"
   },
   "repository": {
     "type": "git",
