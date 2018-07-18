@@ -4,9 +4,6 @@ logs
 npm-debug.log*
 .node-*
 
-# Contracts compiled
-build/contracts
-
 # Dependency directories
 node_modules
 
@@ -15,3 +12,8 @@ node_modules
 
 # Generated artifacts
 dist
+coverage
+.nyc_output
+.nyc_coverage
+build/contracts
+test/utils/compiled

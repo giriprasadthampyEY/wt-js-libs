@@ -2,6 +2,8 @@ require('babel-register');
 require('babel-polyfill');
 
 module.exports = {
+  contracts_directory: './test/utils/contracts',
+  migrations_directory: './test/utils/migrations',
   networks: {
     development: {
       host: 'localhost',
