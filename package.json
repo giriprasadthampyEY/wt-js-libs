@@ -38,6 +38,7 @@
   "dependencies": {
     "@windingtree/lif-token": "^0.1.2-erc827",
     "@windingtree/wt-contracts": "^0.2.3",
+    "babel-runtime": "^6.26.0",
     "bignumber.js": "^7.2.1",
     "lodash.clonedeep": "^4.5.0",
     "web3": "^1.0.0-beta.34"
@@ -49,6 +50,7 @@
     "babel-loader": "^7.1.4",
     "babel-plugin-transform-builtin-extend": "^1.1.2",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-flow": "^6.23.0",
