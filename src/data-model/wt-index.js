@@ -118,6 +118,17 @@ class WTIndex implements WTIndexInterface {
     });
   }
 
+  /**
+   * Generates transaction data required for transferring a hotel
+   * ownership and more metadata required for successful mining of that
+   * transactoin. Does not sign or send the transaction.
+   *
+   * @throws {InputDataError} When hotel does not have an address.
+   * @throws {InputDataError} When hotel does not contain a manager property.
+   * @throws {InputDataError} When the new manager address is the same as the old manager.
+   * @throws {InputDataError} When the new manager address is not a valid address.
+   * @throws {WTLibsError} When anything goes wrong during data preparation phase.
+   */
   async transferHotelOwnership (hotel: HotelInterface, newManager: string): Promise<PreparedTransactionMetadataInterface> {
     if (!hotel.address) {
       throw new InputDataError('Cannot transfer hotel without address.');
@@ -127,7 +138,13 @@ class WTIndex implements WTIndexInterface {
       throw new InputDataError('Cannot transfer hotel without manager.');
     }
 
-    // TODO verify that newManager is actually a present and valid address
+    if (hotelManager.toLowerCase() === newManager.toLowerCase()) {
+      throw new InputDataError('Cannot transfer hotel to the same manager.');
+    }
+
+    if (this.web3Utils.isZeroAddress(newManager)) {
+      throw new InputDataError('Cannot transfer hotel to an invalid newManager address.');
+    }
 
     return hotel.transferOnChainOwnership(newManager, {
       from: hotelManager,

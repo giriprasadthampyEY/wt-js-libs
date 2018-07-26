@@ -316,10 +316,19 @@ class OnChainHotel implements HotelInterface {
    * This is potentially devastating, so it's better to name
    * this operation explicitly instead of hiding it under updateOnChainData.
    *
-   * TODO
+   * Generates transaction data and metadata required for a hotel ownership
+   * transfer.
+   *
+   * @param {string} Address of a new manager
+   * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
+   * @throws {SmartContractInstantiationError} When the underlying contract is not yet deployed.
+   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created hotel instance.
    *
    */
   async transferOnChainOwnership (newManager: string, transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
+    if (!this.onChainDataset.isDeployed()) {
+      throw new SmartContractInstantiationError('Cannot remove hotel: not deployed');
+    }
     const estimate = this.indexContract.methods.transferHotel(this.address, newManager).estimateGas(transactionOptions);
     const data = this.indexContract.methods.transferHotel(this.address, newManager).encodeABI();
     const transactionData = {

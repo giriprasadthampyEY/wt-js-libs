@@ -4,7 +4,7 @@ import WTIndexDataProvider from '../../../src/data-model/wt-index';
 import Web3UriDataModel from '../../../src/data-model/';
 import testedDataModel from '../../utils/data-model-definition';
 
-import { SmartContractInstantiationError, WTLibsError, RemoteDataReadError } from '../../../src/errors';
+import { SmartContractInstantiationError, WTLibsError, RemoteDataReadError, InputDataError } from '../../../src/errors';
 
 describe('WTLibs.data-models.WTIndexDataProvider', () => {
   let dataModel, indexDataProvider;
@@ -111,6 +111,58 @@ describe('WTLibs.data-models.WTIndexDataProvider', () => {
         assert.equal(e.originalError.name, 'some original error');
       }
     });
+  });
+
+  describe('transferHotelOwnership', () => {
+    it('should throw generic error when something does not work during tx data preparation', async () => {
+      try {
+        const hotel = await indexDataProvider.getHotel('0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
+        sinon.stub(hotel, 'transferOnChainOwnership').rejects('some original error');
+        await indexDataProvider.transferHotelOwnership(hotel, '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /cannot transfer hotel/i);
+        assert.instanceOf(e, WTLibsError);
+        assert.isDefined(e.originalError);
+        assert.equal(e.originalError.name, 'some original error');
+      }
+    });
+
+    it('should throw when trying to transfer to an invalid address', async () => {
+      try {
+        const hotel = await indexDataProvider.getHotel('0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
+        await indexDataProvider.transferHotelOwnership(hotel, 'random-string-that-is-not-address');
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /cannot transfer hotel/i);
+        assert.instanceOf(e, InputDataError);
+      }
+    });
+
+    it('should throw when trying to transfer a hotel without a manager', async () => {
+      try {
+        const hotel = await indexDataProvider.getHotel('0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
+        hotel._manager = null;
+        await indexDataProvider.transferHotelOwnership(hotel, '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /cannot transfer hotel/i);
+        assert.instanceOf(e, InputDataError);
+      }
+    });
+
+    it('should throw when transferring to the same manager', async () => {
+      try {
+        const hotel = await indexDataProvider.getHotel('0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
+        await indexDataProvider.transferHotelOwnership(hotel, await hotel.manager);
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /cannot transfer hotel/i);
+        assert.match(e.message, /same manager/i);
+        assert.instanceOf(e, InputDataError);
+      }
+    });
+
   });
 
   describe('removeHotel', () => {
