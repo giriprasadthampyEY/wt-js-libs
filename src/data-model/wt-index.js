@@ -118,6 +118,26 @@ class WTIndex implements WTIndexInterface {
     });
   }
 
+  async transferHotelOwnership (hotel: HotelInterface, newManager: string): Promise<PreparedTransactionMetadataInterface> {
+    if (!hotel.address) {
+      throw new InputDataError('Cannot transfer hotel without address.');
+    }
+    const hotelManager = await hotel.manager;
+    if (!hotelManager) {
+      throw new InputDataError('Cannot transfer hotel without manager.');
+    }
+
+    // TODO verify that newManager is actually a present and valid address
+
+    return hotel.transferOnChainOwnership(newManager, {
+      from: hotelManager,
+    }).catch((err) => {
+      // invalid opcode -> non-existent hotel
+      // invalid opcode -> failed check for manager
+      throw new WTLibsError('Cannot transfer hotel: ' + err.message, err);
+    });
+  }
+
   /**
    * Gets hotel representation of a hotel on a given address. If hotel
    * on such address is not registered through this Winding Tree index

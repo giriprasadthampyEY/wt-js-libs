@@ -313,6 +313,35 @@ class OnChainHotel implements HotelInterface {
   }
 
   /**
+   * This is potentially devastating, so it's better to name
+   * this operation explicitly instead of hiding it under updateOnChainData.
+   *
+   * TODO
+   *
+   */
+  async transferOnChainOwnership (newManager: string, transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
+    const estimate = this.indexContract.methods.transferHotel(this.address, newManager).estimateGas(transactionOptions);
+    const data = this.indexContract.methods.transferHotel(this.address, newManager).encodeABI();
+    const transactionData = {
+      nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
+      data: data,
+      from: transactionOptions.from,
+      to: this.indexContract.options.address,
+      gas: this.web3Utils.applyGasCoefficient(await estimate),
+    };
+    const eventCallbacks: TransactionCallbacksInterface = {
+      onReceipt: (receipt: TxReceiptInterface) => {
+        this._manager = newManager;
+      },
+    };
+    return {
+      hotel: (this: HotelInterface),
+      transactionData: transactionData,
+      eventCallbacks: eventCallbacks,
+    };
+  }
+
+  /**
    * Generates transaction data and metadata required for destroying the hotel object on network.
    *
    * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation

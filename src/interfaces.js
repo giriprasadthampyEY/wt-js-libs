@@ -71,7 +71,8 @@ export interface HotelInterface extends HotelOnChainDataInterface {
   setLocalData(newData: HotelOnChainDataInterface): Promise<void>,
   createOnChainData(transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>,
   updateOnChainData(transactionOptions: TransactionOptionsInterface): Promise<Array<PreparedTransactionMetadataInterface>>,
-  removeOnChainData(transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>
+  removeOnChainData(transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>,
+  transferOnChainOwnership(newManager: string, transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>
 }
 
 /**
@@ -84,7 +85,8 @@ export interface WTIndexInterface {
   getAllHotels(): Promise<Array<HotelInterface>>,
   // It is possible that this operation generates multiple transactions in the future
   updateHotel(hotel: HotelInterface): Promise<Array<PreparedTransactionMetadataInterface>>,
-  removeHotel(hotel: HotelInterface): Promise<PreparedTransactionMetadataInterface>
+  removeHotel(hotel: HotelInterface): Promise<PreparedTransactionMetadataInterface>,
+  transferHotelOwnership(hotel: HotelInterface, newManager: string): Promise<PreparedTransactionMetadataInterface>
 }
 
 /**
