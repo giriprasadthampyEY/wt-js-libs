@@ -1,12 +1,21 @@
 {
   "presets": [
-    "env",
+    ["env", {
+      targets: {
+        "node": "10",
+        "browsers": ["last 2 versions"]
+      }
+    }],
     "flow"
   ],
   "plugins": [
     "transform-object-rest-spread",
     ["babel-plugin-transform-builtin-extend", {
         globals: ["Error", "Array"]
+    }],
+    ["transform-runtime", {
+      "polyfill": false,
+      "regenerator": true
     }]
   ]
 }
