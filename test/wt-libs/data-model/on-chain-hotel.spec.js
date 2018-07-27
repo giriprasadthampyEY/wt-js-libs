@@ -39,6 +39,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
         callHotel: helpers.stubContractMethodResult('called-hotel'),
         registerHotel: helpers.stubContractMethodResult('registered-hotel'),
         deleteHotel: helpers.stubContractMethodResult('deleted-hotel'),
+        transferHotel: helpers.stubContractMethodResult('transfer-hotel'),
       },
     };
   });
@@ -352,6 +353,47 @@ describe('WTLibs.data-model.OnChainHotel', () => {
       assert.equal(indexContractStub.methods.callHotel().estimateGas.callCount, 1);
       assert.equal(indexContractStub.methods.callHotel().encodeABI.callCount, 1);
       assert.equal(indexContractStub.methods.callHotel().estimateGas.firstCall.args[0].from, 'xx');
+    });
+  });
+
+  describe('transferOnChainOwnership', () => {
+    let provider;
+    beforeEach(async () => {
+      provider = OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub, 'fake-address');
+    });
+
+    it('should throw on an undeployed contract', async () => {
+      try {
+        provider.onChainDataset._deployedFlag = false;
+        await provider.transferOnChainOwnership({});
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /cannot remove hotel/i);
+        assert.instanceOf(e, SmartContractInstantiationError);
+      }
+    });
+
+    it('should return transaction metadata', async () => {
+      const result = await provider.transferOnChainOwnership('new-manager', { from: 'xx' });
+      assert.isDefined(result.transactionData);
+      assert.isDefined(result.hotel);
+      assert.isDefined(result.eventCallbacks);
+      assert.isDefined(result.eventCallbacks.onReceipt);
+    });
+
+    it('should apply gasCoefficient', async () => {
+      await provider.transferOnChainOwnership('new-manager', { from: 'xx' });
+      assert.equal(utilsStub.applyGasCoefficient.callCount, 1);
+      assert.equal(indexContractStub.methods.transferHotel().estimateGas.callCount, 1);
+      assert.equal(indexContractStub.methods.transferHotel().encodeABI.callCount, 1);
+      assert.equal(indexContractStub.methods.transferHotel().estimateGas.firstCall.args[0].from, 'xx');
+    });
+
+    it('should set manager', async () => {
+      assert.equal(await provider.manager, 'some-remote-manager');
+      const result = await provider.transferOnChainOwnership('new-manager', { from: 'xx' });
+      result.eventCallbacks.onReceipt({ logs: [{ some: 'logs' }] });
+      assert.equal(await provider.manager, 'new-manager');
     });
   });
 

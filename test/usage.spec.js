@@ -1,13 +1,15 @@
 import { assert } from 'chai';
 import WTLibs from '../src/index';
 import jsonWallet from './utils/test-wallet';
+import jsonWallet2 from './utils/test-wallet-2';
 import testedDataModel from './utils/data-model-definition';
 import OffChainDataClient from '../src/off-chain-data-client';
 
 import { InputDataError, WTLibsError } from '../src/errors';
 
 describe('WTLibs usage', () => {
-  let libs, wallet, index, emptyIndex, minedTxHashes = [];
+  let libs, wallet, index, emptyIndex, minedTxHashes = [],
+    hotelManager = '0xD39Ca7d186a37bb6Bf48AE8abFeB4c687dc8F906';
 
   beforeEach(() => {
     libs = WTLibs.createInstance(testedDataModel.withDataSource());
@@ -37,7 +39,7 @@ describe('WTLibs usage', () => {
         descriptionUri: descUrl,
       });
       const createHotel = await index.addHotel({
-        manager: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
+        manager: hotelManager,
         dataUri: dataUri,
       });
       const hotel = createHotel.hotel;
@@ -50,7 +52,7 @@ describe('WTLibs usage', () => {
       // Prepare getTransactionsStatus test
       minedTxHashes.push(result.transactionHash);
       // Don't bother with checksummed address format
-      assert.equal((await hotel.manager).toLowerCase(), '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906');
+      assert.equal((await hotel.manager), hotelManager);
       assert.equal((await hotel.dataUri).toLowerCase(), dataUri);
       const dataIndex = await hotel.dataIndex;
       const description = await dataIndex.contents.descriptionUri;
@@ -79,7 +81,7 @@ describe('WTLibs usage', () => {
     it('should throw when hotel does not have a dataUri', async () => {
       try {
         await index.addHotel({
-          manager: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',
+          manager: hotelManager,
         });
         throw new Error('should not have been called');
       } catch (e) {
@@ -91,7 +93,7 @@ describe('WTLibs usage', () => {
 
   describe('removeHotel', () => {
     it('should remove hotel', async () => {
-      const manager = '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906';
+      const manager = hotelManager;
       const createHotel = await index.addHotel({
         dataUri: 'json://some-data-hash',
         manager: manager,
@@ -249,6 +251,38 @@ describe('WTLibs usage', () => {
         assert.match(e.message, /cannot update hotel/i);
         assert.instanceOf(e, WTLibsError);
       }
+    });
+  });
+
+  describe('transferHotelOwnership', () => {
+    const hotelAddress = '0xBF18B616aC81830dd0C5D4b771F22FD8144fe769',
+      newHotelOwner = '0x04e46F24307E4961157B986a0b653a0D88F9dBd6';
+
+    it('should transfer hotel', async () => {
+      const hotel = await index.getHotel(hotelAddress);
+      const hotelContract = await hotel._getContractInstance();
+
+      assert.equal(await hotel.manager, hotelManager);
+      assert.equal(await hotelContract.methods.manager().call(), hotelManager);
+      
+      const updateHotel = await index.transferHotelOwnership(hotel, newHotelOwner);
+      await wallet.signAndSendTransaction(updateHotel.transactionData, updateHotel.eventCallbacks);
+      // Verify
+      const hotel2 = await index.getHotel(hotelAddress);
+      const hotel2Contract = await hotel2._getContractInstance();
+      assert.equal(await hotel2.manager, newHotelOwner);
+      assert.equal(await hotel2Contract.methods.manager().call(), newHotelOwner);
+      
+      // Change it back to keep data in line
+      const updateHotel2 = await index.transferHotelOwnership(hotel, hotelManager);
+      const wallet2 = libs.createWallet(jsonWallet2);
+      wallet2.unlock('test123');
+      await wallet2.signAndSendTransaction(updateHotel2.transactionData, updateHotel2.eventCallbacks);
+      // Verify
+      const hotel3 = await index.getHotel(hotelAddress);
+      const hotel3Contract = await hotel3._getContractInstance();
+      assert.equal(await hotel3.manager, hotelManager);
+      assert.equal(await hotel3Contract.methods.manager().call(), hotelManager);
     });
   });
 
