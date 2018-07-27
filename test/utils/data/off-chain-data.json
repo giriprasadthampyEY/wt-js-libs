@@ -1,0 +1,24 @@
+{
+  "urlone": {
+    "descriptionUri": "json://descriptionone"
+  },
+  "urltwo": {
+    "descriptionUri": "json://descriptiontwo"
+  },
+  "descriptionone": {
+    "name": "First hotel",
+    "description": "first description",
+    "location": {
+      "latitude": 14.422378,
+      "longitude": 50.075604
+    }
+  },
+  "descriptiontwo": {
+    "name": "Second hotel",
+    "description": "second description",
+    "location": {
+      "latitude": 14.422387,
+      "longitude": 50.075640
+    }
+  }
+}
