@@ -2,6 +2,9 @@ dist: trusty
 sudo: false
 group: beta
 language: node_js
+cache:
+  directories:
+    - $HOME/.npm
 node_js:
 - 10.3.0
 jobs:

@@ -80,15 +80,19 @@ class StoragePointer {
     }
     fields = fields || [];
     const normalizedFieldDef = [];
-    // TODO deal with field name uniqueness
+    const uniqueFields = {};
+    
     for (let fieldDef of fields) {
       if (typeof fieldDef === 'string') {
-        normalizedFieldDef.push({
+        fieldDef = {
           name: fieldDef,
-        });
-      } else {
-        normalizedFieldDef.push(fieldDef);
+        };
       }
+      if (uniqueFields[fieldDef.name.toLowerCase()]) {
+        throw new StoragePointerError('Cannot create instance: Conflict in field names.');
+      }
+      uniqueFields[fieldDef.name.toLowerCase()] = 1;
+      normalizedFieldDef.push(fieldDef);
     }
     return new StoragePointer(uri, normalizedFieldDef);
   }

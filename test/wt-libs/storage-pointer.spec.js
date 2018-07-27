@@ -39,6 +39,16 @@ describe('WTLibs.StoragePointer', () => {
       assert.equal(pointer._fields[2].name, 'field');
     });
 
+    it('should throw on name conflicts', () => {
+      assert.throws(() => {
+        StoragePointer.createInstance('json://url', ['FiElds', 'fields', { name: 'some' }]);
+      }, StoragePointerError, /conflict in field names/i);
+      
+      assert.throws(() => {
+        StoragePointer.createInstance('json://url', ['FiElds', { name: 'fields' }]);
+      }, StoragePointerError, /conflict in field names/i);
+    });
+
     it('should not panic on empty fields list', () => {
       assert.doesNotThrow(() => {
         StoragePointer.createInstance('json://url');
