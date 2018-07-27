@@ -162,7 +162,6 @@ describe('WTLibs.data-models.WTIndexDataProvider', () => {
         assert.instanceOf(e, InputDataError);
       }
     });
-
   });
 
   describe('removeHotel', () => {
