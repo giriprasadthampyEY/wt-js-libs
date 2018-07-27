@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@windingtree/lif-token": "^0.1.2-erc827",
-    "@windingtree/wt-contracts": "^0.2.3",
+    "@windingtree/wt-contracts": "^0.2.4",
     "bignumber.js": "^7.2.1",
     "lodash.clonedeep": "^4.5.0",
     "web3": "^1.0.0-beta.34"
