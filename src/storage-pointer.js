@@ -298,7 +298,11 @@ class StoragePointer {
           result[field.name] = this._storagePointers[field.name].ref;
         }
       } else {
-        result[field.name] = await this.contents[field.name];
+        const currentValue = await this.contents[field.name];
+        // Do not fabricate undefined fields if they are actually missing in the source data
+        if (this._data && this._data.hasOwnProperty(field.name)) {
+          result[field.name] = currentValue;
+        }
       }
     }
     return {
