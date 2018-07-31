@@ -9,7 +9,7 @@ export const Web3UriBackedDataModel = {
     },
     offChainDataOptions: {
       adapters: {
-        json: {
+        'in-memory': {
           create: () => {
             return new InMemoryAdapter();
           },

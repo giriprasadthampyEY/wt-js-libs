@@ -1,9 +1,9 @@
 {
   "urlone": {
-    "descriptionUri": "json://descriptionone"
+    "descriptionUri": "in-memory://descriptionone"
   },
   "urltwo": {
-    "descriptionUri": "json://descriptiontwo"
+    "descriptionUri": "in-memory://descriptiontwo"
   },
   "descriptionone": {
     "name": "First hotel",
