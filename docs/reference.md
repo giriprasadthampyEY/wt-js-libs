@@ -696,7 +696,7 @@ instance, the method throws immediately.
 
 -   Throws **[HotelNotFoundError][246]** When hotel does not exist.
 -   Throws **[HotelNotInstantiableError][247]** When the hotel class cannot be constructed.
--   Throws **[HotelNotFoundError][246]** When something breaks in the network communication.
+-   Throws **[WTLibsError][244]** When something breaks in the network communication.
 
 Returns **[Promise][224]&lt;[HotelInterface][245]?>** 
 
