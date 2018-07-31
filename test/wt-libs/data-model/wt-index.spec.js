@@ -4,7 +4,7 @@ import WTIndexDataProvider from '../../../src/data-model/wt-index';
 import Web3UriDataModel from '../../../src/data-model/';
 import testedDataModel from '../../utils/data-model-definition';
 
-import { SmartContractInstantiationError, WTLibsError, RemoteDataReadError, InputDataError } from '../../../src/errors';
+import { SmartContractInstantiationError, HotelNotInstantiableError, HotelNotFoundError, WTLibsError, RemoteDataReadError, InputDataError } from '../../../src/errors';
 
 describe('WTLibs.data-models.WTIndexDataProvider', () => {
   let dataModel, indexDataProvider;
@@ -42,7 +42,7 @@ describe('WTLibs.data-models.WTIndexDataProvider', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot find hotel/i);
-        assert.instanceOf(e, WTLibsError);
+        assert.instanceOf(e, HotelNotFoundError);
       }
     });
 
@@ -53,7 +53,7 @@ describe('WTLibs.data-models.WTIndexDataProvider', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot find hotel/i);
-        assert.instanceOf(e, WTLibsError);
+        assert.instanceOf(e, HotelNotInstantiableError);
       } finally {
         indexDataProvider._createHotelInstance.restore();
       }
