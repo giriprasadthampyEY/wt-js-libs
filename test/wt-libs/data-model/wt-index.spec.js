@@ -32,7 +32,7 @@ describe('WTLibs.data-models.WTIndexDataProvider', () => {
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot find hotel/i);
-        assert.instanceOf(e, HotelNotFoundError);
+        assert.instanceOf(e, WTLibsError);
       }
     });
 

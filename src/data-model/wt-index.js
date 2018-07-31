@@ -162,23 +162,24 @@ class WTIndex implements WTIndexInterface {
    *
    * @throws {HotelNotFoundError} When hotel does not exist.
    * @throws {HotelNotInstantiableError} When the hotel class cannot be constructed.
-   * @throws {HotelNotFoundError} When something breaks in the network communication.
+   * @throws {WTLibsError} When something breaks in the network communication.
    */
   async getHotel (address: string): Promise<?HotelInterface> {
     const index = await this._getDeployedIndex();
+    let hotelIndex;
     try {
       // This returns strings
-      const hotelIndex = parseInt(await index.methods.hotelsIndex(address).call(), 10);
-      // Zeroeth position is reserved as empty during index deployment
-      if (!hotelIndex) {
-        throw new Error('Not found in hotel list');
-      } else {
-        return this._createHotelInstance(address).catch((err) => {
-          throw new HotelNotInstantiableError('Cannot find hotel at ' + address + ': ' + err.message, err);
-        });
-      }
+      hotelIndex = parseInt(await index.methods.hotelsIndex(address).call(), 10);
     } catch (err) {
-      throw new HotelNotFoundError('Cannot find hotel at ' + address + ': ' + err.message, err);
+      throw new WTLibsError('Cannot find hotel at ' + address + ': ' + err.message, err);
+    }
+    // Zeroeth position is reserved as empty during index deployment
+    if (!hotelIndex) {
+      throw new HotelNotFoundError(`Cannot find hotel at ${address}: Not found in hotel list`);
+    } else {
+      return this._createHotelInstance(address).catch((err) => {
+        throw new HotelNotInstantiableError('Cannot find hotel at ' + address + ': ' + err.message, err);
+      });
     }
   }
 
