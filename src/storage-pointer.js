@@ -164,10 +164,10 @@ class StoragePointer {
 
   /**
    * Detects schema from an uri, i. e.
-   * from `json://some-data`, detects `json`.
+   * from `schema://some-data`, detects `schema`.
    */
   _detectSchema (uri: string): ?string {
-    const matchResult = uri.match(/([a-z-]+):\/\//i);
+    const matchResult = uri.match(/([a-zA-Z-]+):\/\//i);
     return matchResult ? matchResult[1] : null;
   }
 

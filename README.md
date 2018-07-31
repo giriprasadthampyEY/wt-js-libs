@@ -32,7 +32,7 @@ const libs = WTLibs.createInstance({
   offChainDataOptions: {
     adapters: {
       // This is how you plug-in any off-chain data adapter you want.
-      json: {
+      'in-memory': {
         options: {
           // some: options
         }

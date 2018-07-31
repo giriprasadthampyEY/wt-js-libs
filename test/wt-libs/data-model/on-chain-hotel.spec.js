@@ -65,18 +65,18 @@ describe('WTLibs.data-model.OnChainHotel', () => {
     it('should setup StoragePointer during the first access', async () => {
       const storagePointerSpy = sinon.spy(StoragePointer, 'createInstance');
       const provider = OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub, 'fake-address');
-      provider.dataUri = 'json://something-new';
+      provider.dataUri = 'in-memory://something-new';
       assert.equal(storagePointerSpy.callCount, 0);
       await provider.dataIndex;
       assert.equal(storagePointerSpy.callCount, 1);
-      assert.equal(storagePointerSpy.firstCall.args[0], 'json://something-new');
+      assert.equal(storagePointerSpy.firstCall.args[0], 'in-memory://something-new');
       storagePointerSpy.restore();
     });
 
     it('should reuse StoragePointer instance in successive calls', async () => {
       const storagePointerSpy = sinon.spy(StoragePointer, 'createInstance');
       const provider = OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub, 'fake-address');
-      provider.dataUri = 'json://something-new';
+      provider.dataUri = 'in-memory://something-new';
       assert.equal(storagePointerSpy.callCount, 0);
       await provider.dataIndex;
       assert.equal(storagePointerSpy.callCount, 1);
@@ -88,34 +88,34 @@ describe('WTLibs.data-model.OnChainHotel', () => {
     it('should drop current StoragePointer instance when dataUri changes via setLocalData', async () => {
       const storagePointerSpy = sinon.spy(StoragePointer, 'createInstance');
       const provider = OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub, 'fake-address');
-      provider.dataUri = 'json://something-new';
+      provider.dataUri = 'in-memory://something-new';
       await provider.dataIndex;
-      assert.equal((await provider.dataIndex).ref, 'json://something-new');
+      assert.equal((await provider.dataIndex).ref, 'in-memory://something-new');
       assert.equal(storagePointerSpy.callCount, 1);
       await provider.dataIndex;
       assert.equal(storagePointerSpy.callCount, 1);
       await provider.setLocalData({
-        dataUri: 'json://something-completely-different',
+        dataUri: 'in-memory://something-completely-different',
       });
       await provider.dataIndex;
       assert.equal(storagePointerSpy.callCount, 2);
-      assert.equal((await provider.dataIndex).ref, 'json://something-completely-different');
+      assert.equal((await provider.dataIndex).ref, 'in-memory://something-completely-different');
       storagePointerSpy.restore();
     });
 
     it('should drop current StoragePointer instance when dataUri changes via direct access', async () => {
       const storagePointerSpy = sinon.spy(StoragePointer, 'createInstance');
       const provider = OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub, 'fake-address');
-      provider.dataUri = 'json://something-new';
+      provider.dataUri = 'in-memory://something-new';
       await provider.dataIndex;
-      assert.equal((await provider.dataIndex).ref, 'json://something-new');
+      assert.equal((await provider.dataIndex).ref, 'in-memory://something-new');
       assert.equal(storagePointerSpy.callCount, 1);
       await provider.dataIndex;
       assert.equal(storagePointerSpy.callCount, 1);
-      provider.dataUri = 'json://something-completely-different';
+      provider.dataUri = 'in-memory://something-completely-different';
       await provider.dataIndex;
       assert.equal(storagePointerSpy.callCount, 2);
-      assert.equal((await provider.dataIndex).ref, 'json://something-completely-different');
+      assert.equal((await provider.dataIndex).ref, 'in-memory://something-completely-different');
       storagePointerSpy.restore();
     });
   });
@@ -219,7 +219,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
 
     it('should reset dataIndex if dataUri changes', async () => {
       const provider = OnChainHotel.createInstance(utilsStub, contractsStub, indexContractStub);
-      provider.dataUri = 'json://something-else';
+      provider.dataUri = 'in-memory://something-else';
       assert.isNull(provider._dataIndex);
     });
 

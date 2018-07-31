@@ -41,7 +41,7 @@ describe('WTLibs', () => {
         },
         offChainDataOptions: {
           adapters: {
-            json: {
+            'in-memory': {
               create: () => {
                 return true;
               },
@@ -49,7 +49,7 @@ describe('WTLibs', () => {
           },
         },
       });
-      const adapter = libs.getOffChainDataClient('json');
+      const adapter = libs.getOffChainDataClient('in-memory');
       assert.isDefined(adapter);
       OffChainDataClient._reset();
     });
