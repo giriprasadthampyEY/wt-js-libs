@@ -293,7 +293,7 @@ class StoragePointer {
         // Storage pointer that the user wants to get resolved - call again for a subtree
         // OR resolve the whole subtree if no special fields are requested
         if (!resolvedFields || currentFieldDef.hasOwnProperty(field.name)) {
-          result[field.name] = await (await this.contents[field.name]).toPlainObject(currentFieldDef[field.name]); ;
+          result[field.name] = await (await this.contents[field.name]).toPlainObject(currentFieldDef[field.name]);
         } else { // Unresolved storage pointer, return a URI
           result[field.name] = this._storagePointers[field.name].ref;
         }
