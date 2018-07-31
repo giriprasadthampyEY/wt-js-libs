@@ -127,3 +127,13 @@ export class RemoteDataAccessError extends RemotelyBackedDatasetError {}
  * It is impossible to read from remote data (i. e. the connection might have been lost).
  */
 export class RemoteDataReadError extends RemotelyBackedDatasetError {}
+
+/**
+ * Hotel is not found in WTIndex for some reason.
+ */
+export class HotelNotFoundError extends WTLibsError {}
+
+/**
+ * Hotel abstraction instance cannot be created for some reason.
+ */
+export class HotelNotInstantiableError extends WTLibsError {}
