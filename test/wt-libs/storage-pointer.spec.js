@@ -396,5 +396,18 @@ describe('WTLibs.StoragePointer', () => {
       assert.equal(pojo.contents.eight, `in-memory://${hashLevelOne}`);
       assert.equal(pojo.contents.nine, `in-memory://${hashLevelTwo}`);
     });
+
+    it('should not report undefined for missing fields', async () => {
+      const hash = InMemoryAdapter.storageInstance.create({ six: 'horses', seven: 'cats', nine: undefined });
+      const pointer = StoragePointer.createInstance(`in-memory://${hash}`, [
+        'six', 'seven', 'eight', 'nine',
+      ]);
+      const pojo = await pointer.toPlainObject();
+      assert.property(pojo.contents, 'six');
+      assert.property(pojo.contents, 'seven');
+      assert.notProperty(pojo.contents, 'eight');
+      assert.property(pojo.contents, 'nine');
+      assert.isUndefined(pojo.contents.nine);
+    });
   });
 });
