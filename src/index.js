@@ -28,6 +28,8 @@ import {
   RemotelyBackedDatasetError,
   RemoteDataAccessError,
   RemoteDataReadError,
+  HotelNotFoundError,
+  HotelNotInstantiableError,
 } from './errors';
 
 /**
@@ -125,6 +127,8 @@ WTLibs.errors = {
   RemotelyBackedDatasetError,
   RemoteDataAccessError,
   RemoteDataReadError,
+  HotelNotFoundError,
+  HotelNotInstantiableError,
 };
 
 export default WTLibs;
