@@ -1,6 +1,6 @@
 {
   "name": "@windingtree/wt-js-libs",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Javascript libraries to interact with the Winding Tree contracts",
   "main": "dist/node/wt-js-libs.js",
   "directories": {
@@ -44,7 +44,7 @@
     "web3": "^1.0.0-beta.35"
   },
   "devDependencies": {
-    "@windingtree/off-chain-adapter-in-memory": "^3.1.1",
+    "@windingtree/off-chain-adapter-in-memory": "^4.0.0",
     "babel-core": "^6.26.3",
     "babel-eslint": "^8.2.6",
     "babel-loader": "^7.1.4",

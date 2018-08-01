@@ -46,8 +46,8 @@ module.exports = function (deployer, network, accounts) {
         return secondIndex.setLifToken(LifTokenTest.address, { from: accounts[0], gas: 60000000 });
       }).then(function () {
         return Promise.all([
-          firstIndex.registerHotel('json://urlone', { from: accounts[2], gas: 60000000 }),
-          firstIndex.registerHotel('json://urltwo', { from: accounts[1], gas: 60000000 }),
+          firstIndex.registerHotel('in-memory://urlone', { from: accounts[2], gas: 60000000 }),
+          firstIndex.registerHotel('in-memory://urltwo', { from: accounts[1], gas: 60000000 }),
         ]);
       }).then(function () {
         return firstIndex.getHotels();

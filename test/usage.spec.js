@@ -26,7 +26,7 @@ describe('WTLibs usage', () => {
 
   describe('addHotel', () => {
     it('should add hotel', async () => {
-      const jsonClient = libs.getOffChainDataClient('json');
+      const jsonClient = libs.getOffChainDataClient('in-memory');
       const descUrl = await jsonClient.upload({
         name: 'Premium hotel',
         description: 'Great hotel',
@@ -69,7 +69,7 @@ describe('WTLibs usage', () => {
     it('should throw when hotel does not have a manager', async () => {
       try {
         await index.addHotel({
-          dataUri: 'json://some-data-hash',
+          dataUri: 'in-memory://some-data-hash',
         });
         throw new Error('should not have been called');
       } catch (e) {
@@ -95,7 +95,7 @@ describe('WTLibs usage', () => {
     it('should remove hotel', async () => {
       const manager = hotelManager;
       const createHotel = await index.addHotel({
-        dataUri: 'json://some-data-hash',
+        dataUri: 'in-memory://some-data-hash',
         manager: manager,
       });
       const origHotel = createHotel.hotel;
@@ -138,7 +138,7 @@ describe('WTLibs usage', () => {
       const address = '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769';
       const hotel = await index.getHotel(address);
       assert.isNotNull(hotel);
-      assert.equal(await hotel.dataUri, 'json://urlone');
+      assert.equal(await hotel.dataUri, 'in-memory://urlone');
       assert.equal(await hotel.address, address);
     });
 
@@ -153,7 +153,7 @@ describe('WTLibs usage', () => {
       assert.isDefined(descriptionContents.contents);
       assert.isDefined(descriptionContents.ref);
       assert.equal(await descriptionContents.contents.name, 'First hotel');
-      assert.equal(await descriptionContents.ref, 'json://descriptionone');
+      assert.equal(await descriptionContents.ref, 'in-memory://descriptionone');
     });
 
     it('should provide a toPlainObject method', async () => {
@@ -185,7 +185,7 @@ describe('WTLibs usage', () => {
     const hotelAddress = '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769';
 
     it('should update hotel', async () => {
-      const newUri = 'json://another-url';
+      const newUri = 'in-memory://another-url';
       const hotel = await index.getHotel(hotelAddress);
       const oldUri = await hotel.dataUri;
       hotel.dataUri = newUri;
@@ -213,7 +213,7 @@ describe('WTLibs usage', () => {
 
     it('should throw if hotel has no address', async () => {
       try {
-        const newUri = 'json://another-random-hash';
+        const newUri = 'in-memory://another-random-hash';
         const hotel = await index.getHotel(hotelAddress);
         hotel.dataUri = newUri;
         hotel.address = undefined;
@@ -243,7 +243,7 @@ describe('WTLibs usage', () => {
       try {
         const hotel = {
           address: '0xcd2a3d9f938e13cd947ec05abc7fe734df8dd826',
-          dataUri: 'json://another-random-hash',
+          dataUri: 'in-memory://another-random-hash',
         };
         await index.updateHotel(hotel);
         throw new Error('should not have been called');

@@ -7,7 +7,7 @@ describe('WTLibs.OffChainDataClient', () => {
   beforeEach(() => {
     OffChainDataClient.setup({
       adapters: {
-        json: {
+        'in-memory': {
           create: () => {
             return new InMemoryAdapter();
           },
@@ -21,13 +21,13 @@ describe('WTLibs.OffChainDataClient', () => {
   });
 
   it('should return proper adapter', () => {
-    const adapter = OffChainDataClient.getAdapter('json');
+    const adapter = OffChainDataClient.getAdapter('in-memory');
     assert.isDefined(adapter);
     assert.isDefined(adapter._getHash);
   });
 
   it('should be case insensitive', () => {
-    const adapter = OffChainDataClient.getAdapter('JSON');
+    const adapter = OffChainDataClient.getAdapter('IN-MEMOrY');
     assert.isDefined(adapter);
     assert.isDefined(adapter._getHash);
   });
@@ -36,8 +36,8 @@ describe('WTLibs.OffChainDataClient', () => {
     assert.throws(() =>
       OffChainDataClient.setup({
         adapters: {
-          json: { create: () => { return new InMemoryAdapter(); } },
-          JSON: { create: () => { return new InMemoryAdapter(); } },
+          'in-memory': { create: () => { return new InMemoryAdapter(); } },
+          'IN-MEMOrY': { create: () => { return new InMemoryAdapter(); } },
         },
       }), OffChainDataConfigurationError, /Adapter declared twice/);
   });
