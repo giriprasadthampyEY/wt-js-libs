@@ -154,6 +154,11 @@ describe('WTLibs usage', () => {
       assert.isDefined(descriptionContents.ref);
       assert.equal(await descriptionContents.contents.name, 'First hotel');
       assert.equal(await descriptionContents.ref, 'in-memory://descriptionone');
+      const ratePlanContents = await hotelDataIndex.contents.ratePlansUri;
+      assert.isDefined(ratePlanContents.contents);
+      assert.isDefined(ratePlanContents.ref);
+      assert.equal((await ratePlanContents.contents.ratePlans)['rate-plan'].name, 'Basic');
+      assert.equal(await ratePlanContents.ref, 'in-memory://rateplansone');
     });
 
     it('should provide a toPlainObject method', async () => {
@@ -168,6 +173,10 @@ describe('WTLibs usage', () => {
       assert.isDefined(plainHotel.dataUri.contents.descriptionUri.contents);
       assert.isDefined(plainHotel.dataUri.contents.descriptionUri.contents.location);
       assert.equal(plainHotel.dataUri.contents.descriptionUri.contents.name, 'First hotel');
+      assert.isDefined(plainHotel.dataUri.contents.ratePlansUri);
+      assert.isDefined(plainHotel.dataUri.contents.ratePlansUri.contents);
+      assert.isDefined(plainHotel.dataUri.contents.ratePlansUri.contents.ratePlans);
+      assert.equal(plainHotel.dataUri.contents.ratePlansUri.contents.ratePlans['rate-plan-2'].name, 'More expensive');
     });
 
     it('should throw if no hotel is found on given address', async () => {

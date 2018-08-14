@@ -118,6 +118,15 @@ class OnChainHotel implements HotelInterface {
               'updatedAt',
             ],
           },
+          {
+            name: 'ratePlansUri',
+            isStoragePointer: true,
+            required: false,
+            // This should always be in line with publicly declared HotelDescriptionInterface
+            fields: [
+              'ratePlans',
+            ],
+          },
         ]);
       }
       return this._dataIndex;

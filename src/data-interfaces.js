@@ -11,7 +11,8 @@ export interface PlainHotelInterface {
  * initial document that blockchain is pointing to.
  */
 export interface HotelDataIndex {
-  descriptionUri: string
+  descriptionUri: string,
+  ratePlansUri: string
 }
 
 /**
@@ -92,4 +93,56 @@ export interface AddressInterface {
   city?: Promise<string> | string,
   state?: Promise<?string> | ?string,
   country?: Promise<string> | string
+}
+
+export interface RatePlansInterface {
+  ratePlans: Promise<?{ [id: string]: RatePlanInterface }> | ?{ [id: string]: RatePlanInterface },
+}
+
+export interface RatePlanInterface {
+  name: Promise<string> | string,
+  description?: Promise<?string> | ?string,
+  currency?: Promise<?string> | ?string,
+  price: Promise<number> | number,
+  roomTypeIds?: Promise<?Array<string>> | ?Array<string>,
+  updatedAt: Promise<Date> | Date,
+  availableForReservation?: Promise<?DatePairInterface> | ?DatePairInterface,
+  availableForTravel?: Promise<?DatePairInterface> | ?DatePairInterface,
+  modifiers?: Promise<?Array<RatePlanPriceModifier>> | ?Array<RatePlanPriceModifier>,
+  restrictions?: Promise<?RatePlanRestrictions> | ?RatePlanRestrictions
+}
+
+export interface DatePairInterface {
+  from: Promise<Date> | Date,
+  to: Promise<Date> | Date
+}
+
+export interface RatePlanPriceModifier {
+  from?: Promise<?Date> | ?Date,
+  to?: Promise<?Date> | ?Date,
+  adjustment: Promise<number> | number,
+  conditions?: Promise<{
+    minLengthOfStay?: Promise<?number> | ?number,
+    maxAge?: Promise<?number> | ?number
+  }> | {
+    minLengthOfStay?: Promise<?number> | ?number,
+    maxAge?: Promise<?number> | ?number
+  }
+}
+
+export interface RatePlanRestrictions {
+  bookingCutOff?: Promise<?{
+    min?: Promise<?number> | ?number,
+    max?: Promise<?number> | ?number
+  }> | ?{
+    min?: Promise<?number> | ?number,
+    max?: Promise<?number> | ?number
+  },
+  lengthOfStay?: Promise<?{
+    min?: Promise<?number> | ?number,
+    max?: Promise<?number> | ?number
+  }> | ?{
+    min?: Promise<?number> | ?number,
+    max?: Promise<?number> | ?number
+  }
 }
