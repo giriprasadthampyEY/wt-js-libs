@@ -91,6 +91,25 @@ describe('WTLibs.StoragePointer', () => {
         assert.match(e.message, /unsupported data storage type/i);
       }
     });
+
+    it('should properly setup defaults as required', () => {
+      const pointer = StoragePointer.createInstance('in-memory://url', [{
+        name: 'sp',
+        isStoragePointer: true,
+        fields: ['some', 'fields'],
+      }]);
+      assert.equal(pointer._fields.find((x) => x.name === 'sp').required, true);
+    });
+
+    it('should properly setup required', () => {
+      const pointer = StoragePointer.createInstance('in-memory://url', [{
+        name: 'sp',
+        isStoragePointer: true,
+        required: false,
+        fields: ['some', 'fields'],
+      }]);
+      assert.equal(pointer._fields.find((x) => x.name === 'sp').required, false);
+    });
   });
 
   describe('data downloading', () => {
@@ -189,6 +208,22 @@ describe('WTLibs.StoragePointer', () => {
       });
       assert.equal(pointer.ref, 'in-memory://url');
       await pointer.contents.sp;
+    });
+
+    it('should not panic if a non-required recursive StoragePointer is missing', async () => {
+      try {
+        const pointer = StoragePointer.createInstance('in-memory://url', [{
+          name: 'sp',
+          isStoragePointer: true,
+          required: false,
+        }]);
+        sinon.stub(pointer, '_getOffChainDataClient').returns({
+          download: sinon.stub().returns({}),
+        });
+        await pointer.contents.sp;
+      } catch (e) {
+        throw new Error('should have never been called', e);
+      }
     });
 
     it('should throw if recursive StoragePointer cannot be set up due to null pointer value', async () => {

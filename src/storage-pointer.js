@@ -11,6 +11,7 @@ import { StoragePointerError } from './errors';
 type FieldDefType = {
   name: string,
   isStoragePointer?: boolean,
+  required?: boolean,
   fields?: Array<FieldDefType | string>
 };
 
@@ -40,6 +41,7 @@ type FieldDefType = {
  *   {
  *     name: 'description',
  *     isStoragePointer: true,
+ *     required: false,
  *     fields: ['name', 'description', 'location'],
  *   },
  *   'signature'
@@ -50,6 +52,9 @@ type FieldDefType = {
  * descPointer.ref; // contains whatever is written in a description property in a document located on 'some://url'
  * await descPointer.contents.name;
  * ```
+ * The required attribute is set to true by default. However some documents might be optional
+ * so if you mark a storage pointer as not required, the library will not crash if the field
+ * is missing or nulled.
  *
  * Only a top-level properties have to be defined beforehand, so the `signature`
  * field above may contain a complex JSON object.
@@ -86,10 +91,14 @@ class StoragePointer {
       if (typeof fieldDef === 'string') {
         fieldDef = {
           name: fieldDef,
+          required: true,
         };
       }
       if (uniqueFields[fieldDef.name.toLowerCase()]) {
         throw new StoragePointerError('Cannot create instance: Conflict in field names.');
+      }
+      if (fieldDef.required === undefined) {
+        fieldDef.required = true;
       }
       uniqueFields[fieldDef.name.toLowerCase()] = 1;
       normalizedFieldDef.push(fieldDef);
@@ -192,11 +201,13 @@ class StoragePointer {
     for (let i = 0; i < this._fields.length; i++) {
       const fieldDef = this._fields[i];
       if (fieldDef.isStoragePointer) {
-        if (!this._data[fieldDef.name] || typeof this._data[fieldDef.name] !== 'string') {
+        if (fieldDef.required && (!this._data[fieldDef.name] || typeof this._data[fieldDef.name] !== 'string')) {
           const value = this._data[fieldDef.name] ? (this._data[fieldDef.name]).toString() : 'undefined';
           throw new StoragePointerError(`Cannot access field '${fieldDef.name}' on '${value}' which does not appear to be a valid reference.`);
         }
-        this._storagePointers[fieldDef.name] = StoragePointer.createInstance(this._data[fieldDef.name], fieldDef.fields || []);
+        if (this._data[fieldDef.name]) {
+          this._storagePointers[fieldDef.name] = StoragePointer.createInstance(this._data[fieldDef.name], fieldDef.fields || []);
+        }
       }
     }
   }
