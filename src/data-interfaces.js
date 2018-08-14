@@ -30,7 +30,8 @@ export interface HotelDescriptionInterface {
   currency: Promise<string> | string,
   images?: Promise<?Array<string>> | ?Array<string>,
   amenities?: Promise<?Array<string>> | ?Array<string>,
-  updatedAt: Promise<string> | string
+  updatedAt: Promise<string> | string,
+  cancellationPolicies?: Promise<?Array<CancellationPolicy>> | ?Array<CancellationPolicy>
 }
 
 /**
@@ -102,10 +103,20 @@ export interface AddressInterface {
 }
 
 /**
+ * A single cancellation policy.
+ */
+export interface CancellationPolicy {
+  from?: Promise<?Date> | ?Date,
+  to?: Promise<?Date> | ?Date,
+  deadline?: Promise<?number> | ?number,
+  amount: Promise<number> | number
+}
+
+/**
  * Collection of rate plans.
  */
 export interface RatePlansInterface {
-  ratePlans: Promise<?{ [id: string]: RatePlanInterface }> | ?{ [id: string]: RatePlanInterface },
+  ratePlans: Promise<?{ [id: string]: RatePlanInterface }> | ?{ [id: string]: RatePlanInterface }
 }
 
 /**

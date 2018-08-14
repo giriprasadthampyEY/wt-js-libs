@@ -116,6 +116,7 @@ class OnChainHotel implements HotelInterface {
               'images',
               'amenities',
               'updatedAt',
+              'cancellationPolicies',
             ],
           },
           {
