@@ -33,6 +33,9 @@ export interface HotelDescriptionInterface {
   updatedAt: Promise<string> | string
 }
 
+/**
+ * Definition of a single room type.
+ */
 export interface RoomTypeInterface {
   name: Promise<string> | string,
   description: Promise<string> | string,
@@ -44,6 +47,9 @@ export interface RoomTypeInterface {
   properties?: Promise<?Object> | ?Object
 }
 
+/**
+ * Denotes allowed occupancy of a room type.
+ */
 export interface OccupancyInterface {
   min?: ?number,
   max: number
@@ -95,10 +101,16 @@ export interface AddressInterface {
   country?: Promise<string> | string
 }
 
+/**
+ * Collection of rate plans.
+ */
 export interface RatePlansInterface {
   ratePlans: Promise<?{ [id: string]: RatePlanInterface }> | ?{ [id: string]: RatePlanInterface },
 }
 
+/**
+ * A single rate plan
+ */
 export interface RatePlanInterface {
   name: Promise<string> | string,
   description?: Promise<?string> | ?string,
@@ -106,17 +118,23 @@ export interface RatePlanInterface {
   price: Promise<number> | number,
   roomTypeIds?: Promise<?Array<string>> | ?Array<string>,
   updatedAt: Promise<Date> | Date,
-  availableForReservation?: Promise<?DatePairInterface> | ?DatePairInterface,
-  availableForTravel?: Promise<?DatePairInterface> | ?DatePairInterface,
+  availableForReservation?: Promise<?DateRangeInterface> | ?DateRangeInterface,
+  availableForTravel?: Promise<?DateRangeInterface> | ?DateRangeInterface,
   modifiers?: Promise<?Array<RatePlanPriceModifier>> | ?Array<RatePlanPriceModifier>,
   restrictions?: Promise<?RatePlanRestrictions> | ?RatePlanRestrictions
 }
 
-export interface DatePairInterface {
+/**
+ * Generic date range interface
+ */
+export interface DateRangeInterface {
   from: Promise<Date> | Date,
   to: Promise<Date> | Date
 }
 
+/**
+ * A single rate plan price modifier
+ */
 export interface RatePlanPriceModifier {
   from?: Promise<?Date> | ?Date,
   to?: Promise<?Date> | ?Date,
@@ -130,6 +148,9 @@ export interface RatePlanPriceModifier {
   }
 }
 
+/**
+ * Collection of rate plans restrictions.
+ */
 export interface RatePlanRestrictions {
   bookingCutOff?: Promise<?{
     min?: Promise<?number> | ?number,
