@@ -58,9 +58,10 @@ const hotelName2 = plainHotel.dataUri.contents.descriptionUri.contents.name;
 const dataIndex = await hotel.dataIndex;
 const hotelDataIndexUrl = dataIndex.ref;
 // This data is fetched from some off-chain storage
-const hotelDescriptionDocument = await dataIndex.contents.descriptionUri;
+const dataIndexContents = await dataIndex.contents;
+const hotelDescriptionDocument = await dataIndexContents.descriptionUri.contents;
 // This data is fetched from another off-chain document
-const hotelName = await hotelDescriptionDocument.contents.name;
+const hotelName = hotelDescriptionDocument.name;
 
 
 // How about creating a hotel?

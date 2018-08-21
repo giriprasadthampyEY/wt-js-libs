@@ -32,165 +32,165 @@
     -   [Properties][28]
 -   [AddressInterface][29]
     -   [Properties][30]
--   [RatePlansInterface][31]
+-   [CancellationPolicy][31]
     -   [Properties][32]
--   [RatePlanInterface][33]
+-   [RatePlansInterface][33]
     -   [Properties][34]
--   [DateRangeInterface][35]
+-   [RatePlanInterface][35]
     -   [Properties][36]
--   [RatePlanPriceModifier][37]
+-   [DateRangeInterface][37]
     -   [Properties][38]
--   [RatePlanRestrictions][39]
+-   [RatePlanPriceModifier][39]
     -   [Properties][40]
--   [DataModelOptionsType][41]
+-   [RatePlanRestrictions][41]
     -   [Properties][42]
--   [DataModel][43]
-    -   [Parameters][44]
-    -   [getWindingTreeIndex][45]
-        -   [Parameters][46]
-    -   [getTransactionsStatus][47]
+-   [DataModelOptionsType][43]
+    -   [Properties][44]
+-   [DataModel][45]
+    -   [Parameters][46]
+    -   [getWindingTreeIndex][47]
         -   [Parameters][48]
-    -   [createWallet][49]
+    -   [getTransactionsStatus][49]
         -   [Parameters][50]
-    -   [createInstance][51]
+    -   [createWallet][51]
         -   [Parameters][52]
--   [OnChainHotel][53]
-    -   [Parameters][54]
-    -   [initialize][55]
-    -   [dataIndex][56]
-    -   [setLocalData][57]
-        -   [Parameters][58]
-    -   [toPlainObject][59]
+    -   [createInstance][53]
+        -   [Parameters][54]
+-   [OnChainHotel][55]
+    -   [Parameters][56]
+    -   [initialize][57]
+    -   [dataIndex][58]
+    -   [setLocalData][59]
         -   [Parameters][60]
-    -   [\_editInfoOnChain][61]
+    -   [toPlainObject][61]
         -   [Parameters][62]
-    -   [createOnChainData][63]
+    -   [\_editInfoOnChain][63]
         -   [Parameters][64]
-    -   [updateOnChainData][65]
+    -   [createOnChainData][65]
         -   [Parameters][66]
-    -   [transferOnChainOwnership][67]
+    -   [updateOnChainData][67]
         -   [Parameters][68]
-    -   [removeOnChainData][69]
+    -   [transferOnChainOwnership][69]
         -   [Parameters][70]
-    -   [createInstance][71]
+    -   [removeOnChainData][71]
         -   [Parameters][72]
--   [WTIndex][73]
-    -   [Parameters][74]
-    -   [addHotel][75]
-        -   [Parameters][76]
-    -   [updateHotel][77]
+    -   [createInstance][73]
+        -   [Parameters][74]
+-   [WTIndex][75]
+    -   [Parameters][76]
+    -   [addHotel][77]
         -   [Parameters][78]
-    -   [removeHotel][79]
+    -   [updateHotel][79]
         -   [Parameters][80]
-    -   [transferHotelOwnership][81]
+    -   [removeHotel][81]
         -   [Parameters][82]
-    -   [getHotel][83]
+    -   [transferHotelOwnership][83]
         -   [Parameters][84]
-    -   [getAllHotels][85]
-    -   [createInstance][86]
-        -   [Parameters][87]
--   [WTLibsError][88]
-    -   [Parameters][89]
--   [SmartContractInstantiationError][90]
--   [WalletError][91]
--   [MalformedWalletError][92]
--   [WalletStateError][93]
--   [WalletPasswordError][94]
--   [WalletSigningError][95]
--   [TransactionMiningError][96]
--   [OutOfGasError][97]
--   [InsufficientFundsError][98]
--   [TransactionRevertedError][99]
--   [NoReceiptError][100]
--   [InaccessibleEthereumNodeError][101]
--   [InputDataError][102]
--   [OffChainDataError][103]
--   [OffChainDataConfigurationError][104]
--   [OffChainDataRuntimeError][105]
--   [StoragePointerError][106]
--   [RemotelyBackedDatasetError][107]
--   [RemoteDataAccessError][108]
--   [RemoteDataReadError][109]
--   [HotelNotFoundError][110]
--   [HotelNotInstantiableError][111]
--   [WtLibsOptionsType][112]
-    -   [Properties][113]
--   [WTLibs][114]
-    -   [Parameters][115]
-    -   [getWTIndex][116]
-        -   [Parameters][117]
-    -   [getTransactionsStatus][118]
+    -   [getHotel][85]
+        -   [Parameters][86]
+    -   [getAllHotels][87]
+    -   [createInstance][88]
+        -   [Parameters][89]
+-   [WTLibsError][90]
+    -   [Parameters][91]
+-   [SmartContractInstantiationError][92]
+-   [WalletError][93]
+-   [MalformedWalletError][94]
+-   [WalletStateError][95]
+-   [WalletPasswordError][96]
+-   [WalletSigningError][97]
+-   [TransactionMiningError][98]
+-   [OutOfGasError][99]
+-   [InsufficientFundsError][100]
+-   [TransactionRevertedError][101]
+-   [NoReceiptError][102]
+-   [InaccessibleEthereumNodeError][103]
+-   [InputDataError][104]
+-   [OffChainDataError][105]
+-   [OffChainDataConfigurationError][106]
+-   [OffChainDataRuntimeError][107]
+-   [StoragePointerError][108]
+-   [RemotelyBackedDatasetError][109]
+-   [RemoteDataAccessError][110]
+-   [RemoteDataReadError][111]
+-   [HotelNotFoundError][112]
+-   [HotelNotInstantiableError][113]
+-   [WtLibsOptionsType][114]
+    -   [Properties][115]
+-   [WTLibs][116]
+    -   [Parameters][117]
+    -   [getWTIndex][118]
         -   [Parameters][119]
-    -   [createWallet][120]
+    -   [getTransactionsStatus][120]
         -   [Parameters][121]
-    -   [getOffChainDataClient][122]
+    -   [createWallet][122]
         -   [Parameters][123]
-    -   [createInstance][124]
+    -   [getOffChainDataClient][124]
         -   [Parameters][125]
-    -   [errors][126]
--   [HotelOnChainDataInterface][127]
-    -   [Properties][128]
--   [TransactionOptionsInterface][129]
+    -   [createInstance][126]
+        -   [Parameters][127]
+    -   [errors][128]
+-   [HotelOnChainDataInterface][129]
     -   [Properties][130]
--   [TransactionCallbacksInterface][131]
+-   [TransactionOptionsInterface][131]
     -   [Properties][132]
--   [PreparedTransactionMetadataInterface][133]
+-   [TransactionCallbacksInterface][133]
     -   [Properties][134]
--   [HotelInterface][135]
+-   [PreparedTransactionMetadataInterface][135]
     -   [Properties][136]
--   [WTIndexInterface][137]
+-   [HotelInterface][137]
     -   [Properties][138]
--   [OffChainDataAdapterInterface][139]
+-   [WTIndexInterface][139]
     -   [Properties][140]
--   [DataModelInterface][141]
+-   [OffChainDataAdapterInterface][141]
     -   [Properties][142]
--   [RawLogRecordInterface][143]
+-   [DataModelInterface][143]
     -   [Properties][144]
--   [DecodedLogRecordInterface][145]
+-   [RawLogRecordInterface][145]
     -   [Properties][146]
--   [TransactionDataInterface][147]
+-   [DecodedLogRecordInterface][147]
     -   [Properties][148]
--   [TxInterface][149]
+-   [TransactionDataInterface][149]
     -   [Properties][150]
--   [TxReceiptInterface][151]
+-   [TxInterface][151]
     -   [Properties][152]
--   [AdaptedTxResultInterface][153]
+-   [TxReceiptInterface][153]
     -   [Properties][154]
--   [AdaptedTxResultsInterface][155]
+-   [AdaptedTxResultInterface][155]
     -   [Properties][156]
--   [WalletInterface][157]
+-   [AdaptedTxResultsInterface][157]
     -   [Properties][158]
--   [KeystoreV3Interface][159]
+-   [WalletInterface][159]
     -   [Properties][160]
--   [OffChainDataClientOptionsType][161]
+-   [KeystoreV3Interface][161]
     -   [Properties][162]
--   [OffChainDataClient][163]
-    -   [setup][164]
-        -   [Parameters][165]
-    -   [\_reset][166]
-    -   [getAdapter][167]
-        -   [Parameters][168]
--   [RemotelyBackedDataset][169]
-    -   [bindProperties][170]
-        -   [Parameters][171]
-    -   [isObsolete][172]
-    -   [markObsolete][173]
-    -   [isDeployed][174]
-    -   [markDeployed][175]
-    -   [\_genericGetter][176]
-        -   [Parameters][177]
-    -   [\_genericSetter][178]
+-   [OffChainDataClientOptionsType][163]
+    -   [Properties][164]
+-   [OffChainDataClient][165]
+    -   [setup][166]
+        -   [Parameters][167]
+    -   [\_reset][168]
+    -   [getAdapter][169]
+        -   [Parameters][170]
+-   [RemotelyBackedDataset][171]
+    -   [bindProperties][172]
+        -   [Parameters][173]
+    -   [isObsolete][174]
+    -   [markObsolete][175]
+    -   [isDeployed][176]
+    -   [markDeployed][177]
+    -   [\_genericGetter][178]
         -   [Parameters][179]
-    -   [updateRemoteData][180]
+    -   [\_genericSetter][180]
         -   [Parameters][181]
-    -   [createInstance][182]
--   [FieldDefType][183]
-    -   [Properties][184]
--   [StoragePointer][185]
-    -   [Parameters][186]
-    -   [reset][187]
-    -   [\_genericGetter][188]
-        -   [Parameters][189]
+    -   [updateRemoteData][182]
+        -   [Parameters][183]
+    -   [createInstance][184]
+-   [ChildType][185]
+    -   [Properties][186]
+-   [StoragePointer][187]
+    -   [Parameters][188]
+    -   [reset][189]
     -   [\_detectSchema][190]
         -   [Parameters][191]
     -   [\_getOffChainDataClient][192]
@@ -327,6 +327,7 @@ Description of additional descriptive hotel data.
 -   `images` **([Promise][238]&lt;[Array][233]&lt;[string][230]>?> | [Array][233]&lt;[string][230]>?)?** 
 -   `amenities` **([Promise][238]&lt;[Array][233]&lt;[string][230]>?> | [Array][233]&lt;[string][230]>?)?** 
 -   `updatedAt` **([Promise][238]&lt;[string][230]> | [string][230])** 
+-   `cancellationPolicies` **([Promise][238]&lt;[Array][233]&lt;[CancellationPolicy][242]>?> | [Array][233]&lt;[CancellationPolicy][242]>?)?** 
 
 ## RoomTypeInterface
 
@@ -336,11 +337,11 @@ Definition of a single room type.
 
 -   `name` **([Promise][238]&lt;[string][230]> | [string][230])** 
 -   `description` **([Promise][238]&lt;[string][230]> | [string][230])** 
--   `totalQuantity` **([Promise][238]&lt;[number][242]> | [number][242])** 
--   `occupancy` **([Promise][238]&lt;[OccupancyInterface][243]> | [OccupancyInterface][243])** 
+-   `totalQuantity` **([Promise][238]&lt;[number][243]> | [number][243])** 
+-   `occupancy` **([Promise][238]&lt;[OccupancyInterface][244]> | [OccupancyInterface][244])** 
 -   `amenities` **([Promise][238]&lt;[Array][233]&lt;[string][230]>?> | [Array][233]&lt;[string][230]>?)?** 
 -   `images` **([Promise][238]&lt;[Array][233]&lt;[string][230]>?> | [Array][233]&lt;[string][230]>?)?** 
--   `updatedAt` **([Promise][238]&lt;[Date][244]?> | [Date][244]?)** 
+-   `updatedAt` **([Promise][238]&lt;[Date][245]?> | [Date][245]?)** 
 -   `properties` **([Promise][238]&lt;[Object][231]?> | [Object][231]?)?** 
 
 ## OccupancyInterface
@@ -349,8 +350,8 @@ Denotes allowed occupancy of a room type.
 
 ### Properties
 
--   `min` **[number][242]??** 
--   `max` **[number][242]** 
+-   `min` **[number][243]??** 
+-   `max` **[number][243]** 
 
 ## LocationInterface
 
@@ -358,8 +359,8 @@ Generic GPS location.
 
 ### Properties
 
--   `latitude` **[number][242]??** 
--   `longitude` **[number][242]??** 
+-   `latitude` **[number][243]??** 
+-   `longitude` **[number][243]??** 
 
 ## AdditionalContact
 
@@ -380,7 +381,7 @@ Generic contact.
 -   `phone` **([Promise][238]&lt;[string][230]?> | [string][230]?)?** 
 -   `url` **([Promise][238]&lt;[string][230]?> | [string][230]?)?** 
 -   `ethereum` **([Promise][238]&lt;[string][230]?> | [string][230]?)?** 
--   `additionalContacts` **([Promise][238]&lt;[Array][233]&lt;[AdditionalContact][245]>?> | [Array][233]&lt;[AdditionalContact][245]>?)?** 
+-   `additionalContacts` **([Promise][238]&lt;[Array][233]&lt;[AdditionalContact][246]>?> | [Array][233]&lt;[AdditionalContact][246]>?)?** 
 
 ## ContactsInterface
 
@@ -388,7 +389,7 @@ A map of hotel contacts.
 
 ### Properties
 
--   `general` **[ContactInterface][246]** 
+-   `general` **[ContactInterface][247]** 
 
 ## AddressInterface
 
@@ -402,6 +403,17 @@ Generic address interface.
 -   `city` **([Promise][238]&lt;[string][230]> | [string][230])?** 
 -   `state` **([Promise][238]&lt;[string][230]?> | [string][230]?)?** 
 -   `country` **([Promise][238]&lt;[string][230]> | [string][230])?** 
+
+## CancellationPolicy
+
+A single cancellation policy.
+
+### Properties
+
+-   `from` **([Promise][238]&lt;[Date][245]?> | [Date][245]?)?** 
+-   `to` **([Promise][238]&lt;[Date][245]?> | [Date][245]?)?** 
+-   `deadline` **([Promise][238]&lt;[number][243]?> | [number][243]?)?** 
+-   `amount` **([Promise][238]&lt;[number][243]> | [number][243])** 
 
 ## RatePlansInterface
 
@@ -420,13 +432,13 @@ A single rate plan
 -   `name` **([Promise][238]&lt;[string][230]> | [string][230])** 
 -   `description` **([Promise][238]&lt;[string][230]?> | [string][230]?)?** 
 -   `currency` **([Promise][238]&lt;[string][230]?> | [string][230]?)?** 
--   `price` **([Promise][238]&lt;[number][242]> | [number][242])** 
+-   `price` **([Promise][238]&lt;[number][243]> | [number][243])** 
 -   `roomTypeIds` **([Promise][238]&lt;[Array][233]&lt;[string][230]>?> | [Array][233]&lt;[string][230]>?)?** 
--   `updatedAt` **([Promise][238]&lt;[Date][244]> | [Date][244])** 
--   `availableForReservation` **([Promise][238]&lt;[DateRangeInterface][247]?> | [DateRangeInterface][247]?)?** 
--   `availableForTravel` **([Promise][238]&lt;[DateRangeInterface][247]?> | [DateRangeInterface][247]?)?** 
--   `modifiers` **([Promise][238]&lt;[Array][233]&lt;[RatePlanPriceModifier][248]>?> | [Array][233]&lt;[RatePlanPriceModifier][248]>?)?** 
--   `restrictions` **([Promise][238]&lt;[RatePlanRestrictions][249]?> | [RatePlanRestrictions][249]?)?** 
+-   `updatedAt` **([Promise][238]&lt;[Date][245]> | [Date][245])** 
+-   `availableForReservation` **([Promise][238]&lt;[DateRangeInterface][248]?> | [DateRangeInterface][248]?)?** 
+-   `availableForTravel` **([Promise][238]&lt;[DateRangeInterface][248]?> | [DateRangeInterface][248]?)?** 
+-   `modifiers` **([Promise][238]&lt;[Array][233]&lt;[RatePlanPriceModifier][249]>?> | [Array][233]&lt;[RatePlanPriceModifier][249]>?)?** 
+-   `restrictions` **([Promise][238]&lt;[RatePlanRestrictions][250]?> | [RatePlanRestrictions][250]?)?** 
 
 ## DateRangeInterface
 
@@ -434,8 +446,8 @@ Generic date range interface
 
 ### Properties
 
--   `from` **([Promise][238]&lt;[Date][244]> | [Date][244])** 
--   `to` **([Promise][238]&lt;[Date][244]> | [Date][244])** 
+-   `from` **([Promise][238]&lt;[Date][245]> | [Date][245])** 
+-   `to` **([Promise][238]&lt;[Date][245]> | [Date][245])** 
 
 ## RatePlanPriceModifier
 
@@ -443,10 +455,10 @@ A single rate plan price modifier
 
 ### Properties
 
--   `from` **([Promise][238]&lt;[Date][244]?> | [Date][244]?)?** 
--   `to` **([Promise][238]&lt;[Date][244]?> | [Date][244]?)?** 
--   `adjustment` **([Promise][238]&lt;[number][242]> | [number][242])** 
--   `conditions` **([Promise][238]&lt;{minLengthOfStay: ([Promise][238]&lt;[number][242]?> | [number][242]?)?, maxAge: ([Promise][238]&lt;[number][242]?> | [number][242]?)?}> | {minLengthOfStay: ([Promise][238]&lt;[number][242]?> | [number][242]?)?, maxAge: ([Promise][238]&lt;[number][242]?> | [number][242]?)?})?** 
+-   `from` **([Promise][238]&lt;[Date][245]?> | [Date][245]?)?** 
+-   `to` **([Promise][238]&lt;[Date][245]?> | [Date][245]?)?** 
+-   `adjustment` **([Promise][238]&lt;[number][243]> | [number][243])** 
+-   `conditions` **([Promise][238]&lt;{minLengthOfStay: ([Promise][238]&lt;[number][243]?> | [number][243]?)?, maxAge: ([Promise][238]&lt;[number][243]?> | [number][243]?)?}> | {minLengthOfStay: ([Promise][238]&lt;[number][243]?> | [number][243]?)?, maxAge: ([Promise][238]&lt;[number][243]?> | [number][243]?)?})?** 
 
 ## RatePlanRestrictions
 
@@ -454,8 +466,8 @@ Collection of rate plans restrictions.
 
 ### Properties
 
--   `bookingCutOff` **([Promise][238]&lt;{min: ([Promise][238]&lt;[number][242]?> | [number][242]?)?, max: ([Promise][238]&lt;[number][242]?> | [number][242]?)?}?> | {min: ([Promise][238]&lt;[number][242]?> | [number][242]?)?, max: ([Promise][238]&lt;[number][242]?> | [number][242]?)?}?)?** 
--   `lengthOfStay` **([Promise][238]&lt;{min: ([Promise][238]&lt;[number][242]?> | [number][242]?)?, max: ([Promise][238]&lt;[number][242]?> | [number][242]?)?}?> | {min: ([Promise][238]&lt;[number][242]?> | [number][242]?)?, max: ([Promise][238]&lt;[number][242]?> | [number][242]?)?}?)?** 
+-   `bookingCutOff` **([Promise][238]&lt;{min: ([Promise][238]&lt;[number][243]?> | [number][243]?)?, max: ([Promise][238]&lt;[number][243]?> | [number][243]?)?}?> | {min: ([Promise][238]&lt;[number][243]?> | [number][243]?)?, max: ([Promise][238]&lt;[number][243]?> | [number][243]?)?}?)?** 
+-   `lengthOfStay` **([Promise][238]&lt;{min: ([Promise][238]&lt;[number][243]?> | [number][243]?)?, max: ([Promise][238]&lt;[number][243]?> | [number][243]?)?}?> | {min: ([Promise][238]&lt;[number][243]?> | [number][243]?)?, max: ([Promise][238]&lt;[number][243]?> | [number][243]?)?}?)?** 
 
 ## DataModelOptionsType
 
@@ -466,12 +478,12 @@ DataModelOptionsType options. May look like this:
       "gasCoefficient": 2 // Optional, defaults to 2
     }
 
-Type: {provider: ([string][230] \| [Object][231])?, gasCoefficient: [number][242]?}
+Type: {provider: ([string][230] \| [Object][231])?, gasCoefficient: [number][243]?}
 
 ### Properties
 
 -   `provider` **([string][230] \| [Object][231])?** 
--   `gasCoefficient` **[number][242]?** 
+-   `gasCoefficient` **[number][243]?** 
 
 ## DataModel
 
@@ -479,7 +491,7 @@ DataModel
 
 ### Parameters
 
--   `options` **[DataModelOptionsType][250]** 
+-   `options` **[DataModelOptionsType][251]** 
 
 ### getWindingTreeIndex
 
@@ -503,7 +515,7 @@ metrics.
 
 -   `txHashes` **[Array][233]&lt;[string][230]>** 
 
-Returns **[Promise][238]&lt;[AdaptedTxResultsInterface][251]>** 
+Returns **[Promise][238]&lt;[AdaptedTxResultsInterface][252]>** 
 
 ### createWallet
 
@@ -511,9 +523,9 @@ Returns a wallet instance for given JSON keystore.
 
 #### Parameters
 
--   `jsonWallet` **[KeystoreV3Interface][252]** 
+-   `jsonWallet` **[KeystoreV3Interface][253]** 
 
-Returns **[Wallet][253]** 
+Returns **[Wallet][254]** 
 
 ### createInstance
 
@@ -521,9 +533,9 @@ Creates a configured DataModel instance.
 
 #### Parameters
 
--   `options` **[DataModelOptionsType][250]** 
+-   `options` **[DataModelOptionsType][251]** 
 
-Returns **[DataModel][254]** 
+Returns **[DataModel][255]** 
 
 ## OnChainHotel
 
@@ -537,7 +549,7 @@ are dealt with in StoragePointer.
 
 ### Parameters
 
--   `web3Utils` **[Utils][255]** 
+-   `web3Utils` **[Utils][256]** 
 -   `web3Contracts` **[Contracts][236]** 
 -   `indexContract` **[Object][231]** 
 -   `address` **[string][230]** 
@@ -558,7 +570,7 @@ Any data structure that is accessed by StoragePointer
 instance has for now be known beforehand, thus the whole
 data format of hotel data on `dataUri` is specified here.
 
-Returns **[Promise][238]&lt;[StoragePointer][256]>** 
+Returns **[Promise][238]&lt;[StoragePointer][257]>** 
 
 ### setLocalData
 
@@ -568,7 +580,7 @@ contract (without address).
 
 #### Parameters
 
--   `newData` **[HotelOnChainDataInterface][257]** 
+-   `newData` **[HotelOnChainDataInterface][258]** 
 
 Returns **[Promise][238]&lt;void>** 
 
@@ -599,7 +611,7 @@ Properties that represent an actual separate document have a format of
     If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
 
 
--   Throws **[StoragePointerError][258]** when an adapter encounters an error while accessing the data
+-   Throws **[StoragePointerError][259]** when an adapter encounters an error while accessing the data
 
 Returns **[Promise][238]&lt;PlainHotelInterface>** 
 
@@ -611,10 +623,10 @@ Transaction is not signed nor sent here.
 
 #### Parameters
 
--   `transactionOptions` **[TransactionOptionsInterface][259]** 
--   `options` **[TransactionOptionsInterface][259]** object, only `from` property is currently used, all others are ignored in this implementation
+-   `transactionOptions` **[TransactionOptionsInterface][260]** 
+-   `options` **[TransactionOptionsInterface][260]** object, only `from` property is currently used, all others are ignored in this implementation
 
-Returns **[Promise][238]&lt;[PreparedTransactionMetadataInterface][260]>** resulting transaction metadata
+Returns **[Promise][238]&lt;[PreparedTransactionMetadataInterface][261]>** resulting transaction metadata
 
 ### createOnChainData
 
@@ -623,10 +635,10 @@ Transaction is not signed nor sent here.
 
 #### Parameters
 
--   `transactionOptions` **[TransactionOptionsInterface][259]** 
--   `options` **[TransactionOptionsInterface][259]** object, only `from` property is currently used, all others are ignored in this implementation
+-   `transactionOptions` **[TransactionOptionsInterface][260]** 
+-   `options` **[TransactionOptionsInterface][260]** object, only `from` property is currently used, all others are ignored in this implementation
 
-Returns **[Promise][238]&lt;[PreparedTransactionMetadataInterface][260]>** Transaction data and metadata, including the freshly created hotel instance.
+Returns **[Promise][238]&lt;[PreparedTransactionMetadataInterface][261]>** Transaction data and metadata, including the freshly created hotel instance.
 
 ### updateOnChainData
 
@@ -635,14 +647,14 @@ by calling `updateRemoteData` on a `RemotelyBackedDataset`.
 
 #### Parameters
 
--   `transactionOptions` **[TransactionOptionsInterface][259]** 
--   `options` **[TransactionOptionsInterface][259]** object that is passed to all remote data setters
+-   `transactionOptions` **[TransactionOptionsInterface][260]** 
+-   `options` **[TransactionOptionsInterface][260]** object that is passed to all remote data setters
 
 
 -   Throws **[SmartContractInstantiationError][232]** When the underlying contract is not yet deployed.
 -   Throws **[SmartContractInstantiationError][232]** When dataUri is empty.
 
-Returns **[Promise][238]&lt;[Array][233]&lt;[PreparedTransactionMetadataInterface][260]>>** List of transaction metadata
+Returns **[Promise][238]&lt;[Array][233]&lt;[PreparedTransactionMetadataInterface][261]>>** List of transaction metadata
 
 ### transferOnChainOwnership
 
@@ -655,14 +667,14 @@ transfer.
 #### Parameters
 
 -   `newManager` **[string][230]** 
--   `transactionOptions` **[TransactionOptionsInterface][259]** 
+-   `transactionOptions` **[TransactionOptionsInterface][260]** 
 -   `Address` **[string][230]** of a new manager
--   `options` **[TransactionOptionsInterface][259]** object, only `from` property is currently used, all others are ignored in this implementation
+-   `options` **[TransactionOptionsInterface][260]** object, only `from` property is currently used, all others are ignored in this implementation
 
 
 -   Throws **[SmartContractInstantiationError][232]** When the underlying contract is not yet deployed.
 
-Returns **[Promise][238]&lt;[PreparedTransactionMetadataInterface][260]>** Transaction data and metadata, including the freshly created hotel instance.
+Returns **[Promise][238]&lt;[PreparedTransactionMetadataInterface][261]>** Transaction data and metadata, including the freshly created hotel instance.
 
 ### removeOnChainData
 
@@ -670,13 +682,13 @@ Generates transaction data and metadata required for destroying the hotel object
 
 #### Parameters
 
--   `transactionOptions` **[TransactionOptionsInterface][259]** 
--   `options` **[TransactionOptionsInterface][259]** object, only `from` property is currently used, all others are ignored in this implementation
+-   `transactionOptions` **[TransactionOptionsInterface][260]** 
+-   `options` **[TransactionOptionsInterface][260]** object, only `from` property is currently used, all others are ignored in this implementation
 
 
 -   Throws **[SmartContractInstantiationError][232]** When the underlying contract is not yet deployed.
 
-Returns **[Promise][238]&lt;[PreparedTransactionMetadataInterface][260]>** Transaction data and metadata, including the freshly created hotel instance.
+Returns **[Promise][238]&lt;[PreparedTransactionMetadataInterface][261]>** Transaction data and metadata, including the freshly created hotel instance.
 
 ### createInstance
 
@@ -684,14 +696,14 @@ Create new configured instance.
 
 #### Parameters
 
--   `web3Utils` **[Utils][255]** 
+-   `web3Utils` **[Utils][256]** 
 -   `web3Contracts` **[Contracts][236]** 
 -   `indexContract` **web3.eth.Contract** Representation of Winding Tree index
 -   `address` **[string][230]** is an optional pointer to Ethereum network where the hotel lives.
     It is used as a reference for on-chain stored data. If it is not provided, a hotel has
     to be created on chain to behave as expected.
 
-Returns **[OnChainHotel][261]** 
+Returns **[OnChainHotel][262]** 
 
 ## WTIndex
 
@@ -702,7 +714,7 @@ contracts.
 ### Parameters
 
 -   `indexAddress` **[string][230]** 
--   `web3Utils` **[Utils][255]** 
+-   `web3Utils` **[Utils][256]** 
 -   `web3Contracts` **[Contracts][236]** 
 
 ### addHotel
@@ -713,14 +725,14 @@ Does not sign or send the transaction.
 
 #### Parameters
 
--   `hotelData` **[HotelOnChainDataInterface][257]** 
+-   `hotelData` **[HotelOnChainDataInterface][258]** 
 
 
--   Throws **[InputDataError][262]** When hotelData does not contain dataUri property.
--   Throws **[InputDataError][262]** When hotelData does not contain a manager property.
--   Throws **[WTLibsError][263]** When anything goes wrong during data preparation phase.
+-   Throws **[InputDataError][263]** When hotelData does not contain dataUri property.
+-   Throws **[InputDataError][263]** When hotelData does not contain a manager property.
+-   Throws **[WTLibsError][264]** When anything goes wrong during data preparation phase.
 
-Returns **[Promise][238]&lt;[PreparedTransactionMetadataInterface][260]>** 
+Returns **[Promise][238]&lt;[PreparedTransactionMetadataInterface][261]>** 
 
 ### updateHotel
 
@@ -730,14 +742,14 @@ Does not sign or send any of the transactions.
 
 #### Parameters
 
--   `hotel` **[HotelInterface][264]** 
+-   `hotel` **[HotelInterface][265]** 
 
 
--   Throws **[InputDataError][262]** When hotel does not have a manager field.
--   Throws **[InputDataError][262]** When hotel does not contain a manager property.
--   Throws **[WTLibsError][263]** When anything goes wrong during data preparation phase.
+-   Throws **[InputDataError][263]** When hotel does not have a manager field.
+-   Throws **[InputDataError][263]** When hotel does not contain a manager property.
+-   Throws **[WTLibsError][264]** When anything goes wrong during data preparation phase.
 
-Returns **[Promise][238]&lt;[Array][233]&lt;[PreparedTransactionMetadataInterface][260]>>** 
+Returns **[Promise][238]&lt;[Array][233]&lt;[PreparedTransactionMetadataInterface][261]>>** 
 
 ### removeHotel
 
@@ -747,14 +759,14 @@ Does not sign or send the transaction.
 
 #### Parameters
 
--   `hotel` **[HotelInterface][264]** 
+-   `hotel` **[HotelInterface][265]** 
 
 
--   Throws **[InputDataError][262]** When hotel does not contain dataUri property.
--   Throws **[InputDataError][262]** When hotel does not contain a manager property.
--   Throws **[WTLibsError][263]** When anything goes wrong during data preparation phase.
+-   Throws **[InputDataError][263]** When hotel does not contain dataUri property.
+-   Throws **[InputDataError][263]** When hotel does not contain a manager property.
+-   Throws **[WTLibsError][264]** When anything goes wrong during data preparation phase.
 
-Returns **[Promise][238]&lt;[PreparedTransactionMetadataInterface][260]>** 
+Returns **[Promise][238]&lt;[PreparedTransactionMetadataInterface][261]>** 
 
 ### transferHotelOwnership
 
@@ -764,17 +776,17 @@ transactoin. Does not sign or send the transaction.
 
 #### Parameters
 
--   `hotel` **[HotelInterface][264]** 
+-   `hotel` **[HotelInterface][265]** 
 -   `newManager` **[string][230]** 
 
 
--   Throws **[InputDataError][262]** When hotel does not have an address.
--   Throws **[InputDataError][262]** When hotel does not contain a manager property.
--   Throws **[InputDataError][262]** When the new manager address is the same as the old manager.
--   Throws **[InputDataError][262]** When the new manager address is not a valid address.
--   Throws **[WTLibsError][263]** When anything goes wrong during data preparation phase.
+-   Throws **[InputDataError][263]** When hotel does not have an address.
+-   Throws **[InputDataError][263]** When hotel does not contain a manager property.
+-   Throws **[InputDataError][263]** When the new manager address is the same as the old manager.
+-   Throws **[InputDataError][263]** When the new manager address is not a valid address.
+-   Throws **[WTLibsError][264]** When anything goes wrong during data preparation phase.
 
-Returns **[Promise][238]&lt;[PreparedTransactionMetadataInterface][260]>** 
+Returns **[Promise][238]&lt;[PreparedTransactionMetadataInterface][261]>** 
 
 ### getHotel
 
@@ -787,11 +799,11 @@ instance, the method throws immediately.
 -   `address` **[string][230]** 
 
 
--   Throws **[HotelNotFoundError][265]** When hotel does not exist.
--   Throws **[HotelNotInstantiableError][266]** When the hotel class cannot be constructed.
--   Throws **[WTLibsError][263]** When something breaks in the network communication.
+-   Throws **[HotelNotFoundError][266]** When hotel does not exist.
+-   Throws **[HotelNotInstantiableError][267]** When the hotel class cannot be constructed.
+-   Throws **[WTLibsError][264]** When something breaks in the network communication.
 
-Returns **[Promise][238]&lt;[HotelInterface][264]?>** 
+Returns **[Promise][238]&lt;[HotelInterface][265]?>** 
 
 ### getAllHotels
 
@@ -801,7 +813,7 @@ every hotel that is inaccessible for any reason.
 Currently any inaccessible hotel is silently ignored.
 Subject to change.
 
-Returns **[Promise][238]&lt;[Array][233]&lt;[HotelInterface][264]>>** 
+Returns **[Promise][238]&lt;[Array][233]&lt;[HotelInterface][265]>>** 
 
 ### createInstance
 
@@ -811,10 +823,10 @@ representing a Winding Tree index contract on a given `indexAddress`.
 #### Parameters
 
 -   `indexAddress` **[string][230]** 
--   `web3Utils` **[Utils][255]** 
+-   `web3Utils` **[Utils][256]** 
 -   `web3Contracts` **[Contracts][236]** 
 
-Returns **[WTIndex][267]** 
+Returns **[WTIndex][268]** 
 
 ## WTLibsError
 
@@ -982,12 +994,12 @@ Hotel abstraction instance cannot be created for some reason.
 General options for wt-libs-js. Holds all things necessary
 for successful setup of Winding Tree network.
 
-Type: {dataModelOptions: [DataModelOptionsType][250], offChainDataOptions: [OffChainDataClientOptionsType][268]}
+Type: {dataModelOptions: [DataModelOptionsType][251], offChainDataOptions: [OffChainDataClientOptionsType][269]}
 
 ### Properties
 
--   `dataModelOptions` **[DataModelOptionsType][250]** 
--   `offChainDataOptions` **[OffChainDataClientOptionsType][268]** 
+-   `dataModelOptions` **[DataModelOptionsType][251]** 
+-   `offChainDataOptions` **[OffChainDataClientOptionsType][269]** 
 
 ## WTLibs
 
@@ -995,7 +1007,7 @@ Main public interface of wt-libs-js.
 
 ### Parameters
 
--   `options` **[WtLibsOptionsType][269]** 
+-   `options` **[WtLibsOptionsType][270]** 
 
 ### getWTIndex
 
@@ -1005,7 +1017,7 @@ Get an instance of Winding Tree index from the underlying `data-model`.
 
 -   `address` **[string][230]** of the Winding Tree index
 
-Returns **[WTIndexInterface][270]** 
+Returns **[WTIndexInterface][271]** 
 
 ### getTransactionsStatus
 
@@ -1016,7 +1028,7 @@ This method is async because it communicates directly with and EVM node.
 
 -   `transactionHashes` **[Array][233]&lt;[string][230]>** 
 
-Returns **[Promise][238]&lt;[AdaptedTxResultsInterface][251]>** 
+Returns **[Promise][238]&lt;[AdaptedTxResultsInterface][252]>** 
 
 ### createWallet
 
@@ -1024,9 +1036,9 @@ Returns a wallet abstraction that can be used for signing transactions
 
 #### Parameters
 
--   `jsonWallet` **[KeystoreV3Interface][252]** 
+-   `jsonWallet` **[KeystoreV3Interface][253]** 
 
-Returns **[WalletInterface][271]** 
+Returns **[WalletInterface][272]** 
 
 ### getOffChainDataClient
 
@@ -1037,7 +1049,7 @@ or downloading data stored off-chain.
 
 -   `schema` **[string][230]** 
 
-Returns **[OffChainDataAdapterInterface][272]** 
+Returns **[OffChainDataAdapterInterface][273]** 
 
 ### createInstance
 
@@ -1045,9 +1057,9 @@ Call this to create wt-libs-js instance.
 
 #### Parameters
 
--   `options` **[WtLibsOptionsType][269]** 
+-   `options` **[WtLibsOptionsType][270]** 
 
-Returns **[WTLibs][273]** WTLibs
+Returns **[WTLibs][274]** WTLibs
 
 ### errors
 
@@ -1075,7 +1087,7 @@ about every hotel.
 Ethereum transaction options that are passed from an external user.
 It has to contain `from` and usually would contain `to` as well.
 
-This copies the structure of [https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#contract-estimategas][274]
+This copies the structure of [https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#contract-estimategas][275]
 as it might be used as a base for gas estimation prior to actually
 sending a transaction.
 
@@ -1083,8 +1095,8 @@ sending a transaction.
 
 -   `from` **[string][230]** 
 -   `to` **[string][230]?** 
--   `gas` **[number][242]?** 
--   `value` **([number][242] \| [string][230] | BigNumber)?** 
+-   `gas` **[number][243]?** 
+-   `value` **([number][243] \| [string][230] | BigNumber)?** 
 
 ## TransactionCallbacksInterface
 
@@ -1093,7 +1105,7 @@ will be signed and sent through our Wallet abstraction.
 
 ### Properties
 
--   `onReceipt` **function (receipt: [TxReceiptInterface][275]): void?** 
+-   `onReceipt` **function (receipt: [TxReceiptInterface][276]): void?** 
 -   `onTransactionHash` **function (hash: [string][230]): void?** 
 
 ## PreparedTransactionMetadataInterface
@@ -1107,9 +1119,9 @@ after the transaction is mined.
 
 ### Properties
 
--   `hotel` **[HotelInterface][264]** 
--   `transactionData` **[TransactionDataInterface][276]** 
--   `eventCallbacks` **[TransactionCallbacksInterface][277]?** 
+-   `hotel` **[HotelInterface][265]** 
+-   `transactionData` **[TransactionDataInterface][277]** 
+-   `eventCallbacks` **[TransactionCallbacksInterface][278]?** 
 
 ## HotelInterface
 
@@ -1122,13 +1134,13 @@ property.
 
 ### Properties
 
--   `dataIndex` **[Promise][238]&lt;[StoragePointer][256]>** 
+-   `dataIndex` **[Promise][238]&lt;[StoragePointer][257]>** 
 -   `toPlainObject` **function (): [Promise][238]&lt;[Object][231]>** 
--   `setLocalData` **function (newData: [HotelOnChainDataInterface][257]): [Promise][238]&lt;void>** 
--   `createOnChainData` **function (transactionOptions: [TransactionOptionsInterface][259]): [Promise][238]&lt;[PreparedTransactionMetadataInterface][260]>** 
--   `updateOnChainData` **function (transactionOptions: [TransactionOptionsInterface][259]): [Promise][238]&lt;[Array][233]&lt;[PreparedTransactionMetadataInterface][260]>>** 
--   `removeOnChainData` **function (transactionOptions: [TransactionOptionsInterface][259]): [Promise][238]&lt;[PreparedTransactionMetadataInterface][260]>** 
--   `transferOnChainOwnership` **function (newManager: [string][230], transactionOptions: [TransactionOptionsInterface][259]): [Promise][238]&lt;[PreparedTransactionMetadataInterface][260]>** 
+-   `setLocalData` **function (newData: [HotelOnChainDataInterface][258]): [Promise][238]&lt;void>** 
+-   `createOnChainData` **function (transactionOptions: [TransactionOptionsInterface][260]): [Promise][238]&lt;[PreparedTransactionMetadataInterface][261]>** 
+-   `updateOnChainData` **function (transactionOptions: [TransactionOptionsInterface][260]): [Promise][238]&lt;[Array][233]&lt;[PreparedTransactionMetadataInterface][261]>>** 
+-   `removeOnChainData` **function (transactionOptions: [TransactionOptionsInterface][260]): [Promise][238]&lt;[PreparedTransactionMetadataInterface][261]>** 
+-   `transferOnChainOwnership` **function (newManager: [string][230], transactionOptions: [TransactionOptionsInterface][260]): [Promise][238]&lt;[PreparedTransactionMetadataInterface][261]>** 
 
 ## WTIndexInterface
 
@@ -1137,12 +1149,12 @@ necessary for interaction with the hotels.\`
 
 ### Properties
 
--   `addHotel` **function (hotel: [HotelOnChainDataInterface][257]): [Promise][238]&lt;[PreparedTransactionMetadataInterface][260]>** 
--   `getHotel` **function (address: [string][230]): [Promise][238]&lt;[HotelInterface][264]?>** 
--   `getAllHotels` **function (): [Promise][238]&lt;[Array][233]&lt;[HotelInterface][264]>>** 
--   `updateHotel` **function (hotel: [HotelInterface][264]): [Promise][238]&lt;[Array][233]&lt;[PreparedTransactionMetadataInterface][260]>>** 
--   `removeHotel` **function (hotel: [HotelInterface][264]): [Promise][238]&lt;[PreparedTransactionMetadataInterface][260]>** 
--   `transferHotelOwnership` **function (hotel: [HotelInterface][264], newManager: [string][230]): [Promise][238]&lt;[PreparedTransactionMetadataInterface][260]>** 
+-   `addHotel` **function (hotel: [HotelOnChainDataInterface][258]): [Promise][238]&lt;[PreparedTransactionMetadataInterface][261]>** 
+-   `getHotel` **function (address: [string][230]): [Promise][238]&lt;[HotelInterface][265]?>** 
+-   `getAllHotels` **function (): [Promise][238]&lt;[Array][233]&lt;[HotelInterface][265]>>** 
+-   `updateHotel` **function (hotel: [HotelInterface][265]): [Promise][238]&lt;[Array][233]&lt;[PreparedTransactionMetadataInterface][261]>>** 
+-   `removeHotel` **function (hotel: [HotelInterface][265]): [Promise][238]&lt;[PreparedTransactionMetadataInterface][261]>** 
+-   `transferHotelOwnership` **function (hotel: [HotelInterface][265], newManager: [string][230]): [Promise][238]&lt;[PreparedTransactionMetadataInterface][261]>** 
 
 ## OffChainDataAdapterInterface
 
@@ -1160,9 +1172,9 @@ Formalization of DataModel's public interface.
 
 ### Properties
 
--   `getWindingTreeIndex` **function (address: [string][230]): [WTIndexInterface][270]** 
--   `getTransactionsStatus` **function (transactionHashes: [Array][233]&lt;[string][230]>): [Promise][238]&lt;[AdaptedTxResultsInterface][251]>** 
--   `createWallet` **function (jsonWallet: [Object][231]): [WalletInterface][271]** 
+-   `getWindingTreeIndex` **function (address: [string][230]): [WTIndexInterface][271]** 
+-   `getTransactionsStatus` **function (transactionHashes: [Array][233]&lt;[string][230]>): [Promise][238]&lt;[AdaptedTxResultsInterface][252]>** 
+-   `createWallet` **function (jsonWallet: [Object][231]): [WalletInterface][272]** 
 
 ## RawLogRecordInterface
 
@@ -1175,11 +1187,11 @@ Sometimes you might need the raw data to do some additional processing.
 -   `address` **[string][230]** 
 -   `data` **[string][230]** 
 -   `topics` **[Array][233]&lt;[string][230]>** 
--   `logIndex` **[number][242]** 
--   `transactionIndex` **[number][242]** 
--   `transactionHash` **[number][242]** 
--   `blockHash` **[number][242]** 
--   `blockNumber` **[number][242]** 
+-   `logIndex` **[number][243]** 
+-   `transactionIndex` **[number][243]** 
+-   `transactionHash` **[number][243]** 
+-   `blockHash` **[number][243]** 
+-   `blockNumber` **[number][243]** 
 
 ## DecodedLogRecordInterface
 
@@ -1196,36 +1208,36 @@ and act upon.
 ## TransactionDataInterface
 
 Ethereum transaction data used when creating transaction, see for example
-[https://web3js.readthedocs.io/en/1.0/web3-eth-accounts.html#signtransaction][278]
+[https://web3js.readthedocs.io/en/1.0/web3-eth-accounts.html#signtransaction][279]
 
 ### Properties
 
--   `nonce` **[number][242]??** 
+-   `nonce` **[number][243]??** 
 -   `chainId` **[string][230]?** 
 -   `from` **[string][230]** 
 -   `to` **[string][230]** 
 -   `data` **[string][230]** 
 -   `value` **[string][230]?** 
 -   `gasPrice` **[string][230]?** 
--   `gas` **([string][230] \| [number][242])** 
+-   `gas` **([string][230] \| [number][243])** 
 
 ## TxInterface
 
 Ethereum transaction data after TX was accepted by the network, see
-for example [http://web3js.readthedocs.io/en/1.0/web3-eth.html#gettransaction][279]
+for example [http://web3js.readthedocs.io/en/1.0/web3-eth.html#gettransaction][280]
 
 ### Properties
 
 -   `hash` **[string][230]?** 
--   `nonce` **([string][230] \| [number][242])?** 
+-   `nonce` **([string][230] \| [number][243])?** 
 -   `blockHash` **[string][230]?** 
--   `blockNumber` **[number][242]?** 
--   `transactionIndex` **[number][242]?** 
+-   `blockNumber` **[number][243]?** 
+-   `transactionIndex` **[number][243]?** 
 -   `from` **[string][230]?** 
 -   `to` **[string][230]?** 
 -   `value` **[string][230]?** 
 -   `gasPrice` **[string][230]?** 
--   `gas` **[number][242]?** 
+-   `gas` **[number][243]?** 
 -   `input` **[string][230]?** 
 
 ## TxReceiptInterface
@@ -1237,16 +1249,16 @@ This raw data might be sometimes needed for additional processing.
 ### Properties
 
 -   `transactionHash` **[string][230]** 
--   `blockNumber` **[number][242]** 
+-   `blockNumber` **[number][243]** 
 -   `blockHash` **[string][230]** 
--   `transactionIndex` **[number][242]** 
+-   `transactionIndex` **[number][243]** 
 -   `from` **[string][230]** 
 -   `to` **[string][230]** 
 -   `contractAddress` **any** 
--   `cumulativeGasUsed` **[number][242]** 
--   `gasUsed` **[number][242]** 
+-   `cumulativeGasUsed` **[number][243]** 
+-   `gasUsed` **[number][243]** 
 -   `logs` **[Array][233]&lt;[RawLogRecordInterface][234]>** 
--   `status` **[boolean][280]** 
+-   `status` **[boolean][281]** 
 
 ## AdaptedTxResultInterface
 
@@ -1256,9 +1268,9 @@ about the transaction status, its age and decoded logs.
 ### Properties
 
 -   `transactionHash` **[string][230]** 
--   `blockAge` **[number][242]** 
+-   `blockAge` **[number][243]** 
 -   `decodedLogs` **[Array][233]&lt;[DecodedLogRecordInterface][235]>** 
--   `raw` **[TxReceiptInterface][275]** 
+-   `raw` **[TxReceiptInterface][276]** 
 
 ## AdaptedTxResultsInterface
 
@@ -1269,12 +1281,12 @@ assumptions about confirmations). This also contains the raw data.
 
 ### Properties
 
--   `meta` **{total: [number][242], processed: [number][242], minBlockAge: [number][242], maxBlockAge: [number][242], allPassed: [boolean][280]}** 
--   `meta.total` **[number][242]** 
--   `meta.processed` **[number][242]** 
--   `meta.minBlockAge` **[number][242]** 
--   `meta.maxBlockAge` **[number][242]** 
--   `meta.allPassed` **[boolean][280]** 
+-   `meta` **{total: [number][243], processed: [number][243], minBlockAge: [number][243], maxBlockAge: [number][243], allPassed: [boolean][281]}** 
+-   `meta.total` **[number][243]** 
+-   `meta.processed` **[number][243]** 
+-   `meta.minBlockAge` **[number][243]** 
+-   `meta.maxBlockAge` **[number][243]** 
+-   `meta.allPassed` **[boolean][281]** 
 -   `results` **{}?** 
 
 ## WalletInterface
@@ -1292,7 +1304,7 @@ Wallet abstraction interface. It assumes the following workflow:
 ### Properties
 
 -   `unlock` **function (password: [string][230]): void** 
--   `signAndSendTransaction` **function (transactionData: [TransactionDataInterface][276], eventCallBacks: [TransactionCallbacksInterface][277]): [Promise][238]&lt;([string][230] \| [TxReceiptInterface][275])>** 
+-   `signAndSendTransaction` **function (transactionData: [TransactionDataInterface][277], eventCallBacks: [TransactionCallbacksInterface][278]): [Promise][238]&lt;([string][230] \| [TxReceiptInterface][276])>** 
 -   `lock` **function (): void** 
 -   `destroy` **function (): void** 
 -   `getAddress` **function (): [string][230]** 
@@ -1301,27 +1313,27 @@ Wallet abstraction interface. It assumes the following workflow:
 
 Interface for Ethereum keystore
 
-Description: [https://medium.com/@julien.m./what-is-an-ethereum-keystore-file-86c8c5917b97][281]
+Description: [https://medium.com/@julien.m./what-is-an-ethereum-keystore-file-86c8c5917b97][282]
 
-Specification: [https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition][282]
+Specification: [https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition][283]
 
 ### Properties
 
--   `version` **[number][242]** 
+-   `version` **[number][243]** 
 -   `id` **[string][230]** 
 -   `address` **[string][230]** 
--   `crypto` **{ciphertext: [string][230], cipherparams: {iv: [string][230]}, cipher: [string][230], kdf: [string][230], kdfparams: {dklen: [number][242], salt: [string][230], n: [number][242], r: [number][242], p: [number][242]}, mac: [string][230]}** 
+-   `crypto` **{ciphertext: [string][230], cipherparams: {iv: [string][230]}, cipher: [string][230], kdf: [string][230], kdfparams: {dklen: [number][243], salt: [string][230], n: [number][243], r: [number][243], p: [number][243]}, mac: [string][230]}** 
 -   `crypto.ciphertext` **[string][230]** 
 -   `crypto.cipherparams` **{iv: [string][230]}** 
 -   `crypto.cipherparams.iv` **[string][230]** 
 -   `crypto.cipher` **[string][230]** 
 -   `crypto.kdf` **[string][230]** 
--   `crypto.kdfparams` **{dklen: [number][242], salt: [string][230], n: [number][242], r: [number][242], p: [number][242]}** 
--   `crypto.kdfparams.dklen` **[number][242]** 
+-   `crypto.kdfparams` **{dklen: [number][243], salt: [string][230], n: [number][243], r: [number][243], p: [number][243]}** 
+-   `crypto.kdfparams.dklen` **[number][243]** 
 -   `crypto.kdfparams.salt` **[string][230]** 
--   `crypto.kdfparams.n` **[number][242]** 
--   `crypto.kdfparams.r` **[number][242]** 
--   `crypto.kdfparams.p` **[number][242]** 
+-   `crypto.kdfparams.n` **[number][243]** 
+-   `crypto.kdfparams.r` **[number][243]** 
+-   `crypto.kdfparams.p` **[number][243]** 
 -   `crypto.mac` **[string][230]** 
 
 ## OffChainDataClientOptionsType
@@ -1349,11 +1361,11 @@ Initializes the map of OffChainDataAdapters.
 
 #### Parameters
 
--   `options` **[OffChainDataClientOptionsType][268]** 
+-   `options` **[OffChainDataClientOptionsType][269]** 
 -   `OffChainDataClientOptionsType`  
 
 
--   Throws **[OffChainDataConfigurationError][283]** when there are multiple adapters with the same name
+-   Throws **[OffChainDataConfigurationError][284]** when there are multiple adapters with the same name
 
 ### \_reset
 
@@ -1369,9 +1381,9 @@ calling the `create` function from the adapter's configuration.
 -   `schema` **[string][230]?** 
 
 
--   Throws **[OffChainDataRuntimeError][284]** when schema is not defined or adapter for this schema does not exist
+-   Throws **[OffChainDataRuntimeError][285]** when schema is not defined or adapter for this schema does not exist
 
-Returns **[OffChainDataAdapterInterface][272]** 
+Returns **[OffChainDataAdapterInterface][273]** 
 
 ## RemotelyBackedDataset
 
@@ -1432,7 +1444,7 @@ be synced from the remote storage (if the dataset is marked as deployed).
 
 Is dataset marked as obsolete?
 
-Returns **[Boolean][280]** 
+Returns **[Boolean][281]** 
 
 ### markObsolete
 
@@ -1444,7 +1456,7 @@ but merely serves as a flag to prevent further interaction with this object.
 
 Is dataset deployed to the remote storage?
 
-Returns **[Boolean][280]** 
+Returns **[Boolean][281]** 
 
 ### markDeployed
 
@@ -1462,7 +1474,7 @@ was modified locally before, the modified value will be returned.
 -   `property` **[string][230]** 
 
 
--   Throws **[RemoteDataAccessError][285]** When dataset is marked as obsolete
+-   Throws **[RemoteDataAccessError][286]** When dataset is marked as obsolete
 
 Returns **any** property's current value
 
@@ -1494,19 +1506,17 @@ object is appended to every result and onReceipt callback is added to ensure tha
 
 Generic factory method.
 
-## FieldDefType
+## ChildType
 
 Definition of a data field that is stored off-chain.
 This may be recursive.
 
-Type: {name: [string][230], isStoragePointer: [boolean][280]?, required: [boolean][280]?, fields: [Array][233]&lt;([FieldDefType][286] \| [string][230])>?}
+Type: {required: [boolean][281]?, children: ChildrenType?}
 
 ### Properties
 
--   `name` **[string][230]** 
--   `isStoragePointer` **[boolean][280]?** 
--   `required` **[boolean][280]?** 
--   `fields` **[Array][233]&lt;([FieldDefType][286] \| [string][230])>?** 
+-   `required` **[boolean][281]?** 
+-   `children` **ChildrenType?** 
 
 ## StoragePointer
 
@@ -1521,39 +1531,37 @@ It is possible to use this recursively, so you can define
 a field as another storage pointer. The configuration is
 declarative and may look like this:
 
-    const pointer = StoragePointer.createInstance('some://url', ['name', 'description']);
+    const pointer = StoragePointer.createInstance('some://url');
     pointer.ref; // contains 'some://url',
-    await pointer.contents.name;
-    await pointer.contents.description;
+    contents = await pointer.contents;
+    contents.name;
+    contents.description;
+    // etc.
 
 Or in recursive cases:
 
-    const pointer = StoragePointer.createInstance('some://url', [
-      {
-        name: 'description',
-        isStoragePointer: true,
+    const pointer = StoragePointer.createInstance('some://url', {
+      description: {
         required: false,
-        fields: ['name', 'description', 'location'],
       },
-      'signature'
-    ]);
+    });
     pointer.ref; // contains  'some://url'
-    await pointer.contents.signature;
-    const descPointer = await pointer.contents.description;
+    contents = await pointer.contents;
+    contents.signature;
+    const descPointer = contents.description;
     descPointer.ref; // contains whatever is written in a description property in a document located on 'some://url'
-    await descPointer.contents.name;
+    descContents = await descPointer.contents;
 
-The required attribute is set to true by default. However some documents might be optional
 so if you mark a storage pointer as not required, the library will not crash if the field
 is missing or nulled.
 
-Only a top-level properties have to be defined beforehand, so the `signature`
+Only subordinate storage pointers (`children`) have to be defined beforehand, so the `signature`
 field above may contain a complex JSON object.
 
 ### Parameters
 
 -   `uri` **[string][230]** where to look for the data
--   `fields` **[Array][233]&lt;[FieldDefType][286]>** definition from which are generated getters
+-   `children` **ChildrenType** subordinate storage pointers
 
 ### reset
 
@@ -1564,24 +1572,6 @@ Usable when the the off-chain data might have changed since
 the last query and the most recent version of it is needed.
 
 Returns **[Promise][238]&lt;void>** 
-
-### \_genericGetter
-
-Lazy data getter. The contents file gets downloaded only
-once any data field is accessed for the first time. Also
-the recursive `StoragePointer`s are created here only
-after the contents of the data is known, because we need
-to know the uri to be able to instantiate the appropariate
-`StoragePointer`.
-
-This behaviour might change in a way that we are able to
-swap the StoragePointer implementation during runtime.
-
-#### Parameters
-
--   `field` **[string][230]** 
-
-Returns **([StoragePointer][256] \| [Object][231])** 
 
 ### \_detectSchema
 
@@ -1599,12 +1589,12 @@ Returns **[string][230]?**
 Returns appropriate implementation of `OffChainDataAdapterInterface`
 based on schema. Uses `OffChainDataClient.getAdapter` factory method.
 
-Returns **[OffChainDataAdapterInterface][272]** 
+Returns **[OffChainDataAdapterInterface][273]** 
 
 ### \_initFromStorage
 
-Sets the internal properties (\_data, \_storagePointers)
-based on the data retrieved from the storage.
+Sets the internal \_data property based on the data retrieved from
+the storage.
 
 #### Parameters
 
@@ -1655,7 +1645,7 @@ The resulting structure mimicks the original `StoragePointer` data structure:
      If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
 
 
--   Throws **[StoragePointerError][258]** when an adapter encounters an error while accessing the data
+-   Throws **[StoragePointerError][259]** when an adapter encounters an error while accessing the data
 
 Returns **[Promise][238]&lt;{ref: [string][230], contents: [Object][231]}>** 
 
@@ -1669,9 +1659,9 @@ instance
 #### Parameters
 
 -   `uri` **[string][230]** where to look for data document. It has to include schema, i. e. `https://example.com/data`
--   `fields` **[Array][233]&lt;([FieldDefType][286] \| [string][230])>** list of top-level fields in the referred document
+-   `children` **ChildrenType** subordinate storage pointers
 
-Returns **[StoragePointer][256]** 
+Returns **[StoragePointer][257]** 
 
 ## Utils
 
@@ -1680,7 +1670,7 @@ communication with Ethereum network.
 
 ### Parameters
 
--   `gasCoefficient` **[number][242]** 
+-   `gasCoefficient` **[number][243]** 
 -   `web3` **Web3** 
 
 ### isZeroAddress
@@ -1692,7 +1682,7 @@ Returns true also for strings that are not a valid address.
 
 -   `address` **[string][230]** 
 
-Returns **[boolean][280]** 
+Returns **[boolean][281]** 
 
 ### applyGasCoefficient
 
@@ -1700,9 +1690,9 @@ Multiplies the gas with a previously configured `gasCoefficient`
 
 #### Parameters
 
--   `gas` **[number][242]** 
+-   `gas` **[number][243]** 
 
-Returns **[number][242]** 
+Returns **[number][243]** 
 
 ### getCurrentWeb3Provider
 
@@ -1714,7 +1704,7 @@ Returns **[Object][231]**
 
 Proxy method for `web3.eth.getBlockNumber`
 
-Returns **[Promise][238]&lt;[number][242]>** 
+Returns **[Promise][238]&lt;[number][243]>** 
 
 ### determineCurrentAddressNonce
 
@@ -1725,7 +1715,7 @@ Ethereum address
 
 -   `address` **[string][230]** 
 
-Returns **[Promise][238]&lt;[number][242]>** number
+Returns **[Promise][238]&lt;[number][243]>** number
 
 ### getTransactionReceipt
 
@@ -1735,7 +1725,7 @@ Proxy method for `web3.eth.getTransactionReceipt`
 
 -   `txHash` **[string][230]** 
 
-Returns **[TxReceiptInterface][275]** 
+Returns **[TxReceiptInterface][276]** 
 
 ### getTransaction
 
@@ -1753,7 +1743,7 @@ Returns an initialized instance
 
 #### Parameters
 
--   `gasCoefficient` **[number][242]** 
+-   `gasCoefficient` **[number][243]** 
 -   `web3` **Web3** instance created by `new Web3(provider)`
 
 Returns **[Contracts][236]** 
@@ -1764,7 +1754,7 @@ Web3 based wallet implementation
 
 ### Parameters
 
--   `keystoreJsonV3` **[KeystoreV3Interface][252]** 
+-   `keystoreJsonV3` **[KeystoreV3Interface][253]** 
 
 ### setWeb3
 
@@ -1779,7 +1769,7 @@ Sets up an initialized Web3 instance for later use
 It is not possible to do any operations on a destroyed
 wallet. Wallet is destroyed by calling the `destroy()` method.
 
-Returns **[boolean][280]** 
+Returns **[boolean][281]** 
 
 ### getAddress
 
@@ -1818,9 +1808,9 @@ When onReceipt callback is present, Promise is resolved after `receipt` event
 
 #### Parameters
 
--   `transactionData` **[TransactionDataInterface][276]** 
--   `eventCallbacks` **[TransactionCallbacksInterface][277]?** 
--   `optional` **[TransactionCallbacksInterface][277]** callbacks called when events come back from the network
+-   `transactionData` **[TransactionDataInterface][277]** 
+-   `eventCallbacks` **[TransactionCallbacksInterface][278]?** 
+-   `optional` **[TransactionCallbacksInterface][278]** callbacks called when events come back from the network
 
 
 -   Throws **[WalletStateError][288]** When wallet was destroyed.
@@ -1834,7 +1824,7 @@ When onReceipt callback is present, Promise is resolved after `receipt` event
 -   Throws **[InaccessibleEthereumNodeError][297]** When it seems the network is unreachable
 -   Throws **[TransactionMiningError][298]** When there's another error during the signing and mining process
 
-Returns **[Promise][238]&lt;([string][230] \| [TxReceiptInterface][275])>** transaction hash
+Returns **[Promise][238]&lt;([string][230] \| [TxReceiptInterface][276])>** transaction hash
 
 ### lock
 
@@ -1864,9 +1854,9 @@ Creates an initialized instance
 
 #### Parameters
 
--   `keystoreJsonV3` **[KeystoreV3Interface][252]** 
+-   `keystoreJsonV3` **[KeystoreV3Interface][253]** 
 
-Returns **[Wallet][253]** 
+Returns **[Wallet][254]** 
 
 [1]: #contracts
 
@@ -1928,355 +1918,355 @@ Returns **[Wallet][253]**
 
 [30]: #properties-8
 
-[31]: #rateplansinterface
+[31]: #cancellationpolicy
 
 [32]: #properties-9
 
-[33]: #rateplaninterface
+[33]: #rateplansinterface
 
 [34]: #properties-10
 
-[35]: #daterangeinterface
+[35]: #rateplaninterface
 
 [36]: #properties-11
 
-[37]: #rateplanpricemodifier
+[37]: #daterangeinterface
 
 [38]: #properties-12
 
-[39]: #rateplanrestrictions
+[39]: #rateplanpricemodifier
 
 [40]: #properties-13
 
-[41]: #datamodeloptionstype
+[41]: #rateplanrestrictions
 
 [42]: #properties-14
 
-[43]: #datamodel
+[43]: #datamodeloptionstype
 
-[44]: #parameters-6
+[44]: #properties-15
 
-[45]: #getwindingtreeindex
+[45]: #datamodel
 
-[46]: #parameters-7
+[46]: #parameters-6
 
-[47]: #gettransactionsstatus
+[47]: #getwindingtreeindex
 
-[48]: #parameters-8
+[48]: #parameters-7
 
-[49]: #createwallet
+[49]: #gettransactionsstatus
 
-[50]: #parameters-9
+[50]: #parameters-8
 
-[51]: #createinstance-1
+[51]: #createwallet
 
-[52]: #parameters-10
+[52]: #parameters-9
 
-[53]: #onchainhotel
+[53]: #createinstance-1
 
-[54]: #parameters-11
+[54]: #parameters-10
 
-[55]: #initialize
+[55]: #onchainhotel
 
-[56]: #dataindex
+[56]: #parameters-11
 
-[57]: #setlocaldata
+[57]: #initialize
 
-[58]: #parameters-12
+[58]: #dataindex
 
-[59]: #toplainobject
+[59]: #setlocaldata
 
-[60]: #parameters-13
+[60]: #parameters-12
 
-[61]: #_editinfoonchain
+[61]: #toplainobject
 
-[62]: #parameters-14
+[62]: #parameters-13
 
-[63]: #createonchaindata
+[63]: #_editinfoonchain
 
-[64]: #parameters-15
+[64]: #parameters-14
 
-[65]: #updateonchaindata
+[65]: #createonchaindata
 
-[66]: #parameters-16
+[66]: #parameters-15
 
-[67]: #transferonchainownership
+[67]: #updateonchaindata
 
-[68]: #parameters-17
+[68]: #parameters-16
 
-[69]: #removeonchaindata
+[69]: #transferonchainownership
 
-[70]: #parameters-18
+[70]: #parameters-17
 
-[71]: #createinstance-2
+[71]: #removeonchaindata
 
-[72]: #parameters-19
+[72]: #parameters-18
 
-[73]: #wtindex
+[73]: #createinstance-2
 
-[74]: #parameters-20
+[74]: #parameters-19
 
-[75]: #addhotel
+[75]: #wtindex
 
-[76]: #parameters-21
+[76]: #parameters-20
 
-[77]: #updatehotel
+[77]: #addhotel
 
-[78]: #parameters-22
+[78]: #parameters-21
 
-[79]: #removehotel
+[79]: #updatehotel
 
-[80]: #parameters-23
+[80]: #parameters-22
 
-[81]: #transferhotelownership
+[81]: #removehotel
 
-[82]: #parameters-24
+[82]: #parameters-23
 
-[83]: #gethotel
+[83]: #transferhotelownership
 
-[84]: #parameters-25
+[84]: #parameters-24
 
-[85]: #getallhotels
+[85]: #gethotel
 
-[86]: #createinstance-3
+[86]: #parameters-25
 
-[87]: #parameters-26
+[87]: #getallhotels
 
-[88]: #wtlibserror
+[88]: #createinstance-3
 
-[89]: #parameters-27
+[89]: #parameters-26
 
-[90]: #smartcontractinstantiationerror
+[90]: #wtlibserror
 
-[91]: #walleterror
+[91]: #parameters-27
 
-[92]: #malformedwalleterror
+[92]: #smartcontractinstantiationerror
 
-[93]: #walletstateerror
+[93]: #walleterror
 
-[94]: #walletpassworderror
+[94]: #malformedwalleterror
 
-[95]: #walletsigningerror
+[95]: #walletstateerror
 
-[96]: #transactionminingerror
+[96]: #walletpassworderror
 
-[97]: #outofgaserror
+[97]: #walletsigningerror
 
-[98]: #insufficientfundserror
+[98]: #transactionminingerror
 
-[99]: #transactionrevertederror
+[99]: #outofgaserror
 
-[100]: #noreceipterror
+[100]: #insufficientfundserror
 
-[101]: #inaccessibleethereumnodeerror
+[101]: #transactionrevertederror
 
-[102]: #inputdataerror
+[102]: #noreceipterror
 
-[103]: #offchaindataerror
+[103]: #inaccessibleethereumnodeerror
 
-[104]: #offchaindataconfigurationerror
+[104]: #inputdataerror
 
-[105]: #offchaindataruntimeerror
+[105]: #offchaindataerror
 
-[106]: #storagepointererror
+[106]: #offchaindataconfigurationerror
 
-[107]: #remotelybackeddataseterror
+[107]: #offchaindataruntimeerror
 
-[108]: #remotedataaccesserror
+[108]: #storagepointererror
 
-[109]: #remotedatareaderror
+[109]: #remotelybackeddataseterror
 
-[110]: #hotelnotfounderror
+[110]: #remotedataaccesserror
 
-[111]: #hotelnotinstantiableerror
+[111]: #remotedatareaderror
 
-[112]: #wtlibsoptionstype
+[112]: #hotelnotfounderror
 
-[113]: #properties-15
+[113]: #hotelnotinstantiableerror
 
-[114]: #wtlibs
+[114]: #wtlibsoptionstype
 
-[115]: #parameters-28
+[115]: #properties-16
 
-[116]: #getwtindex
+[116]: #wtlibs
 
-[117]: #parameters-29
+[117]: #parameters-28
 
-[118]: #gettransactionsstatus-1
+[118]: #getwtindex
 
-[119]: #parameters-30
+[119]: #parameters-29
 
-[120]: #createwallet-1
+[120]: #gettransactionsstatus-1
 
-[121]: #parameters-31
+[121]: #parameters-30
 
-[122]: #getoffchaindataclient
+[122]: #createwallet-1
 
-[123]: #parameters-32
+[123]: #parameters-31
 
-[124]: #createinstance-4
+[124]: #getoffchaindataclient
 
-[125]: #parameters-33
+[125]: #parameters-32
 
-[126]: #errors
+[126]: #createinstance-4
 
-[127]: #hotelonchaindatainterface
+[127]: #parameters-33
 
-[128]: #properties-16
+[128]: #errors
 
-[129]: #transactionoptionsinterface
+[129]: #hotelonchaindatainterface
 
 [130]: #properties-17
 
-[131]: #transactioncallbacksinterface
+[131]: #transactionoptionsinterface
 
 [132]: #properties-18
 
-[133]: #preparedtransactionmetadatainterface
+[133]: #transactioncallbacksinterface
 
 [134]: #properties-19
 
-[135]: #hotelinterface
+[135]: #preparedtransactionmetadatainterface
 
 [136]: #properties-20
 
-[137]: #wtindexinterface
+[137]: #hotelinterface
 
 [138]: #properties-21
 
-[139]: #offchaindataadapterinterface
+[139]: #wtindexinterface
 
 [140]: #properties-22
 
-[141]: #datamodelinterface
+[141]: #offchaindataadapterinterface
 
 [142]: #properties-23
 
-[143]: #rawlogrecordinterface
+[143]: #datamodelinterface
 
 [144]: #properties-24
 
-[145]: #decodedlogrecordinterface
+[145]: #rawlogrecordinterface
 
 [146]: #properties-25
 
-[147]: #transactiondatainterface
+[147]: #decodedlogrecordinterface
 
 [148]: #properties-26
 
-[149]: #txinterface
+[149]: #transactiondatainterface
 
 [150]: #properties-27
 
-[151]: #txreceiptinterface
+[151]: #txinterface
 
 [152]: #properties-28
 
-[153]: #adaptedtxresultinterface
+[153]: #txreceiptinterface
 
 [154]: #properties-29
 
-[155]: #adaptedtxresultsinterface
+[155]: #adaptedtxresultinterface
 
 [156]: #properties-30
 
-[157]: #walletinterface
+[157]: #adaptedtxresultsinterface
 
 [158]: #properties-31
 
-[159]: #keystorev3interface
+[159]: #walletinterface
 
 [160]: #properties-32
 
-[161]: #offchaindataclientoptionstype
+[161]: #keystorev3interface
 
 [162]: #properties-33
 
-[163]: #offchaindataclient
+[163]: #offchaindataclientoptionstype
 
-[164]: #setup
+[164]: #properties-34
 
-[165]: #parameters-34
+[165]: #offchaindataclient
 
-[166]: #_reset
+[166]: #setup
 
-[167]: #getadapter
+[167]: #parameters-34
 
-[168]: #parameters-35
+[168]: #_reset
 
-[169]: #remotelybackeddataset
+[169]: #getadapter
 
-[170]: #bindproperties
+[170]: #parameters-35
 
-[171]: #parameters-36
+[171]: #remotelybackeddataset
 
-[172]: #isobsolete
+[172]: #bindproperties
 
-[173]: #markobsolete
+[173]: #parameters-36
 
-[174]: #isdeployed
+[174]: #isobsolete
 
-[175]: #markdeployed
+[175]: #markobsolete
 
-[176]: #_genericgetter
+[176]: #isdeployed
 
-[177]: #parameters-37
+[177]: #markdeployed
 
-[178]: #_genericsetter
+[178]: #_genericgetter
 
-[179]: #parameters-38
+[179]: #parameters-37
 
-[180]: #updateremotedata
+[180]: #_genericsetter
 
-[181]: #parameters-39
+[181]: #parameters-38
 
-[182]: #createinstance-5
+[182]: #updateremotedata
 
-[183]: #fielddeftype
+[183]: #parameters-39
 
-[184]: #properties-34
+[184]: #createinstance-5
 
-[185]: #storagepointer
+[185]: #childtype
 
-[186]: #parameters-40
+[186]: #properties-35
 
-[187]: #reset
+[187]: #storagepointer
 
-[188]: #_genericgetter-1
+[188]: #parameters-40
 
-[189]: #parameters-41
+[189]: #reset
 
 [190]: #_detectschema
 
-[191]: #parameters-42
+[191]: #parameters-41
 
 [192]: #_getoffchaindataclient
 
 [193]: #_initfromstorage
 
-[194]: #parameters-43
+[194]: #parameters-42
 
 [195]: #_downloadfromstorage
 
 [196]: #toplainobject-1
 
-[197]: #parameters-44
+[197]: #parameters-43
 
 [198]: #createinstance-6
 
-[199]: #parameters-45
+[199]: #parameters-44
 
 [200]: #utils
 
-[201]: #parameters-46
+[201]: #parameters-45
 
 [202]: #iszeroaddress
 
-[203]: #parameters-47
+[203]: #parameters-46
 
 [204]: #applygascoefficient
 
-[205]: #parameters-48
+[205]: #parameters-47
 
 [206]: #getcurrentweb3provider
 
@@ -2284,27 +2274,27 @@ Returns **[Wallet][253]**
 
 [208]: #determinecurrentaddressnonce
 
-[209]: #parameters-49
+[209]: #parameters-48
 
 [210]: #gettransactionreceipt
 
-[211]: #parameters-50
+[211]: #parameters-49
 
 [212]: #gettransaction
 
-[213]: #parameters-51
+[213]: #parameters-50
 
 [214]: #createinstance-7
 
-[215]: #parameters-52
+[215]: #parameters-51
 
 [216]: #wallet
 
-[217]: #parameters-53
+[217]: #parameters-52
 
 [218]: #setweb3
 
-[219]: #parameters-54
+[219]: #parameters-53
 
 [220]: #isdestroyed
 
@@ -2312,11 +2302,11 @@ Returns **[Wallet][253]**
 
 [222]: #unlock
 
-[223]: #parameters-55
+[223]: #parameters-54
 
 [224]: #signandsendtransaction
 
-[225]: #parameters-56
+[225]: #parameters-55
 
 [226]: #lock
 
@@ -2324,7 +2314,7 @@ Returns **[Wallet][253]**
 
 [228]: #createinstance-8
 
-[229]: #parameters-57
+[229]: #parameters-56
 
 [230]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 
@@ -2350,95 +2340,95 @@ Returns **[Wallet][253]**
 
 [241]: #addressinterface
 
-[242]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[242]: #cancellationpolicy
 
-[243]: #occupancyinterface
+[243]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[244]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date
+[244]: #occupancyinterface
 
-[245]: #additionalcontact
+[245]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date
 
-[246]: #contactinterface
+[246]: #additionalcontact
 
-[247]: #daterangeinterface
+[247]: #contactinterface
 
-[248]: #rateplanpricemodifier
+[248]: #daterangeinterface
 
-[249]: #rateplanrestrictions
+[249]: #rateplanpricemodifier
 
-[250]: #datamodeloptionstype
+[250]: #rateplanrestrictions
 
-[251]: #adaptedtxresultsinterface
+[251]: #datamodeloptionstype
 
-[252]: #keystorev3interface
+[252]: #adaptedtxresultsinterface
 
-[253]: #wallet
+[253]: #keystorev3interface
 
-[254]: #datamodel
+[254]: #wallet
 
-[255]: #utils
+[255]: #datamodel
 
-[256]: #storagepointer
+[256]: #utils
 
-[257]: #hotelonchaindatainterface
+[257]: #storagepointer
 
-[258]: #storagepointererror
+[258]: #hotelonchaindatainterface
 
-[259]: #transactionoptionsinterface
+[259]: #storagepointererror
 
-[260]: #preparedtransactionmetadatainterface
+[260]: #transactionoptionsinterface
 
-[261]: #onchainhotel
+[261]: #preparedtransactionmetadatainterface
 
-[262]: #inputdataerror
+[262]: #onchainhotel
 
-[263]: #wtlibserror
+[263]: #inputdataerror
 
-[264]: #hotelinterface
+[264]: #wtlibserror
 
-[265]: #hotelnotfounderror
+[265]: #hotelinterface
 
-[266]: #hotelnotinstantiableerror
+[266]: #hotelnotfounderror
 
-[267]: #wtindex
+[267]: #hotelnotinstantiableerror
 
-[268]: #offchaindataclientoptionstype
+[268]: #wtindex
 
-[269]: #wtlibsoptionstype
+[269]: #offchaindataclientoptionstype
 
-[270]: #wtindexinterface
+[270]: #wtlibsoptionstype
 
-[271]: #walletinterface
+[271]: #wtindexinterface
 
-[272]: #offchaindataadapterinterface
+[272]: #walletinterface
 
-[273]: #wtlibs
+[273]: #offchaindataadapterinterface
 
-[274]: https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#contract-estimategas
+[274]: #wtlibs
 
-[275]: #txreceiptinterface
+[275]: https://web3js.readthedocs.io/en/1.0/web3-eth-contract.html#contract-estimategas
 
-[276]: #transactiondatainterface
+[276]: #txreceiptinterface
 
-[277]: #transactioncallbacksinterface
+[277]: #transactiondatainterface
 
-[278]: https://web3js.readthedocs.io/en/1.0/web3-eth-accounts.html#signtransaction
+[278]: #transactioncallbacksinterface
 
-[279]: http://web3js.readthedocs.io/en/1.0/web3-eth.html#gettransaction
+[279]: https://web3js.readthedocs.io/en/1.0/web3-eth-accounts.html#signtransaction
 
-[280]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[280]: http://web3js.readthedocs.io/en/1.0/web3-eth.html#gettransaction
 
-[281]: https://medium.com/@julien.m./what-is-an-ethereum-keystore-file-86c8c5917b97
+[281]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
 
-[282]: https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition
+[282]: https://medium.com/@julien.m./what-is-an-ethereum-keystore-file-86c8c5917b97
 
-[283]: #offchaindataconfigurationerror
+[283]: https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition
 
-[284]: #offchaindataruntimeerror
+[284]: #offchaindataconfigurationerror
 
-[285]: #remotedataaccesserror
+[285]: #offchaindataruntimeerror
 
-[286]: #fielddeftype
+[286]: #remotedataaccesserror
 
 [287]: #txinterface
 
