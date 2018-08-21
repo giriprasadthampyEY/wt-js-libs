@@ -158,7 +158,7 @@ describe('WTLibs usage', () => {
       const ratePlanContents = hotelDataContents.ratePlansUri;
       assert.isDefined(ratePlanContents.contents);
       assert.isDefined(ratePlanContents.ref);
-      assert.equal((await ratePlanContents.contents).ratePlans['rate-plan'].name, 'Basic');
+      assert.equal((await ratePlanContents.contents)['rate-plan'].name, 'Basic');
       assert.equal(ratePlanContents.ref, 'in-memory://rateplansone');
     });
 
@@ -176,8 +176,7 @@ describe('WTLibs usage', () => {
       assert.equal(plainHotel.dataUri.contents.descriptionUri.contents.name, 'First hotel');
       assert.isDefined(plainHotel.dataUri.contents.ratePlansUri);
       assert.isDefined(plainHotel.dataUri.contents.ratePlansUri.contents);
-      assert.isDefined(plainHotel.dataUri.contents.ratePlansUri.contents.ratePlans);
-      assert.equal(plainHotel.dataUri.contents.ratePlansUri.contents.ratePlans['rate-plan-2'].name, 'More expensive');
+      assert.equal(plainHotel.dataUri.contents.ratePlansUri.contents['rate-plan-2'].name, 'More expensive');
     });
 
     it('should throw if no hotel is found on given address', async () => {

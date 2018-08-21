@@ -24,35 +24,31 @@
     }
   },
   "rateplansone": {
-    "ratePlans": {
-      "rate-plan": {
-        "name": "Basic",
-        "description": "Generic rate plan",
-        "currency": "EUR",
-        "price": 10
-      },
-      "rate-plan-2": {
-        "name": "More expensive",
-        "description": "More expensive rate plan",
-        "currency": "EUR",
-        "price": 20
-      }
+    "rate-plan": {
+      "name": "Basic",
+      "description": "Generic rate plan",
+      "currency": "EUR",
+      "price": 10
+    },
+    "rate-plan-2": {
+      "name": "More expensive",
+      "description": "More expensive rate plan",
+      "currency": "EUR",
+      "price": 20
     }
   },
   "rateplanstwo": {
-    "ratePlans": {
-      "rate-plan": {
-        "name": "Basic",
-        "description": "Generic rate plan",
-        "currency": "EUR",
-        "price": 10
-      },
-      "rate-plan-2": {
-        "name": "More expensive",
-        "description": "More expensive rate plan",
-        "currency": "EUR",
-        "price": 20
-      }
+    "rate-plan": {
+      "name": "Basic",
+      "description": "Generic rate plan",
+      "currency": "EUR",
+      "price": 10
+    },
+    "rate-plan-2": {
+      "name": "More expensive",
+      "description": "More expensive rate plan",
+      "currency": "EUR",
+      "price": 20
     }
   }
 }
