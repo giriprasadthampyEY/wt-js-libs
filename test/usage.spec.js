@@ -55,8 +55,8 @@ describe('WTLibs usage', () => {
       assert.equal((await hotel.manager), hotelManager);
       assert.equal((await hotel.dataUri).toLowerCase(), dataUri);
       const dataIndex = await hotel.dataIndex;
-      const description = await dataIndex.contents.descriptionUri;
-      assert.equal(await description.contents.name, 'Premium hotel');
+      const description = (await dataIndex.contents).descriptionUri;
+      assert.equal((await description.contents).name, 'Premium hotel');
 
       // We're removing the hotel to ensure clean slate after this test is run.
       // It is too possibly expensive to re-set on-chain WTIndex after each test.
@@ -149,16 +149,17 @@ describe('WTLibs usage', () => {
       const hotelDataIndex = await hotel.dataIndex;
       assert.equal(hotelDataIndex.ref, await hotel.dataUri);
       assert.isDefined(hotelDataIndex.contents);
-      const descriptionContents = await hotelDataIndex.contents.descriptionUri;
+      const hotelDataContents = (await hotelDataIndex.contents);
+      const descriptionContents = hotelDataContents.descriptionUri;
       assert.isDefined(descriptionContents.contents);
       assert.isDefined(descriptionContents.ref);
-      assert.equal(await descriptionContents.contents.name, 'First hotel');
-      assert.equal(await descriptionContents.ref, 'in-memory://descriptionone');
-      const ratePlanContents = await hotelDataIndex.contents.ratePlansUri;
+      assert.equal((await descriptionContents.contents).name, 'First hotel');
+      assert.equal(descriptionContents.ref, 'in-memory://descriptionone');
+      const ratePlanContents = hotelDataContents.ratePlansUri;
       assert.isDefined(ratePlanContents.contents);
       assert.isDefined(ratePlanContents.ref);
-      assert.equal((await ratePlanContents.contents.ratePlans)['rate-plan'].name, 'Basic');
-      assert.equal(await ratePlanContents.ref, 'in-memory://rateplansone');
+      assert.equal((await ratePlanContents.contents).ratePlans['rate-plan'].name, 'Basic');
+      assert.equal(ratePlanContents.ref, 'in-memory://rateplansone');
     });
 
     it('should provide a toPlainObject method', async () => {
