@@ -19,6 +19,12 @@ export interface HotelOnChainDataInterface {
   dataUri: Promise<?string> | ?string
 }
 
+export interface PlainHotelInterface {
+  address: Promise<?string> | ?string,
+  manager: Promise<?string> | ?string,
+  dataUri: Promise<{ref: string, contents: Object}> | {ref: string, contents: Object}
+}
+
 /**
  * Ethereum transaction options that are passed from an external user.
  * It has to contain `from` and usually would contain `to` as well.
