@@ -116,7 +116,7 @@ export interface CancellationPolicy {
  * Collection of rate plans.
  */
 export interface RatePlansInterface {
-  ratePlans: Promise<?{ [id: string]: RatePlanInterface }> | ?{ [id: string]: RatePlanInterface }
+  [id: string]: RatePlanInterface
 }
 
 /**

@@ -99,36 +99,10 @@ class OnChainHotel implements HotelInterface {
   get dataIndex (): Promise<StoragePointer> {
     return (async () => {
       if (!this._dataIndex) {
-        this._dataIndex = StoragePointer.createInstance(await this.dataUri, [
-          {
-            name: 'descriptionUri',
-            isStoragePointer: true,
-            // This should always be in line with publicly declared HotelDescriptionInterface
-            fields: [
-              'location',
-              'name',
-              'description',
-              'roomTypes',
-              'contacts',
-              'address',
-              'timezone',
-              'currency',
-              'images',
-              'amenities',
-              'updatedAt',
-              'cancellationPolicies',
-            ],
-          },
-          {
-            name: 'ratePlansUri',
-            isStoragePointer: true,
-            required: false,
-            // This should always be in line with publicly declared HotelDescriptionInterface
-            fields: [
-              'ratePlans',
-            ],
-          },
-        ]);
+        this._dataIndex = StoragePointer.createInstance(await this.dataUri, {
+          descriptionUri: { required: true },
+          ratePlansUri: { required: false },
+        });
       }
       return this._dataIndex;
     })();
@@ -225,7 +199,7 @@ class OnChainHotel implements HotelInterface {
    * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
    */
   async toPlainObject (resolvedFields: ?Array<string>): Promise<PlainHotelInterface> {
-    const dataIndex = (await this.dataIndex);
+    const dataIndex = await this.dataIndex;
     const offChainData = await dataIndex.toPlainObject(resolvedFields);
     let result = {
       manager: await this.manager,
