@@ -1,6 +1,5 @@
 // @flow
-import type { TransactionOptionsInterface, TransactionCallbacksInterface, PreparedTransactionMetadataInterface, TxReceiptInterface, HotelInterface, HotelOnChainDataInterface } from '../interfaces';
-import type { PlainHotelInterface } from '../data-interfaces';
+import type { TransactionOptionsInterface, TransactionCallbacksInterface, PreparedTransactionMetadataInterface, TxReceiptInterface, HotelInterface, PlainHotelInterface, HotelOnChainDataInterface } from '../interfaces';
 import Utils from '../utils';
 import Contracts from '../contracts';
 import RemotelyBackedDataset from '../remotely-backed-dataset';
@@ -91,34 +90,18 @@ class OnChainHotel implements HotelInterface {
    * Async getter for `StoragePointer` instance.
    * Since it has to eventually access the `dataUri`
    * field stored on-chain, it is lazy loaded.
-   * Any data structure that is accessed by StoragePointer
-   * instance has for now be known beforehand, thus the whole
-   * data format of hotel data on `dataUri` is specified here.
+   *
+   * Data format of off-chain hotel data can be found on
+   * https://github.com/windingtree/wiki/blob/master/hotel-data-swagger.yaml
    *
    */
   get dataIndex (): Promise<StoragePointer> {
     return (async () => {
       if (!this._dataIndex) {
-        this._dataIndex = StoragePointer.createInstance(await this.dataUri, [
-          {
-            name: 'descriptionUri',
-            isStoragePointer: true,
-            // This should always be in line with publicly declared HotelDescriptionInterface
-            fields: [
-              'location',
-              'name',
-              'description',
-              'roomTypes',
-              'contacts',
-              'address',
-              'timezone',
-              'currency',
-              'images',
-              'amenities',
-              'updatedAt',
-            ],
-          },
-        ]);
+        this._dataIndex = StoragePointer.createInstance(await this.dataUri, {
+          descriptionUri: { required: true },
+          ratePlansUri: { required: false },
+        });
       }
       return this._dataIndex;
     })();
@@ -215,7 +198,7 @@ class OnChainHotel implements HotelInterface {
    * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
    */
   async toPlainObject (resolvedFields: ?Array<string>): Promise<PlainHotelInterface> {
-    const dataIndex = (await this.dataIndex);
+    const dataIndex = await this.dataIndex;
     const offChainData = await dataIndex.toPlainObject(resolvedFields);
     let result = {
       manager: await this.manager,

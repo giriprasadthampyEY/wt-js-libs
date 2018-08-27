@@ -8,11 +8,12 @@ import { StoragePointerError } from './errors';
  * Definition of a data field that is stored off-chain.
  * This may be recursive.
  */
-type FieldDefType = {
-  name: string,
-  isStoragePointer?: boolean,
-  fields?: Array<FieldDefType | string>
+type ChildType = {
+  required?: boolean,
+  children?: ChildrenType
 };
+
+type ChildrenType = {[string]: ChildType};
 
 /**
  * `StoragePointer` serves as a representation of an
@@ -27,40 +28,41 @@ type FieldDefType = {
  * declarative and may look like this:
  *
  * ```
- * const pointer = StoragePointer.createInstance('some://url', ['name', 'description']);
+ * const pointer = StoragePointer.createInstance('some://url');
  * pointer.ref; // contains 'some://url',
- * await pointer.contents.name;
- * await pointer.contents.description;
+ * contents = await pointer.contents;
+ * contents.name;
+ * contents.description;
+ * // etc.
  * ```
  *
  * Or in recursive cases:
  *
  * ```
- * const pointer = StoragePointer.createInstance('some://url', [
- *   {
- *     name: 'description',
- *     isStoragePointer: true,
- *     fields: ['name', 'description', 'location'],
+ * const pointer = StoragePointer.createInstance('some://url', {
+ *   description: {
+ *     required: false,
  *   },
- *   'signature'
- * ]);
+ * });
  * pointer.ref; // contains  'some://url'
- * await pointer.contents.signature;
- * const descPointer = await pointer.contents.description;
+ * contents = await pointer.contents;
+ * contents.signature;
+ * const descPointer = contents.description;
  * descPointer.ref; // contains whatever is written in a description property in a document located on 'some://url'
- * await descPointer.contents.name;
+ * descContents = await descPointer.contents;
  * ```
+ * so if you mark a storage pointer as not required, the library will not crash if the field
+ * is missing or nulled.
  *
- * Only a top-level properties have to be defined beforehand, so the `signature`
+ * Only subordinate storage pointers (`children`) have to be defined beforehand, so the `signature`
  * field above may contain a complex JSON object.
  */
 class StoragePointer {
   ref: string;
-  contents: Object;
-  _storagePointers: {[string]: StoragePointer};
+  contents: Promise<Object>;
   _downloaded: boolean;
-  _data: ?{[string]: Object};
-  _fields: Array<FieldDefType>;
+  _data: {[string]: Object};
+  _children: ?ChildrenType;
   _adapter: OffChainDataAdapterInterface;
   _downloading: ?Promise<void>;
 
@@ -71,30 +73,26 @@ class StoragePointer {
    * instance
    *
    * @param {string} uri where to look for data document. It has to include schema, i. e. `https://example.com/data`
-   * @param {Array<FieldDefType | string>} fields list of top-level fields in the referred document
+   * @param {ChildrenType} children subordinate storage pointers
    * @throw {StoragePointerError} if uri is not defined
    */
-  static createInstance (uri: ?string, fields: ?Array<FieldDefType | string>): StoragePointer {
+  static createInstance (uri: ?string, children: ?ChildrenType): StoragePointer {
     if (!uri) {
       throw new StoragePointerError('Cannot instantiate StoragePointer without uri');
     }
-    fields = fields || [];
-    const normalizedFieldDef = [];
     const uniqueFields = {};
+    children = children || {};
     
-    for (let fieldDef of fields) {
-      if (typeof fieldDef === 'string') {
-        fieldDef = {
-          name: fieldDef,
-        };
-      }
-      if (uniqueFields[fieldDef.name.toLowerCase()]) {
+    for (let fieldName in children) {
+      if (uniqueFields[fieldName.toLowerCase()]) {
         throw new StoragePointerError('Cannot create instance: Conflict in field names.');
       }
-      uniqueFields[fieldDef.name.toLowerCase()] = 1;
-      normalizedFieldDef.push(fieldDef);
+      if (children[fieldName].required === undefined) {
+        children[fieldName].required = true;
+      }
+      uniqueFields[fieldName.toLowerCase()] = 1;
     }
-    return new StoragePointer(uri, normalizedFieldDef);
+    return new StoragePointer(uri, children);
   }
 
   /**
@@ -102,27 +100,23 @@ class StoragePointer {
    * `OffChainDataAdapterInterface` implementation and sets up all data
    * getters.
    *
-   * @param  {string} uri where to look for the data
-   * @param  {Array<FieldDefType>} fields definition from which are generated getters
+   * @param {string} uri where to look for the data
+   * @param {ChildrenType} children subordinate storage pointers
    */
-  constructor (uri: string, fields: Array<FieldDefType>) {
+  constructor (uri: string, children: ChildrenType) {
     this.ref = uri;
-    this.contents = {};
-    this._storagePointers = {};
     this._downloaded = false;
-    this._data = null;
-    this._fields = fields;
+    this._data = {};
+    this._children = children || [];
+  }
 
-    for (let i = 0; i < this._fields.length; i++) {
-      let fieldDef = this._fields[i];
-      Object.defineProperty(this.contents, fieldDef.name, {
-        configurable: false,
-        enumerable: true,
-        get: async () => {
-          return this._genericGetter(fieldDef.name);
-        },
-      });
-    }
+  get contents (): {[string]: Object} {
+    return (async () => {
+      if (!this._downloaded) {
+        await this._downloadFromStorage();
+      }
+      return this._data;
+    })();
   }
 
   /**
@@ -139,27 +133,6 @@ class StoragePointer {
     // Force repeated download upon the next contents access.
     delete this._downloading;
     this._downloaded = false;
-  }
-
-  /**
-   * Lazy data getter. The contents file gets downloaded only
-   * once any data field is accessed for the first time. Also
-   * the recursive `StoragePointer`s are created here only
-   * after the contents of the data is known, because we need
-   * to know the uri to be able to instantiate the appropariate
-   * `StoragePointer`.
-   *
-   * This behaviour might change in a way that we are able to
-   * swap the StoragePointer implementation during runtime.
-   */
-  async _genericGetter (field: string): StoragePointer | Object {
-    if (!this._downloaded) {
-      await this._downloadFromStorage();
-    }
-    if (this._storagePointers[field]) {
-      return this._storagePointers[field];
-    }
-    return this._data && this._data[field];
   }
 
   /**
@@ -183,20 +156,19 @@ class StoragePointer {
   }
 
   /**
-   * Sets the internal properties (_data, _storagePointers)
-   * based on the data retrieved from the storage.
+   * Sets the internal _data property based on the data retrieved from
+   * the storage.
    */
   _initFromStorage (data: Object) {
-    this._data = data;
-    this._storagePointers = {};
-    for (let i = 0; i < this._fields.length; i++) {
-      const fieldDef = this._fields[i];
-      if (fieldDef.isStoragePointer) {
-        if (!this._data[fieldDef.name] || typeof this._data[fieldDef.name] !== 'string') {
-          const value = this._data[fieldDef.name] ? (this._data[fieldDef.name]).toString() : 'undefined';
-          throw new StoragePointerError(`Cannot access field '${fieldDef.name}' on '${value}' which does not appear to be a valid reference.`);
-        }
-        this._storagePointers[fieldDef.name] = StoragePointer.createInstance(this._data[fieldDef.name], fieldDef.fields || []);
+    this._data = Object.assign({}, data); // Copy top-level data to avoid issues with mutability.
+    for (let fieldName in this._children) {
+      const fieldDef = this._children[fieldName];
+      if (fieldDef.required && (!this._data[fieldName] || typeof this._data[fieldName] !== 'string')) {
+        const value = this._data[fieldName] ? (this._data[fieldName]).toString() : 'undefined';
+        throw new StoragePointerError(`Cannot access field '${fieldName}' on '${value}' which does not appear to be a valid reference.`);
+      }
+      if (this._data[fieldName]) {
+        this._data[fieldName] = StoragePointer.createInstance(this._data[fieldName], fieldDef.children || {});
       }
     }
   }
@@ -288,20 +260,20 @@ class StoragePointer {
     }
 
     // Put everything together
-    for (let field of this._fields) {
-      if (this._storagePointers[field.name]) {
+    let contents = await this.contents;
+    for (let fieldName in this._data) {
+      if (this._children && this._children[fieldName]) {
         // Storage pointer that the user wants to get resolved - call again for a subtree
         // OR resolve the whole subtree if no special fields are requested
-        if (!resolvedFields || currentFieldDef.hasOwnProperty(field.name)) {
-          result[field.name] = await (await this.contents[field.name]).toPlainObject(currentFieldDef[field.name]);
+        if (!resolvedFields || currentFieldDef.hasOwnProperty(fieldName)) {
+          result[fieldName] = await contents[fieldName].toPlainObject(currentFieldDef[fieldName]);
         } else { // Unresolved storage pointer, return a URI
-          result[field.name] = this._storagePointers[field.name].ref;
+          result[fieldName] = this._data[fieldName].ref;
         }
       } else {
-        const currentValue = await this.contents[field.name];
         // Do not fabricate undefined fields if they are actually missing in the source data
-        if (this._data && this._data.hasOwnProperty(field.name)) {
-          result[field.name] = currentValue;
+        if (this._data && this._data.hasOwnProperty(fieldName)) {
+          result[fieldName] = contents[fieldName];
         }
       }
     }
