@@ -7,6 +7,7 @@ cache:
     - $HOME/.npm
 node_js:
 - 10.3.0
+install: case $TRAVIS_BRANCH in greenkeeper*) npm i;; *) npm ci;; esac;
 jobs:
   include:
   - stage: test
