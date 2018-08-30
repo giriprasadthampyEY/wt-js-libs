@@ -1,5 +1,7 @@
 # Winding Tree Javascript Libraries for Hotels
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/windingtree/wt-js-libs.svg)](https://greenkeeper.io/)
+
 A JS interface to WindingTree's Ethereum smart-contracts for Hotels.
 
 ## Installation
