@@ -101,6 +101,7 @@ class OnChainHotel implements HotelInterface {
         this._dataIndex = StoragePointer.createInstance(await this.dataUri, {
           descriptionUri: { required: true },
           ratePlansUri: { required: false },
+          availabilityUri: { required: false },
         });
       }
       return this._dataIndex;
