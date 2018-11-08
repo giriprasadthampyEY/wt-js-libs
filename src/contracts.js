@@ -19,6 +19,7 @@ class Contracts {
 
   constructor (web3) {
     this.web3 = web3;
+    this.contractsCache = {};
   }
 
   /**
@@ -35,11 +36,14 @@ class Contracts {
     if (!this.web3.utils.isAddress(address)) {
       throw new SmartContractInstantiationError('Cannot get ' + name + ' instance at an invalid address ' + address);
     }
-    const deployedCode = await this.web3.eth.getCode(address);
-    if (deployedCode === '0x0') {
-      throw new SmartContractInstantiationError('Cannot get ' + name + ' instance at an address with no code on ' + address);
+    if (!this.contractsCache[`${name}:${address}`]) {
+      const deployedCode = await this.web3.eth.getCode(address);
+      if (deployedCode === '0x0') {
+        throw new SmartContractInstantiationError('Cannot get ' + name + ' instance at an address with no code on ' + address);
+      }
+      this.contractsCache[`${name}:${address}`] = new this.web3.eth.Contract(abi, address);
     }
-    return new this.web3.eth.Contract(abi, address);
+    return this.contractsCache[`${name}:${address}`];
   }
 
   /**
