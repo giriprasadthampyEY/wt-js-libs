@@ -1,6 +1,5 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import Web3 from 'web3';
 import Contracts from '../../src/contracts';
 import { SmartContractInstantiationError } from '../../src/errors';
 
@@ -10,14 +9,12 @@ describe('WTLibs.Contracts', () => {
   beforeEach(() => {
     getCodeStub = sinon.stub().resolves('0x01');
     ContractStub = sinon.spy();
-    let web3 = new Web3();
-    web3.eth.getCode = getCodeStub;
-    web3.eth.Contract = ContractStub;
-    contracts = Contracts.createInstance(web3);
+    contracts = Contracts.createInstance('http://localhost:8545');
+    contracts.web3Eth.getCode = getCodeStub;
+    contracts.web3Eth.Contract = ContractStub;
   });
 
   it('should throw on an invalid address', async () => {
-    sinon.stub(contracts.web3.utils, 'isAddress').returns(false);
     try {
       await contracts._getInstance('some', {}, 'address');
       throw new Error('should not have been called');
@@ -25,11 +22,10 @@ describe('WTLibs.Contracts', () => {
       assert.match(e.message, /at an invalid address/i);
       assert.instanceOf(e, SmartContractInstantiationError);
     }
-    contracts.web3.utils.isAddress.restore();
   });
 
   it('should throw if no code exists on the address', async () => {
-    contracts.web3.eth.getCode = sinon.stub().returns('0x0');
+    contracts.web3Eth.getCode = sinon.stub().returns('0x0');
     try {
       await contracts._getInstance('some', {}, '0x36bbf6b87d1a770edd5d64145cc617385c66885d');
       throw new Error('should not have been called');

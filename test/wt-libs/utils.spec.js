@@ -1,13 +1,12 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import Utils from '../../src/utils';
-import Web3 from 'web3';
 
 describe('WTLibs.Utils', () => {
   let utils;
 
   beforeEach(() => {
-    utils = Utils.createInstance(3, new Web3('http://localhost:8545'));
+    utils = Utils.createInstance(3, 'http://localhost:8545');
   });
 
   describe('isZeroAddress', () => {
@@ -34,17 +33,18 @@ describe('WTLibs.Utils', () => {
     });
   });
 
-  describe('getCurrentWeb3Provider', () => {
-    it('should return current web3 provider', () => {
-      assert.equal(utils.getCurrentWeb3Provider().host, 'http://localhost:8545');
+  describe('checkAddressChecksum', () => {
+    it('should return if the address is properly checksummed', () => {
+      assert.equal(utils.checkAddressChecksum('0x8C2373842D5EA4Ce4Baf53f4175e5e42a364c59C'), true);
+      assert.equal(utils.checkAddressChecksum('0x8c2373842d5ea4Ce4baf53f4175e5e42a364c59c'), false);
     });
   });
 
   describe('determineCurrentAddressNonce', () => {
     it('should return transaction count', async () => {
-      sinon.stub(utils.web3.eth, 'getTransactionCount').returns(6);
+      sinon.stub(utils.web3Eth, 'getTransactionCount').returns(6);
       assert.equal(await utils.determineCurrentAddressNonce('0x8c2373842d5ea4ce4baf53f4175e5e42a364c59c'), 6);
-      utils.web3.eth.getTransactionCount.restore();
+      utils.web3Eth.getTransactionCount.restore();
     });
   });
 });

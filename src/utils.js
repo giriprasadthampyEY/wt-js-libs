@@ -1,7 +1,8 @@
 // @flow
 
 import type { TxReceiptInterface, TxInterface } from './interfaces';
-import Web3 from 'web3';
+import Web3Eth from 'web3-eth';
+import Web3Utils from 'web3-utils';
 
 /**
  * Collection of utility methods useful during
@@ -9,22 +10,26 @@ import Web3 from 'web3';
  */
 class Utils {
   gasCoefficient: number;
-  web3: Web3;
+  provider: string | Object;
+  web3Eth: Web3Eth;
 
   /**
    * Returns an initialized instance
+   *
    * @parameters {number} gasCoefficient is a constant that can be applied to any
    * ethereum transaction to ensure it will be mined.
-   * @param  {Web3} web3 instance created by `new Web3(provider)`
-   * @return {Contracts}
+   * @param  {number} gasCoefficient which is applied to every transaction
+   * @param  {string|Object} web3 instance provider used to create web3-eth
+   * @return {Utils}
    */
-  static createInstance (gasCoefficient: number, web3: Web3): Utils {
-    return new Utils(gasCoefficient, web3);
+  static createInstance (gasCoefficient: number, provider: string | Object): Utils {
+    return new Utils(gasCoefficient, provider);
   }
 
-  constructor (gasCoefficient: number, web3: Web3) {
+  constructor (gasCoefficient: number, provider: string | Object) {
     this.gasCoefficient = gasCoefficient;
-    this.web3 = web3;
+    this.provider = provider;
+    this.web3Eth = new Web3Eth(provider);
   }
 
   /**
@@ -34,7 +39,7 @@ class Utils {
    * @return {boolean}
    */
   isZeroAddress (address: string): boolean {
-    if (!address || !this.web3.utils.isAddress(address)) {
+    if (!address || !Web3Utils.isAddress(address)) {
       return true;
     }
     return String(address) === '0x0000000000000000000000000000000000000000';
@@ -53,17 +58,17 @@ class Utils {
   }
 
   /**
-   * Proxy method for `web3.currentProvider`
-   */
-  getCurrentWeb3Provider (): Object {
-    return this.web3.currentProvider;
-  }
-
-  /**
    * Proxy method for `web3.eth.getBlockNumber`
    */
   async getCurrentBlockNumber (): Promise<number> {
-    return this.web3.eth.getBlockNumber();
+    return this.web3Eth.getBlockNumber();
+  }
+
+  /**
+   * Proxy method for `web3.eth.checkAddressChecksum`
+   */
+  checkAddressChecksum (address: string): boolean {
+    return Web3Utils.checkAddressChecksum(address);
   }
 
   /**
@@ -74,7 +79,7 @@ class Utils {
    * @return number
    */
   async determineCurrentAddressNonce (address: string): Promise<number> {
-    return this.web3.eth.getTransactionCount(address);
+    return this.web3Eth.getTransactionCount(address);
   }
 
   /**
@@ -84,14 +89,14 @@ class Utils {
    * @return {TxReceiptInterface}
    */
   async getTransactionReceipt (txHash: string): Promise<TxReceiptInterface> {
-    return this.web3.eth.getTransactionReceipt(txHash);
+    return this.web3Eth.getTransactionReceipt(txHash);
   }
 
   /**
    * Proxy method for `web3.eth.getTransaction`
    */
   async getTransaction (txHash: string): Promise<TxInterface> {
-    return this.web3.eth.getTransaction(txHash);
+    return this.web3Eth.getTransaction(txHash);
   }
 }
 

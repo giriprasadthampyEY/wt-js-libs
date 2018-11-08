@@ -1,5 +1,7 @@
 // @flow
-import Web3 from 'web3';
+import Web3Utils from 'web3-utils';
+import Web3Eth from 'web3-eth';
+
 import type { WalletInterface, KeystoreV3Interface, TransactionDataInterface, TransactionCallbacksInterface, TxReceiptInterface } from './interfaces';
 import {
   WalletError,
@@ -16,13 +18,13 @@ import {
 } from './errors';
 
 /**
- * Web3 based wallet implementation
+ * web3-eth based wallet implementation
  */
 class Wallet implements WalletInterface {
   _destroyedFlag: boolean;
   _jsonWallet: ?KeystoreV3Interface;
   _account: ?Object;
-  web3: Web3;
+  web3Eth: Web3Eth;
 
   /**
    * Creates an initialized instance
@@ -37,10 +39,10 @@ class Wallet implements WalletInterface {
   }
 
   /**
-   * Sets up an initialized Web3 instance for later use
+   * Sets up an initialized web3-eth instance for later use
    */
-  setWeb3 (web3: Web3) {
-    this.web3 = web3;
+  setupWeb3Eth (provider: string | Object) {
+    this.web3Eth = new Web3Eth(provider);
   }
 
   /**
@@ -66,7 +68,7 @@ class Wallet implements WalletInterface {
     if (!this._jsonWallet || !this._jsonWallet.address) {
       throw new WalletStateError('Cannot get address from a non existing keystore.');
     }
-    return this.web3.utils.toChecksumAddress(this._jsonWallet.address);
+    return Web3Utils.toChecksumAddress(this._jsonWallet.address);
   }
 
   /**
@@ -74,21 +76,21 @@ class Wallet implements WalletInterface {
    * there is a readable privateKey stored in memory!</strong>
    *
    * @throws {WalletStateError} When wallet was destroyed.
-   * @throws {WalletStateError} When there is no web3 instance configured.
+   * @throws {WalletStateError} When there is no web3-eth instance configured.
    * @throws {WalletPasswordError} When wallet cannot be decrypted.
-   * @throws {MalformedWalletError} When wallet format is not recognized by web3.
+   * @throws {MalformedWalletError} When wallet format is not recognized by web3-eth.
    * @throws {WalletError} When anything else breaks down during decryption. But
-   * that should actually never happen unless the web3 implementation is changed.
+   * that should actually never happen unless the web3-eth implementation is changed.
    */
   unlock (password: string) {
     if (this.isDestroyed()) {
       throw new WalletStateError('Cannot unlock destroyed wallet.');
     }
-    if (!this.web3) {
-      throw new WalletStateError('Cannot unlock wallet without web3 instance.');
+    if (!this.web3Eth) {
+      throw new WalletStateError('Cannot unlock wallet without web3Eth instance (call setupWeb3Eth first).');
     }
     try {
-      this._account = this.web3.eth.accounts.decrypt(this._jsonWallet, password);
+      this._account = this.web3Eth.accounts.decrypt(this._jsonWallet, password);
     } catch (e) {
       if (e && e.message) {
         // Tihs heavily relies on web3-eth-accounts implementation
@@ -110,7 +112,7 @@ class Wallet implements WalletInterface {
    * When onReceipt callback is present, Promise is resolved after `receipt` event
    *
    * @throws {WalletStateError} When wallet was destroyed.
-   * @throws {WalletStateError} When there is no web3 instance configured.
+   * @throws {WalletStateError} When there is no web3-eth instance configured.
    * @throws {WalletStateError} When wallet is not unlocked.
    * @throws {WalletSigningError} When transaction.from does not match the wallet account.
    * @throws {NoReceiptError} When there are issues with getting a transaction receipt.
@@ -127,8 +129,8 @@ class Wallet implements WalletInterface {
     if (this.isDestroyed()) {
       throw new WalletStateError('Cannot use destroyed wallet.');
     }
-    if (!this.web3) {
-      throw new WalletStateError('Cannot use wallet without web3 instance.');
+    if (!this.web3Eth) {
+      throw new WalletStateError('Cannot use wallet without web3Eth instance (call setupWeb3Eth first).');
     }
     if (!this._account) {
       throw new WalletStateError('Cannot use wallet without unlocking it first.');
@@ -140,7 +142,7 @@ class Wallet implements WalletInterface {
     try {
       const signedTx = await this._account.signTransaction(transactionData);
       return new Promise(async (resolve, reject) => {
-        return this.web3.eth.sendSignedTransaction(signedTx.rawTransaction)
+        return this.web3Eth.sendSignedTransaction(signedTx.rawTransaction)
           .on('transactionHash', (hash) => {
             if (eventCallbacks && eventCallbacks.onTransactionHash) {
               eventCallbacks.onTransactionHash(hash);
