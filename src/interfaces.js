@@ -258,7 +258,6 @@ export interface WalletInterface {
 export interface KeystoreV3Interface {
   version: number,
   id: string,
-  address: string,
   crypto: {
     ciphertext: string,
     cipherparams: {

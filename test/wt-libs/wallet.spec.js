@@ -148,10 +148,6 @@ describe('WTLibs.Wallet', () => {
       wallet = dataModel.createWallet(jsonWallet);
     });
 
-    it('should return the address', () => {
-      assert.equal(wallet.getAddress().toLowerCase(), '0x' + jsonWallet.address);
-    });
-
     it('should throw when no JSON wallet exists', () => {
       wallet._jsonWallet = null;
       try {
@@ -172,6 +168,33 @@ describe('WTLibs.Wallet', () => {
         assert.match(e.message, /cannot get address/i);
         assert.instanceOf(e, WalletStateError);
       }
+    });
+
+    it('should throw when JSON wallet does not contain address', () => {
+      try {
+        wallet.getAddress();
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /cannot get address/i);
+        assert.instanceOf(e, WalletStateError);
+      }
+    });
+
+    it('should not return the address when in JSON file', () => {
+      wallet._jsonWallet.address = 'd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906';
+      try {
+        wallet.getAddress();
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /cannot get address/i);
+        assert.instanceOf(e, WalletStateError);
+      }
+    });
+
+    it('should return the proper address from an unlocked wallet', () => {
+      wallet._jsonWallet.address = 'somethingRandom';
+      wallet.unlock(correctPassword);
+      assert.equal(wallet.getAddress().toLowerCase(), '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906');
     });
   });
 

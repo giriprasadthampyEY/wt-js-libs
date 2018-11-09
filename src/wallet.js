@@ -54,21 +54,26 @@ class Wallet implements WalletInterface {
   }
 
   /**
-   * Returns the address passed in `keystoreJsonV3`
+   * Returns the address of the account passed in JSON
    * in a checksummed format, e.g. prefixed with 0x
-   * and case-sensitive.
+   * and case-sensitive. Works only in an unlocked state,
+   * because all other methods are unreliable.
    *
    * @throws {WalletStateError} When wallet was destroyed.
-   * @throws {WalletStateError} When there's no keystore
+   * @throws {WalletStateError} When wallet is not unlocked.
+   * @throws {WalletStateError} When there's no keystore.
    */
   getAddress (): string {
     if (this.isDestroyed()) {
       throw new WalletStateError('Cannot get address of a destroyed wallet.');
     }
-    if (!this._jsonWallet || !this._jsonWallet.address) {
+    if (!this._jsonWallet) {
       throw new WalletStateError('Cannot get address from a non existing keystore.');
     }
-    return Web3Utils.toChecksumAddress(this._jsonWallet.address);
+    if (!this._account) {
+      throw new WalletStateError('Cannot get address from a locked keystore.');
+    }
+    return Web3Utils.toChecksumAddress(this._account.address);
   }
 
   /**
