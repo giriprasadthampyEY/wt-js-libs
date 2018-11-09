@@ -55,7 +55,12 @@ fi
 # migrate contracts
 ./node_modules/.bin/truffle migrate --network development
 # Fire up the application
-npm run test-runner &
+if [ "$1" = "--watch" ]; then
+  npm run test-runner-watch &
+else
+  npm run test-runner &
+fi
+
 npm_pid=$!
 # And let ganache running
 wait $npm_pid

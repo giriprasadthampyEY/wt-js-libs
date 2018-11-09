@@ -42,13 +42,13 @@ describe('WTLibs.Wallet', () => {
       }
     });
 
-    it('should not unlock a wallet without web3', async () => {
+    it('should not unlock a wallet without web3Eth', async () => {
       const wallet = Web3WTWallet.createInstance(jsonWallet);
       try {
         wallet.unlock(correctPassword);
         throw new Error('should not have been called');
       } catch (e) {
-        assert.match(e.message, /cannot unlock wallet without web3 instance/i);
+        assert.match(e.message, /cannot unlock wallet without web3Eth instance/i);
         assert.instanceOf(e, WalletStateError);
       }
     });
@@ -179,11 +179,11 @@ describe('WTLibs.Wallet', () => {
     let wallet, sendStub;
     beforeEach(async function () {
       wallet = dataModel.createWallet(jsonWallet);
-      sendStub = sinon.stub(wallet.web3.eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent());
+      sendStub = sinon.stub(wallet.web3Eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent());
     });
 
     afterEach(() => {
-      wallet.web3.eth.sendSignedTransaction.restore();
+      wallet.web3Eth.sendSignedTransaction.restore();
     });
 
     it('should throw on a destroyed wallet', async () => {
@@ -207,14 +207,14 @@ describe('WTLibs.Wallet', () => {
       }
     });
 
-    it('should throw on a wallet without web3', async () => {
+    it('should throw on a wallet without web3Eth', async () => {
       const customWallet = dataModel.createWallet(jsonWallet);
-      customWallet.web3 = null;
+      customWallet.web3Eth = null;
       try {
         await customWallet.signAndSendTransaction({});
         throw new Error('should not have been called');
       } catch (e) {
-        assert.match(e.message, /cannot use wallet without web3 instance/i);
+        assert.match(e.message, /cannot use wallet without web3Eth instance/i);
         assert.instanceOf(e, WalletStateError);
       }
     });
@@ -312,8 +312,8 @@ describe('WTLibs.Wallet', () => {
       return async () => {
         wallet.unlock(correctPassword);
         sinon.stub(wallet._account, 'signTransaction').resolves({ rawTransaction: 'tx-bytecode' });
-        wallet.web3.eth.sendSignedTransaction.restore();
-        sinon.stub(wallet.web3.eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent(errorSetup));
+        wallet.web3Eth.sendSignedTransaction.restore();
+        sinon.stub(wallet.web3Eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent(errorSetup));
         try {
           await wallet.signAndSendTransaction({
             from: '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906',

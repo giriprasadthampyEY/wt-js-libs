@@ -1,6 +1,5 @@
 // @flow
 
-import Web3 from 'web3';
 import Utils from '../utils';
 import Contracts from '../contracts';
 import type { DataModelInterface, AdaptedTxResultInterface, AdaptedTxResultsInterface, KeystoreV3Interface } from '../interfaces';
@@ -19,7 +18,7 @@ import Wallet from '../wallet';
  */
 export type DataModelOptionsType = {
   // URL of currently used RPC provider for Web3.
-  provider?: string | Object,
+  provider: string | Object,
   // Gas coefficient that is used as a multiplier when setting
   // a transaction gas.
   gasCoefficient?: number
@@ -30,7 +29,6 @@ export type DataModelOptionsType = {
  */
 class DataModel implements DataModelInterface {
   options: DataModelOptionsType;
-  web3Instance: Web3;
   web3Utils: Utils;
   web3Contracts: Contracts;
   _wtIndexCache: {[address: string]: WTIndexDataProvider};
@@ -43,15 +41,14 @@ class DataModel implements DataModelInterface {
   }
 
   /**
-   * Creates a new Web3 instance for given provider,
-   * sets up Utils and Contracts.
+   * Sets up Utils and Contracts with given web3 provider. Sets
+   * up gasCoefficient which defaults to 2.
    */
   constructor (options: DataModelOptionsType) {
     this.options = options || {};
     this.options.gasCoefficient = this.options.gasCoefficient || 2;
-    this.web3Instance = new Web3(this.options.provider);
-    this.web3Utils = Utils.createInstance(this.options.gasCoefficient, this.web3Instance);
-    this.web3Contracts = Contracts.createInstance(this.web3Instance);
+    this.web3Utils = Utils.createInstance(this.options.gasCoefficient, this.options.provider);
+    this.web3Contracts = Contracts.createInstance(this.options.provider);
     this._wtIndexCache = {};
   }
 
@@ -116,7 +113,7 @@ class DataModel implements DataModelInterface {
    */
   createWallet (jsonWallet: KeystoreV3Interface): Wallet {
     const wallet = Wallet.createInstance(jsonWallet);
-    wallet.setWeb3(this.web3Instance);
+    wallet.setupWeb3Eth(this.options.provider);
     return wallet;
   }
 };

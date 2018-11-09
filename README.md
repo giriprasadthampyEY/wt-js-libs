@@ -115,3 +115,16 @@ utilities. The only actual method used in the wt-js-libs internals is `download`
 ## Test
 
 To run unit tests, run `npm test`.
+
+## Update notifications
+
+Ideally, in addition to storing the data on the WT platform, the
+WT Notification API should be used to immediately broadcast any data
+changes to interested data consumers. For various reasons, the
+wt-js-libs library does not implement this functionality. You
+should make yourself familiar with the concept and documentation
+at [https://github.com/windingtree/wt-notification-api](https://github.com/windingtree/wt-notification-api)
+and make sure to publish the notifications when appropriate. If
+you do not do this, things will still work but the consumers
+might take a significantly longer time to learn about the latest
+changes you made.

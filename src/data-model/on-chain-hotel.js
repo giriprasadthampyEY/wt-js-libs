@@ -214,7 +214,7 @@ class OnChainHotel implements HotelInterface {
       throw new SmartContractInstantiationError('Cannot get hotel instance without address');
     }
     if (!this.contractInstance) {
-      this.contractInstance = await this.web3Contracts.getHotelInstance(this.address, this.web3Utils.getCurrentWeb3Provider());
+      this.contractInstance = await this.web3Contracts.getHotelInstance(this.address);
     }
     return this.contractInstance;
   }
