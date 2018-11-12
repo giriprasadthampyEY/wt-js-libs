@@ -14,6 +14,7 @@ import {
   OutOfGasError,
   InsufficientFundsError,
   TransactionRevertedError,
+  TransactionDidNotComeThroughError,
   NoReceiptError,
   InaccessibleEthereumNodeError,
 } from '../../src/errors';
@@ -382,6 +383,13 @@ describe('WTLibs.Wallet', () => {
     it('should reject with TransactionRevertedError', async () => {
       await _makeErrorTestCase({ error: 'Transaction has been reverted by the EVM' }, TransactionRevertedError)();
       await _makeErrorTestCase({ catch: 'Transaction has been reverted by the EVM' }, TransactionRevertedError)();
+    });
+
+    it('should reject with TransactionDidNotComeThroughError', async () => {
+      await _makeErrorTestCase({ error: 'replacement transaction underpriced' }, TransactionDidNotComeThroughError)();
+      await _makeErrorTestCase({ catch: 'replacement transaction underpriced' }, TransactionDidNotComeThroughError)();
+      await _makeErrorTestCase({ error: 'known transaction: 14b03e6aefa8ef94fcdff05b7adc9eaf4c88ce15c6d33b3326fa9bd6f15829ab' }, TransactionDidNotComeThroughError)();
+      await _makeErrorTestCase({ catch: 'known transaction: 14b03e6aefa8ef94fcdff05b7adc9eaf4c88ce15c6d33b3326fa9bd6f15829ab' }, TransactionDidNotComeThroughError)();
     });
 
     it('should reject with InaccessibleEthereumNodeError', async () => {

@@ -73,6 +73,13 @@ export class InsufficientFundsError extends TransactionMiningError {}
 export class TransactionRevertedError extends TransactionMiningError {}
 
 /**
+ * Transaction did not go into mining at all. It might be due to
+ * an existing transaction with the same ID or because you tried
+ * to replace an existing transaction with less gas.
+ */
+export class TransactionDidNotComeThroughError extends TransactionMiningError {}
+
+/**
  * There was a problem with getting a transaction receipt (network issue,
  * timeout, small gasPrice). It does not necessarily mean that the
  * transaction was not mined. You should probably check for it by other means.

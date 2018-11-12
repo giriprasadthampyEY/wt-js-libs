@@ -13,6 +13,7 @@ import {
   OutOfGasError,
   InsufficientFundsError,
   TransactionRevertedError,
+  TransactionDidNotComeThroughError,
   NoReceiptError,
   InaccessibleEthereumNodeError,
 } from './errors';
@@ -182,6 +183,9 @@ class Wallet implements WalletInterface {
       }
       if (originalError.message.match(/Transaction has been reverted by the EVM/i)) {
         return new TransactionRevertedError('Transaction reverted', originalError);
+      }
+      if (originalError.message.match(/(known transaction)|(replacement transaction underpriced)/i)) {
+        return new TransactionDidNotComeThroughError('Transaction did not come through', originalError);
       }
       if (originalError.message.match(/(insufficient funds for gas)|(have enough funds to send tx)/i)) {
         return new InsufficientFundsError('Not enough funds', originalError);
