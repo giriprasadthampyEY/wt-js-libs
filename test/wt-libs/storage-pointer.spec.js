@@ -85,6 +85,13 @@ describe('WTLibs.StoragePointer', () => {
       });
       assert.equal(pointer._children.sp.required, false);
     });
+
+    it('should properly setup nested', () => {
+      const pointer = StoragePointer.createInstance('in-memory://url', {
+        sp: { nested: true },
+      });
+      assert.equal(pointer._children.sp.nested, true);
+    });
   });
 
   describe('data downloading', () => {
@@ -166,6 +173,26 @@ describe('WTLibs.StoragePointer', () => {
       assert.isDefined(recursivePointer.contents);
     });
 
+    it('should work well with nested storage pointers', async () => {
+      const pointer = StoragePointer.createInstance('in-memory://url', { sp: { nested: true } });
+      sinon.stub(pointer, '_getOffChainDataClient').returns({
+        download: sinon.stub().returns({
+          'sp': {
+            key1: 'in-memory://point1',
+            key2: 'in-memory://point2',
+          },
+        }),
+      });
+      assert.equal(pointer.ref, 'in-memory://url');
+      const sp = (await pointer.contents).sp;
+      assert.equal(sp.key1.constructor.name, 'StoragePointer');
+      assert.equal(sp.key2.constructor.name, 'StoragePointer');
+      assert.equal(sp.key1.ref, 'in-memory://point1');
+      assert.equal(sp.key2.ref, 'in-memory://point2');
+      assert.isDefined(sp.key1.contents);
+      assert.isDefined(sp.key2.contents);
+    });
+
     it('should not panic if a non-required recursive StoragePointer is missing', async () => {
       const pointer = StoragePointer.createInstance('in-memory://url', {
         sp: { required: false },
@@ -182,7 +209,7 @@ describe('WTLibs.StoragePointer', () => {
         await pointer.contents;
         throw new Error('should have never been called');
       } catch (e) {
-        assert.match(e.message, /which does not appear to be a valid reference/i);
+        assert.match(e.message, /which is required/i);
       }
     });
 
@@ -197,7 +224,25 @@ describe('WTLibs.StoragePointer', () => {
         await pointer.contents;
         throw new Error('should have never been called');
       } catch (e) {
-        assert.match(e.message, /which does not appear to be a valid reference/i);
+        assert.match(e.message, /which does not appear to be of type string/i);
+      }
+    });
+
+    it('should throw if recursive nested StoragePointer cannot be set up due to a malformed pointer value', async () => {
+      try {
+        const pointer = StoragePointer.createInstance('in-memory://url', { sp: { nested: true } });
+        sinon.stub(pointer, '_getOffChainDataClient').returns({
+          download: sinon.stub().returns({
+            'sp': {
+              key1: { dummy: 'dummy' },
+              key2: { dummy: 'dummy' },
+            },
+          }),
+        });
+        await pointer.contents;
+        throw new Error('should have never been called');
+      } catch (e) {
+        assert.match(e.message, /which does not appear to be of type string/i);
       }
     });
 
@@ -250,12 +295,23 @@ describe('WTLibs.StoragePointer', () => {
   });
 
   describe('toPlainObject', () => {
-    let pointer, hashLevelZero, hashLevelOne, hashLevelTwo, hashLevelThree;
+    let pointer, hashKey1, hashKey2, hashLevelZero, hashLevelOne, hashLevelTwo, hashLevelThree;
     before(() => {
+      hashKey1 = InMemoryAdapter.storageInstance.create({ value: 'value1' });
+      hashKey2 = InMemoryAdapter.storageInstance.create({ value: 'value2' });
       hashLevelThree = InMemoryAdapter.storageInstance.create({ below: 'cows', above: 'sheep' });
       hashLevelTwo = InMemoryAdapter.storageInstance.create({ one: 'bunny', two: 'frogs', below: `in-memory://${hashLevelThree}` });
       hashLevelOne = InMemoryAdapter.storageInstance.create({ three: 'dogs', four: 'donkeys', five: `in-memory://${hashLevelTwo}` });
-      hashLevelZero = InMemoryAdapter.storageInstance.create({ six: 'horses', seven: 'cats', eight: `in-memory://${hashLevelOne}`, nine: `in-memory://${hashLevelTwo}` });
+      hashLevelZero = InMemoryAdapter.storageInstance.create({
+        six: 'horses',
+        seven: 'cats',
+        eight: `in-memory://${hashLevelOne}`,
+        nine: `in-memory://${hashLevelTwo}`,
+        ten: {
+          key1: `in-memory://${hashKey1}`,
+          key2: `in-memory://${hashKey2}`,
+        },
+      });
       pointer = StoragePointer.createInstance(`in-memory://${hashLevelZero}`, {
         eight: {
           children: {
@@ -271,6 +327,7 @@ describe('WTLibs.StoragePointer', () => {
             below: {},
           },
         },
+        ten: { nested: true },
       });
     });
 
@@ -288,6 +345,8 @@ describe('WTLibs.StoragePointer', () => {
       assert.equal(pojo.contents.nine.contents.two, 'frogs');
       assert.equal(pojo.contents.nine.contents.below.contents.below, 'cows');
       assert.equal(pojo.contents.nine.contents.below.contents.above, 'sheep');
+      assert.equal(pojo.contents.ten.key1.contents.value, 'value1');
+      assert.equal(pojo.contents.ten.key2.contents.value, 'value2');
     });
 
     it('should limit resolved fields', async () => {
@@ -302,6 +361,10 @@ describe('WTLibs.StoragePointer', () => {
       assert.equal(pojo.contents.eight.contents.five.contents.below.contents.below, 'cows');
       assert.equal(pojo.contents.eight.contents.five.contents.below.contents.above, 'sheep');
       assert.equal(pojo.contents.nine, `in-memory://${hashLevelTwo}`);
+      assert.deepEqual(pojo.contents.ten, {
+        key1: `in-memory://${hashKey1}`,
+        key2: `in-memory://${hashKey2}`,
+      });
     });
 
     it('should resolve multiple recursive fields', async () => {
@@ -350,6 +413,12 @@ describe('WTLibs.StoragePointer', () => {
       assert.equal(pojo2.contents.eight.contents.five.contents.two, 'frogs');
       assert.equal(pojo.contents.eight.contents.five.contents.below.contents.below, 'cows');
       assert.equal(pojo.contents.eight.contents.five.contents.below.contents.above, 'sheep');
+    });
+
+    it('should resolve a `nested` pointer', async () => {
+      const pojo = await pointer.toPlainObject(['ten']);
+      assert.deepEqual(pojo.contents.ten.key1.contents, { value: 'value1' });
+      assert.deepEqual(pojo.contents.ten.key2.contents, { value: 'value2' });
     });
 
     it('should allow the user to not resolve any field', async () => {
