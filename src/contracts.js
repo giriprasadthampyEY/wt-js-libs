@@ -44,7 +44,7 @@ class Contracts {
     }
     if (!this.contractsCache[`${name}:${address}`]) {
       const deployedCode = await this.web3Eth.getCode(address);
-      if (deployedCode === '0x0') {
+      if (deployedCode === '0x0' || deployedCode === '0x') {
         throw new SmartContractInstantiationError('Cannot get ' + name + ' instance at an address with no code on ' + address);
       }
       this.contractsCache[`${name}:${address}`] = new this.web3Eth.Contract(abi, address);
