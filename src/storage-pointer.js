@@ -10,6 +10,8 @@ import { StoragePointerError } from './errors';
  */
 type ChildType = {
   required?: boolean,
+  // If `nested` is true, we assume the child is actually an object whose keys are field names and values are uris.
+  nested?: boolean,
   children?: ChildrenType
 };
 
@@ -162,13 +164,30 @@ class StoragePointer {
   _initFromStorage (data: Object) {
     this._data = Object.assign({}, data); // Copy top-level data to avoid issues with mutability.
     for (let fieldName in this._children) {
-      const fieldDef = this._children[fieldName];
-      if (fieldDef.required && (!this._data[fieldName] || typeof this._data[fieldName] !== 'string')) {
-        const value = this._data[fieldName] ? (this._data[fieldName]).toString() : 'undefined';
-        throw new StoragePointerError(`Cannot access field '${fieldName}' on '${value}' which does not appear to be a valid reference.`);
+      const fieldData = this._data[fieldName],
+        fieldDef = this._children[fieldName],
+        expectedType = fieldDef.nested ? 'object' : 'string';
+      if (fieldDef.required && !fieldData) {
+        throw new StoragePointerError(`Cannot access field '${fieldName}' which is required.`);
       }
-      if (this._data[fieldName]) {
-        this._data[fieldName] = StoragePointer.createInstance(this._data[fieldName], fieldDef.children || {});
+      if (!fieldData) {
+        continue;
+      }
+      if (typeof fieldData !== expectedType) { // eslint-disable-line valid-typeof
+        const value = fieldData ? fieldData.toString() : 'undefined';
+        throw new StoragePointerError(`Cannot access field '${fieldName}' on '${value}' which does not appear to be of type ${expectedType}.`);
+      }
+      if (fieldDef.nested) {
+        const pointers = {};
+        for (let key of Object.keys(fieldData)) {
+          if (typeof fieldData[key] !== 'string') {
+            throw new StoragePointerError(`Cannot access field '${fieldName}.${key}' which does not appear to be of type string.`);
+          }
+          pointers[key] = StoragePointer.createInstance(fieldData[key], fieldDef.children || {});
+        }
+        this._data[fieldName] = pointers;
+      } else {
+        this._data[fieldName] = StoragePointer.createInstance(fieldData, fieldDef.children || {});
       }
     }
   }
@@ -262,18 +281,32 @@ class StoragePointer {
     // Put everything together
     let contents = await this.contents;
     for (let fieldName in this._data) {
-      if (this._children && this._children[fieldName]) {
-        // Storage pointer that the user wants to get resolved - call again for a subtree
-        // OR resolve the whole subtree if no special fields are requested
-        if (!resolvedFields || currentFieldDef.hasOwnProperty(fieldName)) {
-          result[fieldName] = await contents[fieldName].toPlainObject(currentFieldDef[fieldName]);
-        } else { // Unresolved storage pointer, return a URI
-          result[fieldName] = this._data[fieldName].ref;
-        }
-      } else {
+      if (!this._children || !this._children[fieldName]) {
         // Do not fabricate undefined fields if they are actually missing in the source data
         if (this._data && this._data.hasOwnProperty(fieldName)) {
           result[fieldName] = contents[fieldName];
+        }
+        continue;
+      }
+
+      // Check if the user wants to resolve the child StoragePointer;
+      const resolve = !resolvedFields || currentFieldDef.hasOwnProperty(fieldName),
+        nested = this._children && this._children[fieldName].nested;
+
+      if (nested) {
+        result[fieldName] = {};
+        for (let key of Object.keys(contents[fieldName])) {
+          if (resolve) {
+            result[fieldName][key] = await contents[fieldName][key].toPlainObject(currentFieldDef[fieldName]);
+          } else {
+            result[fieldName][key] = contents[fieldName][key].ref;
+          }
+        }
+      } else {
+        if (resolve) {
+          result[fieldName] = await contents[fieldName].toPlainObject(currentFieldDef[fieldName]);
+        } else {
+          result[fieldName] = this._data[fieldName].ref;
         }
       }
     }
