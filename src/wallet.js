@@ -174,6 +174,7 @@ class Wallet implements WalletInterface {
 
   _repackageWeb3Error (originalError: Error): WalletError {
     // This heavily depends on web3.js and EVM implementation
+    // Reference of some errors on https://github.com/ethereum/go-ethereum/blob/master/core/tx_pool.go#L43
     if (originalError.message) {
       if (originalError.message.match(/(Failed to check for transaction receipt)|(Receipt missing or blockHash null)|(The transaction receipt didn't contain a contract address)|(Transaction was not mined within)/i)) {
         return new NoReceiptError('Cannot get receipt', originalError);
@@ -184,7 +185,7 @@ class Wallet implements WalletInterface {
       if (originalError.message.match(/Transaction has been reverted by the EVM/i)) {
         return new TransactionRevertedError('Transaction reverted', originalError);
       }
-      if (originalError.message.match(/(known transaction)|(replacement transaction underpriced)/i)) {
+      if (originalError.message.match(/(known transaction)|(replacement transaction underpriced)|(nonce too low)|(transaction underpriced)|(intrinsic gas too low)|(exceeds block gas limit)/i)) {
         return new TransactionDidNotComeThroughError('Transaction did not come through', originalError);
       }
       if (originalError.message.match(/(insufficient funds for gas)|(have enough funds to send tx)/i)) {
