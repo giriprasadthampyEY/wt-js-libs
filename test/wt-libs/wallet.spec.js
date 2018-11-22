@@ -14,6 +14,7 @@ import {
   OutOfGasError,
   InsufficientFundsError,
   TransactionRevertedError,
+  TransactionDidNotComeThroughError,
   NoReceiptError,
   InaccessibleEthereumNodeError,
 } from '../../src/errors';
@@ -148,10 +149,6 @@ describe('WTLibs.Wallet', () => {
       wallet = dataModel.createWallet(jsonWallet);
     });
 
-    it('should return the address', () => {
-      assert.equal(wallet.getAddress().toLowerCase(), '0x' + jsonWallet.address);
-    });
-
     it('should throw when no JSON wallet exists', () => {
       wallet._jsonWallet = null;
       try {
@@ -172,6 +169,33 @@ describe('WTLibs.Wallet', () => {
         assert.match(e.message, /cannot get address/i);
         assert.instanceOf(e, WalletStateError);
       }
+    });
+
+    it('should throw when JSON wallet does not contain address', () => {
+      try {
+        wallet.getAddress();
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /cannot get address/i);
+        assert.instanceOf(e, WalletStateError);
+      }
+    });
+
+    it('should not return the address when in JSON file', () => {
+      wallet._jsonWallet.address = 'd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906';
+      try {
+        wallet.getAddress();
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /cannot get address/i);
+        assert.instanceOf(e, WalletStateError);
+      }
+    });
+
+    it('should return the proper address from an unlocked wallet', () => {
+      wallet._jsonWallet.address = 'somethingRandom';
+      wallet.unlock(correctPassword);
+      assert.equal(wallet.getAddress().toLowerCase(), '0xd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906');
     });
   });
 
@@ -359,6 +383,13 @@ describe('WTLibs.Wallet', () => {
     it('should reject with TransactionRevertedError', async () => {
       await _makeErrorTestCase({ error: 'Transaction has been reverted by the EVM' }, TransactionRevertedError)();
       await _makeErrorTestCase({ catch: 'Transaction has been reverted by the EVM' }, TransactionRevertedError)();
+    });
+
+    it('should reject with TransactionDidNotComeThroughError', async () => {
+      await _makeErrorTestCase({ error: 'replacement transaction underpriced' }, TransactionDidNotComeThroughError)();
+      await _makeErrorTestCase({ catch: 'replacement transaction underpriced' }, TransactionDidNotComeThroughError)();
+      await _makeErrorTestCase({ error: 'known transaction: 14b03e6aefa8ef94fcdff05b7adc9eaf4c88ce15c6d33b3326fa9bd6f15829ab' }, TransactionDidNotComeThroughError)();
+      await _makeErrorTestCase({ catch: 'known transaction: 14b03e6aefa8ef94fcdff05b7adc9eaf4c88ce15c6d33b3326fa9bd6f15829ab' }, TransactionDidNotComeThroughError)();
     });
 
     it('should reject with InaccessibleEthereumNodeError', async () => {

@@ -13,6 +13,7 @@ import {
   OutOfGasError,
   InsufficientFundsError,
   TransactionRevertedError,
+  TransactionDidNotComeThroughError,
   NoReceiptError,
   InaccessibleEthereumNodeError,
 } from './errors';
@@ -54,21 +55,26 @@ class Wallet implements WalletInterface {
   }
 
   /**
-   * Returns the address passed in `keystoreJsonV3`
+   * Returns the address of the account passed in JSON
    * in a checksummed format, e.g. prefixed with 0x
-   * and case-sensitive.
+   * and case-sensitive. Works only in an unlocked state,
+   * because all other methods are unreliable.
    *
    * @throws {WalletStateError} When wallet was destroyed.
-   * @throws {WalletStateError} When there's no keystore
+   * @throws {WalletStateError} When wallet is not unlocked.
+   * @throws {WalletStateError} When there's no keystore.
    */
   getAddress (): string {
     if (this.isDestroyed()) {
       throw new WalletStateError('Cannot get address of a destroyed wallet.');
     }
-    if (!this._jsonWallet || !this._jsonWallet.address) {
+    if (!this._jsonWallet) {
       throw new WalletStateError('Cannot get address from a non existing keystore.');
     }
-    return Web3Utils.toChecksumAddress(this._jsonWallet.address);
+    if (!this._account) {
+      throw new WalletStateError('Cannot get address from a locked keystore.');
+    }
+    return Web3Utils.toChecksumAddress(this._account.address);
   }
 
   /**
@@ -168,6 +174,7 @@ class Wallet implements WalletInterface {
 
   _repackageWeb3Error (originalError: Error): WalletError {
     // This heavily depends on web3.js and EVM implementation
+    // Reference of some errors on https://github.com/ethereum/go-ethereum/blob/master/core/tx_pool.go#L43
     if (originalError.message) {
       if (originalError.message.match(/(Failed to check for transaction receipt)|(Receipt missing or blockHash null)|(The transaction receipt didn't contain a contract address)|(Transaction was not mined within)/i)) {
         return new NoReceiptError('Cannot get receipt', originalError);
@@ -177,6 +184,9 @@ class Wallet implements WalletInterface {
       }
       if (originalError.message.match(/Transaction has been reverted by the EVM/i)) {
         return new TransactionRevertedError('Transaction reverted', originalError);
+      }
+      if (originalError.message.match(/(known transaction)|(replacement transaction underpriced)|(nonce too low)|(transaction underpriced)|(intrinsic gas too low)|(exceeds block gas limit)/i)) {
+        return new TransactionDidNotComeThroughError('Transaction did not come through', originalError);
       }
       if (originalError.message.match(/(insufficient funds for gas)|(have enough funds to send tx)/i)) {
         return new InsufficientFundsError('Not enough funds', originalError);
