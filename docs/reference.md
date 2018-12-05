@@ -176,7 +176,7 @@
     -   [Parameters][172]
     -   [isZeroAddress][173]
         -   [Parameters][174]
-    -   [applyGasCoefficient][175]
+    -   [applyGasModifier][175]
         -   [Parameters][176]
     -   [getCurrentBlockNumber][177]
     -   [checkAddressChecksum][178]
@@ -282,12 +282,13 @@ DataModelOptionsType options. May look like this:
       "gasCoefficient": 2 // Optional, defaults to 2
     }
 
-Type: {provider: ([string][202] \| [Object][203]), gasCoefficient: [number][209]?}
+Type: {provider: ([string][202] \| [Object][203]), gasCoefficient: [number][209]?, gasMargin: [number][209]?}
 
 ### Properties
 
 -   `provider` **([string][202] \| [Object][203])** 
 -   `gasCoefficient` **[number][209]?** 
+-   `gasMargin` **[number][209]?** 
 
 ## DataModel
 
@@ -1482,7 +1483,7 @@ communication with Ethereum network.
 
 ### Parameters
 
--   `gasCoefficient` **[number][209]** 
+-   `gasModifiers` **GasModifiersType** 
 -   `provider` **([string][202] \| [Object][203])** 
 
 ### isZeroAddress
@@ -1496,15 +1497,16 @@ Returns true also for strings that are not a valid address.
 
 Returns **[boolean][242]** 
 
-### applyGasCoefficient
+### applyGasModifier
 
-Multiplies the gas with a previously configured `gasCoefficient`
+Modifies the gas with a previously configured `gasCoefficient`
+or `gasMargin`.
 
 #### Parameters
 
 -   `gas` **[number][209]** 
 
-Returns **[number][209]** 
+Returns **[number][209]** modified gas
 
 ### getCurrentBlockNumber
 
@@ -1559,8 +1561,10 @@ Returns an initialized instance
 
 #### Parameters
 
--   `gasCoefficient` **[number][209]** which is applied to every transaction
+-   `gasModifiers` **GasModifiersType** 
 -   `provider` **([string][202] \| [Object][203])** 
+-   `gasCoefficient` **GasModifiersType** or gasMargin that can be applied
+    to outgoing transactions.
 -   `web3` **([string][202] \| [Object][203])** instance provider used to create web3-eth
 
 Returns **[Utils][216]** 
@@ -2025,7 +2029,7 @@ Returns **[Wallet][214]**
 
 [174]: #parameters-46
 
-[175]: #applygascoefficient
+[175]: #applygasmodifier
 
 [176]: #parameters-47
 
