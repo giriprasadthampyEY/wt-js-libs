@@ -21,7 +21,10 @@ export type DataModelOptionsType = {
   provider: string | Object,
   // Gas coefficient that is used as a multiplier when setting
   // a transaction gas.
-  gasCoefficient?: number
+  gasCoefficient?: number,
+  // Gas margin that is added to a computed gas amount when
+  // setting a transaction gas.
+  gasMargin?: number
 };
 
 /**
@@ -41,13 +44,21 @@ class DataModel implements DataModelInterface {
   }
 
   /**
-   * Sets up Utils and Contracts with given web3 provider. Sets
-   * up gasCoefficient which defaults to 2.
+   * Sets up Utils and Contracts with given web3 provider.
+   * Sets up gasCoefficient or gasMargin. If neither is provided,
+   * sets gasCoefficient to a default of 2.
    */
   constructor (options: DataModelOptionsType) {
     this.options = options || {};
-    this.options.gasCoefficient = this.options.gasCoefficient || 2;
-    this.web3Utils = Utils.createInstance(this.options.gasCoefficient, this.options.provider);
+    this.options.gasMargin = this.options.gasMargin;
+    this.options.gasCoefficient = this.options.gasCoefficient;
+    if (!this.options.gasMargin && !this.options.gasCoefficient) {
+      this.options.gasCoefficient = 2;
+    }
+    this.web3Utils = Utils.createInstance({
+      gasCoefficient: this.options.gasCoefficient,
+      gasMargin: this.options.gasMargin,
+    }, this.options.provider);
     this.web3Contracts = Contracts.createInstance(this.options.provider);
     this._wtIndexCache = {};
   }

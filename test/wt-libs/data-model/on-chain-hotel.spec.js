@@ -14,7 +14,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
   beforeEach(() => {
     utilsStub = {
       getCurrentWeb3Provider: sinon.stub().returns('current-provider'),
-      applyGasCoefficient: sinon.stub().returns(12),
+      applyGasModifier: sinon.stub().returns(12),
       determineCurrentAddressNonce: sinon.stub().resolves(3),
     };
     urlStub = helpers.stubContractMethodResult('some-remote-url');
@@ -287,7 +287,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
 
     it('should apply gasCoefficient', async () => {
       await provider.createOnChainData({ from: 'xx' });
-      assert.equal(utilsStub.applyGasCoefficient.callCount, 1);
+      assert.equal(utilsStub.applyGasModifier.callCount, 1);
       assert.equal(indexContractStub.methods.registerHotel().estimateGas.callCount, 1);
       assert.equal(indexContractStub.methods.registerHotel().encodeABI.callCount, 1);
       assert.equal(indexContractStub.methods.registerHotel().estimateGas.firstCall.args[0].from, 'xx');
@@ -349,7 +349,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
 
     it('should apply gasCoefficient', async () => {
       await provider.updateOnChainData({ from: 'xx' });
-      assert.equal(utilsStub.applyGasCoefficient.callCount, 1);
+      assert.equal(utilsStub.applyGasModifier.callCount, 1);
       assert.equal(indexContractStub.methods.callHotel().estimateGas.callCount, 1);
       assert.equal(indexContractStub.methods.callHotel().encodeABI.callCount, 1);
       assert.equal(indexContractStub.methods.callHotel().estimateGas.firstCall.args[0].from, 'xx');
@@ -383,7 +383,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
 
     it('should apply gasCoefficient', async () => {
       await provider.transferOnChainOwnership('new-manager', { from: 'xx' });
-      assert.equal(utilsStub.applyGasCoefficient.callCount, 1);
+      assert.equal(utilsStub.applyGasModifier.callCount, 1);
       assert.equal(indexContractStub.methods.transferHotel().estimateGas.callCount, 1);
       assert.equal(indexContractStub.methods.transferHotel().encodeABI.callCount, 1);
       assert.equal(indexContractStub.methods.transferHotel().estimateGas.firstCall.args[0].from, 'xx');
@@ -424,7 +424,7 @@ describe('WTLibs.data-model.OnChainHotel', () => {
 
     it('should apply gasCoefficient', async () => {
       await provider.removeOnChainData({ from: 'xx' });
-      assert.equal(utilsStub.applyGasCoefficient.callCount, 1);
+      assert.equal(utilsStub.applyGasModifier.callCount, 1);
       assert.equal(indexContractStub.methods.deleteHotel().estimateGas.callCount, 1);
       assert.equal(indexContractStub.methods.deleteHotel().encodeABI.callCount, 1);
       assert.equal(indexContractStub.methods.deleteHotel().estimateGas.firstCall.args[0].from, 'xx');

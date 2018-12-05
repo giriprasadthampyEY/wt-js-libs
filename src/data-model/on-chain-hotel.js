@@ -236,7 +236,7 @@ class OnChainHotel implements HotelInterface {
       data: txData,
       from: transactionOptions.from,
       to: this.indexContract.options.address,
-      gas: this.web3Utils.applyGasCoefficient(await estimate),
+      gas: this.web3Utils.applyGasModifier(await estimate),
     };
     return {
       hotel: (this: HotelInterface),
@@ -261,7 +261,7 @@ class OnChainHotel implements HotelInterface {
       data: data,
       from: transactionOptions.from,
       to: this.indexContract.options.address,
-      gas: this.web3Utils.applyGasCoefficient(await estimate),
+      gas: this.web3Utils.applyGasModifier(await estimate),
     };
     const eventCallbacks: TransactionCallbacksInterface = {
       onReceipt: (receipt: TxReceiptInterface) => {
@@ -320,7 +320,7 @@ class OnChainHotel implements HotelInterface {
       data: data,
       from: transactionOptions.from,
       to: this.indexContract.options.address,
-      gas: this.web3Utils.applyGasCoefficient(await estimate),
+      gas: this.web3Utils.applyGasModifier(await estimate),
     };
     const eventCallbacks: TransactionCallbacksInterface = {
       onReceipt: (receipt: TxReceiptInterface) => {
@@ -352,7 +352,7 @@ class OnChainHotel implements HotelInterface {
       data: data,
       from: transactionOptions.from,
       to: this.indexContract.options.address,
-      gas: this.web3Utils.applyGasCoefficient(await estimate),
+      gas: this.web3Utils.applyGasModifier(await estimate),
     };
     const eventCallbacks: TransactionCallbacksInterface = {
       onReceipt: (receipt: TxReceiptInterface) => {
