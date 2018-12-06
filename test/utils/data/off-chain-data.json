@@ -23,32 +23,36 @@
       "longitude": 50.075640
     }
   },
-  "rateplansone": {
-    "rate-plan": {
+  "rateplansone": [
+    {
+      "id": "rate-plan",
       "name": "Basic",
       "description": "Generic rate plan",
       "currency": "EUR",
       "price": 10
     },
-    "rate-plan-2": {
+    {
+      "id": "rate-plan-2",
       "name": "More expensive",
       "description": "More expensive rate plan",
       "currency": "EUR",
       "price": 20
     }
-  },
-  "rateplanstwo": {
-    "rate-plan": {
+  ],
+  "rateplanstwo": [
+    {
+      "id": "rate-plan",
       "name": "Basic",
       "description": "Generic rate plan",
       "currency": "EUR",
       "price": 10
     },
-    "rate-plan-2": {
+    {
+      "id": "rate-plan-2",
       "name": "More expensive",
       "description": "More expensive rate plan",
       "currency": "EUR",
       "price": 20
     }
-  }
+  ]
 }
