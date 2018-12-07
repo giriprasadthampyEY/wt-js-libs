@@ -4,30 +4,38 @@ import type { TxReceiptInterface, TxInterface } from './interfaces';
 import Web3Eth from 'web3-eth';
 import Web3Utils from 'web3-utils';
 
+export type GasModifiersType = {
+  // Gas coefficient that is used as a multiplier when setting
+  // a transaction gas.
+  gasCoefficient?: number,
+  // Gas margin that is added to a computed gas amount when
+  // setting a transaction gas.
+  gasMargin?: number
+};
+
 /**
  * Collection of utility methods useful during
  * communication with Ethereum network.
  */
 class Utils {
-  gasCoefficient: number;
+  gasModifiers: GasModifiersType;
   provider: string | Object;
   web3Eth: Web3Eth;
 
   /**
    * Returns an initialized instance
    *
-   * @parameters {number} gasCoefficient is a constant that can be applied to any
-   * ethereum transaction to ensure it will be mined.
-   * @param  {number} gasCoefficient which is applied to every transaction
+   * @param  {GasModifiersType} gasCoefficient or gasMargin that can be applied
+   * to outgoing transactions.
    * @param  {string|Object} web3 instance provider used to create web3-eth
    * @return {Utils}
    */
-  static createInstance (gasCoefficient: number, provider: string | Object): Utils {
-    return new Utils(gasCoefficient, provider);
+  static createInstance (gasModifiers: GasModifiersType, provider: string | Object): Utils {
+    return new Utils(gasModifiers, provider);
   }
 
-  constructor (gasCoefficient: number, provider: string | Object) {
-    this.gasCoefficient = gasCoefficient;
+  constructor (gasModifiers: GasModifiersType, provider: string | Object) {
+    this.gasModifiers = gasModifiers;
     this.provider = provider;
     this.web3Eth = new Web3Eth(provider);
   }
@@ -46,13 +54,18 @@ class Utils {
   }
 
   /**
-   * Multiplies the gas with a previously configured `gasCoefficient`
+   * Modifies the gas with a previously configured `gasCoefficient`
+   * or `gasMargin`.
    * @param {number} gas
-   * @return {number}
+   * @return {number} modified gas
    */
-  applyGasCoefficient (gas: number): number {
-    if (this.gasCoefficient) {
-      return Math.ceil(gas * this.gasCoefficient);
+  applyGasModifier (gas: number): number {
+    if (this.gasModifiers) {
+      if (this.gasModifiers.gasMargin) {
+        return Math.ceil(gas + this.gasModifiers.gasMargin);
+      } else if (this.gasModifiers.gasCoefficient) {
+        return Math.ceil(gas * this.gasModifiers.gasCoefficient);
+      }
     }
     return gas;
   }

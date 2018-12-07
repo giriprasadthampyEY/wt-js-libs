@@ -6,7 +6,7 @@ describe('WTLibs.Utils', () => {
   let utils;
 
   beforeEach(() => {
-    utils = Utils.createInstance(3, 'http://localhost:8545');
+    utils = Utils.createInstance({ gasCoefficient: 3 }, 'http://localhost:8545');
   });
 
   describe('isZeroAddress', () => {
@@ -18,18 +18,37 @@ describe('WTLibs.Utils', () => {
     });
   });
 
-  describe('applyGasCoefficient', () => {
+  describe('applyGasModifier', () => {
     it('should apply gas coefficient', () => {
-      const gas = utils.applyGasCoefficient(10);
-      assert.equal(gas, 10 * utils.gasCoefficient);
+      const gas = utils.applyGasModifier(10);
+      assert.equal(gas, 10 * utils.gasModifiers.gasCoefficient);
     });
 
-    it('should fallback to gas if no coefficient is specified', () => {
-      const origCoeff = utils.gasCoefficient;
-      utils.gasCoefficient = undefined;
-      const gas = utils.applyGasCoefficient(10);
-      assert.equal(gas, 10);
-      utils.gasCoefficient = origCoeff;
+    it('should apply gas margin', () => {
+      const origModifiers = utils.gasModifiers;
+      utils.gasModifiers = { gasMargin: 1000 };
+      const gas = utils.applyGasModifier(10);
+      assert.equal(gas, 10 + utils.gasModifiers.gasMargin);
+      utils.gasModifiers = origModifiers;
+    });
+
+    it('should prefer gas margin over gasCoefficient', () => {
+      const origModifiers = utils.gasModifiers;
+      utils.gasModifiers = { gasMargin: 1000, gasCoefficient: 3 };
+      const gas = utils.applyGasModifier(10);
+      assert.equal(gas, 10 + utils.gasModifiers.gasMargin);
+      utils.gasModifiers = origModifiers;
+    });
+
+    it('should fallback to gas if no modifiers are specified', () => {
+      const origModifiers = utils.gasModifiers;
+      utils.gasModifiers = {};
+      const gas1 = utils.applyGasModifier(10);
+      assert.equal(gas1, 10);
+      utils.gasModifiers = undefined;
+      const gas2 = utils.applyGasModifier(10);
+      assert.equal(gas2, 10);
+      utils.gasModifiers = origModifiers;
     });
   });
 
