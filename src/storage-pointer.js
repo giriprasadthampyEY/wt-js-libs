@@ -179,17 +179,16 @@ class StoragePointer {
       }
       if (fieldDef.nested) {
         if (Array.isArray(fieldData)) {
-          this._data[fieldName] = fieldData;
-        } else {
-          const pointers = {};
-          for (let key of Object.keys(fieldData)) {
-            if (typeof fieldData[key] !== 'string') {
-              throw new StoragePointerError(`Cannot access field '${fieldName}.${key}' which does not appear to be of type string.`);
-            }
-            pointers[key] = StoragePointer.createInstance(fieldData[key], fieldDef.children || {});
-          }
-          this._data[fieldName] = pointers;
+          throw new StoragePointerError(`Cannot access field '${fieldName}'. Nested pointer cannot be an Array.`);
         }
+        const pointers = {};
+        for (let key of Object.keys(fieldData)) {
+          if (typeof fieldData[key] !== 'string') {
+            throw new StoragePointerError(`Cannot access field '${fieldName}.${key}' which does not appear to be of type string.`);
+          }
+          pointers[key] = StoragePointer.createInstance(fieldData[key], fieldDef.children || {});
+        }
+        this._data[fieldName] = pointers;
       } else {
         this._data[fieldName] = StoragePointer.createInstance(fieldData, fieldDef.children || {});
       }
