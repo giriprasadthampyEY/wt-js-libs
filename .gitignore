@@ -17,3 +17,6 @@ coverage
 .nyc_coverage
 build/contracts
 test/utils/compiled
+
+# Ide
+.idea/

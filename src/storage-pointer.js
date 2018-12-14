@@ -84,7 +84,7 @@ class StoragePointer {
     }
     const uniqueFields = {};
     children = children || {};
-    
+
     for (let fieldName in children) {
       if (uniqueFields[fieldName.toLowerCase()]) {
         throw new StoragePointerError('Cannot create instance: Conflict in field names.');
@@ -162,7 +162,7 @@ class StoragePointer {
    * the storage.
    */
   _initFromStorage (data: Object) {
-    this._data = Object.assign({}, data); // Copy top-level data to avoid issues with mutability.
+    this._data = Object.assign(Array.isArray(data) ? [] : {}, data); // Copy top-level data to avoid issues with mutability.
     for (let fieldName in this._children) {
       const fieldData = this._data[fieldName],
         fieldDef = this._children[fieldName],
@@ -178,6 +178,9 @@ class StoragePointer {
         throw new StoragePointerError(`Cannot access field '${fieldName}' on '${value}' which does not appear to be of type ${expectedType}.`);
       }
       if (fieldDef.nested) {
+        if (Array.isArray(fieldData)) {
+          throw new StoragePointerError(`Cannot access field '${fieldName}'. Nested pointer cannot be an Array.`);
+        }
         const pointers = {};
         for (let key of Object.keys(fieldData)) {
           if (typeof fieldData[key] !== 'string') {
@@ -280,33 +283,37 @@ class StoragePointer {
 
     // Put everything together
     let contents = await this.contents;
-    for (let fieldName in this._data) {
-      if (!this._children || !this._children[fieldName]) {
-        // Do not fabricate undefined fields if they are actually missing in the source data
-        if (this._data && this._data.hasOwnProperty(fieldName)) {
-          result[fieldName] = contents[fieldName];
-        }
-        continue;
-      }
-
-      // Check if the user wants to resolve the child StoragePointer;
-      const resolve = !resolvedFields || currentFieldDef.hasOwnProperty(fieldName),
-        nested = this._children && this._children[fieldName].nested;
-
-      if (nested) {
-        result[fieldName] = {};
-        for (let key of Object.keys(contents[fieldName])) {
-          if (resolve) {
-            result[fieldName][key] = await contents[fieldName][key].toPlainObject(currentFieldDef[fieldName]);
-          } else {
-            result[fieldName][key] = contents[fieldName][key].ref;
+    if (Array.isArray(contents)) {
+      result = contents;
+    } else {
+      for (let fieldName in this._data) {
+        if (!this._children || !this._children[fieldName]) {
+          // Do not fabricate undefined fields if they are actually missing in the source data
+          if (this._data && this._data.hasOwnProperty(fieldName)) {
+            result[fieldName] = contents[fieldName];
           }
+          continue;
         }
-      } else {
-        if (resolve) {
-          result[fieldName] = await contents[fieldName].toPlainObject(currentFieldDef[fieldName]);
+
+        // Check if the user wants to resolve the child StoragePointer;
+        const resolve = !resolvedFields || currentFieldDef.hasOwnProperty(fieldName),
+          nested = this._children && this._children[fieldName].nested;
+
+        if (nested) {
+          result[fieldName] = {};
+          for (let key of Object.keys(contents[fieldName])) {
+            if (resolve) {
+              result[fieldName][key] = await contents[fieldName][key].toPlainObject(currentFieldDef[fieldName]);
+            } else {
+              result[fieldName][key] = contents[fieldName][key].ref;
+            }
+          }
         } else {
-          result[fieldName] = this._data[fieldName].ref;
+          if (resolve) {
+            result[fieldName] = await contents[fieldName].toPlainObject(currentFieldDef[fieldName]);
+          } else {
+            result[fieldName] = this._data[fieldName].ref;
+          }
         }
       }
     }
