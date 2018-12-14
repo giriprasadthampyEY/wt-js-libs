@@ -294,14 +294,29 @@ describe('WTLibs.StoragePointer', () => {
     });
   });
 
-  describe('toPlainObject', () => {
-    let pointer, hashKey1, hashKey2, hashLevelZero, hashLevelOne, hashLevelTwo, hashLevelThree;
+  describe('toPlainObject()', () => {
+    let pointer, hashKey1, hashKey2, hashLevelZero, hashLevelOne, hashLevelTwo, hashLevelThree,
+      topLevelArrayHash, arrayInsideHash;
     before(() => {
+      topLevelArrayHash = InMemoryAdapter.storageInstance.create([
+        { type: 'cat', name: 'Garfield' },
+        { type: 'dog', name: 'Odie' },
+        { type: 'human', name: 'Jon' },
+      ]);
+      arrayInsideHash = InMemoryAdapter.storageInstance.create({
+        publisher: 'Random House',
+        members: [
+          { type: 'cat', name: 'Garfield' },
+          { type: 'dog', name: 'Odie' },
+          { type: 'human', name: 'Jon' },
+        ],
+      });
       hashKey1 = InMemoryAdapter.storageInstance.create({ value: 'value1' });
       hashKey2 = InMemoryAdapter.storageInstance.create({ value: 'value2' });
       hashLevelThree = InMemoryAdapter.storageInstance.create({ below: 'cows', above: 'sheep' });
       hashLevelTwo = InMemoryAdapter.storageInstance.create({ one: 'bunny', two: 'frogs', below: `in-memory://${hashLevelThree}` });
       hashLevelOne = InMemoryAdapter.storageInstance.create({ three: 'dogs', four: 'donkeys', five: `in-memory://${hashLevelTwo}` });
+
       hashLevelZero = InMemoryAdapter.storageInstance.create({
         six: 'horses',
         seven: 'cats',
@@ -310,7 +325,11 @@ describe('WTLibs.StoragePointer', () => {
         ten: {
           key1: `in-memory://${hashKey1}`,
           key2: `in-memory://${hashKey2}`,
+          key3: `in-memory://${topLevelArrayHash}`,
+          key4: `in-memory://${arrayInsideHash}`,
         },
+        eleven: `in-memory://${topLevelArrayHash}`,
+        twelve: `in-memory://${arrayInsideHash}`,
       });
       pointer = StoragePointer.createInstance(`in-memory://${hashLevelZero}`, {
         eight: {
@@ -328,6 +347,8 @@ describe('WTLibs.StoragePointer', () => {
           },
         },
         ten: { nested: true },
+        eleven: {},
+        twelve: {},
       });
     });
 
@@ -349,6 +370,23 @@ describe('WTLibs.StoragePointer', () => {
       assert.equal(pojo.contents.ten.key2.contents.value, 'value2');
     });
 
+    it('should work for arrays on top level of the document', async () => {
+      const pojo = await pointer.toPlainObject(['eleven']);
+      assert.equal(pojo.contents.eleven.contents.length, 3);
+      assert.equal(pojo.contents.eleven.contents[0].name, 'Garfield');
+      assert.equal(pojo.contents.eleven.contents[1].name, 'Odie');
+      assert.equal(pojo.contents.eleven.contents[2].name, 'Jon');
+    });
+
+    it('should work for arrays inside the document', async () => {
+      const pojo = await pointer.toPlainObject(['twelve']);
+      assert.equal(pojo.contents.twelve.contents.publisher, 'Random House');
+      assert.equal(pojo.contents.twelve.contents.members.length, 3);
+      assert.equal(pojo.contents.twelve.contents.members[0].name, 'Garfield');
+      assert.equal(pojo.contents.twelve.contents.members[1].name, 'Odie');
+      assert.equal(pojo.contents.twelve.contents.members[2].name, 'Jon');
+    });
+
     it('should limit resolved fields', async () => {
       const pojo = await pointer.toPlainObject(['eight']);
       assert.equal(pojo.contents.six, 'horses');
@@ -364,7 +402,26 @@ describe('WTLibs.StoragePointer', () => {
       assert.deepEqual(pojo.contents.ten, {
         key1: `in-memory://${hashKey1}`,
         key2: `in-memory://${hashKey2}`,
+        key3: `in-memory://${topLevelArrayHash}`,
+        key4: `in-memory://${arrayInsideHash}`,
       });
+    });
+
+    it('should throw for nested pointer that actually contains array', async () => {
+      const hash = InMemoryAdapter.storageInstance.create({
+        ten: [
+          { okey: 'dokey' },
+        ],
+      });
+      const ptr = StoragePointer.createInstance(`in-memory://${hash}`, {
+        ten: { nested: true },
+      });
+      try {
+        await ptr.toPlainObject();
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /cannot be an array/i);
+      }
     });
 
     it('should resolve multiple recursive fields', async () => {
@@ -419,6 +476,9 @@ describe('WTLibs.StoragePointer', () => {
       const pojo = await pointer.toPlainObject(['ten']);
       assert.deepEqual(pojo.contents.ten.key1.contents, { value: 'value1' });
       assert.deepEqual(pojo.contents.ten.key2.contents, { value: 'value2' });
+      assert.equal(pojo.contents.ten.key3.contents.length, 3);
+      assert.deepEqual(pojo.contents.ten.key4.contents.publisher, 'Random House');
+      assert.equal(pojo.contents.ten.key4.contents.members.length, 3);
     });
 
     it('should allow the user to not resolve any field', async () => {

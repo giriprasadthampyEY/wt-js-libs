@@ -1,6 +1,6 @@
 {
   "name": "@windingtree/wt-js-libs",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Javascript libraries to interact with the Winding Tree contracts",
   "main": "dist/node/wt-js-libs.js",
   "directories": {
@@ -62,7 +62,7 @@
     "chai": "^4.1.2",
     "chai-string": "^1.4.0",
     "coveralls": "^3.0.1",
-    "documentation": "^9.0.0-alpha.0",
+    "documentation": "^9.0.0",
     "esdoc": "^1.1.0",
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "esdoc-node": "^1.0.2",
@@ -74,7 +74,7 @@
     "eslint-plugin-node": "^8.0.0",
     "eslint-plugin-promise": "^4.0.0",
     "eslint-plugin-standard": "^4.0.0",
-    "flow-bin": "^0.86.0",
+    "flow-bin": "^0.89.0",
     "ganache-cli": "^6.2.1",
     "jsdom": "^13.0.0",
     "jsdom-global": "3.0.2",
