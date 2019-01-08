@@ -162,7 +162,7 @@ class OnChainHotel implements HotelInterface {
    * contract (without address).
    * @param {HotelOnChainDataInterface} newData
    */
-  async setLocalData (newData: HotelOnChainDataInterface): Promise<void> {
+  async setLocalData (newData: HotelOnChainDataInterface) {
     const newManager = await newData.manager;
     if (newManager) {
       this.manager = newManager;
