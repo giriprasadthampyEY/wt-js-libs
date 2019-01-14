@@ -1,5 +1,5 @@
 // @flow
-import type { TransactionOptionsInterface, TransactionCallbacksInterface, PreparedTransactionMetadataInterface, TxReceiptInterface, HotelInterface, PlainHotelInterface, HotelOnChainDataInterface } from '../hotel-interfaces';
+import type { TransactionOptionsInterface, TransactionCallbacksInterface, PreparedTransactionMetadataInterface, TxReceiptInterface, AirlineInterface, PlainAirlineInterface, AirlineOnChainDataInterface } from '../airline-interfaces';
 import Utils from '../utils';
 import Contracts from '../contracts';
 import RemotelyBackedDataset from '../remotely-backed-dataset';
@@ -8,7 +8,7 @@ import StoragePointer from '../storage-pointer';
 import { InputDataError, SmartContractInstantiationError } from '../errors';
 
 /**
- * Wrapper class for a hotel backed by a smart contract on
+ * Wrapper class for an airline backed by a smart contract on
  * Ethereum that's holding `dataUri` pointer to its data.
  *
  * It provides an accessor to such data in a form of
@@ -17,7 +17,7 @@ import { InputDataError, SmartContractInstantiationError } from '../errors';
  * are dealt with in StoragePointer.
  *
  */
-class OnChainHotel implements HotelInterface {
+class OnChainAirline implements AirlineInterface {
   address: Promise<?string> | ?string;
 
   // provided by eth backed dataset
@@ -39,15 +39,15 @@ class OnChainHotel implements HotelInterface {
    * @param  {Utils} web3Utils
    * @param  {Contracts} web3Contracts
    * @param  {web3.eth.Contract} indexContract Representation of Winding Tree index
-   * @param  {string} address is an optional pointer to Ethereum network where the hotel lives.
-   * It is used as a reference for on-chain stored data. If it is not provided, a hotel has
+   * @param  {string} address is an optional pointer to Ethereum network where the airline lives.
+   * It is used as a reference for on-chain stored data. If it is not provided, an airline has
    * to be created on chain to behave as expected.
-   * @return {OnChainHotel}
+   * @return {OnChainAirline}
    */
-  static createInstance (web3Utils: Utils, web3Contracts: Contracts, indexContract: Object, address?: string): OnChainHotel {
-    const hotel = new OnChainHotel(web3Utils, web3Contracts, indexContract, address);
-    hotel.initialize();
-    return hotel;
+  static createInstance (web3Utils: Utils, web3Contracts: Contracts, indexContract: Object, address?: string): OnChainAirline {
+    const airline = new OnChainAirline(web3Utils, web3Contracts, indexContract, address);
+    airline.initialize();
+    return airline;
   }
 
   constructor (web3Utils: Utils, web3Contracts: Contracts, indexContract: Object, address?: string) {
@@ -91,8 +91,8 @@ class OnChainHotel implements HotelInterface {
    * Since it has to eventually access the `dataUri`
    * field stored on-chain, it is lazy loaded.
    *
-   * Data format of off-chain hotel data can be found on
-   * https://github.com/windingtree/wiki/blob/master/hotel-data-swagger.yaml
+   * Data format of off-chain airline data can be found on
+   * https://github.com/windingtree/wiki/blob/master/airline-data-swagger.yaml
    *
    */
   get dataIndex (): Promise<StoragePointer> {
@@ -100,8 +100,7 @@ class OnChainHotel implements HotelInterface {
       if (!this._dataIndex) {
         this._dataIndex = StoragePointer.createInstance(await this.dataUri, {
           descriptionUri: { required: true },
-          ratePlansUri: { required: false },
-          availabilityUri: { required: false },
+          flightsUri: { required: false },
         });
       }
       return this._dataIndex;
@@ -121,12 +120,12 @@ class OnChainHotel implements HotelInterface {
   set dataUri (newDataUri: Promise<?string> | ?string) {
     if (!newDataUri) {
       throw new InputDataError(
-        'Cannot update hotel: Cannot set dataUri when it is not provided'
+        'Cannot update airline: Cannot set dataUri when it is not provided'
       );
     }
     if (typeof newDataUri === 'string' && !newDataUri.match(/([a-z-]+):\/\//)) {
       throw new InputDataError(
-        'Cannot update hotel: Cannot set dataUri with invalid format'
+        'Cannot update airline: Cannot set dataUri with invalid format'
       );
     }
     if (newDataUri !== this._dataUri) {
@@ -148,10 +147,10 @@ class OnChainHotel implements HotelInterface {
 
   set manager (newManager: Promise<?string> | ?string) {
     if (!newManager) {
-      throw new InputDataError('Cannot update hotel: Cannot set manager to null');
+      throw new InputDataError('Cannot update airline: Cannot set manager to null');
     }
     if (this.address) {
-      throw new InputDataError('Cannot update hotel: Cannot set manager when hotel is deployed');
+      throw new InputDataError('Cannot update airline: Cannot set manager when airline is deployed');
     }
     this._manager = newManager;
   }
@@ -160,9 +159,9 @@ class OnChainHotel implements HotelInterface {
    * Update manager and dataUri properties. dataUri can never be nulled. Manager
    * can never be nulled. Manager can be changed only for an un-deployed
    * contract (without address).
-   * @param {HotelOnChainDataInterface} newData
+   * @param {AirlineOnChainDataInterface} newData
    */
-  async setLocalData (newData: HotelOnChainDataInterface) {
+  async setLocalData (newData: AirlineOnChainDataInterface) {
     const newManager = await newData.manager;
     if (newManager) {
       this.manager = newManager;
@@ -174,7 +173,7 @@ class OnChainHotel implements HotelInterface {
   }
 
   /**
-   * Helper method that transforms the whole hotel into a sync simple
+   * Helper method that transforms the whole airline into a sync simple
    * JavaScript object only with data properties.
    *
    * By default, all off-chain data is resolved recursively. If you want to
@@ -198,7 +197,7 @@ class OnChainHotel implements HotelInterface {
    *
    * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
    */
-  async toPlainObject (resolvedFields: ?Array<string>): Promise<PlainHotelInterface> {
+  async toPlainObject (resolvedFields: ?Array<string>): Promise<PlainAirlineInterface> {
     const dataIndex = await this.dataIndex;
     const offChainData = await dataIndex.toPlainObject(resolvedFields);
     let result = {
@@ -211,10 +210,10 @@ class OnChainHotel implements HotelInterface {
 
   async _getContractInstance (): Promise<Object> {
     if (!this.address) {
-      throw new SmartContractInstantiationError('Cannot get hotel instance without address');
+      throw new SmartContractInstantiationError('Cannot get airline instance without address');
     }
     if (!this.contractInstance) {
-      this.contractInstance = await this.web3Contracts.getHotelInstance(this.address);
+      this.contractInstance = await this.web3Contracts.getAirlineInstance(this.address);
     }
     return this.contractInstance;
   }
@@ -229,8 +228,8 @@ class OnChainHotel implements HotelInterface {
    */
   async _editInfoOnChain (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
     const data = (await this._getContractInstance()).methods.editInfo(await this.dataUri).encodeABI();
-    const estimate = this.indexContract.methods.callHotel(this.address, data).estimateGas(transactionOptions);
-    const txData = this.indexContract.methods.callHotel(this.address, data).encodeABI();
+    const estimate = this.indexContract.methods.callAirline(this.address, data).estimateGas(transactionOptions);
+    const txData = this.indexContract.methods.callAirline(this.address, data).encodeABI();
     const transactionData = {
       nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
       data: txData,
@@ -239,23 +238,23 @@ class OnChainHotel implements HotelInterface {
       gas: this.web3Utils.applyGasModifier(await estimate),
     };
     return {
-      hotel: (this: HotelInterface),
+      airline: (this: AirlineInterface),
       transactionData: transactionData,
     };
   }
 
   /**
-   * Generates transaction data and metadata for creating new hotel contract on-chain.
+   * Generates transaction data and metadata for creating new airline contract on-chain.
    * Transaction is not signed nor sent here.
    *
    * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
-   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created hotel instance.
+   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created airline instance.
    */
   async createOnChainData (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
-    // Create hotel on-network
+    // Create airline on-network
     const dataUri = await this.dataUri;
-    const estimate = this.indexContract.methods.registerHotel(dataUri).estimateGas(transactionOptions);
-    const data = this.indexContract.methods.registerHotel(dataUri).encodeABI();
+    const estimate = this.indexContract.methods.registerAirline(dataUri).estimateGas(transactionOptions);
+    const data = this.indexContract.methods.registerAirline(dataUri).encodeABI();
     const transactionData = {
       nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
       data: data,
@@ -273,14 +272,14 @@ class OnChainHotel implements HotelInterface {
       },
     };
     return {
-      hotel: (this: HotelInterface),
+      airline: (this: AirlineInterface),
       transactionData: transactionData,
       eventCallbacks: eventCallbacks,
     };
   }
 
   /**
-   * Generates transaction data and metadata required for all hotel-related data modification
+   * Generates transaction data and metadata required for all airline-related data modification
    * by calling `updateRemoteData` on a `RemotelyBackedDataset`.
    *
    * @param {TransactionOptionsInterface} options object that is passed to all remote data setters
@@ -300,21 +299,21 @@ class OnChainHotel implements HotelInterface {
    * This is potentially devastating, so it's better to name
    * this operation explicitly instead of hiding it under updateOnChainData.
    *
-   * Generates transaction data and metadata required for a hotel ownership
+   * Generates transaction data and metadata required for a airline ownership
    * transfer.
    *
    * @param {string} Address of a new manager
    * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
    * @throws {SmartContractInstantiationError} When the underlying contract is not yet deployed.
-   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created hotel instance.
+   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created airline instance.
    *
    */
   async transferOnChainOwnership (newManager: string, transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
     if (!this.onChainDataset.isDeployed()) {
-      throw new SmartContractInstantiationError('Cannot remove hotel: not deployed');
+      throw new SmartContractInstantiationError('Cannot remove airline: not deployed');
     }
-    const estimate = this.indexContract.methods.transferHotel(this.address, newManager).estimateGas(transactionOptions);
-    const data = this.indexContract.methods.transferHotel(this.address, newManager).encodeABI();
+    const estimate = this.indexContract.methods.transferAirline(this.address, newManager).estimateGas(transactionOptions);
+    const data = this.indexContract.methods.transferAirline(this.address, newManager).encodeABI();
     const transactionData = {
       nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
       data: data,
@@ -328,25 +327,25 @@ class OnChainHotel implements HotelInterface {
       },
     };
     return {
-      hotel: (this: HotelInterface),
+      airline: (this: AirlineInterface),
       transactionData: transactionData,
       eventCallbacks: eventCallbacks,
     };
   }
 
   /**
-   * Generates transaction data and metadata required for destroying the hotel object on network.
+   * Generates transaction data and metadata required for destroying the airline object on network.
    *
    * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
    * @throws {SmartContractInstantiationError} When the underlying contract is not yet deployed.
-   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created hotel instance.
+   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created airline instance.
    */
   async removeOnChainData (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
     if (!this.onChainDataset.isDeployed()) {
-      throw new SmartContractInstantiationError('Cannot remove hotel: not deployed');
+      throw new SmartContractInstantiationError('Cannot remove airline: not deployed');
     }
-    const estimate = this.indexContract.methods.deleteHotel(this.address).estimateGas(transactionOptions);
-    const data = this.indexContract.methods.deleteHotel(this.address).encodeABI();
+    const estimate = this.indexContract.methods.deleteAirline(this.address).estimateGas(transactionOptions);
+    const data = this.indexContract.methods.deleteAirline(this.address).encodeABI();
     const transactionData = {
       nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
       data: data,
@@ -360,11 +359,11 @@ class OnChainHotel implements HotelInterface {
       },
     };
     return {
-      hotel: (this: HotelInterface),
+      airline: (this: AirlineInterface),
       transactionData: transactionData,
       eventCallbacks: eventCallbacks,
     };
   }
 }
 
-export default OnChainHotel;
+export default OnChainAirline;

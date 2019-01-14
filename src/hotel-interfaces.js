@@ -108,7 +108,7 @@ export interface OffChainDataAdapterInterface {
 }
 
 /**
- * Formalization of DataModel's public interface.
+ * Formalization of AbstractDataModel's public interface.
  */
 export interface DataModelInterface {
   getWindingTreeIndex(address: string): WTIndexInterface,

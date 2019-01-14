@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import WTLibs from '../src/index';
 import jsonWallet from './utils/test-wallet';
 import jsonWallet2 from './utils/test-wallet-2';
-import testedDataModel from './utils/data-model-definition';
+import testedDataModel from './utils/data-hotel-model-definition';
 import OffChainDataClient from '../src/off-chain-data-client';
 
 import { InputDataError, WTLibsError } from '../src/errors';
@@ -138,7 +138,7 @@ describe('WTLibs usage', () => {
       const address = '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769';
       const hotel = await index.getHotel(address);
       assert.isNotNull(hotel);
-      assert.equal(await hotel.dataUri, 'in-memory://urlone');
+      assert.equal(await hotel.dataUri, 'in-memory://hotel-url-one');
       assert.equal(await hotel.address, address);
     });
 
@@ -154,14 +154,14 @@ describe('WTLibs usage', () => {
       assert.isDefined(descriptionContents.contents);
       assert.isDefined(descriptionContents.ref);
       assert.equal((await descriptionContents.contents).name, 'First hotel');
-      assert.equal(descriptionContents.ref, 'in-memory://descriptionone');
+      assert.equal(descriptionContents.ref, 'in-memory://hotel-description-one');
       const ratePlanContents = hotelDataContents.ratePlansUri;
       assert.isDefined(ratePlanContents.contents);
       assert.isDefined(ratePlanContents.ref);
       let ratePlans = await ratePlanContents.contents;
       assert.isArray(ratePlans);
       assert.equal(ratePlans[0].name, 'Basic');
-      assert.equal(ratePlanContents.ref, 'in-memory://rateplansone');
+      assert.equal(ratePlanContents.ref, 'in-memory://hotel-rateplans-one');
     });
 
     it('should provide a toPlainObject method', async () => {

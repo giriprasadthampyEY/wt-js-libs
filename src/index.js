@@ -3,7 +3,7 @@
 import type { DataModelOptionsType } from './data-model';
 import type { OffChainDataClientOptionsType } from './off-chain-data-client';
 import type { WTIndexInterface, AdaptedTxResultsInterface, OffChainDataAdapterInterface, WalletInterface, KeystoreV3Interface } from './interfaces';
-import DataModel from './data-model';
+import { AbstractDataModel, AirlineDataModel, HotelDataModel } from './data-model/index';
 import OffChainDataClient from './off-chain-data-client';
 
 import {
@@ -40,6 +40,7 @@ import {
  * @type WtLibsOptionsType
  */
 type WtLibsOptionsType = {
+  segment: string,
   dataModelOptions: DataModelOptionsType,
   offChainDataOptions: OffChainDataClientOptionsType
 };
@@ -49,7 +50,7 @@ type WtLibsOptionsType = {
  */
 class WTLibs {
   static errors: Object;
-  dataModel: DataModel;
+  dataModel: AbstractDataModel;
   offChainDataClient: OffChainDataClient;
   options: WtLibsOptionsType;
 
@@ -64,7 +65,15 @@ class WTLibs {
 
   constructor (options: WtLibsOptionsType) {
     this.options = options || {};
-    this.dataModel = DataModel.createInstance(this.options.dataModelOptions);
+
+    if (this.options.segment === 'hotels') {
+      this.dataModel = HotelDataModel.createInstance(this.options.dataModelOptions);
+    } else if (this.options.segment === 'airlines') {
+      this.dataModel = AirlineDataModel.createInstance(this.options.dataModelOptions);
+    } else {
+      throw Error(`Unknown segment: ${this.options.segment}`);
+    }
+
     OffChainDataClient.setup(this.options.offChainDataOptions);
   }
 

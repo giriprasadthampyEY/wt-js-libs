@@ -1,16 +1,16 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import WTIndexDataProvider from '../../../src/data-model/wt-index';
-import Web3UriDataModel from '../../../src/data-model/';
-import testedDataModel from '../../utils/data-model-definition';
+import WTIndexDataProvider from '../../../../src/data-model/wt-hotel-index';
+import { HotelDataModel } from '../../../../src/data-model/';
+import testedDataModel from '../../../utils/data-hotel-model-definition';
 
-import { SmartContractInstantiationError, HotelNotInstantiableError, HotelNotFoundError, WTLibsError, RemoteDataReadError, InputDataError } from '../../../src/errors';
+import { SmartContractInstantiationError, HotelNotInstantiableError, HotelNotFoundError, WTLibsError, RemoteDataReadError, InputDataError } from '../../../../src/errors';
 
-describe('WTLibs.data-models.WTIndexDataProvider', () => {
+describe('WTLibs.data-model.WTHotelIndex', () => {
   let dataModel, indexDataProvider;
 
   beforeEach(async function () {
-    dataModel = Web3UriDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions);
+    dataModel = HotelDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions);
     indexDataProvider = dataModel.getWindingTreeIndex(testedDataModel.indexAddress);
   });
 
@@ -68,7 +68,7 @@ describe('WTLibs.data-models.WTIndexDataProvider', () => {
       // There is not a valid hotel on this address
       const address = '0x994afd347b160be3973b41f0a144819496d175e9';
       const hotel = await indexDataProvider.getHotel(address);
-      
+
       try {
         await hotel.dataIndex;
         throw new Error('should not have been called');

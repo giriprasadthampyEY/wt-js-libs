@@ -4,6 +4,7 @@ import InMemoryAdapter from '@windingtree/off-chain-adapter-in-memory';
 export const Web3UriBackedDataModel = {
   emptyConfig: {},
   withDataSource: () => ({
+    segment: 'hotels',
     dataModelOptions: {
       provider: 'http://localhost:8545',
     },

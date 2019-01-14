@@ -1,13 +1,21 @@
 {
-  "urlone": {
-    "descriptionUri": "in-memory://descriptionone",
-    "ratePlansUri": "in-memory://rateplansone"
+  "hotel-url-one": {
+    "descriptionUri": "in-memory://hotel-description-one",
+    "ratePlansUri": "in-memory://hotel-rateplans-one"
   },
-  "urltwo": {
-    "descriptionUri": "in-memory://descriptiontwo",
-    "ratePlansUri": "in-memory://rateplanstwo"
+  "hotel-url-two": {
+    "descriptionUri": "in-memory://hotel-description-two",
+    "ratePlansUri": "in-memory://hotel-rateplans-two"
   },
-  "descriptionone": {
+  "airline-url-one": {
+    "descriptionUri": "in-memory://airline-description-one",
+    "flightsUri": "in-memory://airline-flights-one"
+  },
+  "airline-url-two": {
+    "descriptionUri": "in-memory://airline-description-two",
+    "flightsUri": "in-memory://airline-flights-two"
+  },
+  "hotel-description-one": {
     "name": "First hotel",
     "description": "first description",
     "location": {
@@ -15,7 +23,7 @@
       "longitude": 50.075604
     }
   },
-  "descriptiontwo": {
+  "hotel-description-two": {
     "name": "Second hotel",
     "description": "second description",
     "location": {
@@ -23,7 +31,21 @@
       "longitude": 50.075640
     }
   },
-  "rateplansone": [
+  "airline-description-one": {
+    "name": "First airline",
+    "code": "a1",
+    "contacts": {
+      "general": { "email": "airline1@example.com" }
+    }
+  },
+  "airline-description-two": {
+    "name": "Second airline",
+    "code": "a2",
+    "contacts": {
+      "general": { "email": "airline2@example.com" }
+    }
+  },
+  "hotel-rateplans-one": [
     {
       "id": "rate-plan",
       "name": "Basic",
@@ -39,7 +61,7 @@
       "price": 20
     }
   ],
-  "rateplanstwo": [
+  "hotel-rateplans-two": [
     {
       "id": "rate-plan",
       "name": "Basic",
@@ -54,5 +76,59 @@
       "currency": "EUR",
       "price": 20
     }
-  ]
+  ],
+  "airline-flights-one": {
+    "updatedAt": "2019-01-01 12:00:00",
+    "flights": [
+      {
+        "id": "OK0965",
+        "origin": "PRG",
+        "destination": "LAX",
+        "segments": [
+          {
+            "id": "segment1",
+            "departureAirport": "PRG",
+            "arrivalAirport": "CDG"
+          },
+          {
+            "id": "segment2",
+            "departureAirport": "CDG",
+            "arrivalAirport": "LAX"
+          }
+        ],
+        "flightInstancesUri": "in-memory://airline-flightinstancesone"
+      },
+      {
+        "id": "BA123",
+        "origin": "LON",
+        "destination": "CAP",
+        "segments": [
+          {
+            "id": "segment1",
+            "departureAirport": "LON",
+            "arrivalAirport": "CAP"
+          }
+        ],
+        "flightInstancesUri": "in-memory://airline-flightinstancestwo"
+      }
+    ]
+  },
+  "airline-flights-two": {
+    "updatedAt": "2019-01-10 12:00:00",
+    "flights": [
+      {
+        "id": "CN9000",
+        "origin": "PEK",
+        "destination": "KYO",
+        "segments": [
+          {
+            "id": "segment1",
+            "departureAirport": "PEK",
+            "arrivalAirport": "KYO"
+          }
+        ],
+        "flightInstancesUri": "in-memory://airline-flightinstancesthree"
+      }
+    ]
+  }
 }

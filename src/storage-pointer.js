@@ -128,7 +128,7 @@ class StoragePointer {
    * Usable when the the off-chain data might have changed since
    * the last query and the most recent version of it is needed.
    */
-  async reset (): Promise<void> {
+  async reset () {
     // If the download is still in progress, wait for it to
     // finish to reduce race condition possibilities.
     await (this._downloading || Promise.resolve());

@@ -1,9 +1,9 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import helpers from '../utils/helpers';
-import testedDataModel from '../utils/data-model-definition';
+import testedDataModel from '../utils/data-hotel-model-definition';
 import jsonWallet from '../utils/test-wallet';
-import DataModel from '../../src/data-model/';
+import { HotelDataModel } from '../../src/data-model/';
 import Web3WTWallet from '../../src/wallet';
 import {
   MalformedWalletError,
@@ -23,7 +23,7 @@ describe('WTLibs.Wallet', () => {
   let dataModel;
   const correctPassword = 'test123';
   beforeEach(async function () {
-    dataModel = DataModel.createInstance(testedDataModel.withDataSource().dataModelOptions);
+    dataModel = HotelDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions);
   });
 
   describe('unlock', () => {

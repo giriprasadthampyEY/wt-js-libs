@@ -1,15 +1,15 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import WTLibs from '../../src/index';
-import DataModel from '../../src/data-model';
-import OffChainDataClient from '../../src/off-chain-data-client';
+import WTLibs from '../../../src/index';
+import { AirlineDataModel } from '../../../src/data-model';
+import OffChainDataClient from '../../../src/off-chain-data-client';
 
-describe('WTLibs', () => {
+describe('WTLibs.WTAirlineIndex', () => {
   describe('createInstance', () => {
     let createDataModelSpy;
 
     beforeEach(() => {
-      createDataModelSpy = sinon.spy(DataModel, 'createInstance');
+      createDataModelSpy = sinon.spy(AirlineDataModel, 'createInstance');
     });
 
     afterEach(() => {
@@ -17,13 +17,14 @@ describe('WTLibs', () => {
     });
 
     it('should initialize data model', () => {
-      const libs = WTLibs.createInstance();
+      const libs = WTLibs.createInstance({ segment: 'airlines' });
       assert.isDefined(libs.dataModel);
       assert.equal(createDataModelSpy.callCount, 1);
     });
 
     it('should pass data model options', () => {
       const libs = WTLibs.createInstance({
+        segment: 'airlines',
         dataModelOptions: {
           random: '1234',
         },
@@ -36,6 +37,7 @@ describe('WTLibs', () => {
   describe('getOffChainDataClient', () => {
     it('should return OffChainDataClient', () => {
       const libs = WTLibs.createInstance({
+        segment: 'airlines',
         dataModelOptions: {
           random: '1234',
         },

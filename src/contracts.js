@@ -1,5 +1,7 @@
-import WTIndexContractMetadata from '@windingtree/wt-contracts/build/contracts/AbstractWTIndex.json';
+import WTHotelIndexContractMetadata from '@windingtree/wt-contracts/build/contracts/AbstractWTHotelIndex.json';
 import HotelContractMetadata from '@windingtree/wt-contracts/build/contracts/AbstractHotel.json';
+import WTAirlineIndexContractMetadata from '@windingtree/wt-contracts/build/contracts/AbstractWTAirlineIndex.json';
+import AirlineContractMetadata from '@windingtree/wt-contracts/build/contracts/AbstractAirline.json';
 import { SmartContractInstantiationError } from './errors';
 
 import Web3Utils from 'web3-utils';
@@ -53,13 +55,23 @@ class Contracts {
   }
 
   /**
-   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.2.0/contracts/WTIndex.sol">WTIndex.sol</a>.
+   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.3.0/contracts/WTHotelIndex.sol">WTHotelIndex.sol</a>.
    *
    * @param  {string} address
    * @return {web3.eth.Contract} Instance of an Index
    */
-  async getIndexInstance (address) {
-    return this._getInstance('index', WTIndexContractMetadata.abi, address);
+  async getHotelIndexInstance (address) {
+    return this._getInstance('index', WTHotelIndexContractMetadata.abi, address);
+  }
+
+  /**
+   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.3.0/contracts/WTAirlineIndex.sol">WTAirlineIndex.sol</a>.
+   *
+   * @param  {string} address
+   * @return {web3.eth.Contract} Instance of an Index
+   */
+  async getAirlineIndexInstance (address) {
+    return this._getInstance('index', WTAirlineIndexContractMetadata.abi, address);
   }
 
   /**
@@ -70,6 +82,16 @@ class Contracts {
    */
   async getHotelInstance (address) {
     return this._getInstance('hotel', HotelContractMetadata.abi, address);
+  }
+
+  /**
+   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.3.0/contracts/hotel/Airline.sol">Airline.sol</a>.
+   *
+   * @param  {string} address
+   * @return {web3.eth.Contract} Instance of an Airline
+   */
+  async getAirlineInstance (address) {
+    return this._getInstance('airline', AirlineContractMetadata.abi, address);
   }
 
   _initEventRegistry () {
@@ -86,8 +108,9 @@ class Contracts {
     if (!this.eventRegistry) {
       this.eventRegistry = Object.assign(
         {},
-        generateEventSignatures(WTIndexContractMetadata.abi),
-        generateEventSignatures(HotelContractMetadata.abi)
+        generateEventSignatures(WTHotelIndexContractMetadata.abi),
+        generateEventSignatures(HotelContractMetadata.abi),
+        generateEventSignatures(AirlineContractMetadata.abi),
       );
     }
     return this.eventRegistry;

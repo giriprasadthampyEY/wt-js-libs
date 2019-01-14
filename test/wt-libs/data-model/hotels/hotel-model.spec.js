@@ -1,13 +1,13 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import Web3UriDataModel from '../../../src/data-model/';
-import WTIndexDataProvider from '../../../src/data-model/wt-index';
-import testedDataModel from '../../utils/data-model-definition';
+import { HotelDataModel } from '../../../../src/data-model/index';
+import WTHotelIndex from '../../../../src/data-model/wt-hotel-index';
+import testedDataModel from '../../../utils/data-hotel-model-definition';
 
-describe('WTLibs.data-model', () => {
+describe('WTLibs.data-model.HotelDataModel', () => {
   it('should cache WTIndex instances', () => {
-    const dataModel = Web3UriDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions);
-    const createInstanceSpy = sinon.spy(WTIndexDataProvider, 'createInstance');
+    const dataModel = HotelDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions);
+    const createInstanceSpy = sinon.spy(WTHotelIndex, 'createInstance');
     assert.equal(createInstanceSpy.callCount, 0);
     dataModel.getWindingTreeIndex('address1');
     assert.equal(createInstanceSpy.callCount, 1);

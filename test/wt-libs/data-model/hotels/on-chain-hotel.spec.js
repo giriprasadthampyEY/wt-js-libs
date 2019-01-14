@@ -1,10 +1,10 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import helpers from '../../utils/helpers';
-import OnChainHotel from '../../../src/data-model/on-chain-hotel';
-import StoragePointer from '../../../src/storage-pointer';
+import helpers from '../../../utils/helpers';
+import OnChainHotel from '../../../../src/data-model/on-chain-hotel';
+import StoragePointer from '../../../../src/storage-pointer';
 
-import { InputDataError, SmartContractInstantiationError } from '../../../src/errors';
+import { InputDataError, SmartContractInstantiationError } from '../../../../src/errors';
 
 describe('WTLibs.data-model.OnChainHotel', () => {
   let contractsStub, utilsStub, indexContractStub, urlStub, managerStub;
