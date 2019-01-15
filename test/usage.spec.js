@@ -349,4 +349,14 @@ describe('WTLibs usage', () => {
       assert.deepEqual(result.results, {});
     });
   });
+
+  it('should throw on unknown segment', () => {
+    try {
+      WTLibs.createInstance({ segment: 'books' });
+      throw new Error('should not have been called');
+    } catch (e) {
+      assert.match(e.message, /Unknown segment: books/i);
+      assert.instanceOf(e, Error);
+    }
+  });
 });
