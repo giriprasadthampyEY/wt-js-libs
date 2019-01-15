@@ -17,6 +17,7 @@ import {
   TransactionDidNotComeThroughError,
   NoReceiptError,
   InaccessibleEthereumNodeError,
+  WalletError,
 } from '../../src/errors';
 
 describe('WTLibs.Wallet', () => {
@@ -85,6 +86,20 @@ describe('WTLibs.Wallet', () => {
       } catch (e) {
         assert.match(e.message, /cannot unlock destroyed wallet/i);
         assert.instanceOf(e, WalletStateError);
+      }
+    });
+
+    it('should translate unknown error', async () => {
+      // we just need coverage
+      const wallet = dataModel.createWallet(jsonWallet);
+      sinon.stub(wallet.web3Eth.accounts, 'decrypt').throws(new Error('Unknown web3-eth-accounts error'));
+      try {
+        wallet.unlock(correctPassword);
+        throw new Error('should not have been called');
+      } catch (e) {
+        wallet.web3Eth.accounts.decrypt.restore();
+        assert.match(e.message, /Unknown error during wallet decryption/i);
+        assert.instanceOf(e, WalletError);
       }
     });
   });
