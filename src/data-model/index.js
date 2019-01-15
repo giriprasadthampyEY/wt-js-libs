@@ -2,8 +2,7 @@
 
 import Utils from '../utils';
 import Contracts from '../contracts';
-import type { DataModelInterface, AdaptedTxResultInterface, AdaptedTxResultsInterface, KeystoreV3Interface } from '../interfaces';
-import AbstractWTIndex from './wt-index';
+import type { DataModelInterface, AdaptedTxResultInterface, AdaptedTxResultsInterface, KeystoreV3Interface } from '../interfaces/base-interfaces';
 import Wallet from '../wallet';
 import WTHotelIndex from './wt-hotel-index';
 import WTAirlineIndex from './wt-airline-index';
@@ -36,12 +35,11 @@ class AbstractDataModel implements DataModelInterface {
   options: DataModelOptionsType;
   web3Utils: Utils;
   web3Contracts: Contracts;
-  _wtIndexCache: {[address: string]: AbstractWTIndex};
 
   /**
    * Returns an Ethereum backed Winding Tree index.
    */
-  getWindingTreeIndex (address: string): AbstractWTIndex {
+  getWindingTreeIndex (address: string): WTHotelIndex | WTAirlineIndex {
     throw Error('Not implemented. Should be called on a subclass instance.');
   }
 
@@ -102,6 +100,8 @@ class AbstractDataModel implements DataModelInterface {
 }
 
 class HotelDataModel extends AbstractDataModel {
+  _wtIndexCache: {[address: string]: WTHotelIndex};
+
   /**
    * Sets up Utils and Contracts with given web3 provider.
    * Sets up gasCoefficient or gasMargin. If neither is provided,
@@ -140,6 +140,8 @@ class HotelDataModel extends AbstractDataModel {
 }
 
 class AirlineDataModel extends AbstractDataModel {
+  _wtIndexCache: {[address: string]: WTAirlineIndex};
+
   /**
    * Sets up Utils and Contracts with given web3 provider.
    * Sets up gasCoefficient or gasMargin. If neither is provided,

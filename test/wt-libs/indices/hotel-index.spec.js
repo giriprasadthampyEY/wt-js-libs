@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import WTLibs from '../../../src/index';
 import { HotelDataModel } from '../../../src/data-model';
 import OffChainDataClient from '../../../src/off-chain-data-client';
+import { HOTEL_SEGMENT_ID } from '../../utils/data-hotel-model-definition';
 
 describe('WTLibs.WTHotelIndex', () => {
   describe('createInstance', () => {
@@ -17,14 +18,14 @@ describe('WTLibs.WTHotelIndex', () => {
     });
 
     it('should initialize data model', () => {
-      const libs = WTLibs.createInstance({ segment: 'hotels' });
+      const libs = WTLibs.createInstance({ segment: HOTEL_SEGMENT_ID });
       assert.isDefined(libs.dataModel);
       assert.equal(createDataModelSpy.callCount, 1);
     });
 
     it('should pass data model options', () => {
       const libs = WTLibs.createInstance({
-        segment: 'hotels',
+        segment: HOTEL_SEGMENT_ID,
         dataModelOptions: {
           random: '1234',
         },
@@ -37,7 +38,7 @@ describe('WTLibs.WTHotelIndex', () => {
   describe('getOffChainDataClient', () => {
     it('should return OffChainDataClient', () => {
       const libs = WTLibs.createInstance({
-        segment: 'hotels',
+        segment: HOTEL_SEGMENT_ID,
         dataModelOptions: {
           random: '1234',
         },

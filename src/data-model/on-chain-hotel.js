@@ -1,5 +1,11 @@
 // @flow
-import type { TransactionOptionsInterface, TransactionCallbacksInterface, PreparedTransactionMetadataInterface, TxReceiptInterface, HotelInterface, PlainHotelInterface, HotelOnChainDataInterface } from '../hotel-interfaces';
+import type {
+  PlainDataInterface,
+  TransactionCallbacksInterface,
+  TransactionOptionsInterface,
+  TxReceiptInterface,
+} from '../interfaces/base-interfaces';
+import type { HotelInterface, PreparedTransactionMetadataInterface } from '../interfaces/hotel-interfaces';
 import Utils from '../utils';
 import Contracts from '../contracts';
 import RemotelyBackedDataset from '../remotely-backed-dataset';
@@ -160,9 +166,9 @@ class OnChainHotel implements HotelInterface {
    * Update manager and dataUri properties. dataUri can never be nulled. Manager
    * can never be nulled. Manager can be changed only for an un-deployed
    * contract (without address).
-   * @param {HotelOnChainDataInterface} newData
+   * @param {HotelInterface} newData
    */
-  async setLocalData (newData: HotelOnChainDataInterface) {
+  async setLocalData (newData: HotelInterface) {
     const newManager = await newData.manager;
     if (newManager) {
       this.manager = newManager;
@@ -198,7 +204,7 @@ class OnChainHotel implements HotelInterface {
    *
    * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
    */
-  async toPlainObject (resolvedFields: ?Array<string>): Promise<PlainHotelInterface> {
+  async toPlainObject (resolvedFields: ?Array<string>): Promise<PlainDataInterface> {
     const dataIndex = await this.dataIndex;
     const offChainData = await dataIndex.toPlainObject(resolvedFields);
     let result = {

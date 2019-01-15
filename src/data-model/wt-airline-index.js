@@ -1,5 +1,5 @@
 // @flow
-import type { WTIndexInterface, AirlineOnChainDataInterface, AirlineInterface, PreparedTransactionMetadataInterface } from '../airline-interfaces';
+import type { WTAirlineIndexInterface, AirlineInterface, PreparedTransactionMetadataInterface } from '../interfaces/airline-interfaces';
 import Utils from '../utils';
 import Contracts from '../contracts';
 import OnChainAirline from './on-chain-airline';
@@ -12,7 +12,7 @@ import AbstractWTIndex from './wt-index';
  * index wrapper. It provides methods for working with airline
  * contracts.
  */
-class WTAirlineIndex extends AbstractWTIndex implements WTIndexInterface {
+class WTAirlineIndex extends AbstractWTIndex implements WTAirlineIndexInterface {
   constructor (indexAddress: string, web3Utils: Utils, web3Contracts: Contracts) {
     super();
     this.address = indexAddress;
@@ -48,7 +48,7 @@ class WTAirlineIndex extends AbstractWTIndex implements WTIndexInterface {
    * @throws {InputDataError} When airlineData does not contain a manager property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
-  async addAirline (airlineData: AirlineOnChainDataInterface): Promise<PreparedTransactionMetadataInterface> {
+  async addAirline (airlineData: AirlineInterface): Promise<PreparedTransactionMetadataInterface> {
     if (!await airlineData.dataUri) {
       throw new InputDataError('Cannot add airline: Missing dataUri');
     }

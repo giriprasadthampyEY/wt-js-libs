@@ -1,5 +1,11 @@
 // @flow
-import type { TransactionOptionsInterface, TransactionCallbacksInterface, PreparedTransactionMetadataInterface, TxReceiptInterface, AirlineInterface, PlainAirlineInterface, AirlineOnChainDataInterface } from '../airline-interfaces';
+import type {
+  PlainDataInterface,
+  TransactionCallbacksInterface,
+  TransactionOptionsInterface,
+  TxReceiptInterface,
+} from '../interfaces/base-interfaces';
+import type { AirlineInterface, PreparedTransactionMetadataInterface } from '../interfaces/airline-interfaces';
 import Utils from '../utils';
 import Contracts from '../contracts';
 import RemotelyBackedDataset from '../remotely-backed-dataset';
@@ -159,9 +165,9 @@ class OnChainAirline implements AirlineInterface {
    * Update manager and dataUri properties. dataUri can never be nulled. Manager
    * can never be nulled. Manager can be changed only for an un-deployed
    * contract (without address).
-   * @param {AirlineOnChainDataInterface} newData
+   * @param {AirlineInterface} newData
    */
-  async setLocalData (newData: AirlineOnChainDataInterface) {
+  async setLocalData (newData: AirlineInterface) {
     const newManager = await newData.manager;
     if (newManager) {
       this.manager = newManager;
@@ -197,7 +203,7 @@ class OnChainAirline implements AirlineInterface {
    *
    * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
    */
-  async toPlainObject (resolvedFields: ?Array<string>): Promise<PlainAirlineInterface> {
+  async toPlainObject (resolvedFields: ?Array<string>): Promise<PlainDataInterface> {
     const dataIndex = await this.dataIndex;
     const offChainData = await dataIndex.toPlainObject(resolvedFields);
     let result = {

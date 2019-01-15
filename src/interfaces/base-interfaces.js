@@ -2,24 +2,29 @@
 
 import BigNumber from 'bignumber.js';
 
-import StoragePointer from './storage-pointer';
+import type { WTHotelIndexInterface } from './hotel-interfaces';
+import type { WTAirlineIndexInterface } from './airline-interfaces';
+import StoragePointer from '../storage-pointer';
 
 /**
  * Shape of data that is stored on-chain
- * about every hotel.
+ * about every hotel/airline.
  *
  * - `address` is the network address.
- * - `manager` is the network address of hotel manager.
+ * - `manager` is the network address of airline manager.
  * - `dataUri` holds a pointer to the off-chain storage
  * that is used internally to store data.
  */
-export interface HotelOnChainDataInterface {
+export interface BaseOnChainDataInterface {
+  +dataIndex: Promise<StoragePointer>,
   address: Promise<?string> | ?string,
   manager: Promise<?string> | ?string,
-  dataUri: Promise<?string> | ?string
+  dataUri: Promise<?string> | ?string,
+
+  toPlainObject(): Promise<Object>
 }
 
-export interface PlainHotelInterface {
+export interface PlainDataInterface {
   address: Promise<?string> | ?string,
   manager: Promise<?string> | ?string,
   dataUri: Promise<{ref: string, contents: Object}> | {ref: string, contents: Object}
@@ -50,49 +55,12 @@ export interface TransactionCallbacksInterface {
 }
 
 /**
- * Format of generated transaction data and metadata
- * that contains a related hotel instance, transactionData
- * itself (ready for signing) and optionally eventCallbacks
- * that should be passed to our Wallet abstraction with
- * transactionData itself to ensure a consistent internal state
- * after the transaction is mined.
+ * Formalization of AbstractDataModel's public interface.
  */
-export interface PreparedTransactionMetadataInterface {
-  hotel: HotelInterface,
-  transactionData: TransactionDataInterface,
-  eventCallbacks?: TransactionCallbacksInterface
-}
-
-/**
- * Represents a hotel instance that can
- * communicate with on-chain hotel representation
- * and provides an access to offChain data via `dataIndex`
- * property.
- *
- */
-export interface HotelInterface extends HotelOnChainDataInterface {
-  +dataIndex: Promise<StoragePointer>,
-
-  toPlainObject(): Promise<Object>,
-  setLocalData(newData: HotelOnChainDataInterface): Promise<void>,
-  createOnChainData(transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>,
-  updateOnChainData(transactionOptions: TransactionOptionsInterface): Promise<Array<PreparedTransactionMetadataInterface>>,
-  removeOnChainData(transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>,
-  transferOnChainOwnership(newManager: string, transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>
-}
-
-/**
- * WindingTree index interface that provides all methods
- * necessary for interaction with the hotels.`
- */
-export interface WTIndexInterface {
-  addHotel(hotel: HotelOnChainDataInterface): Promise<PreparedTransactionMetadataInterface>,
-  getHotel(address: string): Promise<?HotelInterface>,
-  getAllHotels(): Promise<Array<HotelInterface>>,
-  // It is possible that this operation generates multiple transactions in the future
-  updateHotel(hotel: HotelInterface): Promise<Array<PreparedTransactionMetadataInterface>>,
-  removeHotel(hotel: HotelInterface): Promise<PreparedTransactionMetadataInterface>,
-  transferHotelOwnership(hotel: HotelInterface, newManager: string): Promise<PreparedTransactionMetadataInterface>
+export interface DataModelInterface {
+  getWindingTreeIndex(address: string): WTHotelIndexInterface | WTAirlineIndexInterface,
+  getTransactionsStatus(transactionHashes: Array<string>): Promise<AdaptedTxResultsInterface>,
+  createWallet(jsonWallet: Object): WalletInterface
 }
 
 /**
@@ -105,15 +73,6 @@ export interface OffChainDataAdapterInterface {
   update(uri: string, data: {[string]: Object}): Promise<string>,
   // Download content from given uri
   download(uri: string): Promise<?{[string]: Object}>
-}
-
-/**
- * Formalization of AbstractDataModel's public interface.
- */
-export interface DataModelInterface {
-  getWindingTreeIndex(address: string): WTIndexInterface,
-  getTransactionsStatus(transactionHashes: Array<string>): Promise<AdaptedTxResultsInterface>,
-  createWallet(jsonWallet: Object): WalletInterface
 }
 
 /**

@@ -3,6 +3,7 @@ import sinon from 'sinon';
 import WTLibs from '../../../src/index';
 import { AirlineDataModel } from '../../../src/data-model';
 import OffChainDataClient from '../../../src/off-chain-data-client';
+import { AIRLINE_SEGMENT_ID } from '../../utils/data-airline-model-definition';
 
 describe('WTLibs.WTAirlineIndex', () => {
   describe('createInstance', () => {
@@ -17,14 +18,14 @@ describe('WTLibs.WTAirlineIndex', () => {
     });
 
     it('should initialize data model', () => {
-      const libs = WTLibs.createInstance({ segment: 'airlines' });
+      const libs = WTLibs.createInstance({ segment: AIRLINE_SEGMENT_ID });
       assert.isDefined(libs.dataModel);
       assert.equal(createDataModelSpy.callCount, 1);
     });
 
     it('should pass data model options', () => {
       const libs = WTLibs.createInstance({
-        segment: 'airlines',
+        segment: AIRLINE_SEGMENT_ID,
         dataModelOptions: {
           random: '1234',
         },
@@ -37,7 +38,7 @@ describe('WTLibs.WTAirlineIndex', () => {
   describe('getOffChainDataClient', () => {
     it('should return OffChainDataClient', () => {
       const libs = WTLibs.createInstance({
-        segment: 'airlines',
+        segment: AIRLINE_SEGMENT_ID,
         dataModelOptions: {
           random: '1234',
         },

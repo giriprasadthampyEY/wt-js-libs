@@ -1,5 +1,8 @@
 // @flow
 
+import Utils from '../utils';
+import Contracts from '../contracts';
+
 /**
  * Ethereum smart contract backed implementation of Winding Tree
  * index wrapper. It provides methods for working with hotel

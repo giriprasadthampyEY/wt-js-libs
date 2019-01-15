@@ -1,5 +1,5 @@
 // @flow
-import type { WTIndexInterface, HotelOnChainDataInterface, HotelInterface, PreparedTransactionMetadataInterface } from '../hotel-interfaces';
+import type { WTHotelIndexInterface, HotelInterface, PreparedTransactionMetadataInterface } from '../interfaces/hotel-interfaces';
 import Utils from '../utils';
 import Contracts from '../contracts';
 import OnChainHotel from './on-chain-hotel';
@@ -12,7 +12,7 @@ import AbstractWTIndex from './wt-index';
  * index wrapper. It provides methods for working with hotel
  * contracts.
  */
-class WTHotelIndex extends AbstractWTIndex implements WTIndexInterface {
+class WTHotelIndex extends AbstractWTIndex implements WTHotelIndexInterface {
   constructor (indexAddress: string, web3Utils: Utils, web3Contracts: Contracts) {
     super();
     this.address = indexAddress;
@@ -48,7 +48,7 @@ class WTHotelIndex extends AbstractWTIndex implements WTIndexInterface {
    * @throws {InputDataError} When hotelData does not contain a manager property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
-  async addHotel (hotelData: HotelOnChainDataInterface): Promise<PreparedTransactionMetadataInterface> {
+  async addHotel (hotelData: HotelInterface): Promise<PreparedTransactionMetadataInterface> {
     if (!await hotelData.dataUri) {
       throw new InputDataError('Cannot add hotel: Missing dataUri');
     }
