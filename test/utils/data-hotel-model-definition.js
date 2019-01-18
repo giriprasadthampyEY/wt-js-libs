@@ -1,7 +1,6 @@
 import offChainData from './data/off-chain-data.json';
 import InMemoryAdapter from '@windingtree/off-chain-adapter-in-memory';
-
-export const HOTEL_SEGMENT_ID = 'hotels';
+import { HOTEL_SEGMENT_ID } from '../../src/constants';
 
 export const Web3UriBackedDataModel = {
   emptyConfig: {},

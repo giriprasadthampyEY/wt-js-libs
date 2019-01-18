@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import WTLibs from '../../../src/index';
 import { HotelDataModel } from '../../../src/data-model';
 import OffChainDataClient from '../../../src/off-chain-data-client';
-import { HOTEL_SEGMENT_ID } from '../../utils/data-hotel-model-definition';
+import { HOTEL_SEGMENT_ID } from '../../../src/constants';
 
 describe('WTLibs.WTHotelIndex', () => {
   describe('createInstance', () => {

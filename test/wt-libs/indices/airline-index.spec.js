@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import WTLibs from '../../../src/index';
 import { AirlineDataModel } from '../../../src/data-model';
 import OffChainDataClient from '../../../src/off-chain-data-client';
-import { AIRLINE_SEGMENT_ID } from '../../utils/data-airline-model-definition';
+import { AIRLINE_SEGMENT_ID } from '../../../src/constants';
 
 describe('WTLibs.WTAirlineIndex', () => {
   describe('createInstance', () => {
