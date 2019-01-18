@@ -109,6 +109,7 @@ class Contracts {
       this.eventRegistry = Object.assign(
         {},
         generateEventSignatures(WTHotelIndexContractMetadata.abi),
+        generateEventSignatures(WTAirlineIndexContractMetadata.abi),
         generateEventSignatures(HotelContractMetadata.abi),
         generateEventSignatures(AirlineContractMetadata.abi),
       );
