@@ -20,7 +20,7 @@ describe('WTLibs.data-model.WTHotelIndex', () => {
       await customIndexDataProvider._getDeployedIndex();
       throw new Error('should not have been called');
     } catch (e) {
-      assert.match(e.message, /cannot get index instance/i);
+      assert.match(e.message, /cannot get hotelIndex instance/i);
       assert.instanceOf(e, SmartContractInstantiationError);
     }
   });

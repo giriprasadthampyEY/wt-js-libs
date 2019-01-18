@@ -61,7 +61,7 @@ class Contracts {
    * @return {web3.eth.Contract} Instance of an Index
    */
   async getHotelIndexInstance (address) {
-    return this._getInstance('index', WTHotelIndexContractMetadata.abi, address);
+    return this._getInstance('hotelIndex', WTHotelIndexContractMetadata.abi, address);
   }
 
   /**
@@ -71,11 +71,11 @@ class Contracts {
    * @return {web3.eth.Contract} Instance of an Index
    */
   async getAirlineIndexInstance (address) {
-    return this._getInstance('index', WTAirlineIndexContractMetadata.abi, address);
+    return this._getInstance('airlineIndex', WTAirlineIndexContractMetadata.abi, address);
   }
 
   /**
-   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.2.0/contracts/hotel/Hotel.sol">Hotel.sol</a>.
+   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.3.0/contracts/hotel/Hotel.sol">Hotel.sol</a>.
    *
    * @param  {string} address
    * @return {web3.eth.Contract} Instance of a Hotel
