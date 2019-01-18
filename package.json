@@ -74,7 +74,7 @@
     "eslint-plugin-node": "^8.0.0",
     "eslint-plugin-promise": "^4.0.0",
     "eslint-plugin-standard": "^4.0.0",
-    "flow-bin": "^0.90.0",
+    "flow-bin": "^0.91.0",
     "ganache-cli": "^6.2.1",
     "jsdom": "^13.0.0",
     "jsdom-global": "3.0.2",
