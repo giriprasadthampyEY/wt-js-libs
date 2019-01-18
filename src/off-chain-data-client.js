@@ -1,5 +1,5 @@
 // @flow
-import type { OffChainDataAdapterInterface } from './interfaces';
+import type { OffChainDataAdapterInterface } from './interfaces/base-interfaces';
 
 import { OffChainDataRuntimeError, OffChainDataConfigurationError } from './errors';
 

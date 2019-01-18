@@ -1,8 +1,8 @@
-# Winding Tree Javascript Libraries for Hotels
+# Winding Tree Javascript Libraries
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/windingtree/wt-js-libs.svg)](https://greenkeeper.io/)
 
-A JS interface to WindingTree's Ethereum smart-contracts for Hotels.
+A JS interface to WindingTree's Ethereum smart-contracts for Hotels and Airlines.
 
 ## Installation
 
@@ -21,13 +21,14 @@ should always be the same regardless of what kind of implementation is used
 under the hood.
 
 ```javascript
-// Winding Tree backed by a local Ethereum node.
+// Winding Tree hotel index backed by a local Ethereum node. See below for airlines usage.
 // You need to deploy the index and the hotel first. See test/utils/migrations
 // for inspiration.
 import WTLibs from '@windingtree/wt-js-libs';
 import InMemoryAdapter from '@windingtree/off-chain-adapter-in-memory';
 
 const libs = WTLibs.createInstance({
+  segment: 'hotels',
   dataModelOptions: {
     provider: 'http://localhost:8545',
   },
@@ -78,6 +79,26 @@ try {
   // After the transaction is confirmed, one of the callbacks
   // will set the address of the hotel.
   const newHotelAddress = hotel.address;
+} finally {
+  wallet.lock();
+}
+
+// Working with airline data is very similar. Just change the segment and a few method names:
+const libs = WTLibs.createInstance({
+  segment: 'airlines',
+  ...
+});
+const airline = await index.getAirline('0x...');
+
+try {
+  const { airline, transactionData, eventCallbacks } = await index.addAirline({
+    manager: wallet.getAddress(),
+    dataUri: 'https://example.com/my-airline-data.json',
+  });
+  const result = await wallet.signAndSendTransaction(transactionData, eventCallbacks);
+  // After the transaction is confirmed, one of the callbacks
+  // will set the address of the airline.
+  const newAirlineAddress = airline.address;
 } finally {
   wallet.lock();
 }
