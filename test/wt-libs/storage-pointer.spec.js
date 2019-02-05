@@ -424,6 +424,39 @@ describe('WTLibs.StoragePointer', () => {
       }
     });
 
+    it('should accept an array of objects that contain pointers', async () => {
+      const childHash = InMemoryAdapter.storageInstance.create({
+        referenced: true,
+        number: 23,
+      });
+      const hash = InMemoryAdapter.storageInstance.create({
+        array: [
+          { valueUri: `in-memory://${childHash}` },
+        ],
+      });
+      const ptr = StoragePointer.createInstance(`in-memory://${hash}`, {
+        array: { children: { valueUri: { required: true } } },
+      });
+      let data = await ptr.toPlainObject();
+      assert.equal(data.contents.array[0].contents.number, 23);
+    });
+
+    it('should throw for nested pointer that contains an array', async () => {
+      const hash = InMemoryAdapter.storageInstance.create({
+        ten:
+          { okey: [ 'dokey', 'foo' ], },
+      });
+      const ptr = StoragePointer.createInstance(`in-memory://${hash}`, {
+        ten: { nested: true },
+      });
+      try {
+        await ptr.toPlainObject();
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /which does not appear to be of type string/i);
+      }
+    });
+
     it('should resolve multiple recursive fields', async () => {
       const pojo = await pointer.toPlainObject(['eight.five.two', 'nine.below.above']);
       assert.equal(pojo.contents.six, 'horses');

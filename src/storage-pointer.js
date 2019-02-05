@@ -173,24 +173,35 @@ class StoragePointer {
       if (!fieldData) {
         continue;
       }
-      if (typeof fieldData !== expectedType) { // eslint-disable-line valid-typeof
+      if (!Array.isArray(fieldData) && typeof fieldData !== expectedType) { // eslint-disable-line valid-typeof
         const value = fieldData ? fieldData.toString() : 'undefined';
-        throw new StoragePointerError(`Cannot access field '${fieldName}' on '${value}' which does not appear to be of type ${expectedType}.`);
+        throw new StoragePointerError(`Cannot access field '${fieldName}' on '${value}' which does not appear to be of type ${expectedType} but ${typeof fieldData}.`);
       }
       if (fieldDef.nested) {
         if (Array.isArray(fieldData)) {
           throw new StoragePointerError(`Cannot access field '${fieldName}'. Nested pointer cannot be an Array.`);
-        }
-        const pointers = {};
-        for (let key of Object.keys(fieldData)) {
-          if (typeof fieldData[key] !== 'string') {
-            throw new StoragePointerError(`Cannot access field '${fieldName}.${key}' which does not appear to be of type string.`);
+        } else {
+          const pointers = {};
+          for (let key of Object.keys(fieldData)) {
+            if (typeof fieldData[key] !== 'string') {
+              throw new StoragePointerError(`Cannot access field '${fieldName}.${key}' which does not appear to be of type string.`);
+            }
+            pointers[key] = StoragePointer.createInstance(fieldData[key], fieldDef.children || {});
           }
-          pointers[key] = StoragePointer.createInstance(fieldData[key], fieldDef.children || {});
+          this._data[fieldName] = pointers;
         }
-        this._data[fieldName] = pointers;
       } else {
-        this._data[fieldName] = StoragePointer.createInstance(fieldData, fieldDef.children || {});
+        if (Array.isArray(fieldData)) {
+          this._data[fieldName] = [];
+          for (let i = 0; i < fieldData.length; i++) {
+            this._data[fieldName].push({});
+            for (let refName in fieldDef.children) {
+              this._data[fieldName][i][refName] = StoragePointer.createInstance(fieldData[i][refName], fieldDef.children[refName].children || {});
+            }
+          }
+        } else {
+          this._data[fieldName] = StoragePointer.createInstance(fieldData, fieldDef.children || {});
+        }
       }
     }
   }
@@ -310,7 +321,14 @@ class StoragePointer {
           }
         } else {
           if (resolve) {
-            result[fieldName] = await contents[fieldName].toPlainObject(currentFieldDef[fieldName]);
+            if (Array.isArray(contents[fieldName])) {
+              result[fieldName] = [];
+              for (let i = 0; i < contents[fieldName].length; i++) {
+                result[fieldName].push(await contents[fieldName][i].valueUri.toPlainObject(currentFieldDef[fieldName]));
+              }
+            } else {
+              result[fieldName] = await contents[fieldName].toPlainObject(currentFieldDef[fieldName]);
+            }
           } else {
             result[fieldName] = this._data[fieldName].ref;
           }
