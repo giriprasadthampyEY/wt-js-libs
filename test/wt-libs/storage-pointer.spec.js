@@ -444,7 +444,7 @@ describe('WTLibs.StoragePointer', () => {
     it('should throw for nested pointer that contains an array', async () => {
       const hash = InMemoryAdapter.storageInstance.create({
         ten:
-          { okey: [ 'dokey', 'foo' ], },
+          { okey: [ 'dokey', 'foo' ] },
       });
       const ptr = StoragePointer.createInstance(`in-memory://${hash}`, {
         ten: { nested: true },

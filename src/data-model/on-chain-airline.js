@@ -106,7 +106,7 @@ class OnChainAirline implements AirlineInterface {
       if (!this._dataIndex) {
         this._dataIndex = StoragePointer.createInstance(await this.dataUri, {
           descriptionUri: { required: true },
-          flightsUri: { required: false, children: { flightInstancesUri: { required: true } } },
+          flightsUri: { required: false, children: { flights: { children: { flightInstancesUri: { required: true } } } } },
         });
       }
       return this._dataIndex;
