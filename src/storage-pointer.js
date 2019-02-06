@@ -194,9 +194,11 @@ class StoragePointer {
         if (Array.isArray(fieldData)) {
           this._data[fieldName] = [];
           for (let i = 0; i < fieldData.length; i++) {
-            this._data[fieldName].push({});
-            for (let refName in fieldDef.children) {
-              this._data[fieldName][i][refName] = StoragePointer.createInstance(fieldData[i][refName], fieldDef.children[refName].children || {});
+            this._data[fieldName].push(fieldData[i]);
+            for (let refName of Object.keys(fieldDef.children)) {
+              if (!fieldData[i][refName].ref || !fieldData[i][refName].contents) {
+                this._data[fieldName][i][refName] = StoragePointer.createInstance(fieldData[i][refName], fieldDef.children[refName].children);
+              }
             }
           }
         } else {
@@ -324,7 +326,12 @@ class StoragePointer {
             if (Array.isArray(contents[fieldName])) {
               result[fieldName] = [];
               for (let i = 0; i < contents[fieldName].length; i++) {
-                result[fieldName].push(await contents[fieldName][i].valueUri.toPlainObject(currentFieldDef[fieldName]));
+                result[fieldName].push(contents[fieldName][i]);
+                for (let key of Object.keys(contents[fieldName][i])) {
+                  if (contents[fieldName][i][key].toPlainObject) {
+                    result[fieldName][i][key] = await contents[fieldName][i][key].toPlainObject(currentFieldDef[fieldName]);
+                  }
+                }
               }
             } else {
               result[fieldName] = await contents[fieldName].toPlainObject(currentFieldDef[fieldName]);

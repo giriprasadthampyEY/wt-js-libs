@@ -438,7 +438,70 @@ describe('WTLibs.StoragePointer', () => {
         array: { children: { valueUri: { required: true } } },
       });
       let data = await ptr.toPlainObject();
-      assert.equal(data.contents.array[0].contents.number, 23);
+      assert.equal(data.contents.array[0].valueUri.contents.number, 23);
+    });
+
+    it('should work with flights and instances', async () => {
+      const flightInstancesHash = InMemoryAdapter.storageInstance.create([{
+        id: 'IeKeix6G-1',
+        departureDateTime: '2018-12-10 12:00:00',
+        bookingClasses: [
+          { id: 'economy', availabilityCount: 100 },
+          { id: 'business', availabilityCount: 20 },
+        ],
+      }, {
+        id: 'IeKeix6G-2',
+        departureDateTime: '2018-12-24 12:00:00',
+        bookingClasses: [
+          { id: 'economy', availabilityCount: 150 },
+        ],
+      }]);
+      const flightsHash = InMemoryAdapter.storageInstance.create({
+        updatedAt: '2019-01-01 12:00:00',
+        items: [
+          {
+            id: 'IeKeix6G',
+            origin: 'PRG',
+            destination: 'LAX',
+            segments: [
+              {
+                id: 'segment1',
+                departureAirport: 'PRG',
+                arrivalAirport: 'CDG',
+              },
+              {
+                id: 'segment2',
+                departureAirport: 'CDG',
+                arrivalAirport: 'LAX',
+              },
+            ],
+            flightInstancesUri: `in-memory://${flightInstancesHash}`,
+          },
+          {
+            id: 'IeKeix7H',
+            origin: 'LON',
+            destination: 'CAP',
+            segments: [
+              {
+                id: 'segment1',
+                departureAirport: 'LON',
+                arrivalAirport: 'CAP',
+              },
+            ],
+            flightInstancesUri: `in-memory://${flightInstancesHash}`,
+          },
+        ],
+      });
+      const hash = InMemoryAdapter.storageInstance.create({
+        flightsUri: `in-memory://${flightsHash}`,
+      });
+      const ptr = StoragePointer.createInstance(`in-memory://${hash}`, {
+        flightsUri: { required: false, children: { items: { children: { flightInstancesUri: { required: false } } } } },
+      });
+      let data = await ptr.toPlainObject();
+      assert.equal(data.contents.flightsUri.contents.items[0].id, 'IeKeix6G');
+      assert.equal(data.contents.flightsUri.contents.items[0].flightInstancesUri.contents[0].id, 'IeKeix6G-1');
+      assert.equal(data.contents.flightsUri.contents.items[0].flightInstancesUri.contents[0].departureDateTime, '2018-12-10 12:00:00');
     });
 
     it('should throw for nested pointer that contains an array', async () => {
