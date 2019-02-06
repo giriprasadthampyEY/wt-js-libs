@@ -195,7 +195,7 @@ class StoragePointer {
           this._data[fieldName] = [];
           for (let i = 0; i < fieldData.length; i++) {
             this._data[fieldName].push(fieldData[i]);
-            for (let refName of Object.keys(fieldDef.children)) {
+            for (let refName in fieldDef.children) {
               if (!fieldData[i][refName].ref || !fieldData[i][refName].contents) {
                 this._data[fieldName][i][refName] = StoragePointer.createInstance(fieldData[i][refName], fieldDef.children[refName].children);
               }
