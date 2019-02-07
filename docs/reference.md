@@ -1955,7 +1955,7 @@ The resulting structure mimicks the original `StoragePointer` data structure:
              'field': 'value'
           }
         },
-        'storagePointers': [
+        'storagePointers': [ // pointers in arrays are resolved as well
           {
             'ref': 'schema://originalUri1',
             'contents': {
@@ -1977,6 +1977,8 @@ The resulting structure mimicks the original `StoragePointer` data structure:
 -   `resolvedFields` **[Array][263]&lt;[string][260]>?** 
 -   `list` **resolvedFields** of fields that limit the resulting dataset in dot notation (`father.child.son`).
      If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
+     You don't need to specify path to a field in any special way when it is in an array (e.g. storagePointers.0.field or similar).
+     Array items are resolved as if they're on the array level (i.e. storagePointers.field).
 
 
 -   Throws **[StoragePointerError][280]** when an adapter encounters an error while accessing the data
