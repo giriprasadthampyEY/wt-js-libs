@@ -425,13 +425,16 @@ describe('WTLibs.StoragePointer', () => {
     });
 
     it('should accept an array of objects that contain pointers', async () => {
-      const childHash = InMemoryAdapter.storageInstance.create({
-        referenced: true,
+      const childHash1 = InMemoryAdapter.storageInstance.create({
         number: 23,
+      });
+      const childHash2 = InMemoryAdapter.storageInstance.create({
+        number: 42,
       });
       const hash = InMemoryAdapter.storageInstance.create({
         array: [
-          { valueUri: `in-memory://${childHash}` },
+          { valueUri: `in-memory://${childHash1}` },
+          { valueUri: `in-memory://${childHash2}` },
         ],
       });
       const ptr = StoragePointer.createInstance(`in-memory://${hash}`, {
@@ -439,6 +442,33 @@ describe('WTLibs.StoragePointer', () => {
       });
       let data = await ptr.toPlainObject();
       assert.equal(data.contents.array[0].valueUri.contents.number, 23);
+      assert.equal(data.contents.array[1].valueUri.contents.number, 42);
+    });
+
+    it('should accept recursive references, both with/without toPlainObject', async () => {
+      const innerUri = InMemoryAdapter.storageInstance.create({
+        data: 'wt',
+      });
+      const outerUri = InMemoryAdapter.storageInstance.create({
+        detail: `in-memory://${innerUri}`,
+        bar: 'foo',
+      });
+      const pointer = StoragePointer.createInstance(`in-memory://${outerUri}`, {
+        detail: {
+          children: {},
+        },
+      });
+      // direct access
+      assert.equal(pointer.ref, `in-memory://${outerUri}`);
+      let contents = await pointer.contents;
+      assert.equal(contents.bar, 'foo');
+      assert.equal(contents.detail.ref, `in-memory://${innerUri}`);
+      assert.equal((await contents.detail.contents).data, 'wt');
+
+      // toPlainObject
+      let plainObject = await pointer.toPlainObject();
+      assert.equal(plainObject.contents.bar, 'foo');
+      assert.equal(plainObject.contents.detail.contents.data, 'wt');
     });
 
     it('should work with flights and instances', async () => {
@@ -500,8 +530,17 @@ describe('WTLibs.StoragePointer', () => {
       });
       let data = await ptr.toPlainObject();
       assert.equal(data.contents.flightsUri.contents.items[0].id, 'IeKeix6G');
+      assert.equal(data.contents.flightsUri.contents.items[0].origin, 'PRG');
       assert.equal(data.contents.flightsUri.contents.items[0].flightInstancesUri.contents[0].id, 'IeKeix6G-1');
       assert.equal(data.contents.flightsUri.contents.items[0].flightInstancesUri.contents[0].departureDateTime, '2018-12-10 12:00:00');
+      assert.equal(data.contents.flightsUri.contents.items[0].flightInstancesUri.contents[1].id, 'IeKeix6G-2');
+      assert.equal(data.contents.flightsUri.contents.items[0].flightInstancesUri.contents[1].departureDateTime, '2018-12-24 12:00:00');
+      assert.equal(data.contents.flightsUri.contents.items[1].id, 'IeKeix7H');
+      assert.equal(data.contents.flightsUri.contents.items[1].origin, 'LON');
+      assert.equal(data.contents.flightsUri.contents.items[1].flightInstancesUri.contents[0].id, 'IeKeix6G-1');
+      assert.equal(data.contents.flightsUri.contents.items[1].flightInstancesUri.contents[0].departureDateTime, '2018-12-10 12:00:00');
+      assert.equal(data.contents.flightsUri.contents.items[1].flightInstancesUri.contents[1].id, 'IeKeix6G-2');
+      assert.equal(data.contents.flightsUri.contents.items[1].flightInstancesUri.contents[1].departureDateTime, '2018-12-24 12:00:00');
     });
 
     it('should throw for nested pointer that contains an array', async () => {
