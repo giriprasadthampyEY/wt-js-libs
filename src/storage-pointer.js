@@ -15,6 +15,9 @@ type ChildType = {
   children?: ChildrenType
 };
 
+/**
+ * Structure definition of `ChildType`.
+ */
 type ChildrenType = {[string]: ChildType};
 
 /**
@@ -51,13 +54,38 @@ type ChildrenType = {[string]: ChildType};
  * contents.signature;
  * const descPointer = contents.description;
  * descPointer.ref; // contains whatever is written in a description property in a document located on 'some://url'
- * descContents = await descPointer.contents;
+ * descContents = await descPointer.contents; // data from descPointer.ref
  * ```
  * so if you mark a storage pointer as not required, the library will not crash if the field
  * is missing or nulled.
  *
  * Only subordinate storage pointers (`children`) have to be defined beforehand, so the `signature`
  * field above may contain a complex JSON object.
+ *
+ * Recursion is supported, if described in `children` definition.
+ * See [test](https://github.com/windingtree/wt-js-libs/blob/8fdfe3aed7248fd327b60f1a56f0d3a3b1d3e93b/test/wt-libs/storage-pointer.spec.js#L448) for a working example.
+ * ```
+ * const innerUri = InMemoryAdapter.storageInstance.create({
+ *   data: 'wt',
+ * });
+ * const outerUri = InMemoryAdapter.storageInstance.create({
+ *   detail: `in-memory://${innerUri}`,
+ *   bar: 'foo',
+ * });
+ * const pointer = StoragePointer.createInstance(`in-memory://${outerUri}`, {
+ *   detail: {
+ *     children: {},
+ *   },
+ * });
+ * pointer.ref; // contains outerUri
+ * let contents = await pointer.contents;
+ * contents.bar; // contains 'foo'
+ * contents.detail.ref; // contains innerUri
+ * (await contents.detail.contents).data; // contains 'wt'. See `toPlainObject` if you want to avoid multiple `await` clauses.
+ * ```
+ *
+ * StoragePointers in arrays are also supported, see [an example](https://github.com/windingtree/wt-js-libs/blob/8fdfe3aed7248fd327b60f1a56f0d3a3b1d3e93b/test/wt-libs/storage-pointer.spec.js#L427).
+ * Note that arrays are not supported for `nested` children types.
  */
 class StoragePointer {
   ref: string;
@@ -258,6 +286,19 @@ class StoragePointer {
    *          'field': 'value'
    *       }
    *     },
+   *     'storagePointers': [ // pointers in arrays are resolved as well
+   *       {
+   *         'ref': 'schema://originalUri1',
+   *         'contents': {
+   *            'field': 'value1'
+   *         }
+   *       },{
+   *         'ref': 'schema://originalUri2',
+   *         'contents': {
+   *            'field': 'value2'
+   *         }
+   *       }
+   *     ],
    *     'unresolvedStoragePointer': 'schema://unresolved-url'
    *   }
    * }
@@ -265,6 +306,8 @@ class StoragePointer {
    *
    *  @param {resolvedFields} list of fields that limit the resulting dataset in dot notation (`father.child.son`).
    *  If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
+   *  You don't need to specify path to a field in any special way when it is in an array (e.g. storagePointers.0.field or similar).
+   *  Array items are resolved as if they're on the array level (i.e. storagePointers.field).
    *
    * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
    */
