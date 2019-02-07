@@ -424,6 +424,141 @@ describe('WTLibs.StoragePointer', () => {
       }
     });
 
+    it('should accept an array of objects that contain pointers', async () => {
+      const childHash1 = InMemoryAdapter.storageInstance.create({
+        number: 23,
+      });
+      const childHash2 = InMemoryAdapter.storageInstance.create({
+        number: 42,
+      });
+      const hash = InMemoryAdapter.storageInstance.create({
+        array: [
+          { valueUri: `in-memory://${childHash1}` },
+          { valueUri: `in-memory://${childHash2}` },
+        ],
+      });
+      const ptr = StoragePointer.createInstance(`in-memory://${hash}`, {
+        array: { children: { valueUri: { required: true } } },
+      });
+      let data = await ptr.toPlainObject();
+      assert.equal(data.contents.array[0].valueUri.contents.number, 23);
+      assert.equal(data.contents.array[1].valueUri.contents.number, 42);
+    });
+
+    it('should accept recursive references, both with/without toPlainObject', async () => {
+      const innerUri = InMemoryAdapter.storageInstance.create({
+        data: 'wt',
+      });
+      const outerUri = InMemoryAdapter.storageInstance.create({
+        detail: `in-memory://${innerUri}`,
+        bar: 'foo',
+      });
+      const pointer = StoragePointer.createInstance(`in-memory://${outerUri}`, {
+        detail: {
+          children: {},
+        },
+      });
+      // direct access
+      assert.equal(pointer.ref, `in-memory://${outerUri}`);
+      let contents = await pointer.contents;
+      assert.equal(contents.bar, 'foo');
+      assert.equal(contents.detail.ref, `in-memory://${innerUri}`);
+      assert.equal((await contents.detail.contents).data, 'wt');
+
+      // toPlainObject
+      let plainObject = await pointer.toPlainObject();
+      assert.equal(plainObject.contents.bar, 'foo');
+      assert.equal(plainObject.contents.detail.contents.data, 'wt');
+    });
+
+    it('should work with flights and instances', async () => {
+      const flightInstancesHash = InMemoryAdapter.storageInstance.create([{
+        id: 'IeKeix6G-1',
+        departureDateTime: '2018-12-10 12:00:00',
+        bookingClasses: [
+          { id: 'economy', availabilityCount: 100 },
+          { id: 'business', availabilityCount: 20 },
+        ],
+      }, {
+        id: 'IeKeix6G-2',
+        departureDateTime: '2018-12-24 12:00:00',
+        bookingClasses: [
+          { id: 'economy', availabilityCount: 150 },
+        ],
+      }]);
+      const flightsHash = InMemoryAdapter.storageInstance.create({
+        updatedAt: '2019-01-01 12:00:00',
+        items: [
+          {
+            id: 'IeKeix6G',
+            origin: 'PRG',
+            destination: 'LAX',
+            segments: [
+              {
+                id: 'segment1',
+                departureAirport: 'PRG',
+                arrivalAirport: 'CDG',
+              },
+              {
+                id: 'segment2',
+                departureAirport: 'CDG',
+                arrivalAirport: 'LAX',
+              },
+            ],
+            flightInstancesUri: `in-memory://${flightInstancesHash}`,
+          },
+          {
+            id: 'IeKeix7H',
+            origin: 'LON',
+            destination: 'CAP',
+            segments: [
+              {
+                id: 'segment1',
+                departureAirport: 'LON',
+                arrivalAirport: 'CAP',
+              },
+            ],
+            flightInstancesUri: `in-memory://${flightInstancesHash}`,
+          },
+        ],
+      });
+      const hash = InMemoryAdapter.storageInstance.create({
+        flightsUri: `in-memory://${flightsHash}`,
+      });
+      const ptr = StoragePointer.createInstance(`in-memory://${hash}`, {
+        flightsUri: { required: false, children: { items: { children: { flightInstancesUri: { required: false } } } } },
+      });
+      let data = await ptr.toPlainObject();
+      assert.equal(data.contents.flightsUri.contents.items[0].id, 'IeKeix6G');
+      assert.equal(data.contents.flightsUri.contents.items[0].origin, 'PRG');
+      assert.equal(data.contents.flightsUri.contents.items[0].flightInstancesUri.contents[0].id, 'IeKeix6G-1');
+      assert.equal(data.contents.flightsUri.contents.items[0].flightInstancesUri.contents[0].departureDateTime, '2018-12-10 12:00:00');
+      assert.equal(data.contents.flightsUri.contents.items[0].flightInstancesUri.contents[1].id, 'IeKeix6G-2');
+      assert.equal(data.contents.flightsUri.contents.items[0].flightInstancesUri.contents[1].departureDateTime, '2018-12-24 12:00:00');
+      assert.equal(data.contents.flightsUri.contents.items[1].id, 'IeKeix7H');
+      assert.equal(data.contents.flightsUri.contents.items[1].origin, 'LON');
+      assert.equal(data.contents.flightsUri.contents.items[1].flightInstancesUri.contents[0].id, 'IeKeix6G-1');
+      assert.equal(data.contents.flightsUri.contents.items[1].flightInstancesUri.contents[0].departureDateTime, '2018-12-10 12:00:00');
+      assert.equal(data.contents.flightsUri.contents.items[1].flightInstancesUri.contents[1].id, 'IeKeix6G-2');
+      assert.equal(data.contents.flightsUri.contents.items[1].flightInstancesUri.contents[1].departureDateTime, '2018-12-24 12:00:00');
+    });
+
+    it('should throw for nested pointer that contains an array', async () => {
+      const hash = InMemoryAdapter.storageInstance.create({
+        ten:
+          { okey: [ 'dokey', 'foo' ] },
+      });
+      const ptr = StoragePointer.createInstance(`in-memory://${hash}`, {
+        ten: { nested: true },
+      });
+      try {
+        await ptr.toPlainObject();
+        throw new Error('should not have been called');
+      } catch (e) {
+        assert.match(e.message, /which does not appear to be of type string/i);
+      }
+    });
+
     it('should resolve multiple recursive fields', async () => {
       const pojo = await pointer.toPlainObject(['eight.five.two', 'nine.below.above']);
       assert.equal(pojo.contents.six, 'horses');
