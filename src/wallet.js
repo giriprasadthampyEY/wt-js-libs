@@ -2,7 +2,7 @@
 import Web3Utils from 'web3-utils';
 import Web3Eth from 'web3-eth';
 
-import type { WalletInterface, KeystoreV3Interface, TransactionDataInterface, TransactionCallbacksInterface, TxReceiptInterface } from './interfaces';
+import type { WalletInterface, KeystoreV3Interface, TransactionDataInterface, TransactionCallbacksInterface, TxReceiptInterface } from './interfaces/base-interfaces';
 import {
   WalletError,
   MalformedWalletError,
@@ -99,7 +99,7 @@ class Wallet implements WalletInterface {
       this._account = this.web3Eth.accounts.decrypt(this._jsonWallet, password);
     } catch (e) {
       if (e && e.message) {
-        // Tihs heavily relies on web3-eth-accounts implementation
+        // This heavily relies on web3-eth-accounts implementation
         if (e.message.match(/not a valid v3 wallet/i) || e.message.match(/unsupported/i)) {
           throw new MalformedWalletError(e);
         }
@@ -107,7 +107,7 @@ class Wallet implements WalletInterface {
           throw new WalletPasswordError(e);
         }
       }
-      throw new WalletError('Uknown error during wallet decryption');
+      throw new WalletError('Unknown error during wallet decryption');
     }
   }
   

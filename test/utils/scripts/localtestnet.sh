@@ -56,9 +56,9 @@ fi
 ./node_modules/.bin/truffle migrate --network development
 # Fire up the application
 if [ "$1" = "--watch" ]; then
-  npm run test-runner-watch &
+  npm run test-runner-watch -- "$@" &
 else
-  npm run test-runner &
+  npm run test-runner -- "$@" &
 fi
 
 npm_pid=$!

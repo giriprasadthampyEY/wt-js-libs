@@ -1,9 +1,9 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import helpers from '../utils/helpers';
-import testedDataModel from '../utils/data-model-definition';
+import testedDataModel from '../utils/data-hotel-model-definition';
 import jsonWallet from '../utils/test-wallet';
-import DataModel from '../../src/data-model/';
+import { HotelDataModel } from '../../src/data-model/';
 import Web3WTWallet from '../../src/wallet';
 import {
   MalformedWalletError,
@@ -17,13 +17,14 @@ import {
   TransactionDidNotComeThroughError,
   NoReceiptError,
   InaccessibleEthereumNodeError,
+  WalletError,
 } from '../../src/errors';
 
 describe('WTLibs.Wallet', () => {
   let dataModel;
   const correctPassword = 'test123';
   beforeEach(async function () {
-    dataModel = DataModel.createInstance(testedDataModel.withDataSource().dataModelOptions);
+    dataModel = HotelDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions);
   });
 
   describe('unlock', () => {
@@ -85,6 +86,20 @@ describe('WTLibs.Wallet', () => {
       } catch (e) {
         assert.match(e.message, /cannot unlock destroyed wallet/i);
         assert.instanceOf(e, WalletStateError);
+      }
+    });
+
+    it('should translate unknown error', async () => {
+      // we just need coverage
+      const wallet = dataModel.createWallet(jsonWallet);
+      sinon.stub(wallet.web3Eth.accounts, 'decrypt').throws(new Error('Unknown web3-eth-accounts error'));
+      try {
+        wallet.unlock(correctPassword);
+        throw new Error('should not have been called');
+      } catch (e) {
+        wallet.web3Eth.accounts.decrypt.restore();
+        assert.match(e.message, /Unknown error during wallet decryption/i);
+        assert.instanceOf(e, WalletError);
       }
     });
   });

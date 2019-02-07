@@ -35,20 +35,37 @@ describe('WTLibs.Contracts', () => {
     }
   });
 
-  it('should get index instance', async () => {
-    await contracts.getIndexInstance('0x0C4c734F0Ecb92270D1ebE7b04aEC4440EB05CAa');
+  it('should get hotel index instance', async () => {
+    await contracts.getHotelIndexInstance('0x0C4c734F0Ecb92270D1ebE7b04aEC4440EB05CAa');
     assert.equal(ContractStub.calledWithNew(), true);
   });
 
-  it('should reuse existing contract instances', async () => {
-    await contracts.getIndexInstance('0x0C4c734F0Ecb92270D1ebE7b04aEC4440EB05CAa');
+  it('should get airline index instance', async () => {
+    await contracts.getAirlineIndexInstance('0x0C4c734F0Ecb92270D1ebE7b04aEC4440EB05CAa');
     assert.equal(ContractStub.calledWithNew(), true);
-    await contracts.getIndexInstance('0x0C4c734F0Ecb92270D1ebE7b04aEC4440EB05CAa');
+  });
+
+  it('should reuse existing hotel contract instances', async () => {
+    await contracts.getHotelIndexInstance('0x0C4c734F0Ecb92270D1ebE7b04aEC4440EB05CAa');
+    assert.equal(ContractStub.calledWithNew(), true);
+    await contracts.getHotelIndexInstance('0x0C4c734F0Ecb92270D1ebE7b04aEC4440EB05CAa');
+    assert.equal(ContractStub.callCount, 1);
+  });
+
+  it('should reuse existing airline contract instances', async () => {
+    await contracts.getAirlineIndexInstance('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
+    assert.equal(ContractStub.calledWithNew(), true);
+    await contracts.getAirlineIndexInstance('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
     assert.equal(ContractStub.callCount, 1);
   });
 
   it('should get hotel instance', async () => {
     await contracts.getHotelInstance('0x8C2373842D5EA4Ce4Baf53f4175e5e42a364c59C');
+    assert.equal(ContractStub.calledWithNew(), true);
+  });
+
+  it('should get airline instance', async () => {
+    await contracts.getAirlineInstance('0xAc0fE06EC39F677f634F40D5DeE43440e433A5B7');
     assert.equal(ContractStub.calledWithNew(), true);
   });
 
