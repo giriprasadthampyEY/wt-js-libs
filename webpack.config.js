@@ -1,7 +1,13 @@
 const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
+const pkg = require('./package.json');
+const path = require('path');
 
-const getDistPath = target => `${__dirname}/dist/${target}`;
+const getDistPath = (target) => {
+  return target === 'node'
+    ? path.resolve(__dirname, pkg.main, '..')
+    : path.resolve(__dirname, pkg.browser, '..');
+}
 
 const getTargetPlugins = (target) => {
   return target === 'node'
@@ -13,6 +19,12 @@ const getTargetExternals = (target) => {
   return target === 'node'
     ? [nodeExternals()]
     : [];
+}
+
+const getLibraryTarget = (target) => {
+  return target === 'node'
+    ? 'commonjs'
+    : 'umd';
 }
 
 const createConfig = (target) => ({
@@ -44,7 +56,7 @@ const createConfig = (target) => ({
     path: getDistPath(target),
     filename: '[name].js',
     library: '[name]',
-    libraryTarget: 'umd',
+    libraryTarget: getLibraryTarget(target),
     libraryExport: 'default',
   },
   target,

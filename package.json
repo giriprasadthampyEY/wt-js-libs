@@ -2,7 +2,8 @@
   "name": "@windingtree/wt-js-libs",
   "version": "0.8.1",
   "description": "Javascript libraries to interact with the Winding Tree contracts",
-  "main": "dist/node/wt-js-libs.js",
+  "main": "dist/cjs/wt-js-libs.js",
+  "browser": "dist/umd/wt-js-libs.js",
   "directories": {
     "test": "test"
   },
@@ -33,10 +34,6 @@
   ],
   "author": "Winding Tree Developers <dev@windingtree.com>",
   "license": "Apache-2.0",
-  "browser": {
-    "fs": false,
-    "child_process": false
-  },
   "dependencies": {
     "@babel/runtime": "^7.0.0",
     "@windingtree/lif-token": "^0.1.2-erc827",
