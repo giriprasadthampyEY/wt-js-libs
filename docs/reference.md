@@ -533,9 +533,9 @@ Properties that represent an actual separate document have a format of
 
 #### Parameters
 
--   `resolvedFields` **[Array][263]&lt;[string][260]>?** 
--   `List` **resolvedFields** of fields to be resolved from off chain data, in dot notation.
+-   `resolvedFields` **[Array][263]&lt;[string][260]>** List of fields to be resolved from off chain data, in dot notation.
     If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
+-   `depth` **[number][267]** Number of levels to resolve. See `StoragePointer` jsDocs for more info.
 
 
 -   Throws **[StoragePointerError][280]** when an adapter encounters an error while accessing the data
@@ -699,9 +699,9 @@ Properties that represent an actual separate document have a format of
 
 #### Parameters
 
--   `resolvedFields` **[Array][263]&lt;[string][260]>?** 
--   `List` **resolvedFields** of fields to be resolved from off chain data, in dot notation.
+-   `resolvedFields` **[Array][263]&lt;[string][260]>** List of fields to be resolved from off chain data, in dot notation.
     If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
+-   `depth` **[number][267]** Number of levels to resolve. See `StoragePointer` jsDocs for more info.
 
 
 -   Throws **[StoragePointerError][280]** when an adapter encounters an error while accessing the data
@@ -1974,11 +1974,13 @@ The resulting structure mimicks the original `StoragePointer` data structure:
 
 #### Parameters
 
--   `resolvedFields` **[Array][263]&lt;[string][260]>?** 
--   `list` **resolvedFields** of fields that limit the resulting dataset in dot notation (`father.child.son`).
+-   `resolvedFields` **[Array][263]&lt;[string][260]>** List of fields that limit the resulting dataset in dot notation (`father.child.son`).
      If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
      You don't need to specify path to a field in any special way when it is in an array (e.g. storagePointers.0.field or similar).
      Array items are resolved as if they're on the array level (i.e. storagePointers.field).
+-   `depth` **integer** Number of levels to resolve in case no `resolvedFields` are specified on a level anymore.
+     Note that calling `toPlainObject` with specified fields may lead to fields being not specified in recursive calls
+     (e.g. when calling `toPlainObject(['a.b'])` all fields in data.a.b will be resolved - unless limited by depth). (optional, default `9999`)
 
 
 -   Throws **[StoragePointerError][280]** when an adapter encounters an error while accessing the data
