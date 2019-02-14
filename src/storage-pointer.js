@@ -1,10 +1,9 @@
 // @flow
+import cloneDeep from 'lodash.clonedeep';
 import type { OffChainDataAdapterInterface } from './interfaces/base-interfaces';
 import OffChainDataClient from './off-chain-data-client';
 
 import { StoragePointerError } from './errors';
-
-const _ = require('lodash');
 
 /**
  * Definition of a data field that is stored off-chain.
@@ -192,7 +191,7 @@ class StoragePointer {
    * the storage.
    */
   _initFromStorage (data: Object) {
-    this._data = _.cloneDeep(data); // Copy data to avoid issues with mutability.
+    this._data = cloneDeep(data); // Copy data to avoid issues with mutability.
     for (let fieldName in this._children) {
       const fieldData = this._data[fieldName],
         fieldDef = this._children[fieldName],
