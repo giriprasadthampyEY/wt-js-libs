@@ -1,4 +1,5 @@
 // @flow
+import cloneDeep from 'lodash.clonedeep';
 import type { OffChainDataAdapterInterface } from './interfaces/base-interfaces';
 import OffChainDataClient from './off-chain-data-client';
 
@@ -190,7 +191,7 @@ class StoragePointer {
    * the storage.
    */
   _initFromStorage (data: Object) {
-    this._data = Object.assign(Array.isArray(data) ? [] : {}, data); // Copy top-level data to avoid issues with mutability.
+    this._data = cloneDeep(data); // Copy data to avoid issues with mutability.
     for (let fieldName in this._children) {
       const fieldData = this._data[fieldName],
         fieldDef = this._children[fieldName],
@@ -304,14 +305,16 @@ class StoragePointer {
    * }
    * ```
    *
-   *  @param {resolvedFields} list of fields that limit the resulting dataset in dot notation (`father.child.son`).
+   * @param {Array<string>} resolvedFields List of fields that limit the resulting dataset in dot notation (`father.child.son`).
    *  If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
    *  You don't need to specify path to a field in any special way when it is in an array (e.g. storagePointers.0.field or similar).
    *  Array items are resolved as if they're on the array level (i.e. storagePointers.field).
-   *
+   * @param {integer} depth Number of levels to resolve in case no `resolvedFields` are specified on a level anymore.
+   *  Note that calling `toPlainObject` with specified fields may lead to fields being not specified in recursive calls
+   *  (e.g. when calling `toPlainObject(['a.b'])` all fields in data.a.b will be resolved - unless limited by depth).
    * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
    */
-  async toPlainObject (resolvedFields: ?Array<string>): Promise<{ref: string, contents: Object}> {
+  async toPlainObject (resolvedFields: ?Array<string>, depth?: number = 9999): Promise<{ref: string, contents: Object}> {
     // Download data
     await this._downloadFromStorage();
     let result = {};
@@ -352,14 +355,14 @@ class StoragePointer {
         }
 
         // Check if the user wants to resolve the child StoragePointer;
-        const resolve = !resolvedFields || currentFieldDef.hasOwnProperty(fieldName),
+        const resolve = (!resolvedFields && depth > 0) || currentFieldDef.hasOwnProperty(fieldName),
           nested = this._children && this._children[fieldName].nested;
 
         if (nested) {
           result[fieldName] = {};
           for (let key of Object.keys(contents[fieldName])) {
-            if (resolve) {
-              result[fieldName][key] = await contents[fieldName][key].toPlainObject(currentFieldDef[fieldName]);
+            if (resolve && depth > 1) {
+              result[fieldName][key] = await contents[fieldName][key].toPlainObject(currentFieldDef[fieldName], depth - 2);
             } else {
               result[fieldName][key] = contents[fieldName][key].ref;
             }
@@ -371,13 +374,13 @@ class StoragePointer {
               for (let i = 0; i < contents[fieldName].length; i++) {
                 result[fieldName].push(contents[fieldName][i]);
                 for (let key of Object.keys(contents[fieldName][i])) {
-                  if (contents[fieldName][i][key].toPlainObject) {
-                    result[fieldName][i][key] = await contents[fieldName][i][key].toPlainObject(currentFieldDef[fieldName]);
+                  if (contents[fieldName][i][key].toPlainObject && depth > 1) {
+                    result[fieldName][i][key] = await contents[fieldName][i][key].toPlainObject(currentFieldDef[fieldName], depth - 2);
                   }
                 }
               }
             } else {
-              result[fieldName] = await contents[fieldName].toPlainObject(currentFieldDef[fieldName]);
+              result[fieldName] = await contents[fieldName].toPlainObject(currentFieldDef[fieldName], depth - 1);
             }
           } else {
             result[fieldName] = this._data[fieldName].ref;
