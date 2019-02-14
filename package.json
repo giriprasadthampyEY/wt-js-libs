@@ -1,6 +1,6 @@
 {
   "name": "@windingtree/wt-js-libs",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "Javascript libraries to interact with the Winding Tree contracts",
   "main": "dist/cjs/wt-js-libs.js",
   "browser": "dist/umd/wt-js-libs.js",
@@ -78,7 +78,7 @@
     "lodash.isfunction": "^3.0.9",
     "mocha": "^5.2.0",
     "node-loader": "^0.6.0",
-    "nyc": "^13.2.0",
+    "nyc": "^13.3.0",
     "rimraf": "^2.6.2",
     "sinon": "^6.1.4",
     "truffle": "^5.0.0",
