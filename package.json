@@ -78,7 +78,7 @@
     "lodash.isfunction": "^3.0.9",
     "mocha": "^5.2.0",
     "node-loader": "^0.6.0",
-    "nyc": "^13.0.1",
+    "nyc": "^13.2.0",
     "rimraf": "^2.6.2",
     "sinon": "^6.1.4",
     "truffle": "^5.0.0",
