@@ -407,6 +407,62 @@ describe('WTLibs.StoragePointer', () => {
       });
     });
 
+    it('should limit resolved fields by depth=0', async () => {
+      const pojo = await pointer.toPlainObject(undefined, 0);
+      assert.equal(pojo.contents.six, 'horses');
+      assert.equal(pojo.contents.seven, 'cats');
+      assert.isDefined(pojo.contents.eight);
+      assert.isUndefined(pojo.contents.eight.contents);
+      assert.isTrue(pojo.contents.eight.startsWith('in-memory://'));
+      assert.isTrue(pojo.contents.nine.startsWith('in-memory://'));
+      assert.deepEqual(pojo.contents.ten, {
+        key1: `in-memory://${hashKey1}`,
+        key2: `in-memory://${hashKey2}`,
+        key3: `in-memory://${topLevelArrayHash}`,
+        key4: `in-memory://${arrayInsideHash}`,
+      });
+    });
+
+    it('should limit resolved fields by depth=1', async () => {
+      const pojo = await pointer.toPlainObject(undefined, 1);
+      assert.equal(pojo.contents.six, 'horses');
+      assert.equal(pojo.contents.seven, 'cats');
+      assert.isDefined(pojo.contents.eight);
+      assert.equal(pojo.contents.eight.contents.three, 'dogs');
+      assert.equal(pojo.contents.eight.contents.four, 'donkeys');
+      assert.isTrue(pojo.contents.eight.contents.five.startsWith('in-memory://'));
+      assert.equal(pojo.contents.nine.contents.one, 'bunny');
+      assert.equal(pojo.contents.nine.contents.two, 'frogs');
+      assert.isTrue(pojo.contents.nine.contents.below.startsWith('in-memory://'));
+      assert.deepEqual(pojo.contents.ten, {
+        key1: `in-memory://${hashKey1}`,
+        key2: `in-memory://${hashKey2}`,
+        key3: `in-memory://${topLevelArrayHash}`,
+        key4: `in-memory://${arrayInsideHash}`,
+      });
+    });
+
+    it('should limit resolved fields by depth=2', async () => {
+      const pojo = await pointer.toPlainObject(undefined, 2);
+      assert.equal(pojo.contents.six, 'horses');
+      assert.equal(pojo.contents.seven, 'cats');
+      assert.isDefined(pojo.contents.eight);
+      assert.equal(pojo.contents.eight.contents.three, 'dogs');
+      assert.equal(pojo.contents.eight.contents.four, 'donkeys');
+      assert.equal(pojo.contents.eight.contents.five.contents.one, 'bunny');
+      assert.equal(pojo.contents.nine.contents.one, 'bunny');
+      assert.equal(pojo.contents.nine.contents.two, 'frogs');
+      assert.isDefined(pojo.contents.nine.contents.below.contents);
+      assert.isDefined(pojo.contents.ten.key1.contents);
+      assert.isDefined(pojo.contents.ten.key2.contents);
+      assert.isDefined(pojo.contents.ten.key3.contents);
+      assert.isDefined(pojo.contents.ten.key4.contents);
+      assert.equal(pojo.contents.ten.key1.contents.value, 'value1');
+      assert.equal(pojo.contents.ten.key2.contents.value, 'value2');
+      assert.equal(pojo.contents.ten.key3.contents.length, 3);
+      assert.equal(pojo.contents.ten.key4.contents.publisher, 'Random House');
+    });
+
     it('should throw for nested pointer that actually contains array', async () => {
       const hash = InMemoryAdapter.storageInstance.create({
         ten: [

@@ -199,14 +199,15 @@ class OnChainHotel implements HotelInterface {
    * }
    * ```
    *
-   * @param {resolvedFields} List of fields to be resolved from off chain data, in dot notation.
+   * @param {Array<string>} resolvedFields List of fields to be resolved from off chain data, in dot notation.
    * If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
+   * @param {number} depth Number of levels to resolve. See `StoragePointer` jsDocs for more info.
    *
    * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
    */
-  async toPlainObject (resolvedFields: ?Array<string>): Promise<PlainDataInterface> {
+  async toPlainObject (resolvedFields: ?Array<string>, depth?: number): Promise<PlainDataInterface> {
     const dataIndex = await this.dataIndex;
-    const offChainData = await dataIndex.toPlainObject(resolvedFields);
+    const offChainData = await dataIndex.toPlainObject(resolvedFields, depth);
     let result = {
       manager: await this.manager,
       address: this.address,
