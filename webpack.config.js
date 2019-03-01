@@ -55,17 +55,12 @@ const createConfig = (target) => ({
   output: {
     path: getDistPath(target),
     filename: '[name].js',
-    library: '[name]',
     libraryTarget: getLibraryTarget(target),
-    libraryExport: 'default',
   },
   target,
   plugins: [
     // https://github.com/sindresorhus/got/issues/345
     new webpack.IgnorePlugin(/^electron$/),
-    new webpack.DefinePlugin({
-      VERSION: JSON.stringify(require('./package.json').version)
-    }),
     ...getTargetPlugins(target)
   ]
 });
