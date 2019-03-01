@@ -40,9 +40,9 @@ import {
  * General options for wt-libs-js. Holds all things necessary
  * for successful setup of Winding Tree network.
  *
- * @type WtLibsOptionsType
+ * @type WtJsLibsOptionsType
  */
-type WtLibsOptionsType = {
+type WtJsLibsOptionsType = {
   segment: string,
   dataModelOptions: DataModelOptionsType,
   offChainDataOptions: OffChainDataClientOptionsType
@@ -51,22 +51,22 @@ type WtLibsOptionsType = {
 /**
  * Main public interface of wt-libs-js.
  */
-class WTLibs {
+export class WtJsLibs {
   static errors: Object;
   dataModel: AbstractDataModel;
   offChainDataClient: OffChainDataClient;
-  options: WtLibsOptionsType;
+  options: WtJsLibsOptionsType;
 
   /**
    * Call this to create wt-libs-js instance.
    * @param options
-   * @return WTLibs
+   * @return WtJsLibs
    */
-  static createInstance (options: WtLibsOptionsType): WTLibs {
-    return new WTLibs(options);
+  static createInstance (options: WtJsLibsOptionsType): WtJsLibs {
+    return new WtJsLibs(options);
   }
 
-  constructor (options: WtLibsOptionsType) {
+  constructor (options: WtJsLibsOptionsType) {
     this.options = options || {};
 
     if (this.options.segment === HOTEL_SEGMENT_ID) {
@@ -115,10 +115,10 @@ class WTLibs {
 }
 
 /**
- * A map of errors that WTLibs can throw, useful
+ * A map of errors that WtJsLibs can throw, useful
  * for checking what happened in your code.
  */
-WTLibs.errors = {
+export const errors = {
   WTLibsError,
   SmartContractInstantiationError,
   WalletError,
@@ -144,5 +144,3 @@ WTLibs.errors = {
   HotelNotFoundError,
   HotelNotInstantiableError,
 };
-
-export default WTLibs;

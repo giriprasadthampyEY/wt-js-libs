@@ -137,9 +137,9 @@
 -   [HotelNotInstantiableError][133]
 -   [AirlineNotFoundError][134]
 -   [AirlineNotInstantiableError][135]
--   [WtLibsOptionsType][136]
+-   [WtJsLibsOptionsType][136]
     -   [Properties][137]
--   [WTLibs][138]
+-   [WtJsLibs][138]
     -   [Parameters][139]
     -   [getWTIndex][140]
         -   [Parameters][141]
@@ -151,7 +151,7 @@
         -   [Parameters][147]
     -   [createInstance][148]
         -   [Parameters][149]
-    -   [errors][150]
+-   [errors][150]
 -   [PreparedTransactionMetadataInterface][151]
     -   [Properties][152]
 -   [PreparedTransactionMetadataInterface][153]
@@ -1235,7 +1235,7 @@ Airline is not found in WTIndex for some reason.
 
 Airline abstraction instance cannot be created for some reason.
 
-## WtLibsOptionsType
+## WtJsLibsOptionsType
 
 General options for wt-libs-js. Holds all things necessary
 for successful setup of Winding Tree network.
@@ -1248,13 +1248,13 @@ Type: {segment: [string][260], dataModelOptions: [DataModelOptionsType][274], of
 -   `dataModelOptions` **[DataModelOptionsType][274]** 
 -   `offChainDataOptions` **[OffChainDataClientOptionsType][293]** 
 
-## WTLibs
+## WtJsLibs
 
 Main public interface of wt-libs-js.
 
 ### Parameters
 
--   `options` **[WtLibsOptionsType][294]** 
+-   `options` **[WtJsLibsOptionsType][294]** 
 
 ### getWTIndex
 
@@ -1304,13 +1304,13 @@ Call this to create wt-libs-js instance.
 
 #### Parameters
 
--   `options` **[WtLibsOptionsType][294]** 
+-   `options` **[WtJsLibsOptionsType][294]** 
 
-Returns **[WTLibs][299]** WTLibs
+Returns **[WtJsLibs][299]** WtJsLibs
 
-### errors
+## errors
 
-A map of errors that WTLibs can throw, useful
+A map of errors that WtJsLibs can throw, useful
 for checking what happened in your code.
 
 ## PreparedTransactionMetadataInterface
@@ -2476,11 +2476,11 @@ Returns **[Wallet][273]**
 
 [135]: #airlinenotinstantiableerror
 
-[136]: #wtlibsoptionstype
+[136]: #wtjslibsoptionstype
 
 [137]: #properties-1
 
-[138]: #wtlibs
+[138]: #wtjslibs
 
 [139]: #parameters-50
 
@@ -2792,7 +2792,7 @@ Returns **[Wallet][273]**
 
 [293]: #offchaindataclientoptionstype
 
-[294]: #wtlibsoptionstype
+[294]: #wtjslibsoptionstype
 
 [295]: #wthotelindexinterface
 
@@ -2802,7 +2802,7 @@ Returns **[Wallet][273]**
 
 [298]: #offchaindataadapterinterface
 
-[299]: #wtlibs
+[299]: #wtjslibs
 
 [300]: #transactiondatainterface
 

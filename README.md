@@ -8,10 +8,39 @@ A JS interface to WindingTree's Ethereum smart-contracts for Hotels and Airlines
 
 ```sh
 npm install @windingtree/wt-js-libs
-# or
-git clone https://github.com/windingtree/wt-js-libs
-nvm install
-npm install
+```
+
+```js
+const { WtJsLibs } = require('@windingtree/wt-js-libs');
+const libs = WtJsLibs.createInstance({
+  segment: 'hotels', // or 'airlines'
+  dataModelOptions: { ... },
+  offChainDataOptions: { ... },
+});
+const index = libs.getWTIndex('0x...');
+```
+
+```html
+<script type="text/javascript" src="https://unpkg.com/@windingtree/wt-js-libs"></script>
+<script type="text/javascript" src="https://unpkg.com/@windingtree/off-chain-adapter-in-memory"></script>
+<script type="text/javascript">
+const libs = window.WtJsLibs.createInstance({
+  segment: 'hotels', // or 'airlines'
+  dataModelOptions: {
+    provider: 'http://localhost:8545', // or infura
+  },
+  offChainDataOptions: {
+    adapters: {
+      'in-memory': {
+        create: (options) => {
+          return new window.InMemoryAdapter(options);
+        },
+      },
+    },
+  },
+});
+const index = libs.getWTIndex('0x...');
+</script>
 ```
 
 ## Usage
@@ -24,10 +53,10 @@ under the hood.
 // Winding Tree hotel index backed by a local Ethereum node. See below for airlines usage.
 // You need to deploy the index and the hotel first. See test/utils/migrations
 // for inspiration.
-import WTLibs from '@windingtree/wt-js-libs';
+import { WtJsLibs } from '@windingtree/wt-js-libs';
 import InMemoryAdapter from '@windingtree/off-chain-adapter-in-memory';
 
-const libs = WTLibs.createInstance({
+const libs = WtJsLibs.createInstance({
   segment: 'hotels',
   dataModelOptions: {
     provider: 'http://localhost:8545',
@@ -46,6 +75,8 @@ const libs = WTLibs.createInstance({
     },
   },
 });
+
+
 const index = libs.getWTIndex('0x...');
 const hotel = await index.getHotel('0x...');
 
@@ -84,7 +115,7 @@ try {
 }
 
 // Working with airline data is very similar. Just change the segment and a few method names:
-const libs = WTLibs.createInstance({
+const libs = WtJsLibs.createInstance({
   segment: 'airlines',
   ...
 });
