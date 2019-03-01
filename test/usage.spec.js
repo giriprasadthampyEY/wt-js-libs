@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import WTLibs from '../src/index';
+import { WtJsLibs } from '../src/index';
 import jsonWallet from './utils/test-wallet';
 import jsonWallet2 from './utils/test-wallet-2';
 import testedDataModel from './utils/data-hotel-model-definition';
@@ -7,12 +7,12 @@ import OffChainDataClient from '../src/off-chain-data-client';
 
 import { InputDataError, WTLibsError } from '../src/errors';
 
-describe('WTLibs usage', () => {
+describe('WtJsLibs usage', () => {
   let libs, wallet, index, emptyIndex, minedTxHashes = [],
     hotelManager = '0xD39Ca7d186a37bb6Bf48AE8abFeB4c687dc8F906';
 
   beforeEach(() => {
-    libs = WTLibs.createInstance(testedDataModel.withDataSource());
+    libs = WtJsLibs.createInstance(testedDataModel.withDataSource());
     index = libs.getWTIndex(testedDataModel.indexAddress);
     wallet = libs.createWallet(jsonWallet);
     emptyIndex = libs.getWTIndex(testedDataModel.emptyIndexAddress);
@@ -352,7 +352,7 @@ describe('WTLibs usage', () => {
 
   it('should throw on unknown segment', () => {
     try {
-      WTLibs.createInstance({ segment: 'books' });
+      WtJsLibs.createInstance({ segment: 'books' });
       throw new Error('should not have been called');
     } catch (e) {
       assert.match(e.message, /Unknown segment: books/i);
