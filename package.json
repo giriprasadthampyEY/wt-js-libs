@@ -73,7 +73,7 @@
     "eslint-plugin-standard": "^4.0.0",
     "flow-bin": "^0.94.0",
     "ganache-cli": "^6.2.1",
-    "jsdom": "^13.0.0",
+    "jsdom": "^14.0.0",
     "jsdom-global": "3.0.2",
     "lodash.isfunction": "^3.0.9",
     "mocha": "^6.0.0",
