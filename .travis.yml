@@ -4,7 +4,7 @@ group: beta
 language: node_js
 cache:
   directories:
-    - $HOME/.npm
+  - "$HOME/.npm"
 install: case $TRAVIS_BRANCH in greenkeeper*) npm i;; *) npm ci;; esac;
 jobs:
   include:
@@ -21,7 +21,7 @@ jobs:
     before_deploy: npm run build
     deploy:
       provider: npm
-      email: chadima.jiri@gmail.com
+      email: devops@windingtree.com
       skip_cleanup: true
       api_key: "$NPM_TOKEN"
       on:
@@ -29,4 +29,4 @@ jobs:
         tags: true
 env:
   global:
-  - secure: OeFcbSohWTpMEU5rVBETGz7pYprqgb9rYwgpf39Y59cVM1Ltn4RUx9Tqfl+Chwa8KV7PNI390RSN8sbCE/YxDmUmdaQrx5OYku8KnHgk8ljnCbP3K8A07ehF8B8qe/1n/L+VYOF4lYaXuABut1Cx1kY8LehpOHckeomKGqMaVGqtRiZSz2/AGTMl9jCt7S/6A0T6ddNHMW1wzqzhGdzhz+insUQe6DqoVqpfg46zvs6EglsySUqaecEjDHo3c3REHY6vjqmaOBdkmoCqO45BxCldqTUxzTQjZknoEEJjpygSVAhzpDqUCHrJNXNxJeP7QWl5by6Y/v1ey43XwSY/HrBw/HVIePvrMqbPKj0H/GCybxhqzJuacMu3Zgg2gXgQSVdPsUkp11uQMTRE2/9QFEFlKStsaNTgNGcjW3RvxkAWV+pBU+G4kw8EPl9lppDQADjc6E4R3IvFP7GWiBBBQlLSuC7NCxIASiPQ7mpoB3GEAuCTKBnquhGDCaI9dUyh3MirnSF42oh4y9HgX6QgK3s+aqbr/jEO3F8c+/CSDDvfBhfXNWNzvYCaue1N5ijeWMufJbX9dgsuiTCjdhrkSO6ZkBXfOm74Me0SrIzs9d81uVWRbVcTu369H7b9iOP3+Oxa8nrApjwh8F2x4SiTw+IKF7n/YKnPch0yyk5n3SM=
+    secure: a5ewNE5+cD3c479KlkkdR4dG6h8as4TTUOE6kUcZwoaDN4qZZ0t3Q2OBK4g0TOlKD/1oAKUG2Ep7Fw4LeXQqIx6Px79LczfGsZB/yVKWq8wgAvR6MXxyuddq9dcqn5lfvTwSCUFCeTnYhyPwoOriamb/TNrgxr4cwSOPV7h3aMpXOPnEO+CFXkpESqpHmdlC9Bx8womlWGgwseb0AMki1OBlDe3ELges0UH6sVoAODd4bi1jAbrACoj/vDdAa/EJQOH0Znd5w8YLSIcFk8T/E7tuOPGsvLA2yL89LRZwHlkgneHxnr0ss7zZX/smjsuhSnSx7N/9GwY5fcvS4XuVFvSKmXFHOx3lQEmkFMnMPgj+6iTLpDAiQOjXsOC+tM7IiYLOQvMCc+MWgSt/MHqk+qljqxhZlYK0cSOrBFrsVuhNdRCmC552IlVlKAKty5KyH1Ag7qvx0ni/j6UHut+9nlJ4bw4MI6BI/ZndcrZT/mslvTfjT6obDoFaI+FJ/pVORbsvaMyVHBnNv38tyqObuc3+rqAZmJFClX/JMQWceRz4JG0/bLGpES1T9ZBkLCFLxNUXYTh47tdDtQ8JLk4KqYVdD5LL3gAHc/JIgr/YWnTKU+/KijYOqh4RiczKreo/7UIsMjSDh7CV3pojlYxgrKw7+YTyXmgaH+vaZpyO8TY=

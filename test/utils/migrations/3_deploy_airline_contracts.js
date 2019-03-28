@@ -1,15 +1,5 @@
-const TruffleContract = require('truffle-contract');
-const Web3 = require('web3');
-const provider = new Web3.providers.HttpProvider('http://localhost:8545');
-
-function getContractWithProvider (metadata, provider) {
-  let contract = new TruffleContract(metadata);
-  contract.setProvider(provider);
-  return contract;
-}
-
-const LifTokenTest = getContractWithProvider(require('@windingtree/lif-token/build/contracts/LifTokenTest'), provider);
-const WTAirlineIndex = getContractWithProvider(require('@windingtree/wt-contracts/build/contracts/WTAirlineIndex'), provider);
+const LifTokenTest = artifacts.require('@windingtree/lif-token/LifTokenTest');
+const WTAirlineIndex = artifacts.require('@windingtree/wt-contracts/WTAirlineIndex');
 
 module.exports = async function (deployer, network, accounts) {
   if (network === 'development') {
@@ -20,10 +10,11 @@ module.exports = async function (deployer, network, accounts) {
     // And then we setup the WTAirlineIndex
     await deployer.deploy(WTAirlineIndex, { from: accounts[3], gas: 60000000 });
     firstIndex = await WTAirlineIndex.deployed();
+    await firstIndex.initialize(accounts[3], LifTokenTest.address, { from: accounts[3], gas: 60000000 });
     await firstIndex.setLifToken(LifTokenTest.address, { from: accounts[3], gas: 60000000 });
     await deployer.deploy(WTAirlineIndex, { from: accounts[3], gas: 60000000 });
     secondIndex = await WTAirlineIndex.deployed();
-    await secondIndex.setLifToken(LifTokenTest.address, { from: accounts[3], gas: 60000000 });
+    await secondIndex.initialize(accounts[3], LifTokenTest.address, { from: accounts[3], gas: 60000000 });
     await firstIndex.registerAirline('in-memory://airline-url-one', { from: accounts[2], gas: 60000000 });
     await firstIndex.registerAirline('in-memory://airline-url-two', { from: accounts[1], gas: 60000000 });
 
