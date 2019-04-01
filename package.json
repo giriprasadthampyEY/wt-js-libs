@@ -83,7 +83,7 @@
     "nyc": "^13.3.0",
     "rimraf": "^2.6.2",
     "sinon": "^7.2.4",
-    "truffle": "5.0.7",
+    "truffle": "^5.0.10",
     "web3": "1.0.0-beta.36",
     "web3-eth-abi": "1.0.0-beta.36",
     "webpack": "^4.21.0",
