@@ -211,4 +211,11 @@ describe('WTLibs.data-model.WTAirlineIndex', () => {
       getAirlineSpy.restore();
     });
   });
+
+  describe('getLifTokenAddress', () => {
+    it('should return LifToken address', async () => {
+      const tokenAddress = await indexDataProvider.getLifTokenAddress();
+      assert.equal(tokenAddress, '0xC5122d580949215DdEd291437Ad4e47B0206E20C');
+    });
+  });
 });

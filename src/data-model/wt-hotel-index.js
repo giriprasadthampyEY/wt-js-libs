@@ -205,6 +205,11 @@ class WTHotelIndex extends AbstractWTIndex implements WTHotelIndexInterface {
     const hotelList: Array<HotelInterface> = (hotelDetails.filter((a: ?HotelInterface): boolean => a != null): any); // eslint-disable-line flowtype/no-weak-types
     return hotelList;
   }
+
+  async getLifTokenAddress (): Promise<string> {
+    const index = await this._getDeployedIndex();
+    return index.methods.LifToken().call();
+  }
 }
 
 export default WTHotelIndex;

@@ -205,6 +205,11 @@ class WTAirlineIndex extends AbstractWTIndex implements WTAirlineIndexInterface 
     const airlineList: Array<AirlineInterface> = (airlineDetails.filter((a: ?AirlineInterface): boolean => a != null): any); // eslint-disable-line flowtype/no-weak-types
     return airlineList;
   }
+
+  async getLifTokenAddress (): Promise<string> {
+    const index = await this._getDeployedIndex();
+    return index.methods.LifToken().call();
+  }
 }
 
 export default WTAirlineIndex;

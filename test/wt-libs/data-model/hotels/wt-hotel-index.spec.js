@@ -211,4 +211,11 @@ describe('WTLibs.data-model.WTHotelIndex', () => {
       getHotelSpy.restore();
     });
   });
+
+  describe('getLifTokenAddress', () => {
+    it('should return LifToken address', async () => {
+      const tokenAddress = await indexDataProvider.getLifTokenAddress();
+      assert.equal(tokenAddress, '0xAd84405aeF5d241E1BB264f0a58E238e221d70dE');
+    });
+  });
 });
