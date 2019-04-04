@@ -54,6 +54,7 @@ describe('WtJsLibs usage', () => {
       // Don't bother with checksummed address format
       assert.equal((await hotel.manager), hotelManager);
       assert.equal((await hotel.dataUri).toLowerCase(), dataUri);
+      assert.equal((await hotel.created), 20);
       const dataIndex = await hotel.dataIndex;
       const description = (await dataIndex.contents).descriptionUri;
       assert.equal((await description.contents).name, 'Premium hotel');

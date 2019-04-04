@@ -29,6 +29,7 @@ class OnChainHotel implements HotelInterface {
   // provided by eth backed dataset
   _dataUri: Promise<?string> | ?string;
   _manager: Promise<?string> | ?string;
+  _created: Promise<?string> | ?string;
 
   web3Utils: Utils;
   web3Contracts: Contracts;
@@ -82,6 +83,11 @@ class OnChainHotel implements HotelInterface {
         _manager: {
           remoteGetter: async (): Promise<?string> => {
             return (await this._getContractInstance()).methods.manager().call();
+          },
+        },
+        _created: {
+          remoteGetter: async (): Promise<?string> => {
+            return (await this._getContractInstance()).methods.created().call();
           },
         },
       },
@@ -140,6 +146,16 @@ class OnChainHotel implements HotelInterface {
     }
 
     this._dataUri = newDataUri;
+  }
+
+  get created (): Promise<?string> | ?string {
+    if (!this._initialized) {
+      return;
+    }
+    return (async () => {
+      const created = await this._created;
+      return created;
+    })();
   }
 
   get manager (): Promise<?string> | ?string {

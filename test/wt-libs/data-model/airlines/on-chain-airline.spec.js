@@ -7,7 +7,7 @@ import StoragePointer from '../../../../src/storage-pointer';
 import { InputDataError, SmartContractInstantiationError } from '../../../../src/errors';
 
 describe('WTLibs.data-model.OnChainAirline', () => {
-  let contractsStub, utilsStub, indexContractStub, urlStub, managerStub;
+  let contractsStub, createdStub, utilsStub, indexContractStub, urlStub, managerStub;
   const validUri = 'schema://new-url';
   const validManager = 'manager';
 
@@ -19,11 +19,13 @@ describe('WTLibs.data-model.OnChainAirline', () => {
     };
     urlStub = helpers.stubContractMethodResult('some-remote-url');
     managerStub = helpers.stubContractMethodResult('some-remote-manager');
+    createdStub = helpers.stubContractMethodResult('created-block');
     contractsStub = {
       getAirlineInstance: sinon.stub().resolves({
         methods: {
           dataUri: urlStub,
           manager: managerStub,
+          created: createdStub,
           editInfo: helpers.stubContractMethodResult('info-edited'),
         },
       }),
