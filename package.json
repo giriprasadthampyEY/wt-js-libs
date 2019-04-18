@@ -11,10 +11,10 @@
     "flow": "flow",
     "lint": "eslint src test",
     "test": "rimraf .nyc_output .nyc_coverage && ./test/utils/scripts/localtestnet.sh",
-    "test-watch": "rimraf .nyc_output .nyc_coverage && ./test/utils/scripts/localtestnet.sh --watch",
-    "test-runner": "nyc --clean=false --reporter=text mocha \"test/**/*.spec.js\" --timeout 20000 --require @babel/register --require @babel/polyfill",
-    "test-runner-watch": "mocha \"test/**/*.spec.js\" --timeout 20000 --require @babel/register --require @babel/polyfill --watch",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "test:watch": "rimraf coverage && ./test/utils/scripts/localtestnet.sh --watch",
+    "test-runner": "rimraf coverage && jest --coverage",
+    "test-runner-watch": "jest --watch",
+    "coverage": "cat coverage/lcov.info | coveralls",
     "clean": "rimraf dist && rimraf docs",
     "build": "webpack --config webpack.config.js --mode production",
     "docs": "rimraf docs && mkdir docs && documentation build src/** -f md -o docs/reference.md"
@@ -75,12 +75,11 @@
     "eslint-plugin-standard": "^4.0.0",
     "flow-bin": "^0.97.0",
     "ganache-cli": "^6.2.1",
+    "jest": "^24.7.1",
     "jsdom": "^14.0.0",
     "jsdom-global": "3.0.2",
     "lodash.isfunction": "^3.0.9",
-    "mocha": "^6.0.0",
     "node-loader": "^0.6.0",
-    "nyc": "^14.0.0",
     "rimraf": "^2.6.2",
     "sinon": "^7.2.4",
     "truffle": "^5.0.11",
@@ -93,5 +92,18 @@
   },
   "engines": {
     "node": ">=10.0.0"
+  },
+  "jest": {
+    "testRegex": "./test/.*.spec.js",
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "coverageReporters": [
+      "text",
+      "lcov"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ]
   }
 }

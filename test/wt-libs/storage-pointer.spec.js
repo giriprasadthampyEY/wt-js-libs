@@ -297,7 +297,7 @@ describe('WTLibs.StoragePointer', () => {
   describe('toPlainObject()', () => {
     let pointer, hashKey1, hashKey2, hashLevelZero, hashLevelOne, hashLevelTwo, hashLevelThree,
       topLevelArrayHash, arrayInsideHash;
-    before(() => {
+    beforeAll(() => {
       topLevelArrayHash = InMemoryAdapter.storageInstance.create([
         { type: 'cat', name: 'Garfield' },
         { type: 'dog', name: 'Odie' },
