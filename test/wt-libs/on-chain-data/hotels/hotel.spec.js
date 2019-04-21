@@ -1,12 +1,12 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import helpers from '../../../utils/helpers';
-import OnChainHotel from '../../../../src/on-chain-data/on-chain-hotel';
+import OnChainHotel from '../../../../src/on-chain-data/hotels/hotel';
 import StoragePointer from '../../../../src/on-chain-data/storage-pointer';
 
 import { InputDataError, SmartContractInstantiationError } from '../../../../src/on-chain-data/errors';
 
-describe('WTLibs.on-chain-data.OnChainHotel', () => {
+describe('WTLibs.on-chain-data.hotels.Hotel', () => {
   let contractsStub, createdStub, utilsStub, indexContractStub, urlStub, managerStub;
   const validUri = 'schema://new-url';
   const validManager = 'manager';

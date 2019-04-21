@@ -1,12 +1,12 @@
 // @flow
-import type { WTAirlineIndexInterface, AirlineInterface, PreparedTransactionMetadataInterface } from '../interfaces/airline-interfaces';
-import Utils from './utils';
-import Contracts from './contracts';
-import OnChainAirline from './on-chain-airline';
+import type { WTAirlineIndexInterface, AirlineInterface, PreparedTransactionMetadataInterface } from '../../interfaces/airline-interfaces';
+import Utils from '../utils';
+import Contracts from '../contracts';
+import OnChainAirline from './airline';
 
-import { InputDataError, AirlineNotFoundError, AirlineNotInstantiableError } from './errors';
-import { WTLibsError } from '../errors';
-import AbstractWTIndex from './wt-index';
+import { WTLibsError } from '../../errors';
+import { InputDataError, AirlineNotFoundError, AirlineNotInstantiableError } from '../errors';
+import AbstractWTIndex from '../wt-index';
 
 /**
  * Ethereum smart contract backed implementation of Winding Tree

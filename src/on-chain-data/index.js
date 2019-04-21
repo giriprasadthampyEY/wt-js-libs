@@ -4,8 +4,8 @@ import Utils from './utils';
 import Contracts from './contracts';
 import type { DataModelInterface, AdaptedTxResultInterface, AdaptedTxResultsInterface, KeystoreV3Interface } from '../interfaces/base-interfaces';
 import Wallet from '../wallet';
-import WTHotelIndex from './wt-hotel-index';
-import WTAirlineIndex from './wt-airline-index';
+import WTHotelIndex from './hotels/wt-index';
+import WTAirlineIndex from './airlines/wt-index';
 
 /**
  * DataModelOptionsType options. May look like this:

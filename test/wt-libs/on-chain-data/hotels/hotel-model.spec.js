@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import { HotelDataModel } from '../../../../src/on-chain-data/index';
-import WTHotelIndex from '../../../../src/on-chain-data/wt-hotel-index';
+import WTHotelIndex from '../../../../src/on-chain-data/hotels/wt-index';
 import testedDataModel from '../../../utils/data-hotel-model-definition';
 
 describe('WTLibs.on-chain-data.HotelDataModel', () => {

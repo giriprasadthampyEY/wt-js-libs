@@ -1,12 +1,12 @@
 // @flow
-import type { WTHotelIndexInterface, HotelInterface, PreparedTransactionMetadataInterface } from '../interfaces/hotel-interfaces';
-import Utils from './utils';
-import Contracts from './contracts';
-import OnChainHotel from './on-chain-hotel';
+import type { WTHotelIndexInterface, HotelInterface, PreparedTransactionMetadataInterface } from '../../interfaces/hotel-interfaces';
+import Utils from '../utils';
+import Contracts from '../contracts';
+import OnChainHotel from './hotel';
 
-import { InputDataError, HotelNotFoundError, HotelNotInstantiableError } from './errors';
-import { WTLibsError } from '../errors';
-import AbstractWTIndex from './wt-index';
+import { WTLibsError } from '../../errors';
+import { InputDataError, HotelNotFoundError, HotelNotInstantiableError } from '../errors';
+import AbstractWTIndex from '../wt-index';
 
 /**
  * Ethereum smart contract backed implementation of Winding Tree

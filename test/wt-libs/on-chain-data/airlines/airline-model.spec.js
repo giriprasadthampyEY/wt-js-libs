@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import { AirlineDataModel } from '../../../../src/on-chain-data/index';
-import WTAirlineIndex from '../../../../src/on-chain-data/wt-airline-index';
+import WTAirlineIndex from '../../../../src/on-chain-data/airlines/wt-index';
 import testedDataModel from '../../../utils/data-airline-model-definition';
 
 describe('WTLibs.on-chain-data.AirlineDataModel', () => {

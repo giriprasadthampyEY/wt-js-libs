@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import WTIndexDataProvider from '../../../../src/on-chain-data/wt-hotel-index';
+import WTIndexDataProvider from '../../../../src/on-chain-data/hotels/wt-index';
 import { HotelDataModel } from '../../../../src/on-chain-data/';
 import testedDataModel from '../../../utils/data-hotel-model-definition';
 
@@ -8,7 +8,7 @@ import { WTLibsError } from '../../../../src/errors';
 import { SmartContractInstantiationError, HotelNotInstantiableError,
   HotelNotFoundError, RemoteDataReadError, InputDataError } from '../../../../src/on-chain-data/errors';
 
-describe('WTLibs.on-chain-data.WTHotelIndex', () => {
+describe('WTLibs.on-chain-data.hotels.WTHotelIndex', () => {
   let dataModel, indexDataProvider;
 
   beforeEach(async function () {
