@@ -1,7 +1,7 @@
 import { assert } from 'chai';
-import { AbstractDataModel } from '../../../src/data-model/index';
+import { AbstractDataModel } from '../../../src/on-chain-data';
 
-describe('WTLibs.data-model.AirlineDataModel', () => {
+describe('WTLibs.on-chain-data.AirlineDataModel', () => {
   it('should throw when using abstract ancestor', () => {
     let dataModel = new AbstractDataModel();
     try {

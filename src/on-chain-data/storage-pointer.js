@@ -1,7 +1,8 @@
 // @flow
 import cloneDeep from 'lodash.clonedeep';
-import type { OffChainDataAdapterInterface } from './interfaces/base-interfaces';
-import OffChainDataClient from './off-chain-data-client';
+import type { OffChainDataAdapterInterface } from '../interfaces/base-interfaces';
+// TODO replace this with a runtime passed implementation of an interface
+import OffChainDataClient from '../off-chain-data-client';
 
 import { StoragePointerError } from './errors';
 

@@ -1,13 +1,13 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import { HotelDataModel } from '../../../../src/data-model/index';
-import WTHotelIndex from '../../../../src/data-model/wt-hotel-index';
-import testedDataModel from '../../../utils/data-hotel-model-definition';
+import { AirlineDataModel } from '../../../../src/on-chain-data/index';
+import WTAirlineIndex from '../../../../src/on-chain-data/wt-airline-index';
+import testedDataModel from '../../../utils/data-airline-model-definition';
 
-describe('WTLibs.data-model.HotelDataModel', () => {
+describe('WTLibs.on-chain-data.AirlineDataModel', () => {
   it('should cache WTIndex instances', () => {
-    const dataModel = HotelDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions);
-    const createInstanceSpy = sinon.spy(WTHotelIndex, 'createInstance');
+    const dataModel = AirlineDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions);
+    const createInstanceSpy = sinon.spy(WTAirlineIndex, 'createInstance');
     assert.equal(createInstanceSpy.callCount, 0);
     dataModel.getWindingTreeIndex('address1');
     assert.equal(createInstanceSpy.callCount, 1);

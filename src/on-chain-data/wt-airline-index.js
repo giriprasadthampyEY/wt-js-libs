@@ -1,10 +1,11 @@
 // @flow
 import type { WTAirlineIndexInterface, AirlineInterface, PreparedTransactionMetadataInterface } from '../interfaces/airline-interfaces';
-import Utils from '../utils';
-import Contracts from '../contracts';
+import Utils from './utils';
+import Contracts from './contracts';
 import OnChainAirline from './on-chain-airline';
 
-import { InputDataError, AirlineNotFoundError, AirlineNotInstantiableError, WTLibsError } from '../errors';
+import { InputDataError, AirlineNotFoundError, AirlineNotInstantiableError } from './errors';
+import { WTLibsError } from '../errors';
 import AbstractWTIndex from './wt-index';
 
 /**

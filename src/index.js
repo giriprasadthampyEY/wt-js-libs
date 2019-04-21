@@ -1,14 +1,19 @@
 // @flow
 
-import type { DataModelOptionsType } from './data-model';
+import type { DataModelOptionsType } from './on-chain-data';
 import type { OffChainDataClientOptionsType } from './off-chain-data-client';
 import type { AdaptedTxResultsInterface, OffChainDataAdapterInterface, WalletInterface, KeystoreV3Interface } from './interfaces/base-interfaces';
 import type { WTHotelIndexInterface } from './interfaces/hotel-interfaces';
 import type { WTAirlineIndexInterface } from './interfaces/airline-interfaces';
-import { AbstractDataModel, AirlineDataModel, HotelDataModel } from './data-model/index';
-import OffChainDataClient from './off-chain-data-client';
-import { AIRLINE_SEGMENT_ID, HOTEL_SEGMENT_ID } from './constants';
 
+import { AIRLINE_SEGMENT_ID, HOTEL_SEGMENT_ID } from './on-chain-data/constants';
+import { AbstractDataModel, AirlineDataModel, HotelDataModel } from './on-chain-data';
+import { OffChainDataClient } from './off-chain-data-client';
+import {
+  OffChainDataError,
+  OffChainDataConfigurationError,
+  OffChainDataRuntimeError,
+} from './off-chain-data-client/errors';
 import {
   WTLibsError,
   SmartContractInstantiationError,
@@ -23,18 +28,17 @@ import {
   TransactionRevertedError,
   TransactionDidNotComeThroughError,
   NoReceiptError,
-  InputDataError,
   InaccessibleEthereumNodeError,
-  OffChainDataError,
-  OffChainDataConfigurationError,
-  OffChainDataRuntimeError,
+} from './wallet/errors';
+import {
+  InputDataError,
   StoragePointerError,
   RemotelyBackedDatasetError,
   RemoteDataAccessError,
   RemoteDataReadError,
   HotelNotFoundError,
   HotelNotInstantiableError,
-} from './errors';
+} from './on-chain-data/errors';
 
 /**
  * General options for wt-libs-js. Holds all things necessary

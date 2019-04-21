@@ -1,7 +1,7 @@
 // @flow
 
-import Utils from '../utils';
-import Contracts from '../contracts';
+import Utils from './utils';
+import Contracts from './contracts';
 import type { DataModelInterface, AdaptedTxResultInterface, AdaptedTxResultsInterface, KeystoreV3Interface } from '../interfaces/base-interfaces';
 import Wallet from '../wallet';
 import WTHotelIndex from './wt-hotel-index';

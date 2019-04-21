@@ -1,6 +1,6 @@
 import offChainData from './data/off-chain-data.json';
 import InMemoryAdapter from '@windingtree/off-chain-adapter-in-memory';
-import { AIRLINE_SEGMENT_ID } from '../../src/constants';
+import { AIRLINE_SEGMENT_ID } from '../../src/on-chain-data/constants';
 
 export const Web3UriBackedDataModel = {
   emptyConfig: {},

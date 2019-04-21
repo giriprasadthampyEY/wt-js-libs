@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import RemotelyBackedDataset from '../../src/remotely-backed-dataset';
+import RemotelyBackedDataset from '../../../src/on-chain-data/remotely-backed-dataset';
 
-import { RemoteDataAccessError, RemoteDataReadError } from '../../src/errors';
+import { RemoteDataAccessError, RemoteDataReadError } from '../../../src/on-chain-data/errors';
 
 describe('WTLibs.RemotelyBackedDataset', () => {
   let bbbInstance, remoteGetterStub, remoteSetterStub,

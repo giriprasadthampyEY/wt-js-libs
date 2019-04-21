@@ -3,7 +3,7 @@ import sinon from 'sinon';
 import helpers from '../utils/helpers';
 import testedDataModel from '../utils/data-hotel-model-definition';
 import jsonWallet from '../utils/test-wallet';
-import { HotelDataModel } from '../../src/data-model/';
+import { HotelDataModel } from '../../src/on-chain-data/';
 import Web3WTWallet from '../../src/wallet';
 import {
   MalformedWalletError,
@@ -18,7 +18,7 @@ import {
   NoReceiptError,
   InaccessibleEthereumNodeError,
   WalletError,
-} from '../../src/errors';
+} from '../../src/wallet/errors';
 
 describe('WTLibs.Wallet', () => {
   let dataModel;

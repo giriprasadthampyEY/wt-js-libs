@@ -1,9 +1,9 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import { WtJsLibs } from '../../../src/index';
-import { HotelDataModel } from '../../../src/data-model';
-import OffChainDataClient from '../../../src/off-chain-data-client';
-import { HOTEL_SEGMENT_ID } from '../../../src/constants';
+import { WtJsLibs } from '../../../../src/index';
+import { HotelDataModel } from '../../../../src/on-chain-data';
+import { HOTEL_SEGMENT_ID } from '../../../../src/on-chain-data/constants';
+import OffChainDataClient from '../../../../src/off-chain-data-client';
 
 describe('WTLibs.WTHotelIndex', () => {
   describe('createInstance', () => {

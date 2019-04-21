@@ -1,7 +1,10 @@
 // @flow
-import type { OffChainDataAdapterInterface } from './interfaces/base-interfaces';
+import type { OffChainDataAdapterInterface } from '../interfaces/base-interfaces';
 
-import { OffChainDataRuntimeError, OffChainDataConfigurationError } from './errors';
+import {
+  OffChainDataConfigurationError,
+  OffChainDataRuntimeError,
+} from './errors';
 
 /**
  * OffChainDataClientOptionsType
@@ -23,7 +26,7 @@ let offChainDataOptions: OffChainDataClientOptionsType;
  * Please bear in mind, that once the adapters are configured, the
  * configuration is shared during the whole runtime.
  */
-class OffChainDataClient {
+export class OffChainDataClient {
   adapters: Object;
 
   /**

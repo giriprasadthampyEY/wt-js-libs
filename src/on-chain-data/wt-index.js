@@ -1,7 +1,7 @@
 // @flow
 
-import Utils from '../utils';
-import Contracts from '../contracts';
+import Utils from './utils';
+import Contracts from './contracts';
 
 /**
  * Ethereum smart contract backed implementation of Winding Tree

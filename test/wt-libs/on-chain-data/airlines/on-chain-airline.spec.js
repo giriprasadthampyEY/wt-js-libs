@@ -1,12 +1,12 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import helpers from '../../../utils/helpers';
-import OnChainAirline from '../../../../src/data-model/on-chain-airline';
-import StoragePointer from '../../../../src/storage-pointer';
+import OnChainAirline from '../../../../src/on-chain-data/on-chain-airline';
+import StoragePointer from '../../../../src/on-chain-data/storage-pointer';
 
-import { InputDataError, SmartContractInstantiationError } from '../../../../src/errors';
+import { InputDataError, SmartContractInstantiationError } from '../../../../src/on-chain-data/errors';
 
-describe('WTLibs.data-model.OnChainAirline', () => {
+describe('WTLibs.on-chain-data.OnChainAirline', () => {
   let contractsStub, createdStub, utilsStub, indexContractStub, urlStub, managerStub;
   const validUri = 'schema://new-url';
   const validManager = 'manager';

@@ -5,7 +5,8 @@ import jsonWallet2 from './utils/test-wallet-2';
 import testedDataModel from './utils/data-hotel-model-definition';
 import OffChainDataClient from '../src/off-chain-data-client';
 
-import { InputDataError, WTLibsError } from '../src/errors';
+import { WTLibsError } from '../src/errors';
+import { InputDataError } from '../src/on-chain-data/errors';
 
 describe('WtJsLibs usage', () => {
   let libs, wallet, index, emptyIndex, minedTxHashes = [],

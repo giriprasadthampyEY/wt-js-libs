@@ -2,7 +2,8 @@
 import Web3Utils from 'web3-utils';
 import Web3Eth from 'web3-eth';
 
-import type { WalletInterface, KeystoreV3Interface, TransactionDataInterface, TransactionCallbacksInterface, TxReceiptInterface } from './interfaces/base-interfaces';
+import type { WalletInterface, KeystoreV3Interface, TransactionDataInterface,
+  TransactionCallbacksInterface, TxReceiptInterface } from '../interfaces/base-interfaces';
 import {
   WalletError,
   MalformedWalletError,

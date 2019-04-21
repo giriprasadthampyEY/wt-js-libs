@@ -1,6 +1,6 @@
 // @flow
 
-import type { TxReceiptInterface, TxInterface } from './interfaces/base-interfaces';
+import type { TxReceiptInterface, TxInterface } from '../interfaces/base-interfaces';
 import Web3Eth from 'web3-eth';
 import Web3Utils from 'web3-utils';
 

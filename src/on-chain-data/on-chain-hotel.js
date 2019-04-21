@@ -6,12 +6,12 @@ import type {
   TxReceiptInterface,
 } from '../interfaces/base-interfaces';
 import type { HotelInterface, PreparedTransactionMetadataInterface } from '../interfaces/hotel-interfaces';
-import Utils from '../utils';
-import Contracts from '../contracts';
-import RemotelyBackedDataset from '../remotely-backed-dataset';
-import StoragePointer from '../storage-pointer';
+import Utils from './utils';
+import Contracts from './contracts';
+import RemotelyBackedDataset from './remotely-backed-dataset';
+import StoragePointer from './storage-pointer';
 
-import { InputDataError, SmartContractInstantiationError } from '../errors';
+import { InputDataError, SmartContractInstantiationError } from './errors';
 
 /**
  * Wrapper class for a hotel backed by a smart contract on

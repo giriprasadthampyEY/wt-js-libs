@@ -1,12 +1,14 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import WTIndexDataProvider from '../../../../src/data-model/wt-airline-index';
-import { AirlineDataModel } from '../../../../src/data-model/';
+import WTIndexDataProvider from '../../../../src/on-chain-data/wt-airline-index';
+import { AirlineDataModel } from '../../../../src/on-chain-data/';
 import testedDataModel from '../../../utils/data-airline-model-definition';
 
-import { SmartContractInstantiationError, AirlineNotInstantiableError, AirlineNotFoundError, WTLibsError, RemoteDataReadError, InputDataError } from '../../../../src/errors';
+import { WTLibsError } from '../../../../src/errors';
+import { SmartContractInstantiationError, AirlineNotInstantiableError, AirlineNotFoundError,
+  RemoteDataReadError, InputDataError } from '../../../../src/on-chain-data/errors';
 
-describe('WTLibs.data-model.WTAirlineIndex', () => {
+describe('WTLibs.on-chain-data.WTAirlineIndex', () => {
   let dataModel, indexDataProvider;
 
   beforeEach(async function () {

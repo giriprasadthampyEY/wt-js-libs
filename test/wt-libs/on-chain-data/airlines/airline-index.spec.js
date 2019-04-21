@@ -1,9 +1,9 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import { WtJsLibs } from '../../../src/index';
-import { AirlineDataModel } from '../../../src/data-model';
-import OffChainDataClient from '../../../src/off-chain-data-client';
-import { AIRLINE_SEGMENT_ID } from '../../../src/constants';
+import { WtJsLibs } from '../../../../src/index';
+import { AirlineDataModel } from '../../../../src/on-chain-data';
+import OffChainDataClient from '../../../../src/off-chain-data-client';
+import { AIRLINE_SEGMENT_ID } from '../../../../src/on-chain-data/constants';
 
 describe('WTLibs.WTAirlineIndex', () => {
   describe('createInstance', () => {
