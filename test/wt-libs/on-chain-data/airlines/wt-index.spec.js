@@ -50,14 +50,14 @@ describe('WTLibs.on-chain-data.airlines.WTAirlineIndex', () => {
 
     it('should throw if airline contract cannot be instantiated', async () => {
       try {
-        sinon.stub(indexDataProvider, '_createAirlineInstance').rejects();
+        sinon.stub(indexDataProvider, '_createRecordInstanceFactory').rejects();
         await indexDataProvider.getAirline('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
         throw new Error('should not have been called');
       } catch (e) {
         assert.match(e.message, /cannot find airline/i);
         assert.instanceOf(e, AirlineNotInstantiableError);
       } finally {
-        indexDataProvider._createAirlineInstance.restore();
+        indexDataProvider._createRecordInstanceFactory.restore();
       }
     });
 
@@ -86,7 +86,7 @@ describe('WTLibs.on-chain-data.airlines.WTAirlineIndex', () => {
   describe('addAirline', () => {
     it('should throw generic error when something does not work during tx data preparation', async () => {
       try {
-        sinon.stub(indexDataProvider, '_createAirlineInstance').resolves({
+        sinon.stub(indexDataProvider, '_createRecordInstanceFactory').resolves({
           setLocalData: sinon.stub().resolves(),
           createOnChainData: sinon.stub().rejects(),
         });
@@ -196,7 +196,7 @@ describe('WTLibs.on-chain-data.airlines.WTAirlineIndex', () => {
     it('should not panic when one of many airlines is missing on-chain', async () => {
       // pre-heat the contract so we can stub it later
       await indexDataProvider._getDeployedIndex();
-      const getAirlineSpy = sinon.spy(indexDataProvider, 'getAirline');
+      const getAirlineSpy = sinon.spy(indexDataProvider, 'getRecord');
       sinon.stub(indexDataProvider.deployedIndex.methods, 'getAirlines').returns({
         call: sinon.stub().resolves([
           '0x0000000000000000000000000000000000000000', // This is an empty address

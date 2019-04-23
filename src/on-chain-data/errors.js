@@ -31,6 +31,16 @@ export class RemoteDataAccessError extends RemotelyBackedDatasetError {}
 export class RemoteDataReadError extends RemotelyBackedDatasetError {}
 
 /**
+ * Record is not found in WTIndex for some reason.
+ */
+export class RecordNotFoundError extends WTLibsError {}
+
+/**
+ * Record abstraction instance cannot be created for some reason.
+ */
+export class RecordNotInstantiableError extends WTLibsError {}
+
+/**
  * Hotel is not found in WTIndex for some reason.
  */
 export class HotelNotFoundError extends WTLibsError {}

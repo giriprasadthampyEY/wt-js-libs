@@ -4,8 +4,7 @@ import Utils from '../utils';
 import Contracts from '../contracts';
 import OnChainHotel from './hotel';
 
-import { WTLibsError } from '../../errors';
-import { InputDataError, HotelNotFoundError, HotelNotInstantiableError } from '../errors';
+import { HotelNotFoundError, HotelNotInstantiableError, RecordNotFoundError, RecordNotInstantiableError } from '../errors';
 import AbstractWTIndex from '../wt-index';
 
 /**
@@ -14,30 +13,32 @@ import AbstractWTIndex from '../wt-index';
  * contracts.
  */
 class WTHotelIndex extends AbstractWTIndex implements WTHotelIndexInterface {
-  constructor (indexAddress: string, web3Utils: Utils, web3Contracts: Contracts) {
-    super();
-    this.address = indexAddress;
-    this.web3Utils = web3Utils;
-    this.web3Contracts = web3Contracts;
-  }
-
   /**
    * Returns a configured instance of WTHotelIndex
    * representing a Winding Tree index contract on a given `indexAddress`.
    */
   static createInstance (indexAddress: string, web3Utils: Utils, web3Contracts: Contracts): WTHotelIndex {
-    return new WTHotelIndex(indexAddress, web3Utils, web3Contracts);
+    const instance = new WTHotelIndex(indexAddress, web3Utils, web3Contracts);
+    instance.RECORD_TYPE = 'hotel';
+    return instance;
   }
 
-  async _getDeployedIndex (): Promise<Object> {
-    if (!this.deployedIndex) {
-      this.deployedIndex = await this.web3Contracts.getHotelIndexInstance(this.address);
-    }
-    return this.deployedIndex;
+  async _getDeployedIndexFactory (): Promise<Object> {
+    return this.web3Contracts.getHotelIndexInstance(this.address);
   }
 
-  async _createHotelInstance (address?: string): Promise<HotelInterface> {
+  async _createRecordInstanceFactory (address?: string): Promise<Object> {
     return OnChainHotel.createInstance(this.web3Utils, this.web3Contracts, await this._getDeployedIndex(), address);
+  }
+
+  async _getIndexRecordPositionFactory (address: string): Promise<number> {
+    const index = await this._getDeployedIndex();
+    return parseInt(await index.methods.hotelsIndex(address).call(), 10);
+  }
+
+  async _getRecordsAddressListFactory (): Promise<Array<string>> {
+    const index = await this._getDeployedIndex();
+    return index.methods.getHotels().call();
   }
 
   /**
@@ -50,20 +51,7 @@ class WTHotelIndex extends AbstractWTIndex implements WTHotelIndexInterface {
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
   async addHotel (hotelData: HotelInterface): Promise<PreparedTransactionMetadataInterface> {
-    if (!await hotelData.dataUri) {
-      throw new InputDataError('Cannot add hotel: Missing dataUri');
-    }
-    const hotelManager = await hotelData.manager;
-    if (!hotelManager) {
-      throw new InputDataError('Cannot add hotel: Missing manager');
-    }
-    const hotel: HotelInterface = await this._createHotelInstance();
-    await hotel.setLocalData(hotelData);
-    return hotel.createOnChainData({
-      from: hotelManager,
-    }).catch((err) => {
-      throw new WTLibsError('Cannot add hotel: ' + err.message, err);
-    });
+    return this.addRecord(hotelData);
   }
 
   /**
@@ -76,18 +64,7 @@ class WTHotelIndex extends AbstractWTIndex implements WTHotelIndexInterface {
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
   async updateHotel (hotel: HotelInterface): Promise<Array<PreparedTransactionMetadataInterface>> {
-    if (!hotel.address) {
-      throw new InputDataError('Cannot update hotel without address.');
-    }
-    const hotelManager = await hotel.manager;
-    if (!hotelManager) {
-      throw new InputDataError('Cannot update hotel without manager.');
-    }
-    return hotel.updateOnChainData({
-      from: hotelManager,
-    }).catch((err) => {
-      throw new WTLibsError('Cannot update hotel:' + err.message, err);
-    });
+    return this.updateRecord(hotel);
   }
 
   /**
@@ -100,20 +77,7 @@ class WTHotelIndex extends AbstractWTIndex implements WTHotelIndexInterface {
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
   async removeHotel (hotel: HotelInterface): Promise<PreparedTransactionMetadataInterface> {
-    if (!hotel.address) {
-      throw new InputDataError('Cannot remove hotel without address.');
-    }
-    const hotelManager = await hotel.manager;
-    if (!hotelManager) {
-      throw new InputDataError('Cannot remove hotel without manager.');
-    }
-    return hotel.removeOnChainData({
-      from: hotelManager,
-    }).catch((err) => {
-      // invalid opcode -> non-existent hotel
-      // invalid opcode -> failed check for manager
-      throw new WTLibsError('Cannot remove hotel: ' + err.message, err);
-    });
+    return this.removeRecord(hotel);
   }
 
   /**
@@ -128,29 +92,7 @@ class WTHotelIndex extends AbstractWTIndex implements WTHotelIndexInterface {
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
   async transferHotelOwnership (hotel: HotelInterface, newManager: string): Promise<PreparedTransactionMetadataInterface> {
-    if (!hotel.address) {
-      throw new InputDataError('Cannot transfer hotel without address.');
-    }
-    const hotelManager = await hotel.manager;
-    if (!hotelManager) {
-      throw new InputDataError('Cannot transfer hotel without manager.');
-    }
-
-    if (hotelManager.toLowerCase() === newManager.toLowerCase()) {
-      throw new InputDataError('Cannot transfer hotel to the same manager.');
-    }
-
-    if (this.web3Utils.isZeroAddress(newManager)) {
-      throw new InputDataError('Cannot transfer hotel to an invalid newManager address.');
-    }
-
-    return hotel.transferOnChainOwnership(newManager, {
-      from: hotelManager,
-    }).catch((err) => {
-      // invalid opcode -> non-existent hotel
-      // invalid opcode -> failed check for manager
-      throw new WTLibsError('Cannot transfer hotel: ' + err.message, err);
-    });
+    return this.transferRecordOwnership(hotel, newManager);
   }
 
   /**
@@ -163,21 +105,17 @@ class WTHotelIndex extends AbstractWTIndex implements WTHotelIndexInterface {
    * @throws {WTLibsError} When something breaks in the network communication.
    */
   async getHotel (address: string): Promise<?HotelInterface> {
-    const index = await this._getDeployedIndex();
-    let hotelIndex;
     try {
-      // This returns strings
-      hotelIndex = parseInt(await index.methods.hotelsIndex(address).call(), 10);
-    } catch (err) {
-      throw new WTLibsError('Cannot find hotel at ' + address + ': ' + err.message, err);
-    }
-    // Zeroeth position is reserved as empty during index deployment
-    if (!hotelIndex) {
-      throw new HotelNotFoundError(`Cannot find hotel at ${address}: Not found in hotel list`);
-    } else {
-      return this._createHotelInstance(address).catch((err) => {
-        throw new HotelNotInstantiableError('Cannot find hotel at ' + address + ': ' + err.message, err);
-      });
+      const record = await this.getRecord(address);
+      return record;
+    } catch (e) {
+      if (e instanceof RecordNotFoundError) {
+        throw new HotelNotFoundError(e);
+      }
+      if (e instanceof RecordNotInstantiableError) {
+        throw new HotelNotInstantiableError(e);
+      }
+      throw e;
     }
   }
 
@@ -189,22 +127,18 @@ class WTHotelIndex extends AbstractWTIndex implements WTHotelIndexInterface {
    * Subject to change.
    */
   async getAllHotels (): Promise<Array<HotelInterface>> {
-    const index = await this._getDeployedIndex();
-    const hotelsAddressList = await index.methods.getHotels().call();
-    let getHotelDetails = hotelsAddressList
-      // Filtering null addresses beforehand improves efficiency
-      .filter((addr: string): boolean => !this.web3Utils.isZeroAddress(addr))
-      .map((addr: string): Promise<?HotelInterface> => {
-        return this.getHotel(addr) // eslint-disable-line promise/no-nesting
-          // We don't really care why the hotel is inaccessible
-          // and we need to catch exceptions here on each individual hotel
-          .catch((err: Error): null => { // eslint-disable-line
-            return null;
-          });
-      });
-    const hotelDetails: Array<?HotelInterface> = await (Promise.all(getHotelDetails): any); // eslint-disable-line flowtype/no-weak-types
-    const hotelList: Array<HotelInterface> = (hotelDetails.filter((a: ?HotelInterface): boolean => a != null): any); // eslint-disable-line flowtype/no-weak-types
-    return hotelList;
+    try {
+      const list = await this.getAllRecords();
+      return list;
+    } catch (e) {
+      if (e instanceof RecordNotFoundError) {
+        throw new HotelNotFoundError(e);
+      }
+      if (e instanceof RecordNotInstantiableError) {
+        throw new HotelNotInstantiableError(e);
+      }
+      throw e;
+    }
   }
 
   async getLifTokenAddress (): Promise<string> {

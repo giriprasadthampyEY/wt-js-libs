@@ -24,6 +24,24 @@ export interface BaseOnChainDataInterface {
   toPlainObject(): Promise<Object>
 }
 
+export interface BasePreparedTransactionMetadataInterface {
+  // TODO deal with types, flow is so bad in super/subtyping
+  // eslint-disable-next-line
+  airline?: any,
+  // eslint-disable-next-line
+  hotel?: any,
+  transactionData: TransactionDataInterface,
+  eventCallbacks?: TransactionCallbacksInterface
+}
+
+export interface BaseOnChainRecordInterface extends BaseOnChainDataInterface {
+  setLocalData(newData: Object): Promise<void>,
+  createOnChainData(transactionOptions: TransactionOptionsInterface): Promise<BasePreparedTransactionMetadataInterface>,
+  updateOnChainData(transactionOptions: TransactionOptionsInterface): Promise<Array<BasePreparedTransactionMetadataInterface>>,
+  removeOnChainData(transactionOptions: TransactionOptionsInterface): Promise<BasePreparedTransactionMetadataInterface>,
+  transferOnChainOwnership(newManager: string, transactionOptions: TransactionOptionsInterface): Promise<BasePreparedTransactionMetadataInterface>
+}
+
 export interface PlainDataInterface {
   address: Promise<?string> | ?string,
   manager: Promise<?string> | ?string,
