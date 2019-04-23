@@ -25,11 +25,7 @@ export interface BaseOnChainDataInterface {
 }
 
 export interface BasePreparedTransactionMetadataInterface {
-  // TODO deal with types, flow is so bad in super/subtyping
-  // eslint-disable-next-line
-  airline?: any,
-  // eslint-disable-next-line
-  hotel?: any,
+  record?: BaseOnChainDataInterface,
   transactionData: TransactionDataInterface,
   eventCallbacks?: TransactionCallbacksInterface
 }
