@@ -9,7 +9,7 @@ import { WTLibsError } from '../../../../src/errors';
 import { RecordNotFoundError, RecordNotInstantiableError,
   InputDataError } from '../../../../src/on-chain-data/errors';
 
-describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
+describe('WTLibs.on-chain-data.AbstractWTIndex', () => {
   let dataModel;
 
   beforeAll(function () {
@@ -96,7 +96,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
         }
       };
       indexDataProvider = new ImplClass('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', dataModel.web3Utils, dataModel.web3Contracts);
-      indexDataProvider.RECORD_TYPE = 'mana';
+      indexDataProvider.RECORD_TYPE = 'dragon';
     });
 
     describe('getRecord', () => {
@@ -106,7 +106,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           await indexDataProvider.getRecord('random-address');
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot find mana/i);
+          assert.match(e.message, /cannot find dragon/i);
           assert.instanceOf(e, WTLibsError);
         }
       });
@@ -117,7 +117,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           await indexDataProvider.getRecord('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA');
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot find mana/i);
+          assert.match(e.message, /cannot find dragon/i);
           assert.instanceOf(e, RecordNotFoundError);
         }
       });
@@ -128,7 +128,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           await indexDataProvider.getRecord('0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot find mana/i);
+          assert.match(e.message, /cannot find dragon/i);
           assert.instanceOf(e, RecordNotInstantiableError);
         } finally {
           indexDataProvider._createRecordInstanceFactory.restore();
@@ -146,7 +146,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           await indexDataProvider.addRecord({ manager: 'b', dataUri: 'aaa' });
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot add mana/i);
+          assert.match(e.message, /cannot add dragon/i);
           assert.instanceOf(e, WTLibsError);
         }
       });
@@ -156,7 +156,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           await indexDataProvider.addRecord({ manager: 'b' });
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot add mana/i);
+          assert.match(e.message, /cannot add dragon/i);
           assert.instanceOf(e, InputDataError);
         }
       });
@@ -166,7 +166,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           await indexDataProvider.addRecord({ dataUri: 'b' });
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot add mana/i);
+          assert.match(e.message, /cannot add dragon/i);
           assert.instanceOf(e, InputDataError);
         }
       });
@@ -182,7 +182,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           });
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot update mana/i);
+          assert.match(e.message, /cannot update dragon/i);
           assert.instanceOf(e, WTLibsError);
           assert.isDefined(e.originalError);
           assert.equal(e.originalError.name, 'some original error');
@@ -194,7 +194,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           await indexDataProvider.updateRecord({ address: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769', dataUri: 'b' });
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot update mana/i);
+          assert.match(e.message, /cannot update dragon/i);
           assert.instanceOf(e, InputDataError);
         }
       });
@@ -204,7 +204,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           await indexDataProvider.updateRecord({ dataUri: 'b', manager: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769' });
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot update mana/i);
+          assert.match(e.message, /cannot update dragon/i);
           assert.instanceOf(e, InputDataError);
         }
       });
@@ -220,7 +220,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           });
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot remove mana/i);
+          assert.match(e.message, /cannot remove dragon/i);
           assert.instanceOf(e, WTLibsError);
         }
       });
@@ -232,7 +232,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           });
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot remove mana/i);
+          assert.match(e.message, /cannot remove dragon/i);
           assert.instanceOf(e, WTLibsError);
         }
       });
@@ -244,7 +244,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           });
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot remove mana/i);
+          assert.match(e.message, /cannot remove dragon/i);
           assert.instanceOf(e, WTLibsError);
         }
       });
@@ -260,7 +260,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           }, '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot transfer mana/i);
+          assert.match(e.message, /cannot transfer dragon/i);
           assert.instanceOf(e, WTLibsError);
           assert.isDefined(e.originalError);
           assert.equal(e.originalError.name, 'some original error');
@@ -276,7 +276,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           }, 'random-string-that-is-not-address');
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot transfer mana/i);
+          assert.match(e.message, /cannot transfer dragon/i);
           assert.instanceOf(e, InputDataError);
         }
       });
@@ -289,7 +289,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           }, '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot transfer mana/i);
+          assert.match(e.message, /cannot transfer dragon/i);
           assert.instanceOf(e, InputDataError);
         }
       });
@@ -302,7 +302,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           }, '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot transfer mana/i);
+          assert.match(e.message, /cannot transfer dragon/i);
           assert.instanceOf(e, InputDataError);
         }
       });
@@ -316,7 +316,7 @@ describe('WTLibs.on-chain-data.hotels.AbstractWTIndex', () => {
           }, '0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot transfer mana/i);
+          assert.match(e.message, /cannot transfer dragon/i);
           assert.match(e.message, /same manager/i);
           assert.instanceOf(e, InputDataError);
         }

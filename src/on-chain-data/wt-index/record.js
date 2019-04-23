@@ -24,6 +24,7 @@ import { InputDataError, SmartContractInstantiationError } from '../errors';
  *
  */
 class OnChainRecord {
+  RECORD_TYPE: string;
   address: Promise<?string> | ?string;
 
   // provided by eth backed dataset
@@ -40,7 +41,6 @@ class OnChainRecord {
   // Representation of data stored on dataUri
   _dataIndex: ?StoragePointer;
   _initialized: boolean;
-  RECORD_TYPE: string;
 
   constructor (web3Utils: Utils, web3Contracts: Contracts, indexContract: Object, address?: string) {
     this.address = address;
@@ -171,7 +171,7 @@ class OnChainRecord {
 
   set manager (newManager: Promise<?string> | ?string) {
     if (!newManager) {
-      throw new InputDataError(`Cannot update ${this.RECORD_TYPE}: Cannot set manager to null`);
+      throw new InputDataError(`Cannot update ${this.RECORD_TYPE}: Cannot set manager when it is not provided`);
     }
     if (this.address) {
       throw new InputDataError(`Cannot update ${this.RECORD_TYPE}: Cannot set manager when ${this.RECORD_TYPE} is deployed`);
