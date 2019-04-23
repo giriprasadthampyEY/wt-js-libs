@@ -1,10 +1,10 @@
 // @flow
-import type { BaseOnChainRecordInterface, BasePreparedTransactionMetadataInterface } from '../interfaces/base-interfaces';
-import Utils from './utils';
-import Contracts from './contracts';
+import type { BaseOnChainRecordInterface, BasePreparedTransactionMetadataInterface } from '../../interfaces/base-interfaces';
+import Utils from '../utils';
+import Contracts from '../contracts';
 
-import { WTLibsError } from '../errors';
-import { InputDataError, RecordNotFoundError, RecordNotInstantiableError } from './errors';
+import { WTLibsError } from '../../errors';
+import { InputDataError, RecordNotFoundError, RecordNotInstantiableError } from '../errors';
 
 /**
  * Ethereum smart contract backed implementation of Winding Tree
@@ -37,7 +37,7 @@ class AbstractWTIndex {
   }
 
   async _getRecordsAddressListFactory (): Promise<Array<string>> {
-    throw new Error('Cannot call _getIndexRecordPositionFactory on the class');
+    throw new Error('Cannot call _getRecordsAddressListFactory on the class');
   }
 
   async _getDeployedIndex (): Promise<Object> {

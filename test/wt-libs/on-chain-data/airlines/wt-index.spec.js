@@ -6,7 +6,7 @@ import testedDataModel from '../../../utils/data-airline-model-definition';
 
 import { WTLibsError } from '../../../../src/errors';
 import { SmartContractInstantiationError, AirlineNotInstantiableError, AirlineNotFoundError,
-  RemoteDataReadError, InputDataError } from '../../../../src/on-chain-data/errors';
+  RemoteDataReadError } from '../../../../src/on-chain-data/errors';
 
 describe('WTLibs.on-chain-data.airlines.WTAirlineIndex', () => {
   let dataModel, indexDataProvider;
@@ -83,141 +83,48 @@ describe('WTLibs.on-chain-data.airlines.WTAirlineIndex', () => {
     });
   });
 
-  describe('addAirline', () => {
-    it('should throw generic error when something does not work during tx data preparation', async () => {
-      try {
-        sinon.stub(indexDataProvider, '_createRecordInstanceFactory').resolves({
-          setLocalData: sinon.stub().resolves(),
-          createOnChainData: sinon.stub().rejects(),
-        });
-        await indexDataProvider.addAirline({ manager: 'b', dataUri: 'aaa' });
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot add airline/i);
-        assert.instanceOf(e, WTLibsError);
-      }
-    });
-  });
-
-  describe('updateAirline', () => {
-    it('should throw generic error when something does not work during tx data preparation', async () => {
-      try {
-        const airline = await indexDataProvider.getAirline('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
-        sinon.stub(airline, 'updateOnChainData').rejects('some original error');
-        await indexDataProvider.updateAirline(airline);
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot update airline/i);
-        assert.instanceOf(e, WTLibsError);
-        assert.isDefined(e.originalError);
-        assert.equal(e.originalError.name, 'some original error');
-      }
+  describe('getAllAirlines', () => {
+    it('should call getAllRecords', async () => {
+      const callStub = sinon.spy(indexDataProvider, 'getAllRecords');
+      await indexDataProvider.getAllAirlines();
+      assert.equal(callStub.callCount, 1);
+      indexDataProvider.getAllRecords.restore();
     });
   });
 
   describe('transferAirlineOwnership', () => {
-    it('should throw generic error when something does not work during tx data preparation', async () => {
-      try {
-        const airline = await indexDataProvider.getAirline('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
-        sinon.stub(airline, 'transferOnChainOwnership').rejects('some original error');
-        await indexDataProvider.transferAirlineOwnership(airline, '0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot transfer airline/i);
-        assert.instanceOf(e, WTLibsError);
-        assert.isDefined(e.originalError);
-        assert.equal(e.originalError.name, 'some original error');
-      }
+    it('should call transferRecordOwnership', async () => {
+      const callStub = sinon.stub(indexDataProvider, 'transferRecordOwnership').resolves(true);
+      await indexDataProvider.transferAirlineOwnership({}, '0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
+      assert.equal(callStub.callCount, 1);
+      indexDataProvider.transferRecordOwnership.restore();
     });
+  });
 
-    it('should throw when trying to transfer to an invalid address', async () => {
-      try {
-        const airline = await indexDataProvider.getAirline('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
-        await indexDataProvider.transferAirlineOwnership(airline, 'random-string-that-is-not-address');
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot transfer airline/i);
-        assert.instanceOf(e, InputDataError);
-      }
+  describe('addAirline', () => {
+    it('should call addRecord', async () => {
+      const callStub = sinon.stub(indexDataProvider, 'addRecord').resolves(true);
+      await indexDataProvider.addAirline({});
+      assert.equal(callStub.callCount, 1);
+      indexDataProvider.addRecord.restore();
     });
+  });
 
-    it('should throw when trying to transfer a airline without a manager', async () => {
-      try {
-        const airline = await indexDataProvider.getAirline('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
-        airline._manager = null;
-        await indexDataProvider.transferAirlineOwnership(airline, '0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot transfer airline/i);
-        assert.instanceOf(e, InputDataError);
-      }
-    });
-
-    it('should throw when transferring to the same manager', async () => {
-      try {
-        const airline = await indexDataProvider.getAirline('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
-        await indexDataProvider.transferAirlineOwnership(airline, await airline.manager);
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot transfer airline/i);
-        assert.match(e.message, /same manager/i);
-        assert.instanceOf(e, InputDataError);
-      }
+  describe('updateAirline', () => {
+    it('should call updateRecord', async () => {
+      const callStub = sinon.stub(indexDataProvider, 'updateRecord').resolves(true);
+      await indexDataProvider.updateAirline({});
+      assert.equal(callStub.callCount, 1);
+      indexDataProvider.updateRecord.restore();
     });
   });
 
   describe('removeAirline', () => {
-    it('should throw generic error when something does not work during tx data preparation', async () => {
-      try {
-        const airline = await indexDataProvider.getAirline('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
-        sinon.stub(airline, 'removeOnChainData').rejects();
-        await indexDataProvider.removeAirline(airline);
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot remove airline/i);
-        assert.instanceOf(e, WTLibsError);
-      }
-    });
-
-    it('should throw error when trying to remove a airline without manager', async () => {
-      try {
-        const airline = await indexDataProvider.getAirline('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
-        airline._manager = null;
-        await indexDataProvider.removeAirline(airline);
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /cannot remove airline/i);
-        assert.instanceOf(e, WTLibsError);
-      }
-    });
-  });
-
-  describe('getAllAirlines', () => {
-    it('should not panic when one of many airlines is missing on-chain', async () => {
-      // pre-heat the contract so we can stub it later
-      await indexDataProvider._getDeployedIndex();
-      const getAirlineSpy = sinon.spy(indexDataProvider, 'getRecord');
-      sinon.stub(indexDataProvider.deployedIndex.methods, 'getAirlines').returns({
-        call: sinon.stub().resolves([
-          '0x0000000000000000000000000000000000000000', // This is an empty address
-          '0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8',
-          '0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', // This is not an address of a airline
-        ]),
-      });
-      const airlines = await indexDataProvider.getAllAirlines();
-      // Attempting to get two airlines for two valid addresses
-      assert.equal(getAirlineSpy.callCount, 2);
-      // But we know there's only one actual airline
-      assert.equal(airlines.length, 1);
-      indexDataProvider.deployedIndex.methods.getAirlines.restore();
-      getAirlineSpy.restore();
-    });
-  });
-
-  describe('getLifTokenAddress', () => {
-    it('should return LifToken address', async () => {
-      const tokenAddress = await indexDataProvider.getLifTokenAddress();
-      assert.equal(tokenAddress, '0xC5122d580949215DdEd291437Ad4e47B0206E20C');
+    it('should call removeRecord', async () => {
+      const callStub = sinon.stub(indexDataProvider, 'removeRecord').resolves(true);
+      await indexDataProvider.removeAirline('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
+      assert.equal(callStub.callCount, 1);
+      indexDataProvider.removeRecord.restore();
     });
   });
 });

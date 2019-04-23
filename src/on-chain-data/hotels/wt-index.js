@@ -127,23 +127,7 @@ class WTHotelIndex extends AbstractWTIndex implements WTHotelIndexInterface {
    * Subject to change.
    */
   async getAllHotels (): Promise<Array<HotelInterface>> {
-    try {
-      const list = await this.getAllRecords();
-      return list;
-    } catch (e) {
-      if (e instanceof RecordNotFoundError) {
-        throw new HotelNotFoundError(e);
-      }
-      if (e instanceof RecordNotInstantiableError) {
-        throw new HotelNotInstantiableError(e);
-      }
-      throw e;
-    }
-  }
-
-  async getLifTokenAddress (): Promise<string> {
-    const index = await this._getDeployedIndex();
-    return index.methods.LifToken().call();
+    return this.getAllRecords();
   }
 }
 

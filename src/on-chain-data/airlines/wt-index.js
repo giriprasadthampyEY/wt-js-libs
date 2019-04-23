@@ -127,23 +127,7 @@ class WTAirlineIndex extends AbstractWTIndex implements WTAirlineIndexInterface 
    * Subject to change.
    */
   async getAllAirlines (): Promise<Array<AirlineInterface>> {
-    try {
-      const list = await this.getAllRecords();
-      return list;
-    } catch (e) {
-      if (e instanceof RecordNotFoundError) {
-        throw new AirlineNotFoundError(e);
-      }
-      if (e instanceof RecordNotInstantiableError) {
-        throw new AirlineNotInstantiableError(e);
-      }
-      throw e;
-    }
-  }
-
-  async getLifTokenAddress (): Promise<string> {
-    const index = await this._getDeployedIndex();
-    return index.methods.LifToken().call();
+    return this.getAllRecords();
   }
 }
 
