@@ -1,12 +1,12 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import AbstractWTIndex from '../../../src/on-chain-data/wt-index';
+import AbstractWTIndex from '../../../src/on-chain-data-client/wt-index';
 
-import { HotelDataModel } from '../../../src/on-chain-data/';
+import { HotelDataModel } from '../../../src/on-chain-data-client/';
 import testedDataModel from '../../utils/data-hotel-model-definition';
 import { WTLibsError } from '../../../src/errors';
 import { RecordNotFoundError, RecordNotInstantiableError,
-  InputDataError } from '../../../src/on-chain-data/errors';
+  InputDataError } from '../../../src/on-chain-data-client/errors';
 
 describe('WTLibs.on-chain-data.AbstractWTIndex', () => {
   let dataModel;

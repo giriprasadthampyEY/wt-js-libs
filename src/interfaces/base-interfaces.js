@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js';
 
 import type { WTHotelIndexInterface } from './hotel-interfaces';
 import type { WTAirlineIndexInterface } from './airline-interfaces';
-import StoragePointer from '../on-chain-data/storage-pointer';
+import StoragePointer from '../on-chain-data-client/storage-pointer';
 
 /**
  * Shape of data that is stored on-chain

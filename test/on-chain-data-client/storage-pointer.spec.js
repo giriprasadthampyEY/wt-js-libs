@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import InMemoryAdapter from '@windingtree/off-chain-adapter-in-memory';
-import StoragePointer from '../../src/on-chain-data/storage-pointer';
-import { StoragePointerError } from '../../src/on-chain-data/errors';
+import StoragePointer from '../../src/on-chain-data-client/storage-pointer';
+import { StoragePointerError } from '../../src/on-chain-data-client/errors';
 import { OffChainDataClient } from '../../src/off-chain-data-client';
 import { OffChainDataRuntimeError } from '../../src/off-chain-data-client/errors';
 

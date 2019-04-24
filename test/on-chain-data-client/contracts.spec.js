@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import Contracts from '../../src/on-chain-data/contracts';
-import { SmartContractInstantiationError } from '../../src/on-chain-data/errors';
+import Contracts from '../../src/on-chain-data-client/contracts';
+import { SmartContractInstantiationError } from '../../src/on-chain-data-client/errors';
 
 describe('WTLibs.Contracts', () => {
   let contracts, getCodeStub, ContractStub;

@@ -5,10 +5,10 @@ import jsonWallet from '../utils/test-wallet';
 import jsonWallet2 from '../utils/test-wallet-2';
 import testedDataModel from '../utils/data-hotel-model-definition';
 import OffChainDataClient from '../../src/off-chain-data-client';
-import { AirlineDataModel, HotelDataModel } from '../../src/on-chain-data';
-import { AIRLINE_SEGMENT_ID, HOTEL_SEGMENT_ID } from '../../src/on-chain-data/constants';
+import { AirlineDataModel, HotelDataModel } from '../../src/on-chain-data-client';
+import { AIRLINE_SEGMENT_ID, HOTEL_SEGMENT_ID } from '../../src/on-chain-data-client/constants';
 import { WTLibsError } from '../../src/errors';
-import { InputDataError } from '../../src/on-chain-data/errors';
+import { InputDataError } from '../../src/on-chain-data-client/errors';
 
 describe('WtJsLibs usage', () => {
   let libs, wallet, index, emptyIndex, minedTxHashes = [],

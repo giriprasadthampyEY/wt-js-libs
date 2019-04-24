@@ -1,9 +1,9 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import helpers from '../../utils/helpers';
-import OnChainRecord from '../../../src/on-chain-data/wt-index/record';
-import StoragePointer from '../../../src/on-chain-data/storage-pointer';
-import { InputDataError, SmartContractInstantiationError } from '../../../src/on-chain-data/errors';
+import OnChainRecord from '../../../src/on-chain-data-client/wt-index/record';
+import StoragePointer from '../../../src/on-chain-data-client/storage-pointer';
+import { InputDataError, SmartContractInstantiationError } from '../../../src/on-chain-data-client/errors';
 
 describe('WTLibs.on-chain-data.Record', () => {
   let contractsStub, createdStub, utilsStub, indexContractStub, urlStub, managerStub;

@@ -1,12 +1,12 @@
 // @flow
 
-import type { DataModelOptionsType } from './on-chain-data';
+import type { DataModelOptionsType } from './on-chain-data-client';
 import type { OffChainDataClientOptionsType } from './off-chain-data-client';
 import type { AdaptedTxResultsInterface, OffChainDataAdapterInterface, WalletInterface, KeystoreV3Interface } from './interfaces/base-interfaces';
 import type { WTHotelIndexInterface } from './interfaces/hotel-interfaces';
 import type { WTAirlineIndexInterface } from './interfaces/airline-interfaces';
 
-import { OnChainDataClient, AbstractDataModel } from './on-chain-data';
+import { OnChainDataClient, AbstractDataModel } from './on-chain-data-client';
 import { OffChainDataClient } from './off-chain-data-client';
 import Wallet from './wallet';
 
@@ -40,7 +40,7 @@ import {
   HotelNotFoundError,
   HotelNotInstantiableError,
   OnChainDataRuntimeError,
-} from './on-chain-data/errors';
+} from './on-chain-data-client/errors';
 
 /**
  * General options for wt-libs-js. Holds all things necessary
