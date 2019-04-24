@@ -92,7 +92,7 @@ export class WtJsLibs {
    *
    * @param segment - allowed are `hotels` and `airlines`
    * @param address of the Winding Tree index
-   * @type WTIndexInterface
+   * @type WTHotelIndexInterface | WTAirlineIndexInterface
    */
   getWTIndex (segment: string, address: string): WTHotelIndexInterface | WTAirlineIndexInterface {
     const dataModel = OnChainDataClient.getDataModel(segment);
@@ -124,7 +124,11 @@ export class WtJsLibs {
     return OffChainDataClient.getAdapter(schema);
   }
 
-  getTrustClueClient (name: string): TrustClueClient {
+  /**
+   * Returns a TrustClueClient instance configured with all of the clues
+   * passed in the original library options.
+   */
+  getTrustClueClient (): TrustClueClient {
     if (!this.trustClueClient) {
       this.trustClueClient = TrustClueClient.createInstance(this.options.trustClueOptions);
     }

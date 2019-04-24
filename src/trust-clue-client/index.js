@@ -79,6 +79,13 @@ export class TrustClueClient {
     return this._clues[name];
   }
 
+  /**
+   * Walks over all clues and collects their values.
+   * @param {string} address Ethereum address for which the values should
+   * be collected.
+   * @returns A list of objects with either value or error:
+   * `{name: clue-name, value: value, error: error message}`
+   */
   // eslint-disable-next-line flowtype/no-weak-types
   async getAllValues (address: string): Promise<Array<{name: string, value?: any, error?: string}>> {
     let promises = [];
@@ -97,6 +104,13 @@ export class TrustClueClient {
     return Promise.all(promises);
   }
 
+  /**
+   * Walks over all clues and collects their interpreted values.
+   * @param {string} address Ethereum address for which the values should
+   * be collected.
+   * @returns A list of objects with either value or error:
+   * `{name: clue-name, value: value, error: error message}`
+   */
   async interpretAllValues (address: string): Promise<Array<{name: string, value?: boolean | number | string, error?: string}>> {
     let promises = [];
     for (let i = 0; i < this.clueNameList.length; i++) {

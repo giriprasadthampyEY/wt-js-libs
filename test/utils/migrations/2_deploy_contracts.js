@@ -11,7 +11,6 @@ module.exports = async function (deployer, network, accounts) {
     
     await deployer.deploy(WTHotelIndex, { from: accounts[0], gas: 60000000 });
     firstIndex = await WTHotelIndex.deployed();
-
     await firstIndex.initialize(accounts[0], LifTokenTest.address, { from: accounts[0], gas: 60000000 });
     
     await deployer.deploy(WTHotelIndex, { from: accounts[0], gas: 60000000 });
@@ -21,7 +20,7 @@ module.exports = async function (deployer, network, accounts) {
     await firstIndex.registerHotel('in-memory://hotel-url-one', { from: accounts[2], gas: 60000000 });
     await firstIndex.registerHotel('in-memory://hotel-url-two', { from: accounts[1], gas: 60000000 });
 
-    const hotels = firstIndex.getHotels();
+    const hotels = await firstIndex.getHotels();
     console.log('========================================');
     console.log('    Index and token owner:', accounts[0]);
     console.log('    Wallet account:', accounts[1]);
