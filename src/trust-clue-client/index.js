@@ -78,6 +78,41 @@ export class TrustClueClient {
     this._clues[name] = clueInstance;
     return this._clues[name];
   }
+
+  // eslint-disable-next-line flowtype/no-weak-types
+  async getAllValues (address: string): Promise<Array<{name: string, value?: any, error?: string}>> {
+    let promises = [];
+    for (let i = 0; i < this.clueNameList.length; i++) {
+      const getClueValue = this.getClue(this.clueNameList[i]).getValueFor(address)
+        .then((value) => ({
+          name: this.clueNameList[i],
+          value: value,
+        }))
+        .catch((e) => ({
+          name: this.clueNameList[i],
+          error: e.toString(),
+        }));
+      promises.push(getClueValue);
+    }
+    return Promise.all(promises);
+  }
+
+  async interpretAllValues (address: string): Promise<Array<{name: string, value?: boolean | number | string, error?: string}>> {
+    let promises = [];
+    for (let i = 0; i < this.clueNameList.length; i++) {
+      const getClueValue = this.getClue(this.clueNameList[i]).interpretValueFor(address)
+        .then((value) => ({
+          name: this.clueNameList[i],
+          value: value,
+        }))
+        .catch((e) => ({
+          name: this.clueNameList[i],
+          error: e.toString(),
+        }));
+      promises.push(getClueValue);
+    }
+    return Promise.all(promises);
+  }
 }
 
 export default TrustClueClient;

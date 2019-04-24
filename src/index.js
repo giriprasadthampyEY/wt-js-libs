@@ -129,7 +129,6 @@ export class WtJsLibs {
       this.trustClueClient = TrustClueClient.createInstance(this.options.trustClueOptions);
     }
     return this.trustClueClient;
-    // TODO return getClue or clueclient with more logic?
   }
 }
 
