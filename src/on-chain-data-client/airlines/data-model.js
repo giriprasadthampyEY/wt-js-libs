@@ -2,11 +2,14 @@
 
 import type { OnChainDataClientOptionsType } from '../index';
 
-import { AbstractDataModel } from '../abstract-data-model';
+import { AbstractDataModel } from '../wt-index/data-model';
 import Utils from '../utils';
 import Contracts from '../contracts';
 import WTAirlineIndex from './wt-index';
 
+/**
+ * An entry-point abstraction for interacting with airlines.
+ */
 export class AirlineDataModel extends AbstractDataModel {
   /**
    * Creates a configured AirlineDataModel instance.

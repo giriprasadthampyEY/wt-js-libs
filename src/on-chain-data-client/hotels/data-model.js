@@ -2,11 +2,14 @@
 
 import type { OnChainDataClientOptionsType } from '../index';
 
-import { AbstractDataModel } from '../abstract-data-model';
+import { AbstractDataModel } from '../wt-index/data-model';
 import Utils from '../utils';
 import Contracts from '../contracts';
 import WTHotelIndex from './wt-index';
 
+/**
+ * An entry-point abstraction for interacting with hotels.
+ */
 export class HotelDataModel extends AbstractDataModel {
   /**
    * Creates a configured HotelDataModel instance.

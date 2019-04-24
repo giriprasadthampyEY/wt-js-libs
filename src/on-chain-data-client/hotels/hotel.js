@@ -65,6 +65,13 @@ class OnChainHotel extends OnChainRecord implements HotelInterface {
     return this.indexContract.methods.deleteHotel(this.address);
   }
 
+  /**
+   * Generates transaction data and metadata for creating new hotel contract on-chain.
+   * Transaction is not signed nor sent here.
+   *
+   * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
+   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created hotel instance.
+   */
   async createOnChainData (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
     const result = await this._createOnChainData(transactionOptions);
     result.hotel = result.record;
@@ -72,6 +79,19 @@ class OnChainHotel extends OnChainRecord implements HotelInterface {
     return result;
   }
 
+  /**
+   * This is potentially devastating, so it's better to name
+   * this operation explicitly instead of hiding it under updateOnChainData.
+   *
+   * Generates transaction data and metadata required for a hotel ownership
+   * transfer.
+   *
+   * @param {string} Address of a new manager
+   * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
+   * @throws {SmartContractInstantiationError} When the underlying contract is not yet deployed.
+   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created hotel instance.
+   *
+   */
   async transferOnChainOwnership (newManager: string, transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
     const result = await this._transferOnChainOwnership(newManager, transactionOptions);
     result.hotel = result.record;
@@ -79,6 +99,13 @@ class OnChainHotel extends OnChainRecord implements HotelInterface {
     return result;
   }
 
+  /**
+   * Generates transaction data and metadata required for destroying the hotel object on network.
+   *
+   * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
+   * @throws {SmartContractInstantiationError} When the underlying contract is not yet deployed.
+   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created hotel instance.
+   */
   async removeOnChainData (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
     const result = await this._removeOnChainData(transactionOptions);
     result.hotel = result.record;
@@ -86,6 +113,15 @@ class OnChainHotel extends OnChainRecord implements HotelInterface {
     return result;
   }
 
+  /**
+   * Generates transaction data and metadata required for all hotel-related data modification
+   * by calling `updateRemoteData` on a `RemotelyBackedDataset`.
+   *
+   * @param {TransactionOptionsInterface} options object that is passed to all remote data setters
+   * @throws {SmartContractInstantiationError} When the underlying contract is not yet deployed.
+   * @throws {SmartContractInstantiationError} When dataUri is empty.
+   * @return {Promise<Array<PreparedTransactionMetadataInterface>>} List of transaction metadata
+   */
   async updateOnChainData (transactionOptions: TransactionOptionsInterface): Promise<Array<BasePreparedTransactionMetadataInterface>> {
     const results = (await this._updateOnChainData(transactionOptions))
       .map((result) => {

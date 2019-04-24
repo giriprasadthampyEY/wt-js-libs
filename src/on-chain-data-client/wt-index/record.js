@@ -22,6 +22,8 @@ import { InputDataError, SmartContractInstantiationError } from '../errors';
  * Every schema-specific implementation details
  * are dealt with in StoragePointer.
  *
+ * This should be extended by particular data types, such as hotels,
+ * airlines, OTAs etc.
  */
 class OnChainRecord {
   RECORD_TYPE: string;

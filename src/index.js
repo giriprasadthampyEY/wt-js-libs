@@ -11,6 +11,9 @@ import { OffChainDataClient } from './off-chain-data-client';
 import Wallet from './wallet';
 
 import {
+  WTLibsError,
+} from './errors';
+import {
   OffChainDataError,
   OffChainDataConfigurationError,
   OffChainDataRuntimeError,
@@ -26,7 +29,6 @@ import {
   OnChainDataRuntimeError,
 } from './on-chain-data-client/errors';
 import {
-  WTLibsError,
   SmartContractInstantiationError,
   WalletError,
   MalformedWalletError,
@@ -120,6 +122,17 @@ export class WtJsLibs {
  */
 export const errors = {
   WTLibsError,
+  OffChainDataError,
+  OffChainDataConfigurationError,
+  OffChainDataRuntimeError,
+  InputDataError,
+  StoragePointerError,
+  RemotelyBackedDatasetError,
+  RemoteDataAccessError,
+  RemoteDataReadError,
+  HotelNotFoundError,
+  HotelNotInstantiableError,
+  OnChainDataRuntimeError,
   SmartContractInstantiationError,
   WalletError,
   MalformedWalletError,
@@ -133,15 +146,4 @@ export const errors = {
   TransactionDidNotComeThroughError,
   NoReceiptError,
   InaccessibleEthereumNodeError,
-  InputDataError,
-  OffChainDataError,
-  OffChainDataConfigurationError,
-  OffChainDataRuntimeError,
-  StoragePointerError,
-  RemotelyBackedDatasetError,
-  RemoteDataAccessError,
-  RemoteDataReadError,
-  HotelNotFoundError,
-  HotelNotInstantiableError,
-  OnChainDataRuntimeError,
 };

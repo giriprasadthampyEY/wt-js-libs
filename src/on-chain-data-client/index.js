@@ -8,7 +8,7 @@ import Contracts from './contracts';
 import HotelDataModel from './hotels/data-model';
 import AirlineDataModel from './airlines/data-model';
 import { OnChainDataRuntimeError } from './errors';
-import { AbstractDataModel } from './abstract-data-model';
+import { AbstractDataModel } from './wt-index/data-model';
 
 /**
  * OnChainDataClientOptionsType options. May look like this:
@@ -31,12 +31,21 @@ export type OnChainDataClientOptionsType = {
   gasMargin?: number
 };
 
+/**
+ * A factory class used to access various on-chain data
+ * represented by Winding Tree index.
+ */
 export class OnChainDataClient {
   static dataModels: {[key: string]: AbstractDataModel};
   static options: OnChainDataClientOptionsType;
   static web3Utils: Utils;
   static web3Contracts: Contracts;
 
+  /**
+   * Sets up Utils and Contracts with given web3 provider.
+   * Sets up gasCoefficient or gasMargin. If neither is provided,
+   * sets gasCoefficient to a default of 2.
+   */
   static setup (options: OnChainDataClientOptionsType) {
     options = options || {};
     if (!options.gasMargin && !options.gasCoefficient) {
@@ -51,11 +60,21 @@ export class OnChainDataClient {
     OnChainDataClient.web3Contracts = Contracts.createInstance(OnChainDataClient.options.provider);
   }
 
+  /**
+   * Deletes options and dataModels. Useful for testing.
+   */
   static _reset () {
     OnChainDataClient.options = {};
     OnChainDataClient.dataModels = {};
   }
 
+  /**
+   * Returns a cached instance of `AbstractDataModel`
+   * for given segment
+   *
+   * @throws OnChainDataRuntimeError when an unknown segment is encountered.
+   * @param segment - allowed values are hotels and airlines
+   */
   static getDataModel (segment: string): AbstractDataModel {
     segment = segment && segment.toLowerCase();
     if (OnChainDataClient.dataModels[segment]) {

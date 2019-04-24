@@ -10,6 +10,9 @@ import { InputDataError, RecordNotFoundError, RecordNotInstantiableError } from 
  * Ethereum smart contract backed implementation of Winding Tree
  * index wrapper. It provides methods for working with <record>
  * contracts.
+ *
+ * This should be extended by particular data types, such as hotels,
+ * airlines, OTAs etc.
  */
 class AbstractWTIndex {
   address: string;

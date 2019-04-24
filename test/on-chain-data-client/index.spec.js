@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import { AbstractDataModel } from '../../src/on-chain-data-client/abstract-data-model';
+import { AbstractDataModel } from '../../src/on-chain-data-client/wt-index/data-model';
 import { AirlineDataModel } from '../../src/on-chain-data-client/airlines/data-model';
 import WTAirlineIndex from '../../src/on-chain-data-client/airlines/wt-index';
 import testedDataModel from '../utils/data-airline-model-definition';

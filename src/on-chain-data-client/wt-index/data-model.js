@@ -1,15 +1,18 @@
 // @flow
 
-import type { DataModelInterface } from '../interfaces/base-interfaces';
-import type { WTHotelIndexInterface } from '../interfaces/hotel-interfaces';
-import type { WTAirlineIndexInterface } from '../interfaces/airline-interfaces';
-import type { OnChainDataClientOptionsType } from './index';
+import type { DataModelInterface } from '../../interfaces/base-interfaces';
+import type { WTHotelIndexInterface } from '../../interfaces/hotel-interfaces';
+import type { WTAirlineIndexInterface } from '../../interfaces/airline-interfaces';
+import type { OnChainDataClientOptionsType } from '../index';
 
-import Utils from './utils';
-import Contracts from './contracts';
+import Utils from '../utils';
+import Contracts from '../contracts';
 
 /**
- * AbstractDataModel
+ * An entry-point abstraction for interacting with <record>s.
+ *
+ * This should be extended by particular data types, such as hotels,
+ * airlines, OTAs etc.
  */
 export class AbstractDataModel implements DataModelInterface {
   options: OnChainDataClientOptionsType;
@@ -19,9 +22,7 @@ export class AbstractDataModel implements DataModelInterface {
   _wtIndexCache: {[address: string]: WTHotelIndexInterface | WTAirlineIndexInterface};
 
   /**
-   * Sets up Utils and Contracts with given web3 provider.
-   * Sets up gasCoefficient or gasMargin. If neither is provided,
-   * sets gasCoefficient to a default of 2.
+   * Returns new and configured instance
    */
   constructor (options: OnChainDataClientOptionsType, web3Utils: Utils, web3Contracts: Contracts) {
     this.options = options || {};
@@ -38,7 +39,8 @@ export class AbstractDataModel implements DataModelInterface {
   }
 
   /**
-   * Returns an Ethereum backed Winding Tree index.
+   * Returns a cached Ethereum backed Winding Tree index. Caching is done based
+   * on ethereum address.
    */
   getWindingTreeIndex (address: string): WTHotelIndexInterface | WTAirlineIndexInterface {
     if (!this._wtIndexCache[address]) {
