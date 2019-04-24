@@ -16,8 +16,6 @@ export type OffChainDataClientOptionsType = {
   }}
 };
 
-let offChainDataOptions: OffChainDataClientOptionsType;
-
 /**
  * OffChainDataClient is a static factory class that is responsible
  * for creating proper instances of OffChainDataAdapterInterface.
@@ -27,7 +25,8 @@ let offChainDataOptions: OffChainDataClientOptionsType;
  * configuration is shared during the whole runtime.
  */
 export class OffChainDataClient {
-  adapters: Object;
+  static options: OffChainDataClientOptionsType;
+  static adapters: {[key: string]: Object};
 
   /**
    * Initializes the map of OffChainDataAdapters.
@@ -36,24 +35,24 @@ export class OffChainDataClient {
    * @throws {OffChainDataConfigurationError} when there are multiple adapters with the same name
    */
   static setup (options: OffChainDataClientOptionsType) {
-    offChainDataOptions = options || {};
-    let adapters = {};
+    OffChainDataClient.adapters = {};
+    OffChainDataClient.options = options || {};
     // Convert all adapter keys (i.e. URL schemes) to lowercase.
-    for (let key of Object.keys(offChainDataOptions.adapters || {})) {
+    for (let key of Object.keys(OffChainDataClient.options.adapters || {})) {
       let normalizedKey = key.toLowerCase();
-      if (normalizedKey in adapters) {
+      if (OffChainDataClient.adapters[normalizedKey]) {
         throw new OffChainDataConfigurationError(`Adapter declared twice: ${normalizedKey}`);
       }
-      adapters[normalizedKey] = offChainDataOptions.adapters[key];
+      OffChainDataClient.adapters[normalizedKey] = OffChainDataClient.options.adapters[key];
     }
-    offChainDataOptions.adapters = adapters;
   }
 
   /**
    * Drops all pre-configured OffChainDataAdapters. Useful for testing.
    */
   static _reset () {
-    offChainDataOptions.adapters = {};
+    OffChainDataClient.options = {};
+    OffChainDataClient.adapters = {};
   }
 
   /**
@@ -64,10 +63,10 @@ export class OffChainDataClient {
    */
   static getAdapter (schema: ?string): OffChainDataAdapterInterface {
     schema = schema && schema.toLowerCase();
-    if (!schema || !offChainDataOptions.adapters[schema]) {
+    if (!schema || !OffChainDataClient.adapters[schema]) {
       throw new OffChainDataRuntimeError(`Unsupported data storage type: ${schema || 'null'}`);
     }
-    const adapter = offChainDataOptions.adapters[schema];
+    const adapter = OffChainDataClient.adapters[schema];
     return adapter.create(adapter.options);
   }
 }

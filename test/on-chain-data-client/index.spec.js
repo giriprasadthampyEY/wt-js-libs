@@ -8,6 +8,10 @@ import { OnChainDataRuntimeError } from '../../src/on-chain-data-client/errors';
 
 describe('WTLibs.on-chain-data.OnChainDataClient', () => {
   describe('setup', () => {
+    afterEach(() => {
+      OnChainDataClient._reset();
+    });
+
     it('should save options and dataModels', () => {
       OnChainDataClient.setup({ opt1: 'value', gasMargin: 4 });
       assert.equal(OnChainDataClient.options.opt1, 'value');
