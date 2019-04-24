@@ -89,6 +89,19 @@ export interface OffChainDataAdapterInterface {
 }
 
 /**
+ * Interface for a trust clue.
+ */
+export interface TrustClueInterface {
+  // Returns metadata about the clue
+  getMetadata(): {name: string, description: string},
+  // Returns raw value of the clue for given address
+  // eslint-disable-next-line flowtype/no-weak-types
+  getValueFor(address: string): Promise<any>,
+  // Returns an interpreted value of the clue
+  interpretValueFor(address: string): Promise<boolean | number | string>
+}
+
+/**
  * This interface represents raw ethereum transaction log object
  * as returned by <a href="http://web3js.readthedocs.io/en/1.0/web3-eth.html#eth-getpastlogs-return">getPastLogs</a>.
  * Sometimes you might need the raw data to do some additional processing.

@@ -2,12 +2,14 @@
 
 import type { OnChainDataClientOptionsType } from './on-chain-data-client';
 import type { OffChainDataClientOptionsType } from './off-chain-data-client';
+import type { TrustClueClientOptionsType } from './trust-clue-client';
 import type { AdaptedTxResultsInterface, OffChainDataAdapterInterface, WalletInterface, KeystoreV3Interface } from './interfaces/base-interfaces';
 import type { WTHotelIndexInterface } from './interfaces/hotel-interfaces';
 import type { WTAirlineIndexInterface } from './interfaces/airline-interfaces';
 
 import { OnChainDataClient } from './on-chain-data-client';
 import { OffChainDataClient } from './off-chain-data-client';
+import { TrustClueClient } from './trust-clue-client';
 import Wallet from './wallet';
 
 import {
@@ -18,6 +20,11 @@ import {
   OffChainDataConfigurationError,
   OffChainDataRuntimeError,
 } from './off-chain-data-client/errors';
+import {
+  TrustClueError,
+  TrustClueConfigurationError,
+  TrustClueRuntimeError,
+} from './trust-clue-client/errors';
 import {
   InputDataError,
   StoragePointerError,
@@ -53,7 +60,8 @@ import {
 type WtJsLibsOptionsType = {
   segment: string,
   onChainDataOptions: OnChainDataClientOptionsType,
-  offChainDataOptions: OffChainDataClientOptionsType
+  offChainDataOptions: OffChainDataClientOptionsType,
+  trustClueOptions: TrustClueClientOptionsType
 };
 
 /**
@@ -62,6 +70,7 @@ type WtJsLibsOptionsType = {
 export class WtJsLibs {
   static errors: Object;
   options: WtJsLibsOptionsType;
+  trustClueClient: TrustClueClient;
 
   /**
    * Call this to create wt-libs-js instance.
@@ -114,6 +123,14 @@ export class WtJsLibs {
   getOffChainDataClient (schema: string): OffChainDataAdapterInterface {
     return OffChainDataClient.getAdapter(schema);
   }
+
+  getTrustClueClient (name: string): TrustClueClient {
+    if (!this.trustClueClient) {
+      this.trustClueClient = TrustClueClient.createInstance(this.options.trustClueOptions);
+    }
+    return this.trustClueClient;
+    // TODO return getClue or clueclient with more logic?
+  }
 }
 
 /**
@@ -125,6 +142,9 @@ export const errors = {
   OffChainDataError,
   OffChainDataConfigurationError,
   OffChainDataRuntimeError,
+  TrustClueError,
+  TrustClueConfigurationError,
+  TrustClueRuntimeError,
   InputDataError,
   StoragePointerError,
   RemotelyBackedDatasetError,
