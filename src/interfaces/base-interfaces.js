@@ -72,8 +72,8 @@ export interface TransactionCallbacksInterface {
  * Formalization of AbstractDataModel's public interface.
  */
 export interface DataModelInterface {
-  getWindingTreeIndex(address: string): WTHotelIndexInterface | WTAirlineIndexInterface,
-  getTransactionsStatus(transactionHashes: Array<string>): Promise<AdaptedTxResultsInterface>
+  getWindingTreeIndex(address: string): WTHotelIndexInterface | WTAirlineIndexInterface
+//   getTransactionsStatus(transactionHashes: Array<string>): Promise<AdaptedTxResultsInterface>
 }
 
 /**

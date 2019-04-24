@@ -6,8 +6,7 @@ import type { AdaptedTxResultsInterface, OffChainDataAdapterInterface, WalletInt
 import type { WTHotelIndexInterface } from './interfaces/hotel-interfaces';
 import type { WTAirlineIndexInterface } from './interfaces/airline-interfaces';
 
-import { AIRLINE_SEGMENT_ID, HOTEL_SEGMENT_ID } from './on-chain-data/constants';
-import { AbstractDataModel, AirlineDataModel, HotelDataModel } from './on-chain-data';
+import { OnChainDataClient, AbstractDataModel } from './on-chain-data';
 import { OffChainDataClient } from './off-chain-data-client';
 import Wallet from './wallet';
 
@@ -40,6 +39,7 @@ import {
   RemoteDataReadError,
   HotelNotFoundError,
   HotelNotInstantiableError,
+  OnChainDataRuntimeError,
 } from './on-chain-data/errors';
 
 /**
@@ -59,8 +59,6 @@ type WtJsLibsOptionsType = {
  */
 export class WtJsLibs {
   static errors: Object;
-  dataModel: AbstractDataModel;
-  offChainDataClient: OffChainDataClient;
   options: WtJsLibsOptionsType;
 
   /**
@@ -74,16 +72,12 @@ export class WtJsLibs {
 
   constructor (options: WtJsLibsOptionsType) {
     this.options = options || {};
-
-    if (this.options.segment === HOTEL_SEGMENT_ID) {
-      this.dataModel = HotelDataModel.createInstance(this.options.dataModelOptions);
-    } else if (this.options.segment === AIRLINE_SEGMENT_ID) {
-      this.dataModel = AirlineDataModel.createInstance(this.options.dataModelOptions);
-    } else {
-      throw new Error(`Unknown segment: ${this.options.segment}`);
-    }
-
+    OnChainDataClient.setup(this.options.dataModelOptions);
     OffChainDataClient.setup(this.options.offChainDataOptions);
+  }
+
+  _getDataModel (segment: string): AbstractDataModel {
+    return OnChainDataClient.getDataModel(segment);
   }
 
   /**
@@ -92,8 +86,8 @@ export class WtJsLibs {
    * @param address of the Winding Tree index
    * @type WTIndexInterface
    */
-  getWTIndex (address: string): WTHotelIndexInterface | WTAirlineIndexInterface {
-    return this.dataModel.getWindingTreeIndex(address);
+  getWTIndex (address: string, segment: string): WTHotelIndexInterface | WTAirlineIndexInterface {
+    return this._getDataModel(segment).getWindingTreeIndex(address);
   }
 
   /**
@@ -101,7 +95,7 @@ export class WtJsLibs {
    * This method is async because it communicates directly with and EVM node.
    */
   async getTransactionsStatus (transactionHashes: Array<string>): Promise<AdaptedTxResultsInterface> {
-    return this.dataModel.getTransactionsStatus(transactionHashes);
+    return OnChainDataClient.getTransactionsStatus(transactionHashes);
   }
 
   /**
@@ -151,4 +145,5 @@ export const errors = {
   RemoteDataReadError,
   HotelNotFoundError,
   HotelNotInstantiableError,
+  OnChainDataRuntimeError,
 };

@@ -1,5 +1,7 @@
 import { WTLibsError } from '../errors';
 
+export class OnChainDataRuntimeError extends WTLibsError {}
+
 /**
  * A smart contract abstraction could not have been created.
  */
