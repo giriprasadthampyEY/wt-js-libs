@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import { AbstractDataModel, AirlineDataModel } from '../../../src/on-chain-data';
-import WTAirlineIndex from '../../../src/on-chain-data/airlines/wt-index';
-import testedDataModel from '../../utils/data-airline-model-definition';
+import { AbstractDataModel, AirlineDataModel } from '../../src/on-chain-data';
+import WTAirlineIndex from '../../src/on-chain-data/airlines/wt-index';
+import testedDataModel from '../utils/data-airline-model-definition';
 
 describe('WTLibs.on-chain-data.DataModel', () => {
   it('should throw when using abstract ancestor', () => {

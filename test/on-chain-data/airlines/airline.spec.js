@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import helpers from '../../../utils/helpers';
-import OnChainAirline from '../../../../src/on-chain-data/airlines/airline';
+import helpers from '../../utils/helpers';
+import OnChainAirline from '../../../src/on-chain-data/airlines/airline';
 
 describe('WTLibs.on-chain-data.airlines.Airline', () => {
   let contractsStub, createdStub, utilsStub, indexContractStub, urlStub, managerStub;

@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import helpers from '../../../utils/helpers';
-import OnChainHotel from '../../../../src/on-chain-data/hotels/hotel';
+import helpers from '../../utils/helpers';
+import OnChainHotel from '../../../src/on-chain-data/hotels/hotel';
 
 describe('WTLibs.on-chain-data.hotels.Hotel', () => {
   let contractsStub, createdStub, utilsStub, indexContractStub, urlStub, managerStub;

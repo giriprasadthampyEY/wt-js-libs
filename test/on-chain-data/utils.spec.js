@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import Utils from '../../../src/on-chain-data/utils';
+import Utils from '../../src/on-chain-data/utils';
 
 describe('WTLibs.Utils', () => {
   let utils;
