@@ -1,6 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import { AbstractDataModel, AirlineDataModel } from '../../src/on-chain-data';
+import { AbstractDataModel } from '../../src/on-chain-data-client/abstract-data-model';
+import { AirlineDataModel } from '../../src/on-chain-data-client/airlines/data-model';
 import WTAirlineIndex from '../../src/on-chain-data-client/airlines/wt-index';
 import testedDataModel from '../utils/data-airline-model-definition';
 
@@ -9,7 +10,7 @@ describe('WTLibs.on-chain-data.DataModel', () => {
     let dataModel = new AbstractDataModel();
     try {
       dataModel.getWindingTreeIndex('0x0');
-      throw new Error('should not have been called');
+      assert(false);
     } catch (e) {
       assert.match(e.message, /Not implemented. Should be called on a subclass instance/i);
       assert.instanceOf(e, Error);
@@ -17,7 +18,7 @@ describe('WTLibs.on-chain-data.DataModel', () => {
   });
 
   it('should cache WTIndex instances', () => {
-    const dataModel = AirlineDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions);
+    const dataModel = AirlineDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions, {}, {});
     const createInstanceSpy = sinon.spy(WTAirlineIndex, 'createInstance');
     assert.equal(createInstanceSpy.callCount, 0);
     dataModel.getWindingTreeIndex('address1');

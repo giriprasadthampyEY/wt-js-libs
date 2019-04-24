@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import WTIndexDataProvider from '../../../src/on-chain-data-client/hotels/wt-index';
-import { HotelDataModel } from '../../../src/on-chain-data-client/';
+import { HotelDataModel } from '../../../src/on-chain-data-client/hotels/data-model';
 import testedDataModel from '../../utils/data-hotel-model-definition';
+import helpers from '../../utils/helpers';
 import { WTLibsError } from '../../../src/errors';
 import { SmartContractInstantiationError, HotelNotInstantiableError,
   HotelNotFoundError, RemoteDataReadError } from '../../../src/on-chain-data-client/errors';
@@ -11,15 +11,22 @@ describe('WTLibs.on-chain-data.hotels.WTHotelIndex', () => {
   let dataModel, indexDataProvider;
 
   beforeEach(async function () {
-    dataModel = HotelDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions);
+    dataModel = HotelDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions, {}, {
+      getHotelIndexInstance: sinon.stub().resolves({
+        methods: {
+          getHotels: helpers.stubContractMethodResult([]),
+          hotelsIndex: helpers.stubContractMethodResult(1),
+        },
+      }),
+    });
     indexDataProvider = dataModel.getWindingTreeIndex(testedDataModel.indexAddress);
   });
 
   it('should throw when we want index from a bad address', async () => {
-    const customIndexDataProvider = WTIndexDataProvider.createInstance('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', dataModel.web3Utils, dataModel.web3Contracts);
     try {
-      await customIndexDataProvider._getDeployedIndex();
-      throw new Error('should not have been called');
+      indexDataProvider.web3Contracts.getHotelIndexInstance = sinon.stub().rejects(new SmartContractInstantiationError('Cannot get hotelIndex instance at an address with no code on 1234'));
+      await indexDataProvider._getDeployedIndex();
+      assert(false);
     } catch (e) {
       assert.match(e.message, /cannot get hotelIndex instance/i);
       assert.instanceOf(e, SmartContractInstantiationError);
@@ -29,8 +36,15 @@ describe('WTLibs.on-chain-data.hotels.WTHotelIndex', () => {
   describe('getHotel', () => {
     it('should throw if address is malformed', async () => {
       try {
+        indexDataProvider.web3Contracts.getHotelIndexInstance = sinon.stub().resolves({
+          methods: {
+            hotelsIndex: {
+              call: sinon.stub().rejects(),
+            },
+          },
+        });
         await indexDataProvider.getHotel('random-address');
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot find hotel/i);
         assert.instanceOf(e, WTLibsError);
@@ -39,8 +53,13 @@ describe('WTLibs.on-chain-data.hotels.WTHotelIndex', () => {
 
     it('should throw if no hotel exists on that address', async () => {
       try {
+        indexDataProvider.web3Contracts.getHotelIndexInstance = sinon.stub().resolves({
+          methods: {
+            hotelsIndex: helpers.stubContractMethodResult(0),
+          },
+        });
         await indexDataProvider.getHotel('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA');
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot find hotel/i);
         assert.instanceOf(e, HotelNotFoundError);
@@ -51,7 +70,7 @@ describe('WTLibs.on-chain-data.hotels.WTHotelIndex', () => {
       try {
         sinon.stub(indexDataProvider, '_createRecordInstanceFactory').rejects();
         await indexDataProvider.getHotel('0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot find hotel/i);
         assert.instanceOf(e, HotelNotInstantiableError);
@@ -72,7 +91,7 @@ describe('WTLibs.on-chain-data.hotels.WTHotelIndex', () => {
 
       try {
         await hotel.dataIndex;
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot sync remote data/i);
         assert.instanceOf(e, RemoteDataReadError);

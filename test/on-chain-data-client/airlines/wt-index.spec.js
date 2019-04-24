@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import WTIndexDataProvider from '../../../src/on-chain-data-client/airlines/wt-index';
-import { AirlineDataModel } from '../../../src/on-chain-data-client/';
+import { AirlineDataModel } from '../../../src/on-chain-data-client/airlines/data-model';
 import testedDataModel from '../../utils/data-airline-model-definition';
+import helpers from '../../utils/helpers';
 import { WTLibsError } from '../../../src/errors';
 import { SmartContractInstantiationError, AirlineNotInstantiableError, AirlineNotFoundError,
   RemoteDataReadError } from '../../../src/on-chain-data-client/errors';
@@ -11,15 +11,22 @@ describe('WTLibs.on-chain-data.airlines.WTAirlineIndex', () => {
   let dataModel, indexDataProvider;
 
   beforeEach(async function () {
-    dataModel = AirlineDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions);
+    dataModel = AirlineDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions, {}, {
+      getAirlineIndexInstance: sinon.stub().resolves({
+        methods: {
+          getAirlines: helpers.stubContractMethodResult([]),
+          airlinesIndex: helpers.stubContractMethodResult(1),
+        },
+      }),
+    });
     indexDataProvider = dataModel.getWindingTreeIndex(testedDataModel.indexAddress);
   });
 
   it('should throw when we want index from a bad address', async () => {
-    const customIndexDataProvider = WTIndexDataProvider.createInstance('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', dataModel.web3Utils, dataModel.web3Contracts);
     try {
-      await customIndexDataProvider._getDeployedIndex();
-      throw new Error('should not have been called');
+      indexDataProvider.web3Contracts.getAirlineIndexInstance = sinon.stub().rejects(new SmartContractInstantiationError('Cannot get airlineIndex instance at an address with no code on 1234'));
+      await indexDataProvider._getDeployedIndex();
+      assert(false);
     } catch (e) {
       assert.match(e.message, /cannot get airlineIndex instance/i);
       assert.instanceOf(e, SmartContractInstantiationError);
@@ -29,8 +36,15 @@ describe('WTLibs.on-chain-data.airlines.WTAirlineIndex', () => {
   describe('getAirline', () => {
     it('should throw if address is malformed', async () => {
       try {
+        indexDataProvider.web3Contracts.getAirlineIndexInstance = sinon.stub().resolves({
+          methods: {
+            airlinesIndex: {
+              call: sinon.stub().rejects(),
+            },
+          },
+        });
         await indexDataProvider.getAirline('random-address');
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot find airline/i);
         assert.instanceOf(e, WTLibsError);
@@ -39,8 +53,13 @@ describe('WTLibs.on-chain-data.airlines.WTAirlineIndex', () => {
 
     it('should throw if no airline exists on that address', async () => {
       try {
+        indexDataProvider.web3Contracts.getAirlineIndexInstance = sinon.stub().resolves({
+          methods: {
+            airlinesIndex: helpers.stubContractMethodResult(0),
+          },
+        });
         await indexDataProvider.getAirline('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA');
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot find airline/i);
         assert.instanceOf(e, AirlineNotFoundError);
@@ -51,7 +70,7 @@ describe('WTLibs.on-chain-data.airlines.WTAirlineIndex', () => {
       try {
         sinon.stub(indexDataProvider, '_createRecordInstanceFactory').rejects();
         await indexDataProvider.getAirline('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot find airline/i);
         assert.instanceOf(e, AirlineNotInstantiableError);
@@ -72,7 +91,7 @@ describe('WTLibs.on-chain-data.airlines.WTAirlineIndex', () => {
 
       try {
         await airline.dataIndex;
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot sync remote data/i);
         assert.instanceOf(e, RemoteDataReadError);

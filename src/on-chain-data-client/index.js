@@ -1,102 +1,15 @@
 // @flow
 
-import type { DataModelInterface, AdaptedTxResultInterface, AdaptedTxResultsInterface } from '../interfaces/base-interfaces';
-import type { WTHotelIndexInterface } from '../interfaces/hotel-interfaces';
-import type { WTAirlineIndexInterface } from '../interfaces/airline-interfaces';
+import type { AdaptedTxResultInterface, AdaptedTxResultsInterface } from '../interfaces/base-interfaces';
+import type { DataModelOptionsType } from './abstract-data-model';
 
 import { AIRLINE_SEGMENT_ID, HOTEL_SEGMENT_ID } from './constants';
 import Utils from './utils';
 import Contracts from './contracts';
-import WTHotelIndex from './hotels/wt-index';
-import WTAirlineIndex from './airlines/wt-index';
+import HotelDataModel from './hotels/data-model';
+import AirlineDataModel from './airlines/data-model';
 import { OnChainDataRuntimeError } from './errors';
-
-/**
- * DataModelOptionsType options. May look like this:
- *
- * ```
- * {
- *   "provider": 'http://localhost:8545',// or another Web3 provider
- *   "gasCoefficient": 2 // Optional, defaults to 2
- * }
- * ```
- */
-export type DataModelOptionsType = {
-  // URL of currently used RPC provider for Web3.
-  provider: string | Object,
-  // Gas coefficient that is used as a multiplier when setting
-  // a transaction gas.
-  gasCoefficient?: number,
-  // Gas margin that is added to a computed gas amount when
-  // setting a transaction gas.
-  gasMargin?: number
-};
-
-/**
- * AbstractDataModel
- */
-export class AbstractDataModel implements DataModelInterface {
-  options: DataModelOptionsType;
-  web3Utils: Utils;
-  web3Contracts: Contracts;
-
-  _wtIndexCache: {[address: string]: WTHotelIndexInterface | WTAirlineIndexInterface};
-
-  /**
-   * Sets up Utils and Contracts with given web3 provider.
-   * Sets up gasCoefficient or gasMargin. If neither is provided,
-   * sets gasCoefficient to a default of 2.
-   */
-  constructor (options: DataModelOptionsType, web3Utils: Utils, web3Contracts: Contracts) {
-    this.options = options || {};
-    this.web3Utils = web3Utils;
-    this.web3Contracts = web3Contracts;
-    this._wtIndexCache = {};
-  }
-
-  /**
-   * Returns an Ethereum backed Winding Tree index.
-   */
-  _indexFactory (address: string): WTHotelIndexInterface | WTAirlineIndexInterface {
-    throw Error('Not implemented. Should be called on a subclass instance.');
-  }
-
-  /**
-   * Returns an Ethereum backed Winding Tree index.
-   */
-  getWindingTreeIndex (address: string): WTHotelIndexInterface | WTAirlineIndexInterface {
-    if (!this._wtIndexCache[address]) {
-      this._wtIndexCache[address] = this._indexFactory(address);
-    }
-    return this._wtIndexCache[address];
-  }
-}
-
-export class HotelDataModel extends AbstractDataModel {
-  /**
-   * Creates a configured HotelDataModel instance.
-   */
-  static createInstance (options: DataModelOptionsType, web3Utils: Utils, web3Contracts: Contracts): AbstractDataModel {
-    return new HotelDataModel(options, web3Utils, web3Contracts);
-  }
-
-  _indexFactory (address: string): WTHotelIndex {
-    return WTHotelIndex.createInstance(address, this.web3Utils, this.web3Contracts);
-  }
-}
-
-export class AirlineDataModel extends AbstractDataModel {
-  /**
-   * Creates a configured AirlineDataModel instance.
-   */
-  static createInstance (options: DataModelOptionsType, web3Utils: Utils, web3Contracts: Contracts): AbstractDataModel {
-    return new AirlineDataModel(options, web3Utils, web3Contracts);
-  }
-
-  _indexFactory (address: string): WTAirlineIndex {
-    return WTAirlineIndex.createInstance(address, this.web3Utils, this.web3Contracts);
-  }
-}
+import { AbstractDataModel } from './abstract-data-model';
 
 export class OnChainDataClient {
   static dataModels: {[key: string]: AbstractDataModel};
@@ -105,9 +18,11 @@ export class OnChainDataClient {
   static web3Contracts: Contracts;
 
   static setup (options: DataModelOptionsType) {
+    options = options || {};
     if (!options.gasMargin && !options.gasCoefficient) {
       options.gasCoefficient = 2;
     }
+    OnChainDataClient.dataModels = {};
     OnChainDataClient.options = options;
     OnChainDataClient.web3Utils = Utils.createInstance({
       gasCoefficient: OnChainDataClient.options.gasCoefficient,

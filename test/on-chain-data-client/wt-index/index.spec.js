@@ -1,8 +1,8 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import AbstractWTIndex from '../../../src/on-chain-data-client/wt-index';
-
-import { HotelDataModel } from '../../../src/on-chain-data-client/';
+import helpers from '../../utils/helpers';
+import { HotelDataModel } from '../../../src/on-chain-data-client/hotels/data-model';
 import testedDataModel from '../../utils/data-hotel-model-definition';
 import { WTLibsError } from '../../../src/errors';
 import { RecordNotFoundError, RecordNotInstantiableError,
@@ -12,7 +12,18 @@ describe('WTLibs.on-chain-data.AbstractWTIndex', () => {
   let dataModel;
 
   beforeAll(function () {
-    dataModel = HotelDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions);
+    dataModel = HotelDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions, {
+      isZeroAddress: sinon.stub().callsFake((addr) => {
+        return addr === '0x0000000000000000000000000000000000000000' || !addr.startsWith('0x');
+      }),
+    }, {
+      getHotelIndexInstance: sinon.stub().resolves({
+        methods: {
+          getHotels: helpers.stubContractMethodResult([]),
+          hotelsIndex: helpers.stubContractMethodResult(1),
+        },
+      }),
+    });
   });
 
   describe('abstraction', () => {

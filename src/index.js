@@ -1,12 +1,12 @@
 // @flow
 
-import type { DataModelOptionsType } from './on-chain-data-client';
+import type { DataModelOptionsType } from './on-chain-data-client/abstract-data-model';
 import type { OffChainDataClientOptionsType } from './off-chain-data-client';
 import type { AdaptedTxResultsInterface, OffChainDataAdapterInterface, WalletInterface, KeystoreV3Interface } from './interfaces/base-interfaces';
 import type { WTHotelIndexInterface } from './interfaces/hotel-interfaces';
 import type { WTAirlineIndexInterface } from './interfaces/airline-interfaces';
 
-import { OnChainDataClient, AbstractDataModel } from './on-chain-data-client';
+import { OnChainDataClient } from './on-chain-data-client';
 import { OffChainDataClient } from './off-chain-data-client';
 import Wallet from './wallet';
 
@@ -76,18 +76,15 @@ export class WtJsLibs {
     OffChainDataClient.setup(this.options.offChainDataOptions);
   }
 
-  _getDataModel (segment: string): AbstractDataModel {
-    return OnChainDataClient.getDataModel(segment);
-  }
-
   /**
    * Get an instance of Winding Tree index from the underlying `data-model`.
    *
    * @param address of the Winding Tree index
    * @type WTIndexInterface
    */
-  getWTIndex (address: string, segment: string): WTHotelIndexInterface | WTAirlineIndexInterface {
-    return this._getDataModel(segment).getWindingTreeIndex(address);
+  getWTIndex (segment: string, address: string): WTHotelIndexInterface | WTAirlineIndexInterface {
+    const dataModel = OnChainDataClient.getDataModel(segment);
+    return dataModel.getWindingTreeIndex(address);
   }
 
   /**

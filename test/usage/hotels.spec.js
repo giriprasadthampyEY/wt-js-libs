@@ -1,12 +1,9 @@
 import { assert } from 'chai';
-import sinon from 'sinon';
 import { WtJsLibs } from '../../src/index';
 import jsonWallet from '../utils/test-wallet';
 import jsonWallet2 from '../utils/test-wallet-2';
 import testedDataModel from '../utils/data-hotel-model-definition';
 import OffChainDataClient from '../../src/off-chain-data-client';
-import { AirlineDataModel, HotelDataModel } from '../../src/on-chain-data-client';
-import { AIRLINE_SEGMENT_ID, HOTEL_SEGMENT_ID } from '../../src/on-chain-data-client/constants';
 import { WTLibsError } from '../../src/errors';
 import { InputDataError } from '../../src/on-chain-data-client/errors';
 
@@ -16,9 +13,9 @@ describe('WtJsLibs usage', () => {
 
   beforeEach(() => {
     libs = WtJsLibs.createInstance(testedDataModel.withDataSource());
-    index = libs.getWTIndex(testedDataModel.indexAddress);
+    index = libs.getWTIndex('hotels', testedDataModel.indexAddress);
     wallet = libs.createWallet(jsonWallet);
-    emptyIndex = libs.getWTIndex(testedDataModel.emptyIndexAddress);
+    emptyIndex = libs.getWTIndex('hotels', testedDataModel.emptyIndexAddress);
     wallet.unlock('test123');
   });
 
@@ -351,74 +348,6 @@ describe('WtJsLibs usage', () => {
       assert.equal(result.meta.processed, 0);
       assert.equal(result.meta.allPassed, false);
       assert.deepEqual(result.results, {});
-    });
-  });
-
-  describe('initialization', () => {
-    it('should throw on unknown segment', () => {
-      try {
-        WtJsLibs.createInstance({ segment: 'books' });
-        throw new Error('should not have been called');
-      } catch (e) {
-        assert.match(e.message, /Unknown segment: books/i);
-        assert.instanceOf(e, Error);
-      }
-    });
-
-    describe('airlines', () => {
-      let createDataModelSpy;
-
-      beforeEach(() => {
-        createDataModelSpy = sinon.spy(AirlineDataModel, 'createInstance');
-      });
-
-      afterEach(() => {
-        createDataModelSpy.restore();
-      });
-      it('should initialize data model', () => {
-        const libs = WtJsLibs.createInstance({ segment: AIRLINE_SEGMENT_ID });
-        assert.isDefined(libs.dataModel);
-        assert.equal(createDataModelSpy.callCount, 1);
-      });
-
-      it('should pass data model options', () => {
-        const libs = WtJsLibs.createInstance({
-          segment: AIRLINE_SEGMENT_ID,
-          dataModelOptions: {
-            random: '1234',
-          },
-        });
-        assert.isDefined(libs.dataModel);
-        assert.equal(createDataModelSpy.firstCall.args[0].random, '1234');
-      });
-    });
-
-    describe('hotels', () => {
-      let createDataModelSpy;
-
-      beforeEach(() => {
-        createDataModelSpy = sinon.spy(HotelDataModel, 'createInstance');
-      });
-
-      afterEach(() => {
-        createDataModelSpy.restore();
-      });
-      it('should initialize data model', () => {
-        const libs = WtJsLibs.createInstance({ segment: HOTEL_SEGMENT_ID });
-        assert.isDefined(libs.dataModel);
-        assert.equal(createDataModelSpy.callCount, 1);
-      });
-
-      it('should pass data model options', () => {
-        const libs = WtJsLibs.createInstance({
-          segment: HOTEL_SEGMENT_ID,
-          dataModelOptions: {
-            random: '1234',
-          },
-        });
-        assert.isDefined(libs.dataModel);
-        assert.equal(createDataModelSpy.firstCall.args[0].random, '1234');
-      });
     });
   });
 });
