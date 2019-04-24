@@ -1,12 +1,11 @@
 // @flow
 
-import type { DataModelInterface, AdaptedTxResultInterface, AdaptedTxResultsInterface, KeystoreV3Interface } from '../interfaces/base-interfaces';
+import type { DataModelInterface, AdaptedTxResultInterface, AdaptedTxResultsInterface } from '../interfaces/base-interfaces';
 import type { WTHotelIndexInterface } from '../interfaces/hotel-interfaces';
 import type { WTAirlineIndexInterface } from '../interfaces/airline-interfaces';
 
 import Utils from './utils';
 import Contracts from './contracts';
-import Wallet from '../wallet';
 import WTHotelIndex from './hotels/wt-index';
 import WTAirlineIndex from './airlines/wt-index';
 
@@ -120,15 +119,6 @@ class AbstractDataModel implements DataModelInterface {
       this._wtIndexCache[address] = this._indexFactory(address);
     }
     return this._wtIndexCache[address];
-  }
-
-  /**
-   * Returns a wallet instance for given JSON keystore.
-   */
-  createWallet (jsonWallet: KeystoreV3Interface): Wallet {
-    const wallet = Wallet.createInstance(jsonWallet);
-    wallet.setupWeb3Eth(this.options.provider);
-    return wallet;
   }
 }
 

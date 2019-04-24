@@ -9,6 +9,8 @@ import type { WTAirlineIndexInterface } from './interfaces/airline-interfaces';
 import { AIRLINE_SEGMENT_ID, HOTEL_SEGMENT_ID } from './on-chain-data/constants';
 import { AbstractDataModel, AirlineDataModel, HotelDataModel } from './on-chain-data';
 import { OffChainDataClient } from './off-chain-data-client';
+import Wallet from './wallet';
+
 import {
   OffChainDataError,
   OffChainDataConfigurationError,
@@ -103,10 +105,12 @@ export class WtJsLibs {
   }
 
   /**
-   * Returns a wallet abstraction that can be used for signing transactions
+   * Returns a wallet instance for given JSON keystore.
    */
   createWallet (jsonWallet: KeystoreV3Interface): WalletInterface {
-    return this.dataModel.createWallet(jsonWallet);
+    const wallet = Wallet.createInstance(jsonWallet);
+    wallet.setupWeb3Eth(this.options.dataModelOptions.provider);
+    return wallet;
   }
 
   /**

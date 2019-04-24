@@ -3,7 +3,6 @@ import sinon from 'sinon';
 import helpers from '../utils/helpers';
 import testedDataModel from '../utils/data-hotel-model-definition';
 import jsonWallet from '../utils/test-wallet';
-import { HotelDataModel } from '../../src/on-chain-data/';
 import Web3WTWallet from '../../src/wallet';
 import {
   MalformedWalletError,
@@ -21,23 +20,24 @@ import {
 } from '../../src/wallet/errors';
 
 describe('WTLibs.Wallet', () => {
-  let dataModel;
+  let wallet;
   const correctPassword = 'test123';
   beforeEach(async function () {
-    dataModel = HotelDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions);
+    wallet = Web3WTWallet.createInstance(jsonWallet);
+    wallet.setupWeb3Eth(testedDataModel.withDataSource().dataModelOptions.provider);
   });
 
   describe('unlock', () => {
     it('should unlock the wallet', async () => {
-      const wallet = dataModel.createWallet(jsonWallet);
       wallet.unlock(correctPassword);
     });
 
     it('should not unlock on a malformed keystore', async () => {
       try {
-        const wallet = dataModel.createWallet({ random: 'object' });
+        wallet = Web3WTWallet.createInstance({ random: 'object' });
+        wallet.setupWeb3Eth(testedDataModel.withDataSource().dataModelOptions.provider);
         wallet.unlock('random-pwd');
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /not a valid v3 wallet/i);
         assert.instanceOf(e, MalformedWalletError);
@@ -45,10 +45,10 @@ describe('WTLibs.Wallet', () => {
     });
 
     it('should not unlock a wallet without web3Eth', async () => {
-      const wallet = Web3WTWallet.createInstance(jsonWallet);
+      wallet = Web3WTWallet.createInstance(jsonWallet);
       try {
         wallet.unlock(correctPassword);
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot unlock wallet without web3Eth instance/i);
         assert.instanceOf(e, WalletStateError);
@@ -56,10 +56,9 @@ describe('WTLibs.Wallet', () => {
     });
 
     it('should not unlock a wallet with a bad password', async () => {
-      const wallet = dataModel.createWallet(jsonWallet);
       try {
         wallet.unlock('random-password');
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /key derivation failed/i);
         assert.instanceOf(e, WalletPasswordError);
@@ -67,10 +66,9 @@ describe('WTLibs.Wallet', () => {
     });
 
     it('should not unlock a wallet with no password', async () => {
-      const wallet = dataModel.createWallet(jsonWallet);
       try {
         wallet.unlock();
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /no password/i);
         assert.instanceOf(e, WalletPasswordError);
@@ -78,11 +76,10 @@ describe('WTLibs.Wallet', () => {
     });
 
     it('should not unlock a destroyed wallet', async () => {
-      const wallet = dataModel.createWallet(jsonWallet);
       wallet.destroy();
       try {
         wallet.unlock(correctPassword);
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot unlock destroyed wallet/i);
         assert.instanceOf(e, WalletStateError);
@@ -91,11 +88,10 @@ describe('WTLibs.Wallet', () => {
 
     it('should translate unknown error', async () => {
       // we just need coverage
-      const wallet = dataModel.createWallet(jsonWallet);
       sinon.stub(wallet.web3Eth.accounts, 'decrypt').throws(new Error('Unknown web3-eth-accounts error'));
       try {
         wallet.unlock(correctPassword);
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         wallet.web3Eth.accounts.decrypt.restore();
         assert.match(e.message, /Unknown error during wallet decryption/i);
@@ -106,7 +102,6 @@ describe('WTLibs.Wallet', () => {
 
   describe('lock', () => {
     it('should lock the wallet', async () => {
-      const wallet = dataModel.createWallet(jsonWallet);
       wallet.unlock(correctPassword);
       assert.isDefined(wallet._account);
       wallet.lock();
@@ -114,11 +109,10 @@ describe('WTLibs.Wallet', () => {
     });
 
     it('should not lock a destroyed wallet', async () => {
-      const wallet = dataModel.createWallet(jsonWallet);
       wallet.destroy();
       try {
         wallet.lock();
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot lock destroyed wallet/i);
         assert.instanceOf(e, WalletStateError);
@@ -128,14 +122,12 @@ describe('WTLibs.Wallet', () => {
 
   describe('destroy', () => {
     it('should destroy a wallet', async () => {
-      const wallet = dataModel.createWallet(jsonWallet);
       assert.isDefined(wallet._jsonWallet);
       wallet.destroy();
       assert.isUndefined(wallet._jsonWallet);
     });
 
     it('should lock a wallet before destroying it', async () => {
-      const wallet = dataModel.createWallet(jsonWallet);
       wallet.unlock(correctPassword);
       assert.isDefined(wallet._account);
       assert.isDefined(wallet._jsonWallet);
@@ -145,11 +137,10 @@ describe('WTLibs.Wallet', () => {
     });
 
     it('should not destroy an already destroyed wallet', async () => {
-      const wallet = dataModel.createWallet(jsonWallet);
       wallet.destroy();
       try {
         wallet.destroy();
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot destroy destroyed wallet/i);
         assert.instanceOf(e, WalletStateError);
@@ -161,14 +152,15 @@ describe('WTLibs.Wallet', () => {
     let wallet;
 
     beforeEach(async function () {
-      wallet = dataModel.createWallet(jsonWallet);
+      wallet = Web3WTWallet.createInstance(jsonWallet);
+      wallet.setupWeb3Eth(testedDataModel.withDataSource().dataModelOptions.provider);
     });
 
     it('should throw when no JSON wallet exists', () => {
       wallet._jsonWallet = null;
       try {
         wallet.getAddress();
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot get address/i);
         assert.instanceOf(e, WalletStateError);
@@ -179,7 +171,7 @@ describe('WTLibs.Wallet', () => {
       wallet.destroy();
       try {
         wallet.getAddress();
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot get address/i);
         assert.instanceOf(e, WalletStateError);
@@ -189,7 +181,7 @@ describe('WTLibs.Wallet', () => {
     it('should throw when JSON wallet does not contain address', () => {
       try {
         wallet.getAddress();
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot get address/i);
         assert.instanceOf(e, WalletStateError);
@@ -200,7 +192,7 @@ describe('WTLibs.Wallet', () => {
       wallet._jsonWallet.address = 'd39ca7d186a37bb6bf48ae8abfeb4c687dc8f906';
       try {
         wallet.getAddress();
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot get address/i);
         assert.instanceOf(e, WalletStateError);
@@ -217,7 +209,8 @@ describe('WTLibs.Wallet', () => {
   describe('signAndSendTransaction', () => {
     let wallet, sendStub;
     beforeEach(async function () {
-      wallet = dataModel.createWallet(jsonWallet);
+      wallet = Web3WTWallet.createInstance(jsonWallet);
+      wallet.setupWeb3Eth(testedDataModel.withDataSource().dataModelOptions.provider);
       sendStub = sinon.stub(wallet.web3Eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent());
     });
 
@@ -229,7 +222,7 @@ describe('WTLibs.Wallet', () => {
       wallet.destroy();
       try {
         await wallet.signAndSendTransaction({});
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot use destroyed wallet/i);
         assert.instanceOf(e, WalletStateError);
@@ -239,7 +232,7 @@ describe('WTLibs.Wallet', () => {
     it('should throw on a locked wallet', async () => {
       try {
         await wallet.signAndSendTransaction({});
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot use wallet without unlocking it first/i);
         assert.instanceOf(e, WalletStateError);
@@ -247,11 +240,12 @@ describe('WTLibs.Wallet', () => {
     });
 
     it('should throw on a wallet without web3Eth', async () => {
-      const customWallet = dataModel.createWallet(jsonWallet);
+      const customWallet = Web3WTWallet.createInstance(jsonWallet);
+      customWallet.setupWeb3Eth(testedDataModel.withDataSource().dataModelOptions.provider);
       customWallet.web3Eth = null;
       try {
         await customWallet.signAndSendTransaction({});
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /cannot use wallet without web3Eth instance/i);
         assert.instanceOf(e, WalletStateError);
@@ -264,7 +258,7 @@ describe('WTLibs.Wallet', () => {
         await wallet.signAndSendTransaction({
           from: '0xSomeRandomAddress',
         });
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.match(e.message, /transaction originator does not match the wallet address/i);
         assert.instanceOf(e, WalletSigningError);
@@ -360,7 +354,7 @@ describe('WTLibs.Wallet', () => {
             data: 'data',
             gas: 1234,
           });
-          throw new Error('should not have been called');
+          assert(false);
         } catch (e) {
           assert.instanceOf(e, expectedErrorType);
         }
@@ -422,7 +416,7 @@ describe('WTLibs.Wallet', () => {
           data: 'data',
           gas: 1234,
         });
-        throw new Error('should not have been called');
+        assert(false);
       } catch (e) {
         assert.instanceOf(e, TransactionMiningError);
       } finally {

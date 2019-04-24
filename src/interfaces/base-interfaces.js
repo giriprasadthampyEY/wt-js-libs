@@ -73,8 +73,7 @@ export interface TransactionCallbacksInterface {
  */
 export interface DataModelInterface {
   getWindingTreeIndex(address: string): WTHotelIndexInterface | WTAirlineIndexInterface,
-  getTransactionsStatus(transactionHashes: Array<string>): Promise<AdaptedTxResultsInterface>,
-  createWallet(jsonWallet: Object): WalletInterface
+  getTransactionsStatus(transactionHashes: Array<string>): Promise<AdaptedTxResultsInterface>
 }
 
 /**
