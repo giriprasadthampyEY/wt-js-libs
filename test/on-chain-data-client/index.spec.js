@@ -18,7 +18,7 @@ describe('WTLibs.on-chain-data.DataModel', () => {
   });
 
   it('should cache WTIndex instances', () => {
-    const dataModel = AirlineDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions, {}, {});
+    const dataModel = AirlineDataModel.createInstance(testedDataModel.withDataSource().onChainDataOptions, {}, {});
     const createInstanceSpy = sinon.spy(WTAirlineIndex, 'createInstance');
     assert.equal(createInstanceSpy.callCount, 0);
     dataModel.getWindingTreeIndex('address1');

@@ -6,7 +6,7 @@ export const Web3UriBackedDataModel = {
   emptyConfig: {},
   withDataSource: () => ({
     segment: HOTEL_SEGMENT_ID,
-    dataModelOptions: {
+    onChainDataOptions: {
       provider: 'http://localhost:8545',
     },
     offChainDataOptions: {

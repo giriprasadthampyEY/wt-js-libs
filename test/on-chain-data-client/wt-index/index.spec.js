@@ -12,7 +12,7 @@ describe('WTLibs.on-chain-data.AbstractWTIndex', () => {
   let dataModel;
 
   beforeAll(function () {
-    dataModel = HotelDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions, {
+    dataModel = HotelDataModel.createInstance(testedDataModel.withDataSource().onChainDataOptions, {
       isZeroAddress: sinon.stub().callsFake((addr) => {
         return addr === '0x0000000000000000000000000000000000000000' || !addr.startsWith('0x');
       }),

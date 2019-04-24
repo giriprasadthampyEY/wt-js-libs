@@ -11,7 +11,7 @@ describe('WTLibs.on-chain-data.airlines.WTAirlineIndex', () => {
   let dataModel, indexDataProvider;
 
   beforeEach(async function () {
-    dataModel = AirlineDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions, {}, {
+    dataModel = AirlineDataModel.createInstance(testedDataModel.withDataSource().onChainDataOptions, {}, {
       getAirlineIndexInstance: sinon.stub().resolves({
         methods: {
           getAirlines: helpers.stubContractMethodResult([]),

@@ -11,7 +11,7 @@ describe('WTLibs.on-chain-data.hotels.WTHotelIndex', () => {
   let dataModel, indexDataProvider;
 
   beforeEach(async function () {
-    dataModel = HotelDataModel.createInstance(testedDataModel.withDataSource().dataModelOptions, {}, {
+    dataModel = HotelDataModel.createInstance(testedDataModel.withDataSource().onChainDataOptions, {}, {
       getHotelIndexInstance: sinon.stub().resolves({
         methods: {
           getHotels: helpers.stubContractMethodResult([]),

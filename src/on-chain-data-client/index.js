@@ -1,7 +1,6 @@
 // @flow
 
 import type { AdaptedTxResultInterface, AdaptedTxResultsInterface } from '../interfaces/base-interfaces';
-import type { DataModelOptionsType } from './abstract-data-model';
 
 import { AIRLINE_SEGMENT_ID, HOTEL_SEGMENT_ID } from './constants';
 import Utils from './utils';
@@ -11,13 +10,34 @@ import AirlineDataModel from './airlines/data-model';
 import { OnChainDataRuntimeError } from './errors';
 import { AbstractDataModel } from './abstract-data-model';
 
+/**
+ * OnChainDataClientOptionsType options. May look like this:
+ *
+ * ```
+ * {
+ *   "provider": 'http://localhost:8545',// or another Web3 provider
+ *   "gasCoefficient": 2 // Optional, defaults to 2
+ * }
+ * ```
+ */
+export type OnChainDataClientOptionsType = {
+  // URL of currently used RPC provider for Web3.
+  provider: string | Object,
+  // Gas coefficient that is used as a multiplier when setting
+  // a transaction gas.
+  gasCoefficient?: number,
+  // Gas margin that is added to a computed gas amount when
+  // setting a transaction gas.
+  gasMargin?: number
+};
+
 export class OnChainDataClient {
   static dataModels: {[key: string]: AbstractDataModel};
-  static options: DataModelOptionsType;
+  static options: OnChainDataClientOptionsType;
   static web3Utils: Utils;
   static web3Contracts: Contracts;
 
-  static setup (options: DataModelOptionsType) {
+  static setup (options: OnChainDataClientOptionsType) {
     options = options || {};
     if (!options.gasMargin && !options.gasCoefficient) {
       options.gasCoefficient = 2;

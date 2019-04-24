@@ -3,36 +3,16 @@
 import type { DataModelInterface } from '../interfaces/base-interfaces';
 import type { WTHotelIndexInterface } from '../interfaces/hotel-interfaces';
 import type { WTAirlineIndexInterface } from '../interfaces/airline-interfaces';
+import type { OnChainDataClientOptionsType } from './index';
 
 import Utils from './utils';
 import Contracts from './contracts';
 
 /**
- * DataModelOptionsType options. May look like this:
- *
- * ```
- * {
- *   "provider": 'http://localhost:8545',// or another Web3 provider
- *   "gasCoefficient": 2 // Optional, defaults to 2
- * }
- * ```
- */
-export type DataModelOptionsType = {
-  // URL of currently used RPC provider for Web3.
-  provider: string | Object,
-  // Gas coefficient that is used as a multiplier when setting
-  // a transaction gas.
-  gasCoefficient?: number,
-  // Gas margin that is added to a computed gas amount when
-  // setting a transaction gas.
-  gasMargin?: number
-};
-
-/**
  * AbstractDataModel
  */
 export class AbstractDataModel implements DataModelInterface {
-  options: DataModelOptionsType;
+  options: OnChainDataClientOptionsType;
   web3Utils: Utils;
   web3Contracts: Contracts;
 
@@ -43,7 +23,7 @@ export class AbstractDataModel implements DataModelInterface {
    * Sets up gasCoefficient or gasMargin. If neither is provided,
    * sets gasCoefficient to a default of 2.
    */
-  constructor (options: DataModelOptionsType, web3Utils: Utils, web3Contracts: Contracts) {
+  constructor (options: OnChainDataClientOptionsType, web3Utils: Utils, web3Contracts: Contracts) {
     this.options = options || {};
     this.web3Utils = web3Utils;
     this.web3Contracts = web3Contracts;

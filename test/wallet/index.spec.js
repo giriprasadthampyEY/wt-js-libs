@@ -24,7 +24,7 @@ describe('WTLibs.Wallet', () => {
   const correctPassword = 'test123';
   beforeEach(async function () {
     wallet = Web3WTWallet.createInstance(jsonWallet);
-    wallet.setupWeb3Eth(testedDataModel.withDataSource().dataModelOptions.provider);
+    wallet.setupWeb3Eth(testedDataModel.withDataSource().onChainDataOptions.provider);
   });
 
   describe('unlock', () => {
@@ -35,7 +35,7 @@ describe('WTLibs.Wallet', () => {
     it('should not unlock on a malformed keystore', async () => {
       try {
         wallet = Web3WTWallet.createInstance({ random: 'object' });
-        wallet.setupWeb3Eth(testedDataModel.withDataSource().dataModelOptions.provider);
+        wallet.setupWeb3Eth(testedDataModel.withDataSource().onChainDataOptions.provider);
         wallet.unlock('random-pwd');
         assert(false);
       } catch (e) {
@@ -153,7 +153,7 @@ describe('WTLibs.Wallet', () => {
 
     beforeEach(async function () {
       wallet = Web3WTWallet.createInstance(jsonWallet);
-      wallet.setupWeb3Eth(testedDataModel.withDataSource().dataModelOptions.provider);
+      wallet.setupWeb3Eth(testedDataModel.withDataSource().onChainDataOptions.provider);
     });
 
     it('should throw when no JSON wallet exists', () => {
@@ -210,7 +210,7 @@ describe('WTLibs.Wallet', () => {
     let wallet, sendStub;
     beforeEach(async function () {
       wallet = Web3WTWallet.createInstance(jsonWallet);
-      wallet.setupWeb3Eth(testedDataModel.withDataSource().dataModelOptions.provider);
+      wallet.setupWeb3Eth(testedDataModel.withDataSource().onChainDataOptions.provider);
       sendStub = sinon.stub(wallet.web3Eth, 'sendSignedTransaction').returns(helpers.stubPromiEvent());
     });
 
@@ -241,7 +241,7 @@ describe('WTLibs.Wallet', () => {
 
     it('should throw on a wallet without web3Eth', async () => {
       const customWallet = Web3WTWallet.createInstance(jsonWallet);
-      customWallet.setupWeb3Eth(testedDataModel.withDataSource().dataModelOptions.provider);
+      customWallet.setupWeb3Eth(testedDataModel.withDataSource().onChainDataOptions.provider);
       customWallet.web3Eth = null;
       try {
         await customWallet.signAndSendTransaction({});

@@ -1,6 +1,6 @@
 // @flow
 
-import type { DataModelOptionsType } from './on-chain-data-client/abstract-data-model';
+import type { OnChainDataClientOptionsType } from './on-chain-data-client';
 import type { OffChainDataClientOptionsType } from './off-chain-data-client';
 import type { AdaptedTxResultsInterface, OffChainDataAdapterInterface, WalletInterface, KeystoreV3Interface } from './interfaces/base-interfaces';
 import type { WTHotelIndexInterface } from './interfaces/hotel-interfaces';
@@ -15,6 +15,16 @@ import {
   OffChainDataConfigurationError,
   OffChainDataRuntimeError,
 } from './off-chain-data-client/errors';
+import {
+  InputDataError,
+  StoragePointerError,
+  RemotelyBackedDatasetError,
+  RemoteDataAccessError,
+  RemoteDataReadError,
+  HotelNotFoundError,
+  HotelNotInstantiableError,
+  OnChainDataRuntimeError,
+} from './on-chain-data-client/errors';
 import {
   WTLibsError,
   SmartContractInstantiationError,
@@ -31,16 +41,6 @@ import {
   NoReceiptError,
   InaccessibleEthereumNodeError,
 } from './wallet/errors';
-import {
-  InputDataError,
-  StoragePointerError,
-  RemotelyBackedDatasetError,
-  RemoteDataAccessError,
-  RemoteDataReadError,
-  HotelNotFoundError,
-  HotelNotInstantiableError,
-  OnChainDataRuntimeError,
-} from './on-chain-data-client/errors';
 
 /**
  * General options for wt-libs-js. Holds all things necessary
@@ -50,7 +50,7 @@ import {
  */
 type WtJsLibsOptionsType = {
   segment: string,
-  dataModelOptions: DataModelOptionsType,
+  onChainDataOptions: OnChainDataClientOptionsType,
   offChainDataOptions: OffChainDataClientOptionsType
 };
 
@@ -72,13 +72,14 @@ export class WtJsLibs {
 
   constructor (options: WtJsLibsOptionsType) {
     this.options = options || {};
-    OnChainDataClient.setup(this.options.dataModelOptions);
+    OnChainDataClient.setup(this.options.onChainDataOptions);
     OffChainDataClient.setup(this.options.offChainDataOptions);
   }
 
   /**
-   * Get an instance of Winding Tree index from the underlying `data-model`.
+   * Get an instance of Winding Tree index from the OnChainDataClient.
    *
+   * @param segment - allowed are `hotels` and `airlines`
    * @param address of the Winding Tree index
    * @type WTIndexInterface
    */
@@ -88,7 +89,7 @@ export class WtJsLibs {
   }
 
   /**
-   * Get a transactions status from the underlying `data-model`.
+   * Get a transactions status from the OnChainDataClient.
    * This method is async because it communicates directly with and EVM node.
    */
   async getTransactionsStatus (transactionHashes: Array<string>): Promise<AdaptedTxResultsInterface> {
@@ -100,7 +101,7 @@ export class WtJsLibs {
    */
   createWallet (jsonWallet: KeystoreV3Interface): WalletInterface {
     const wallet = Wallet.createInstance(jsonWallet);
-    wallet.setupWeb3Eth(this.options.dataModelOptions.provider);
+    wallet.setupWeb3Eth(this.options.onChainDataOptions.provider);
     return wallet;
   }
 

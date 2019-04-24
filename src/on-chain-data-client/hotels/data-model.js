@@ -1,6 +1,6 @@
 // @flow
 
-import type { DataModelOptionsType } from '../abstract-data-model';
+import type { OnChainDataClientOptionsType } from '../index';
 
 import { AbstractDataModel } from '../abstract-data-model';
 import Utils from '../utils';
@@ -11,7 +11,7 @@ export class HotelDataModel extends AbstractDataModel {
   /**
    * Creates a configured HotelDataModel instance.
    */
-  static createInstance (options: DataModelOptionsType, web3Utils: Utils, web3Contracts: Contracts): AbstractDataModel {
+  static createInstance (options: OnChainDataClientOptionsType, web3Utils: Utils, web3Contracts: Contracts): AbstractDataModel {
     return new HotelDataModel(options, web3Utils, web3Contracts);
   }
 
