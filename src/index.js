@@ -27,9 +27,9 @@ import {
   HotelNotFoundError,
   HotelNotInstantiableError,
   OnChainDataRuntimeError,
+  SmartContractInstantiationError,
 } from './on-chain-data-client/errors';
 import {
-  SmartContractInstantiationError,
   WalletError,
   MalformedWalletError,
   WalletStateError,
