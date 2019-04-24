@@ -211,7 +211,7 @@
         -   [Parameters][207]
 -   [AbstractDataModel][208]
     -   [Parameters][209]
-    -   [\_indexFactory][210]
+    -   [\_indexContractFactory][210]
         -   [Parameters][211]
     -   [getWindingTreeIndex][212]
         -   [Parameters][213]
@@ -1842,7 +1842,7 @@ airlines, OTAs etc.
 -   `web3Utils` **[Utils][305]** 
 -   `web3Contracts` **[Contracts][306]** 
 
-### \_indexFactory
+### \_indexContractFactory
 
 Returns an Ethereum backed Winding Tree index.
 
@@ -2749,7 +2749,7 @@ Returns **[Wallet][337]**
 
 [209]: #parameters-61
 
-[210]: #_indexfactory
+[210]: #_indexcontractfactory
 
 [211]: #parameters-62
 
