@@ -93,7 +93,7 @@ describe('WTLibs.on-chain-data.Record', () => {
       }
     });
 
-    it('should throw when _callRecordInContract is accessed on abstract class', async () => {
+    it('should throw when _callRecordInIndexFactory is accessed on abstract class', async () => {
       try {
         provider._getRecordContractFactory = sinon.stub().resolves({
           methods: {
@@ -114,11 +114,11 @@ describe('WTLibs.on-chain-data.Record', () => {
         await provider._editInfoOnChain({});
         assert(false);
       } catch (e) {
-        assert.match(e.message, /Cannot call _callRecordInContract/i);
+        assert.match(e.message, /Cannot call _callRecordInIndexFactory/i);
       }
     });
 
-    it('should throw when _registerRecordInContract is accessed on abstract class', async () => {
+    it('should throw when _registerRecordInIndexFactory is accessed on abstract class', async () => {
       try {
         provider._getRecordContractFactory = sinon.stub().resolves({
           methods: {
@@ -136,25 +136,25 @@ describe('WTLibs.on-chain-data.Record', () => {
         await provider._createOnChainData({});
         assert(false);
       } catch (e) {
-        assert.match(e.message, /Cannot call _registerRecordInContract/i);
+        assert.match(e.message, /Cannot call _registerRecordInIndexFactory/i);
       }
     });
 
-    it('should throw when _transferRecordInContract is accessed on abstract class', async () => {
+    it('should throw when _transferRecordInIndexFactory is accessed on abstract class', async () => {
       try {
         await provider._transferOnChainOwnership({});
         assert(false);
       } catch (e) {
-        assert.match(e.message, /Cannot call _transferRecordInContract/i);
+        assert.match(e.message, /Cannot call _transferRecordInIndexFactory/i);
       }
     });
 
-    it('should throw when _deleteRecordInContract is accessed on abstract class', async () => {
+    it('should throw when _deleteRecordInIndexFactory is accessed on abstract class', async () => {
       try {
         await provider._removeOnChainData({});
         assert(false);
       } catch (e) {
-        assert.match(e.message, /Cannot call _deleteRecordInContract/i);
+        assert.match(e.message, /Cannot call _deleteRecordInIndexFactory/i);
       }
     });
   });
@@ -177,19 +177,19 @@ describe('WTLibs.on-chain-data.Record', () => {
         };
       }
 
-      _callRecordInContract (data) {
+      _callRecordInIndexFactory (data) {
         return indexContractStub.methods.callRecord();
       }
 
-      _registerRecordInContract (dataUri) {
+      _registerRecordInIndexFactory (dataUri) {
         return indexContractStub.methods.registerRecord();
       }
 
-      _transferRecordInContract (newManager) {
+      _transferRecordInIndexFactory (newManager) {
         return indexContractStub.methods.transferRecord();
       }
 
-      _deleteRecordInContract () {
+      _deleteRecordInIndexFactory () {
         return indexContractStub.methods.deleteRecord();
       }
     }

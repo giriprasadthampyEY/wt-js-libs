@@ -34,7 +34,7 @@ export class AbstractDataModel implements DataModelInterface {
   /**
    * Returns an Ethereum backed Winding Tree index.
    */
-  _indexFactory (address: string): WTHotelIndexInterface | WTAirlineIndexInterface {
+  _indexContractFactory (address: string): WTHotelIndexInterface | WTAirlineIndexInterface {
     throw Error('Not implemented. Should be called on a subclass instance.');
   }
 
@@ -44,7 +44,7 @@ export class AbstractDataModel implements DataModelInterface {
    */
   getWindingTreeIndex (address: string): WTHotelIndexInterface | WTAirlineIndexInterface {
     if (!this._wtIndexCache[address]) {
-      this._wtIndexCache[address] = this._indexFactory(address);
+      this._wtIndexCache[address] = this._indexContractFactory(address);
     }
     return this._wtIndexCache[address];
   }

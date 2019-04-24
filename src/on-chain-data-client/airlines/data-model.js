@@ -18,7 +18,7 @@ export class AirlineDataModel extends AbstractDataModel {
     return new AirlineDataModel(options, web3Utils, web3Contracts);
   }
 
-  _indexFactory (address: string): WTAirlineIndex {
+  _indexContractFactory (address: string): WTAirlineIndex {
     return WTAirlineIndex.createInstance(address, this.web3Utils, this.web3Contracts);
   }
 }

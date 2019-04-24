@@ -93,20 +93,20 @@ class OnChainRecord {
     throw new Error('Cannot call _getRecordContractFactory on class');
   }
 
-  _callRecordInContract (data: string) {
-    throw new Error('Cannot call _callRecordInContract on class');
+  _callRecordInIndexFactory (data: string) {
+    throw new Error('Cannot call _callRecordInIndexFactory on class');
   }
 
-  _registerRecordInContract (dataUri: ?string) {
-    throw new Error('Cannot call _registerRecordInContract on class');
+  _registerRecordInIndexFactory (dataUri: ?string) {
+    throw new Error('Cannot call _registerRecordInIndexFactory on class');
   }
 
-  _transferRecordInContract (newManager: string) {
-    throw new Error('Cannot call _transferRecordInContract on class');
+  _transferRecordInIndexFactory (newManager: string) {
+    throw new Error('Cannot call _transferRecordInIndexFactory on class');
   }
 
-  _deleteRecordInContract () {
-    throw new Error('Cannot call _deleteRecordInContract on class');
+  _deleteRecordInIndexFactory () {
+    throw new Error('Cannot call _deleteRecordInIndexFactory on class');
   }
 
   /**
@@ -257,8 +257,8 @@ class OnChainRecord {
   // eslint-disable-next-line flowtype/require-return-type
   async _editInfoOnChain (transactionOptions: TransactionOptionsInterface) {
     const data = (await this._getContractInstance()).methods.editInfo(await this.dataUri).encodeABI();
-    const estimate = this._callRecordInContract(data).estimateGas(transactionOptions);
-    const txData = this._callRecordInContract(data).encodeABI();
+    const estimate = this._callRecordInIndexFactory(data).estimateGas(transactionOptions);
+    const txData = this._callRecordInIndexFactory(data).encodeABI();
     const transactionData = {
       nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
       data: txData,
@@ -283,8 +283,8 @@ class OnChainRecord {
   // eslint-disable-next-line flowtype/require-return-type
   async _createOnChainData (transactionOptions: TransactionOptionsInterface) {
     const dataUri = await this.dataUri;
-    const estimate = this._registerRecordInContract(dataUri).estimateGas(transactionOptions);
-    const data = this._registerRecordInContract(dataUri).encodeABI();
+    const estimate = this._registerRecordInIndexFactory(dataUri).estimateGas(transactionOptions);
+    const data = this._registerRecordInIndexFactory(dataUri).encodeABI();
     const transactionData = {
       nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
       data: data,
@@ -346,8 +346,8 @@ class OnChainRecord {
     if (!this.onChainDataset.isDeployed()) {
       throw new SmartContractInstantiationError(`Cannot remove ${this.RECORD_TYPE}: not deployed`);
     }
-    const estimate = this._transferRecordInContract(newManager).estimateGas(transactionOptions);
-    const data = this._transferRecordInContract(newManager).encodeABI();
+    const estimate = this._transferRecordInIndexFactory(newManager).estimateGas(transactionOptions);
+    const data = this._transferRecordInIndexFactory(newManager).encodeABI();
     const transactionData = {
       nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
       data: data,
@@ -380,8 +380,8 @@ class OnChainRecord {
     if (!this.onChainDataset.isDeployed()) {
       throw new SmartContractInstantiationError(`Cannot remove ${this.RECORD_TYPE}: not deployed`);
     }
-    const estimate = this._deleteRecordInContract().estimateGas(transactionOptions);
-    const data = this._deleteRecordInContract().encodeABI();
+    const estimate = this._deleteRecordInIndexFactory().estimateGas(transactionOptions);
+    const data = this._deleteRecordInIndexFactory().encodeABI();
     const transactionData = {
       nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
       data: data,

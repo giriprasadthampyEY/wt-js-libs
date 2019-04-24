@@ -18,7 +18,7 @@ export class HotelDataModel extends AbstractDataModel {
     return new HotelDataModel(options, web3Utils, web3Contracts);
   }
 
-  _indexFactory (address: string): WTHotelIndex {
+  _indexContractFactory (address: string): WTHotelIndex {
     return WTHotelIndex.createInstance(address, this.web3Utils, this.web3Contracts);
   }
 }

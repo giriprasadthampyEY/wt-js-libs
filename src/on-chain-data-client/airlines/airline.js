@@ -48,19 +48,19 @@ class OnChainAirline extends OnChainRecord implements AirlineInterface {
     return this.web3Contracts.getAirlineInstance(this.address);
   }
 
-  _callRecordInContract (data: string): Object {
+  _callRecordInIndexFactory (data: string): Object {
     return this.indexContract.methods.callAirline(this.address, data);
   }
 
-  _registerRecordInContract (dataUri: ?string): Object {
+  _registerRecordInIndexFactory (dataUri: ?string): Object {
     return this.indexContract.methods.registerAirline(dataUri);
   }
 
-  _transferRecordInContract (newManager: string): Object {
+  _transferRecordInIndexFactory (newManager: string): Object {
     return this.indexContract.methods.transferAirline(this.address, newManager);
   }
 
-  _deleteRecordInContract (): Object {
+  _deleteRecordInIndexFactory (): Object {
     return this.indexContract.methods.deleteAirline(this.address);
   }
 
