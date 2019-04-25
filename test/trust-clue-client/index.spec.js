@@ -59,8 +59,8 @@ describe('WTLibs.TrustClueClient', () => {
   });
 
   describe('instantiation', () => {
-    it('should pass along options', () => {
-      const clue = client.getClue('test-list');
+    it('should pass along options', async () => {
+      const clue = await client.getClue('test-list');
       assert.isDefined(clue);
       assert.isDefined(clue.getMetadata);
       assert.equal(createTestListStub.firstCall.args[0].opt1, 'val');
@@ -78,32 +78,32 @@ describe('WTLibs.TrustClueClient', () => {
   });
 
   describe('getClue', () => {
-    it('should return proper clue', () => {
-      const clue = client.getClue('test-list');
+    it('should return proper clue', async () => {
+      const clue = await client.getClue('test-list');
       assert.isDefined(clue);
       assert.isDefined(clue.getMetadata);
     });
 
-    it('should be case insensitive', () => {
-      const clue = client.getClue('TEST-LIst');
+    it('should be case insensitive', async () => {
+      const clue = await client.getClue('TEST-LIst');
       assert.isDefined(clue);
       assert.isDefined(clue.getMetadata);
     });
 
-    it('should cache instantiated clues', () => {
-      let clue = client.getClue('test-list');
+    it('should cache instantiated clues', async () => {
+      let clue = await client.getClue('test-list');
       assert.isDefined(clue);
       assert.isDefined(clue.getMetadata);
       assert.equal(createTestListStub.callCount, 1);
-      clue = client.getClue('test-list');
+      clue = await client.getClue('test-list');
       assert.isDefined(clue);
       assert.isDefined(clue.getMetadata);
       assert.equal(createTestListStub.callCount, 1);
     });
 
-    it('should throw when no clue is found for given name', () => {
+    it('should throw when no clue is found for given name', async () => {
       try {
-        client.getClue('non-existent');
+        await client.getClue('non-existent');
         assert(false);
       } catch (e) {
         assert.match(e.message, /unsupported trust clue type/i);

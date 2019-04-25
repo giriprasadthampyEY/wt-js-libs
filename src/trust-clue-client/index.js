@@ -15,7 +15,7 @@ export type TrustClueClientOptionsType = {
       // eslint-disable-next-line flowtype/no-weak-types
       interpret?: (value: any) => Promise<boolean | number | string>
     },
-    create: (options: Object) => TrustClueInterface
+    create: (options: Object) => Promise<TrustClueInterface>
   }}
 };
 
@@ -65,7 +65,7 @@ export class TrustClueClient {
    *
    * @throws {TrustClueRuntimeError} when name is not defined or a clue with such name does not exist
    */
-  getClue (name: ?string): TrustClueInterface {
+  async getClue (name: ?string): Promise<TrustClueInterface> {
     name = name && name.toLowerCase();
 
     if (this._clues[name]) {
@@ -77,7 +77,7 @@ export class TrustClueClient {
     }
 
     const clueDeclaration = this.options.clues[name];
-    const clueInstance = clueDeclaration.create(clueDeclaration.options);
+    const clueInstance = await clueDeclaration.create(clueDeclaration.options);
     this._clues[name] = clueInstance;
     return this._clues[name];
   }
@@ -93,7 +93,10 @@ export class TrustClueClient {
   async getAllValues (address: string): Promise<Array<{name: string, value?: any, error?: string}>> {
     let promises = [];
     for (let i = 0; i < this.clueNameList.length; i++) {
-      const getClueValue = this.getClue(this.clueNameList[i]).getValueFor(address)
+      const getClueValue = this.getClue(this.clueNameList[i])
+        .then((clue) => {
+          return clue.getValueFor(address);
+        })
         .then((value) => ({
           name: this.clueNameList[i],
           value: value,
@@ -117,7 +120,10 @@ export class TrustClueClient {
   async interpretAllValues (address: string): Promise<Array<{name: string, value?: boolean | number | string, error?: string}>> {
     let promises = [];
     for (let i = 0; i < this.clueNameList.length; i++) {
-      const getClueValue = this.getClue(this.clueNameList[i]).interpretValueFor(address)
+      const getClueValue = this.getClue(this.clueNameList[i])
+        .then((clue) => {
+          return clue.interpretValueFor(address);
+        })
         .then((value) => ({
           name: this.clueNameList[i],
           value: value,

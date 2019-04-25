@@ -2216,7 +2216,7 @@ calling the `create` function from the clue's configuration.
 
 -   Throws **[TrustClueRuntimeError][346]** when name is not defined or a clue with such name does not exist
 
-Returns **[TrustClueInterface][347]** 
+Returns **[Promise][297]&lt;[TrustClueInterface][347]>** 
 
 ### getAllValues
 
