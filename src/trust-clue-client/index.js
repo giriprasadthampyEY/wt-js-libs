@@ -11,7 +11,10 @@ import {
  */
 export type TrustClueClientOptionsType = {
   clues: {[name: string]: {
-    options: Object,
+    options: {
+      // eslint-disable-next-line flowtype/no-weak-types
+      interpret?: (value: any) => Promise<boolean | number | string>
+    },
     create: (options: Object) => TrustClueInterface
   }}
 };
@@ -27,7 +30,7 @@ export type TrustClueClientOptionsType = {
 export class TrustClueClient {
   options: TrustClueClientOptionsType;
   clueNameList: Array<string>;
-  _clues: {[key: ?string]: Object};
+  _clues: {[key: ?string]: TrustClueInterface};
 
   /**
    * Initializes the map of `TrustClue`s.
