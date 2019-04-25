@@ -1,8 +1,9 @@
 // @flow
 import type {
   BaseOnChainDataInterface,
-  TransactionCallbacksInterface,
-  TransactionDataInterface, TransactionOptionsInterface,
+  BasePreparedTransactionMetadataInterface,
+  BaseOnChainRecordInterface,
+  TransactionOptionsInterface,
 } from './base-interfaces';
 
 /**
@@ -13,10 +14,8 @@ import type {
  * transactionData itself to ensure a consistent internal state
  * after the transaction is mined.
  */
-export interface PreparedTransactionMetadataInterface {
-  hotel: HotelInterface,
-  transactionData: TransactionDataInterface,
-  eventCallbacks?: TransactionCallbacksInterface
+export interface PreparedTransactionMetadataInterface extends BasePreparedTransactionMetadataInterface {
+  // hotel: HotelInterface,
 }
 
 /**
@@ -26,7 +25,7 @@ export interface PreparedTransactionMetadataInterface {
  * property.
  *
  */
-export interface HotelInterface extends BaseOnChainDataInterface {
+export interface HotelInterface extends BaseOnChainDataInterface, BaseOnChainRecordInterface {
   setLocalData(newData: HotelInterface): Promise<void>,
   createOnChainData(transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>,
   updateOnChainData(transactionOptions: TransactionOptionsInterface): Promise<Array<PreparedTransactionMetadataInterface>>,

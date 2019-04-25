@@ -1,17 +1,35 @@
 // @flow
 
-import type { DataModelOptionsType } from './data-model';
+import type { OnChainDataClientOptionsType } from './on-chain-data-client';
 import type { OffChainDataClientOptionsType } from './off-chain-data-client';
 import type { AdaptedTxResultsInterface, OffChainDataAdapterInterface, WalletInterface, KeystoreV3Interface } from './interfaces/base-interfaces';
 import type { WTHotelIndexInterface } from './interfaces/hotel-interfaces';
 import type { WTAirlineIndexInterface } from './interfaces/airline-interfaces';
-import { AbstractDataModel, AirlineDataModel, HotelDataModel } from './data-model/index';
-import OffChainDataClient from './off-chain-data-client';
-import { AIRLINE_SEGMENT_ID, HOTEL_SEGMENT_ID } from './constants';
+
+import { OnChainDataClient } from './on-chain-data-client';
+import { OffChainDataClient } from './off-chain-data-client';
+import Wallet from './wallet';
 
 import {
   WTLibsError,
+} from './errors';
+import {
+  OffChainDataError,
+  OffChainDataConfigurationError,
+  OffChainDataRuntimeError,
+} from './off-chain-data-client/errors';
+import {
+  InputDataError,
+  StoragePointerError,
+  RemotelyBackedDatasetError,
+  RemoteDataAccessError,
+  RemoteDataReadError,
+  HotelNotFoundError,
+  HotelNotInstantiableError,
+  OnChainDataRuntimeError,
   SmartContractInstantiationError,
+} from './on-chain-data-client/errors';
+import {
   WalletError,
   MalformedWalletError,
   WalletStateError,
@@ -23,18 +41,8 @@ import {
   TransactionRevertedError,
   TransactionDidNotComeThroughError,
   NoReceiptError,
-  InputDataError,
   InaccessibleEthereumNodeError,
-  OffChainDataError,
-  OffChainDataConfigurationError,
-  OffChainDataRuntimeError,
-  StoragePointerError,
-  RemotelyBackedDatasetError,
-  RemoteDataAccessError,
-  RemoteDataReadError,
-  HotelNotFoundError,
-  HotelNotInstantiableError,
-} from './errors';
+} from './wallet/errors';
 
 /**
  * General options for wt-libs-js. Holds all things necessary
@@ -44,7 +52,7 @@ import {
  */
 type WtJsLibsOptionsType = {
   segment: string,
-  dataModelOptions: DataModelOptionsType,
+  onChainDataOptions: OnChainDataClientOptionsType,
   offChainDataOptions: OffChainDataClientOptionsType
 };
 
@@ -53,8 +61,6 @@ type WtJsLibsOptionsType = {
  */
 export class WtJsLibs {
   static errors: Object;
-  dataModel: AbstractDataModel;
-  offChainDataClient: OffChainDataClient;
   options: WtJsLibsOptionsType;
 
   /**
@@ -68,41 +74,37 @@ export class WtJsLibs {
 
   constructor (options: WtJsLibsOptionsType) {
     this.options = options || {};
-
-    if (this.options.segment === HOTEL_SEGMENT_ID) {
-      this.dataModel = HotelDataModel.createInstance(this.options.dataModelOptions);
-    } else if (this.options.segment === AIRLINE_SEGMENT_ID) {
-      this.dataModel = AirlineDataModel.createInstance(this.options.dataModelOptions);
-    } else {
-      throw new Error(`Unknown segment: ${this.options.segment}`);
-    }
-
+    OnChainDataClient.setup(this.options.onChainDataOptions);
     OffChainDataClient.setup(this.options.offChainDataOptions);
   }
 
   /**
-   * Get an instance of Winding Tree index from the underlying `data-model`.
+   * Get an instance of Winding Tree index from the OnChainDataClient.
    *
+   * @param segment - allowed are `hotels` and `airlines`
    * @param address of the Winding Tree index
    * @type WTIndexInterface
    */
-  getWTIndex (address: string): WTHotelIndexInterface | WTAirlineIndexInterface {
-    return this.dataModel.getWindingTreeIndex(address);
+  getWTIndex (segment: string, address: string): WTHotelIndexInterface | WTAirlineIndexInterface {
+    const dataModel = OnChainDataClient.getDataModel(segment);
+    return dataModel.getWindingTreeIndex(address);
   }
 
   /**
-   * Get a transactions status from the underlying `data-model`.
+   * Get a transactions status from the OnChainDataClient.
    * This method is async because it communicates directly with and EVM node.
    */
   async getTransactionsStatus (transactionHashes: Array<string>): Promise<AdaptedTxResultsInterface> {
-    return this.dataModel.getTransactionsStatus(transactionHashes);
+    return OnChainDataClient.getTransactionsStatus(transactionHashes);
   }
 
   /**
-   * Returns a wallet abstraction that can be used for signing transactions
+   * Returns a wallet instance for given JSON keystore.
    */
   createWallet (jsonWallet: KeystoreV3Interface): WalletInterface {
-    return this.dataModel.createWallet(jsonWallet);
+    const wallet = Wallet.createInstance(jsonWallet);
+    wallet.setupWeb3Eth(this.options.onChainDataOptions.provider);
+    return wallet;
   }
 
   /**
@@ -120,6 +122,17 @@ export class WtJsLibs {
  */
 export const errors = {
   WTLibsError,
+  OffChainDataError,
+  OffChainDataConfigurationError,
+  OffChainDataRuntimeError,
+  InputDataError,
+  StoragePointerError,
+  RemotelyBackedDatasetError,
+  RemoteDataAccessError,
+  RemoteDataReadError,
+  HotelNotFoundError,
+  HotelNotInstantiableError,
+  OnChainDataRuntimeError,
   SmartContractInstantiationError,
   WalletError,
   MalformedWalletError,
@@ -133,14 +146,4 @@ export const errors = {
   TransactionDidNotComeThroughError,
   NoReceiptError,
   InaccessibleEthereumNodeError,
-  InputDataError,
-  OffChainDataError,
-  OffChainDataConfigurationError,
-  OffChainDataRuntimeError,
-  StoragePointerError,
-  RemotelyBackedDatasetError,
-  RemoteDataAccessError,
-  RemoteDataReadError,
-  HotelNotFoundError,
-  HotelNotInstantiableError,
 };

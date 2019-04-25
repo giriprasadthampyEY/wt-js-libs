@@ -13,8 +13,7 @@ npm install @windingtree/wt-js-libs
 ```js
 const { WtJsLibs } = require('@windingtree/wt-js-libs');
 const libs = WtJsLibs.createInstance({
-  segment: 'hotels', // or 'airlines'
-  dataModelOptions: { ... },
+  onChainDataOptions: { ... },
   offChainDataOptions: { ... },
 });
 const index = libs.getWTIndex('0x...');
@@ -25,8 +24,7 @@ const index = libs.getWTIndex('0x...');
 <script type="text/javascript" src="https://unpkg.com/@windingtree/off-chain-adapter-in-memory"></script>
 <script type="text/javascript">
 const libs = window.WtJsLibs.createInstance({
-  segment: 'hotels', // or 'airlines'
-  dataModelOptions: {
+  onChainDataOptions: {
     provider: 'http://localhost:8545', // or infura
   },
   offChainDataOptions: {
@@ -39,7 +37,7 @@ const libs = window.WtJsLibs.createInstance({
     },
   },
 });
-const index = libs.getWTIndex('0x...');
+const index = libs.getWTIndex('hotels', '0x...');
 </script>
 ```
 
@@ -57,8 +55,7 @@ import { WtJsLibs } from '@windingtree/wt-js-libs';
 import InMemoryAdapter from '@windingtree/off-chain-adapter-in-memory';
 
 const libs = WtJsLibs.createInstance({
-  segment: 'hotels',
-  dataModelOptions: {
+  onChainDataOptions: {
     provider: 'http://localhost:8545',
   },
   offChainDataOptions: {
@@ -77,7 +74,7 @@ const libs = WtJsLibs.createInstance({
 });
 
 
-const index = libs.getWTIndex('0x...');
+const index = libs.getWTIndex('hotels', '0x...');
 const hotel = await index.getHotel('0x...');
 
 // You can get all the off-chain data at once
@@ -115,10 +112,7 @@ try {
 }
 
 // Working with airline data is very similar. Just change the segment and a few method names:
-const libs = WtJsLibs.createInstance({
-  segment: 'airlines',
-  ...
-});
+const index = libs.getWTIndex('hotels', '0x...');
 const airline = await index.getAirline('0x...');
 
 try {

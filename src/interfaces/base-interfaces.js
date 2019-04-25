@@ -4,7 +4,7 @@ import BigNumber from 'bignumber.js';
 
 import type { WTHotelIndexInterface } from './hotel-interfaces';
 import type { WTAirlineIndexInterface } from './airline-interfaces';
-import StoragePointer from '../storage-pointer';
+import StoragePointer from '../on-chain-data-client/storage-pointer';
 
 /**
  * Shape of data that is stored on-chain
@@ -22,6 +22,20 @@ export interface BaseOnChainDataInterface {
   dataUri: Promise<?string> | ?string,
 
   toPlainObject(): Promise<Object>
+}
+
+export interface BasePreparedTransactionMetadataInterface {
+  record?: BaseOnChainDataInterface,
+  transactionData: TransactionDataInterface,
+  eventCallbacks?: TransactionCallbacksInterface
+}
+
+export interface BaseOnChainRecordInterface extends BaseOnChainDataInterface {
+  setLocalData(newData: Object): Promise<void>,
+  createOnChainData(transactionOptions: TransactionOptionsInterface): Promise<BasePreparedTransactionMetadataInterface>,
+  updateOnChainData(transactionOptions: TransactionOptionsInterface): Promise<Array<BasePreparedTransactionMetadataInterface>>,
+  removeOnChainData(transactionOptions: TransactionOptionsInterface): Promise<BasePreparedTransactionMetadataInterface>,
+  transferOnChainOwnership(newManager: string, transactionOptions: TransactionOptionsInterface): Promise<BasePreparedTransactionMetadataInterface>
 }
 
 export interface PlainDataInterface {
@@ -58,9 +72,8 @@ export interface TransactionCallbacksInterface {
  * Formalization of AbstractDataModel's public interface.
  */
 export interface DataModelInterface {
-  getWindingTreeIndex(address: string): WTHotelIndexInterface | WTAirlineIndexInterface,
-  getTransactionsStatus(transactionHashes: Array<string>): Promise<AdaptedTxResultsInterface>,
-  createWallet(jsonWallet: Object): WalletInterface
+  getWindingTreeIndex(address: string): WTHotelIndexInterface | WTAirlineIndexInterface
+//   getTransactionsStatus(transactionHashes: Array<string>): Promise<AdaptedTxResultsInterface>
 }
 
 /**
