@@ -191,7 +191,7 @@ describe('WTLibs.TrustClueClient', () => {
     });
 
     it('should not fail when address in signerField is not checksummed', () => {
-      data = {
+      const myData = {
         id: '0xd39ca7d186A37BB6bf48ae8abfeb4c687dc8f906',
         data: {
           random: 'thing',
@@ -200,13 +200,34 @@ describe('WTLibs.TrustClueClient', () => {
       };
       const web3eth = new Web3Eth('http://localhost:8545');
       const decryptedWallet = web3eth.accounts.decrypt(wallet, 'test123');
-      signedData = Web3Utils.utf8ToHex(JSON.stringify(data));
-      const signingResult = decryptedWallet.sign(signedData);
-      signature = signingResult.signature;
-      const result = client.verifyAndDecodeSignedData(signedData, signature, 'id');
-      assert.equal(result.id, data.id);
-      assert.equal(result.data.random, data.data.random);
-      assert.equal(result.data.winding, data.data.winding);
+      const mySignedData = Web3Utils.utf8ToHex(JSON.stringify(myData));
+      const signingResult = decryptedWallet.sign(mySignedData);
+      const mySignature = signingResult.signature;
+      const result = client.verifyAndDecodeSignedData(mySignedData, mySignature, 'id');
+      assert.equal(result.id, myData.id);
+      assert.equal(result.data.random, myData.data.random);
+      assert.equal(result.data.winding, myData.data.winding);
+    });
+
+    it('should throw when signerField does not contain address', () => {
+      const myData = {
+        id: '0xd39ca7d186A37BB6bf48ae8abfeb4c687dc8f906',
+        data: {
+          random: 'thing',
+          winding: 'tree',
+        },
+      };
+      const web3eth = new Web3Eth('http://localhost:8545');
+      const decryptedWallet = web3eth.accounts.decrypt(wallet, 'test123');
+      const mySignedData = Web3Utils.utf8ToHex(JSON.stringify(myData));
+      const signingResult = decryptedWallet.sign(mySignedData);
+      const mySignature = signingResult.signature;
+      try {
+        client.verifyAndDecodeSignedData(mySignedData, mySignature, 'id');
+      } catch (e) {
+        assert.match(e.message, /ethereum address/i);
+        assert.instanceOf(e, TrustClueRuntimeError);
+      }
     });
 
     it('should throw when any of the arguments is missing', () => {

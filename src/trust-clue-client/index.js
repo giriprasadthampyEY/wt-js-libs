@@ -161,8 +161,7 @@ export class TrustClueClient {
         throw new TrustClueRuntimeError(`signerField '${signerField}' is not part of the decoded data`);
       }
       const actualSigner = this.web3Eth.accounts.recover(signedData, signature);
-      // TODO normalize to checksummed addresses
-      if (expectedSigner.toLowerCase() !== actualSigner.toLowerCase()) {
+      if (Web3Utils.toChecksumAddress(expectedSigner) !== actualSigner) {
         throw new TrustClueRuntimeError(`Expected signer '${expectedSigner}' does not match the recovered one '${actualSigner}'`);
       }
       return message;
