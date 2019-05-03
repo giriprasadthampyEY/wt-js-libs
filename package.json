@@ -10,7 +10,7 @@
   "scripts": {
     "flow": "flow",
     "lint": "eslint src test",
-    "test": "rimraf .nyc_output .nyc_coverage && ./test/utils/scripts/localtestnet.sh",
+    "test": "rimraf coverage && ./test/utils/scripts/localtestnet.sh",
     "test:watch": "rimraf coverage && ./test/utils/scripts/localtestnet.sh --watch",
     "test-runner": "rimraf coverage && jest --coverage",
     "test-runner-watch": "jest --watch",
