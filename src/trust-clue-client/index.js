@@ -1,6 +1,8 @@
 // @flow
 import type { TrustClueInterface } from '../interfaces/base-interfaces';
 
+import Web3Eth from 'web3-eth';
+import Web3Utils from 'web3-utils';
 import {
   TrustClueConfigurationError,
   TrustClueRuntimeError,
@@ -10,6 +12,7 @@ import {
  * TrustClueClientOptionsType
  */
 export type TrustClueClientOptionsType = {
+  provider: string | Object,
   clues: {[name: string]: {
     options: {
       // eslint-disable-next-line flowtype/no-weak-types
@@ -29,6 +32,7 @@ export type TrustClueClientOptionsType = {
  */
 export class TrustClueClient {
   options: TrustClueClientOptionsType;
+  web3Eth: Web3Eth;
   clueNameList: Array<string>;
   _clues: {[key: ?string]: TrustClueInterface};
 
@@ -57,6 +61,7 @@ export class TrustClueClient {
     this._clues = {};
     this.options = options || {};
     this.clueNameList = Object.keys(options.clues);
+    this.web3Eth = new Web3Eth(options.provider);
   }
 
   /**
@@ -135,6 +140,38 @@ export class TrustClueClient {
       promises.push(getClueValue);
     }
     return Promise.all(promises);
+  }
+
+  verifyAndDecodeSignedData (signedData: string, signature: string, signerField: string): Object {
+    if (!signedData || !Web3Utils.isHexStrict(signedData)) {
+      throw new TrustClueRuntimeError('signedData is either missing or not hex encoded with 0x prefix.');
+    }
+    
+    if (!signature || !Web3Utils.isHexStrict(signature)) {
+      throw new TrustClueRuntimeError('signature is either missing or not hex encoded with 0x prefix.');
+    }
+    if (!signerField) {
+      throw new TrustClueRuntimeError('signerField is a mandator argument.');
+    }
+
+    try {
+      const message = JSON.parse(Web3Utils.hexToUtf8(signedData));
+      const expectedSigner = message[signerField];
+      if (!expectedSigner) {
+        throw new TrustClueRuntimeError(`signerField '${signerField}' is not part of the decoded data`);
+      }
+      const actualSigner = this.web3Eth.accounts.recover(signedData, signature);
+      // TODO normalize to checksummed addresses
+      if (expectedSigner.toLowerCase() !== actualSigner.toLowerCase()) {
+        throw new TrustClueRuntimeError(`Expected signer '${expectedSigner}' does not match the recovered one '${actualSigner}'`);
+      }
+      return message;
+    } catch (e) {
+      if (e instanceof SyntaxError) {
+        throw new TrustClueRuntimeError(`signedData does not seem to be a valid JSON: ${e.toString()}`);
+      }
+      throw new TrustClueRuntimeError(e);
+    }
   }
 }
 
