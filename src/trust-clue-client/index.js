@@ -142,6 +142,19 @@ export class TrustClueClient {
     return Promise.all(promises);
   }
 
+  /**
+   * Verifies `signature` of `signedData` against the contents of `signerField` in `signedData`.
+   *
+   * @param {string} Strictly hex encoded (starting with 0x) valid JSON document.
+   * @param {string} Strictly hex encoded (starting with 0x) signature of `signedData`.
+   * @param {string} Field name in `signedData` JSON that should contain Ethereum address that
+   * the decoded signature producer is compared to.
+   *
+   * @throws {TrustClueRuntimeError} When any of arguments is missing, or the signature recovery
+   * fails or the signature verification fails or any other decoding error occurs.
+   *
+   * @returns {Object} parsed contents of `signedData`
+   */
   verifyAndDecodeSignedData (signedData: string, signature: string, signerField: string): Object {
     if (!signedData || !Web3Utils.isHexStrict(signedData)) {
       throw new TrustClueRuntimeError('signedData is either missing or not hex encoded with 0x prefix.');
