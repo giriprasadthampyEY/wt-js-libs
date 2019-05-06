@@ -18,7 +18,7 @@ const libs = WtJsLibs.createInstance({
   offChainDataOptions: { ... },
   trustClueOptions: { ... },
 });
-const index = libs.getWTIndex('0x...');
+const hotelIndex = libs.getWTIndex('hotels', '0x...');
 ```
 
 ```html
