@@ -2185,7 +2185,8 @@ An error occurred during an attempt to use trust clues.
 
 ## TrustClueClientOptionsType
 
-TrustClueClientOptionsType
+TrustClueClientOptionsType. `provider` is required in order to
+properly recover signatures.
 
 Type: {provider: ([string][291] \| [Object][310]), clues: {}}
 

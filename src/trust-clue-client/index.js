@@ -9,7 +9,8 @@ import {
 } from './errors';
 
 /**
- * TrustClueClientOptionsType
+ * TrustClueClientOptionsType. `provider` is required in order to
+ * properly recover signatures.
  */
 export type TrustClueClientOptionsType = {
   provider: string | Object,
