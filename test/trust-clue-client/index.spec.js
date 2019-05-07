@@ -344,4 +344,15 @@ describe('WTLibs.TrustClueClient', () => {
       }
     });
   });
+
+  describe('getMetadataForAllClues', () => {
+    it('should return metadata for all clues', async () => {
+      const values = await client.getMetadataForAllClues();
+      assert.equal(values.length, 2);
+      assert.equal(values[0].name, 'testList');
+      assert.equal(values[0].description, 'description');
+      assert.equal(values[1].name, 'myList');
+      assert.equal(values[1].description, 'description');
+    });
+  });
 });

@@ -89,6 +89,18 @@ export class TrustClueClient {
   }
 
   /**
+   * Returns a list of metadata for all clues.
+   */
+  async getMetadataForAllClues (): Promise<Object> {
+    const trustClues = [];
+    for (let i = 0; i < this.clueNameList.length; i++) {
+      const clue = await this.getClue(this.clueNameList[i]);
+      trustClues.push(await clue.getMetadata());
+    }
+    return trustClues;
+  }
+
+  /**
    * Walks over all clues and collects their values.
    * @param {string} address Ethereum address for which the values should
    * be collected.

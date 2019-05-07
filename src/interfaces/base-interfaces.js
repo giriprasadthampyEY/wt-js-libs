@@ -93,7 +93,7 @@ export interface OffChainDataAdapterInterface {
  */
 export interface TrustClueInterface {
   // Returns metadata about the clue
-  getMetadata(): {name: string, description: string},
+  getMetadata(): Promise<{name: string, description: string}>,
   // Returns raw value of the clue for given address
   // eslint-disable-next-line flowtype/no-weak-types
   getValueFor(address: string): Promise<any>,
