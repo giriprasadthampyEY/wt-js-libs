@@ -1,6 +1,6 @@
 {
   "name": "@windingtree/wt-js-libs",
-  "version": "0.10.0",
+  "version": "0.11.1",
   "description": "Javascript libraries to interact with the Winding Tree contracts",
   "main": "dist/cjs/wt-js-libs.js",
   "browser": "dist/umd/wt-js-libs.js",
@@ -10,11 +10,11 @@
   "scripts": {
     "flow": "flow",
     "lint": "eslint src test",
-    "test": "rimraf .nyc_output .nyc_coverage && ./test/utils/scripts/localtestnet.sh",
-    "test-watch": "rimraf .nyc_output .nyc_coverage && ./test/utils/scripts/localtestnet.sh --watch",
-    "test-runner": "nyc --clean=false --reporter=text mocha \"test/**/*.spec.js\" --timeout 20000 --require @babel/register --require @babel/polyfill",
-    "test-runner-watch": "mocha \"test/**/*.spec.js\" --timeout 20000 --require @babel/register --require @babel/polyfill --watch",
-    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "test": "rimraf coverage && ./test/utils/scripts/localtestnet.sh",
+    "test:watch": "rimraf coverage && ./test/utils/scripts/localtestnet.sh --watch",
+    "test-runner": "rimraf coverage && jest --coverage",
+    "test-runner-watch": "jest --watch",
+    "coverage": "cat coverage/lcov.info | coveralls",
     "clean": "rimraf dist && rimraf docs",
     "build": "webpack --config webpack.config.js --mode production",
     "docs": "rimraf docs && mkdir docs && documentation build src/** -f md -o docs/reference.md"
@@ -61,29 +61,24 @@
     "chai": "^4.1.2",
     "chai-string": "^1.4.0",
     "coveralls": "^3.0.1",
-    "documentation": "^9.0.0",
-    "esdoc": "^1.1.0",
-    "esdoc-ecmascript-proposal-plugin": "^1.0.0",
-    "esdoc-node": "^1.0.2",
-    "esdoc-standard-plugin": "^1.0.0",
+    "documentation": "^9.3.1",
     "eslint": "^5.2.0",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-flowtype": "^3.2.1",
     "eslint-plugin-import": "^2.13.0",
-    "eslint-plugin-node": "^8.0.0",
+    "eslint-plugin-node": "^9.0.0",
     "eslint-plugin-promise": "^4.0.0",
     "eslint-plugin-standard": "^4.0.0",
-    "flow-bin": "^0.95.1",
+    "flow-bin": "^0.98.0",
     "ganache-cli": "^6.2.1",
-    "jsdom": "^14.0.0",
+    "jest": "^24.7.1",
+    "jsdom": "^15.0.0",
     "jsdom-global": "3.0.2",
     "lodash.isfunction": "^3.0.9",
-    "mocha": "^6.0.0",
     "node-loader": "^0.6.0",
-    "nyc": "^13.3.0",
     "rimraf": "^2.6.2",
     "sinon": "^7.2.4",
-    "truffle": "5.0.7",
+    "truffle": "^5.0.15",
     "web3": "1.0.0-beta.36",
     "web3-eth-abi": "1.0.0-beta.36",
     "webpack": "^4.21.0",
@@ -93,5 +88,18 @@
   },
   "engines": {
     "node": ">=10.0.0"
+  },
+  "jest": {
+    "testRegex": "./test/.*.spec.js",
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "coverageReporters": [
+      "text",
+      "lcov"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ]
   }
 }

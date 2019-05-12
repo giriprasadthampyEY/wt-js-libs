@@ -2,7 +2,8 @@
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/windingtree/wt-js-libs.svg)](https://greenkeeper.io/)
 
-A JS interface to WindingTree's Ethereum smart-contracts for Hotels and Airlines.
+A JS library for interaction with Winding Tree platform. For detailed description of higher-level
+concepts, please head over to our [Developer portal](https://developers.windingtree.com).
 
 ## Installation
 
@@ -13,21 +14,21 @@ npm install @windingtree/wt-js-libs
 ```js
 const { WtJsLibs } = require('@windingtree/wt-js-libs');
 const libs = WtJsLibs.createInstance({
-  segment: 'hotels', // or 'airlines'
-  dataModelOptions: { ... },
+  onChainDataOptions: { ... },
   offChainDataOptions: { ... },
+  trustClueOptions: { ... },
 });
-const index = libs.getWTIndex('0x...');
+const hotelIndex = libs.getWTIndex('hotels', '0x...');
 ```
 
 ```html
 <script type="text/javascript" src="https://unpkg.com/@windingtree/wt-js-libs"></script>
 <script type="text/javascript" src="https://unpkg.com/@windingtree/off-chain-adapter-in-memory"></script>
+<script type="text/javascript" src="https://unpkg.com/@windingtree/trust-clue-curated-list"></script>
 <script type="text/javascript">
 const libs = window.WtJsLibs.createInstance({
-  segment: 'hotels', // or 'airlines'
-  dataModelOptions: {
-    provider: 'http://localhost:8545', // or infura
+  onChainDataOptions: {
+    provider: 'http://localhost:8545', // or infura or any other ETH RPC node
   },
   offChainDataOptions: {
     adapters: {
@@ -38,8 +39,22 @@ const libs = window.WtJsLibs.createInstance({
       },
     },
   },
+  trustClueOptions: {
+    provider: 'http://localhost:8545', // or infura or any other ETH RPC node
+    clues: {
+      'curated-list': {
+        options: {
+          address: '0x...',
+          provider: 'http://localhost:8545',
+        },
+        create: async (options) => {
+          return new window.TrustClueCuratedList(options);
+        },
+      },
+    }
+  },
 });
-const index = libs.getWTIndex('0x...');
+const index = libs.getWTIndex('hotels', '0x...');
 </script>
 ```
 
@@ -55,10 +70,10 @@ under the hood.
 // for inspiration.
 import { WtJsLibs } from '@windingtree/wt-js-libs';
 import InMemoryAdapter from '@windingtree/off-chain-adapter-in-memory';
+import { TrustClueCuratedList } from '@windingtree/trust-clue-curated-list';
 
 const libs = WtJsLibs.createInstance({
-  segment: 'hotels',
-  dataModelOptions: {
+  onChainDataOptions: {
     provider: 'http://localhost:8545',
   },
   offChainDataOptions: {
@@ -74,10 +89,25 @@ const libs = WtJsLibs.createInstance({
       },
     },
   },
+  // This is how you configure trust clues
+  trustClueOptions: {
+    provider: 'http://localhost:8545', // or infura or any other ETH RPC node
+    clues: {
+      'curated-list': {
+        options: {
+          address: '0x...',
+          provider: 'http://localhost:8545',
+        },
+        create: async (options) => {
+          return new window.TrustClueCuratedList(options);
+        },
+      },
+    }
+  },
 });
 
 
-const index = libs.getWTIndex('0x...');
+const index = libs.getWTIndex('hotels', '0x...');
 const hotel = await index.getHotel('0x...');
 
 // You can get all the off-chain data at once
@@ -115,10 +145,7 @@ try {
 }
 
 // Working with airline data is very similar. Just change the segment and a few method names:
-const libs = WtJsLibs.createInstance({
-  segment: 'airlines',
-  ...
-});
+const index = libs.getWTIndex('hotels', '0x...');
 const airline = await index.getAirline('0x...');
 
 try {
@@ -137,9 +164,12 @@ try {
 
 ## Documentation
 
-The current documentation can be rendered by running `npm run docs`
+The current documentation can be rendered by running `npm run docs`.
 
 ### Off-chain data adapters
+
+These are used to access data stored not on the Ethereum blockchain but in
+a different storage. The adapters are used to unify access to these resources.
 
 **Existing implementations**
 
@@ -152,7 +182,7 @@ The current documentation can be rendered by running `npm run docs`
 For insipiration, you can have a look at [in-memory adapter](https://github.com/windingtree/off-chain-adapter-in-memory),
 if you'd like to create it all by yourself, here's what you need.
 
-1. Your package has to implement a [simple interface](https://github.com/windingtree/wt-js-libs/blob/proposal/next/docs/reference.md#offchaindataadapterinterface)
+1. Your package has to implement a [simple interface](https://github.com/windingtree/wt-js-libs/blob/master/docs/reference.md#offchaindataadapterinterface)
 that provides ways to store, update and retrieve data.
 1. You can also choose how your plugin is instantiated and whether you need any initialization
 options. These will be passed whenever an instance is created.
@@ -163,6 +193,28 @@ options. These will be passed whenever an instance is created.
 The interface is subject to change as we go along and find out what other types
 of storages might require - be it a signature verification, data signing and other non-common
 utilities. The only actual method used in the wt-js-libs internals is `download` right now.
+
+### Trust clues
+
+Trust clues are used to determine a trust level towards an actor on Winding Tree
+platform. Every client can use and interpret any trust clues they want. This library
+does not enforce any combination or implementation of trust clues.
+
+**Existing implementations**
+
+- [Curated List](https://github.com/windingtree/trust-clue-curated-list) - Example list of addresses maintained by a smart contract owner
+- [LÍF Deposit](https://github.com/windingtree/trust-clue-lif-deposit) - Lif deposit smart contract
+
+#### Developing your own trust clue
+
+1. Your package has to implement [simple interface](https://github.com/windingtree/wt-js-libs/blob/master/docs/reference.md#trustclueinterface)
+that provides ways to get and interpret its value for a particular ETH address.
+1. You can also choose how your plugin is instantiated and whether you need any initialization
+options. These will be passed whenever an instance of a clue is created.
+1. Trust clues are used in a single place - the `TrustClueClient`. However, all users
+of this library are encouraged to pass their own `interpret` methods that
+convert the raw value into a boolean flag based on the client's needs.
+
 
 ## Test
 

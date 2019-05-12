@@ -1,12 +1,12 @@
 import offChainData from './data/off-chain-data.json';
 import InMemoryAdapter from '@windingtree/off-chain-adapter-in-memory';
-import { AIRLINE_SEGMENT_ID } from '../../src/constants';
+import { AIRLINE_SEGMENT_ID } from '../../src/on-chain-data-client/constants';
 
 export const Web3UriBackedDataModel = {
   emptyConfig: {},
   withDataSource: () => ({
     segment: AIRLINE_SEGMENT_ID,
-    dataModelOptions: {
+    onChainDataOptions: {
       provider: 'http://localhost:8545',
     },
     offChainDataOptions: {

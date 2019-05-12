@@ -1,4 +1,5 @@
 // address 04e46f24307e4961157b986a0b653a0d88f9dbd6
+// password: test123
 const wallet = {
   'version': 3,
   'id': '7c9344f6-cecc-4c5e-ba1a-885ddafee541',
