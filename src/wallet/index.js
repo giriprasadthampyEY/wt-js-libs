@@ -142,7 +142,7 @@ class Wallet implements WalletInterface {
     if (!this._account) {
       throw new WalletStateError('Cannot use wallet without unlocking it first.');
     }
-    // Ignore checksummed formatting
+    // Ignore checksummed formatting // TODO fix
     if (transactionData.from && transactionData.from.toLowerCase() !== this.getAddress().toLowerCase()) {
       throw new WalletSigningError('Transaction originator does not match the wallet address.');
     }
@@ -197,6 +197,45 @@ class Wallet implements WalletInterface {
       }
     }
     return new TransactionMiningError('Cannot send transaction: ' + originalError.message, originalError);
+  }
+
+  /**
+   * Hex encodes an arbitrary JSON claim and signs it with a
+   * private key associated with this wallet. To be able to prove
+   * the signature, the data has to contain the signer's address.
+   * If it is not provided in `signerField` field in `claim`, the method
+   * automatically adds this wallet's address.
+   *
+   * @throws {WalletStateError} When wallet was destroyed.
+   * @throws {WalletStateError} When wallet is not unlocked.
+   * @throws {WalletSigningError} When `signerField` contents does not match the wallet address
+   * @throws {WalletSigningError} When something does not work during JSON encoding or the actual signing
+   * @return {Promise<{claim: string, signature: string}>} Hex encoded claim and hex encoded signature
+   */
+  async encodeAndSignData (claim: Object, signerField: string): Promise<{claim: string, signature: string}> {
+    if (this.isDestroyed()) {
+      throw new WalletStateError('Cannot sign with a destroyed wallet.');
+    }
+    if (!this._account) {
+      throw new WalletStateError('Cannot use wallet without unlocking it first.');
+    }
+    if (!claim[signerField]) {
+      claim[signerField] = this.getAddress();
+    // ignore checksummed format TODO fix this
+    } else if (claim[signerField].toLowerCase() !== this.getAddress().toLowerCase()) {
+      throw new WalletSigningError(`data[${signerField}] of ${claim[signerField]} does not match the wallet address ${this.getAddress()}.`);
+    }
+
+    try {
+      const hexData = Web3Utils.utf8ToHex(JSON.stringify(claim));
+      const signed = await (this._account: Object).sign(hexData);
+      return {
+        claim: hexData,
+        signature: signed.signature,
+      };
+    } catch (e) {
+      throw new WalletSigningError(`Cannot sign the claim: ${e.message}`, e);
+    }
   }
 
   /**
