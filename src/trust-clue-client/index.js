@@ -171,7 +171,7 @@ export class TrustClueClient {
    * @throws {TrustClueRuntimeError} When any of arguments is missing, or the signature recovery
    * fails or the signature verification fails or any other error occurs.
    */
-  verifySignedData (serializedData: string, signature: string, verificationFn?: () => mixed) {
+  verifySignedData (serializedData: string, signature: string, verificationFn?: (string) => mixed) {
     if (!serializedData) {
       throw new TrustClueRuntimeError('serializedData is missing.');
     }
