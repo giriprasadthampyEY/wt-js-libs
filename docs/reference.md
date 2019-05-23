@@ -244,7 +244,7 @@
         -   [Parameters][240]
     -   [interpretAllValues][241]
         -   [Parameters][242]
-    -   [verifyAndDecodeSignedData][243]
+    -   [verifySignedData][243]
         -   [Parameters][244]
     -   [createInstance][245]
         -   [Parameters][246]
@@ -270,7 +270,7 @@
         -   [Parameters][266]
     -   [signAndSendTransaction][267]
         -   [Parameters][268]
-    -   [encodeAndSignData][269]
+    -   [signData][269]
         -   [Parameters][270]
     -   [lock][271]
     -   [destroy][272]
@@ -2069,25 +2069,23 @@ Walks over all clues and collects their interpreted values.
 Returns **[Promise][283]&lt;[Array][282]&lt;{name: [string][275], value: ([boolean][319] \| [number][318] \| [string][275])?, error: [string][275]?}>>** A list of objects with either value or error:
 `{name: clue-name, value: value, error: error message}`
 
-### verifyAndDecodeSignedData
+### verifySignedData
 
-Verifies `signature` of `signedData` against the contents of `signerField` in `signedData`.
+Verifies the signature and actual signer.
 
 #### Parameters
 
--   `signedData` **[string][275]** 
--   `signature` **[string][275]** 
--   `signerField` **[string][275]** 
--   `Strictly` **[string][275]** hex encoded (starting with 0x) valid JSON document.
--   `Strictly` **[string][275]** hex encoded (starting with 0x) signature of `signedData`.
--   `Field` **[string][275]** name in `signedData` JSON that should contain Ethereum address that
-    the decoded signature producer is compared to.
+-   `serializedData` **[string][275]** Strictly hex encoded (starting with 0x) string.
+-   `signature` **[string][275]** Strictly hex encoded (starting with 0x) signature of `serializedData`.
+-   `verificationFn` **[function][332]** Optional verification function. Is called with the actual
+    signer and should throw when verification fails. The return value is ignored.
+    Default: Parse `serializedData` as JSON and compare the actual signer to checksum
+    address of the `signer` field.Default verification fn expects the `serializedData` is string containing JSON with `signer` field
+    Provide custom `verificationFn` if needed.
 
 
 -   Throws **[TrustClueRuntimeError][330]** When any of arguments is missing, or the signature recovery
-    fails or the signature verification fails or any other decoding error occurs.
-
-Returns **[Object][310]** parsed contents of `signedData`
+    fails or the signature verification fails or any other error occurs.
 
 ### createInstance
 
@@ -2099,7 +2097,7 @@ Initializes the map of `TrustClue`s.
 -   `TrustClueClientOptionsType`  
 
 
--   Throws **[TrustClueConfigurationError][332]** when there are multiple clues with the same name
+-   Throws **[TrustClueConfigurationError][333]** when there are multiple clues with the same name
 
 Returns **[TrustClueClient][288]** 
 
@@ -2225,9 +2223,9 @@ in a checksummed format, e.g. prefixed with 0x
 and case-sensitive. Works only in an unlocked state,
 because all other methods are unreliable.
 
--   Throws **[WalletStateError][333]** When wallet was destroyed.
--   Throws **[WalletStateError][333]** When wallet is not unlocked.
--   Throws **[WalletStateError][333]** When there's no keystore.
+-   Throws **[WalletStateError][334]** When wallet was destroyed.
+-   Throws **[WalletStateError][334]** When wallet is not unlocked.
+-   Throws **[WalletStateError][334]** When there's no keystore.
 
 Returns **[string][275]** 
 
@@ -2241,11 +2239,11 @@ there is a readable privateKey stored in memory!</strong>
 -   `password` **[string][275]** 
 
 
--   Throws **[WalletStateError][333]** When wallet was destroyed.
--   Throws **[WalletStateError][333]** When there is no web3-eth instance configured.
--   Throws **[WalletPasswordError][334]** When wallet cannot be decrypted.
--   Throws **[MalformedWalletError][335]** When wallet format is not recognized by web3-eth.
--   Throws **[WalletError][336]** When anything else breaks down during decryption. But
+-   Throws **[WalletStateError][334]** When wallet was destroyed.
+-   Throws **[WalletStateError][334]** When there is no web3-eth instance configured.
+-   Throws **[WalletPasswordError][335]** When wallet cannot be decrypted.
+-   Throws **[MalformedWalletError][336]** When wallet format is not recognized by web3-eth.
+-   Throws **[WalletError][337]** When anything else breaks down during decryption. But
     that should actually never happen unless the web3-eth implementation is changed.
 
 ### signAndSendTransaction
@@ -2257,44 +2255,38 @@ When onReceipt callback is present, Promise is resolved after `receipt` event
 
 #### Parameters
 
--   `transactionData` **[TransactionDataInterface][337]** 
--   `eventCallbacks` **[TransactionCallbacksInterface][338]?** 
--   `optional` **[TransactionCallbacksInterface][338]** callbacks called when events come back from the network
+-   `transactionData` **[TransactionDataInterface][338]** 
+-   `eventCallbacks` **[TransactionCallbacksInterface][339]?** 
+-   `optional` **[TransactionCallbacksInterface][339]** callbacks called when events come back from the network
 
 
--   Throws **[WalletStateError][333]** When wallet was destroyed.
--   Throws **[WalletStateError][333]** When there is no web3-eth instance configured.
--   Throws **[WalletStateError][333]** When wallet is not unlocked.
--   Throws **[WalletSigningError][339]** When transaction.from does not match the wallet account.
--   Throws **[NoReceiptError][340]** When there are issues with getting a transaction receipt.
--   Throws **[OutOfGasError][341]** When it seems transaction ran out of gas
--   Throws **[TransactionRevertedError][342]** When it seems transaction was reverted in EVM
--   Throws **[InsufficientFundsError][343]** When it seems there is not enough ETH in this wallet
--   Throws **[InaccessibleEthereumNodeError][344]** When it seems the network is unreachable
--   Throws **[TransactionMiningError][345]** When there's another error during the signing and mining process
+-   Throws **[WalletStateError][334]** When wallet was destroyed.
+-   Throws **[WalletStateError][334]** When there is no web3-eth instance configured.
+-   Throws **[WalletStateError][334]** When wallet is not unlocked.
+-   Throws **[WalletSigningError][340]** When transaction.from does not match the wallet account.
+-   Throws **[NoReceiptError][341]** When there are issues with getting a transaction receipt.
+-   Throws **[OutOfGasError][342]** When it seems transaction ran out of gas
+-   Throws **[TransactionRevertedError][343]** When it seems transaction was reverted in EVM
+-   Throws **[InsufficientFundsError][344]** When it seems there is not enough ETH in this wallet
+-   Throws **[InaccessibleEthereumNodeError][345]** When it seems the network is unreachable
+-   Throws **[TransactionMiningError][346]** When there's another error during the signing and mining process
 
 Returns **[Promise][283]&lt;([string][275] \| [TxReceiptInterface][326])>** transaction hash
 
-### encodeAndSignData
+### signData
 
-Hex encodes an arbitrary JSON claim and signs it with a
-private key associated with this wallet. To be able to prove
-the signature, the data has to contain the signer's address.
-If it is not provided in `signerField` field in `claim`, the method
-automatically adds this wallet's address.
+Signs a claim with a private key associated with this wallet.
 
 #### Parameters
 
--   `claim` **[Object][310]** 
--   `signerField` **[string][275]** 
+-   `claim` **[string][275]** 
 
 
--   Throws **[WalletStateError][333]** When wallet was destroyed.
--   Throws **[WalletStateError][333]** When wallet is not unlocked.
--   Throws **[WalletSigningError][339]** When `signerField` contents does not match the wallet address
--   Throws **[WalletSigningError][339]** When something does not work during JSON encoding or the actual signing
+-   Throws **[WalletStateError][334]** When wallet was destroyed.
+-   Throws **[WalletStateError][334]** When wallet is not unlocked.
+-   Throws **[WalletSigningError][340]** When something does not work during the actual signing
 
-Returns **[Promise][283]&lt;{claim: [string][275], signature: [string][275]}>** Hex encoded claim and hex encoded signature
+Returns **[Promise][283]&lt;[string][275]>** Hex encoded signature
 
 ### lock
 
@@ -2305,7 +2297,7 @@ be unlocked again if necessary.
 This relies on the JS garbage collector, so please do not reference
 the internal variables of this class elsewhere.
 
--   Throws **[WalletStateError][333]** When wallet was destroyed.
+-   Throws **[WalletStateError][334]** When wallet was destroyed.
 
 ### destroy
 
@@ -2316,7 +2308,7 @@ memory the JSON file.
 This relies on the JS garbage collector, so please do not reference
 the internal variables of this class elsewhere.
 
--   Throws **[WalletStateError][333]** When wallet was destroyed.
+-   Throws **[WalletStateError][334]** When wallet was destroyed.
 
 ### createInstance
 
@@ -2326,7 +2318,7 @@ Creates an initialized instance
 
 -   `keystoreJsonV3` **[KeystoreV3Interface][285]** 
 
-Returns **[Wallet][346]** 
+Returns **[Wallet][347]** 
 
 [1]: #wtlibserror
 
@@ -2812,7 +2804,7 @@ Returns **[Wallet][346]**
 
 [242]: #parameters-81
 
-[243]: #verifyanddecodesigneddata
+[243]: #verifysigneddata
 
 [244]: #parameters-82
 
@@ -2864,7 +2856,7 @@ Returns **[Wallet][346]**
 
 [268]: #parameters-87
 
-[269]: #encodeandsigndata
+[269]: #signdata
 
 [270]: #parameters-88
 
@@ -2990,32 +2982,34 @@ Returns **[Wallet][346]**
 
 [331]: #trustclueinterface
 
-[332]: #trustclueconfigurationerror
+[332]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
 
-[333]: #walletstateerror
+[333]: #trustclueconfigurationerror
 
-[334]: #walletpassworderror
+[334]: #walletstateerror
 
-[335]: #malformedwalleterror
+[335]: #walletpassworderror
 
-[336]: #walleterror
+[336]: #malformedwalleterror
 
-[337]: #transactiondatainterface
+[337]: #walleterror
 
-[338]: #transactioncallbacksinterface
+[338]: #transactiondatainterface
 
-[339]: #walletsigningerror
+[339]: #transactioncallbacksinterface
 
-[340]: #noreceipterror
+[340]: #walletsigningerror
 
-[341]: #outofgaserror
+[341]: #noreceipterror
 
-[342]: #transactionrevertederror
+[342]: #outofgaserror
 
-[343]: #insufficientfundserror
+[343]: #transactionrevertederror
 
-[344]: #inaccessibleethereumnodeerror
+[344]: #insufficientfundserror
 
-[345]: #transactionminingerror
+[345]: #inaccessibleethereumnodeerror
 
-[346]: #wallet
+[346]: #transactionminingerror
+
+[347]: #wallet
