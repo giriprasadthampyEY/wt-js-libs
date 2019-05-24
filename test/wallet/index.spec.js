@@ -1,6 +1,4 @@
 import { assert } from 'chai';
-import Web3Utils from 'web3-utils';
-import Web3Eth from 'web3-eth';
 import sinon from 'sinon';
 import helpers from '../utils/helpers';
 import testedDataModel from '../utils/data-hotel-model-definition';
@@ -427,38 +425,29 @@ describe('WTLibs.Wallet', () => {
     });
   });
 
-  describe('encodeAndSignData', () => {
-    let wallet, data;
+  describe('signData', () => {
+    let wallet;
     beforeEach(async function () {
       wallet = Web3WTWallet.createInstance(jsonWallet);
       wallet.setupWeb3Eth(testedDataModel.withDataSource().onChainDataOptions.provider);
       wallet.unlock(correctPassword);
-      data = {
+    });
+
+    it('should sign the data', async () => {
+      let serializedData = JSON.stringify({
         city: 'Islamabad',
         country: 'Pakistan',
         signer: wallet.getAddress(),
-      };
-    });
-
-    it('should encode and sign the data', async () => {
-      const result = await wallet.encodeAndSignData(data, 'signer');
-      const web3Eth = new Web3Eth('http://localhost:8545');
-      assert.isDefined(result.claim);
-      assert.isDefined(result.signature);
-      assert.equal(result.claim, '0x7b2263697479223a2249736c616d61626164222c22636f756e747279223a2250616b697374616e222c227369676e6572223a22307844333943613764313836613337626236426634384145386162466542346336383764633846393036227d');
-      assert.equal(result.signature, '0xbdf4103642a7449ecca41ac4ab7a00cddd0e7cc07b8ea6845e1c78c76f4c20723fb5e533c11cfc5fdae9d6d428a7118f50185f1a7bf8e127b0d4e969d88127f61c');
-      const actualSigner = web3Eth.accounts.recover(result.claim, result.signature);
-      assert.equal(actualSigner, data.signer);
-      const decodedClaim = JSON.parse(Web3Utils.hexToUtf8(result.claim));
-      assert.equal(decodedClaim.city, data.city);
-      assert.equal(decodedClaim.country, data.country);
-      assert.equal(decodedClaim.signer, data.signer);
+      });
+      const signature = await wallet.signData(serializedData);
+      assert.isDefined(signature);
+      assert.equal(signature, '0xbdf4103642a7449ecca41ac4ab7a00cddd0e7cc07b8ea6845e1c78c76f4c20723fb5e533c11cfc5fdae9d6d428a7118f50185f1a7bf8e127b0d4e969d88127f61c');
     });
 
     it('should throw on a destroyed wallet', async () => {
       wallet.destroy();
       try {
-        await wallet.encodeAndSignData(data, 'signer');
+        await wallet.signData('random string');
         assert(false);
       } catch (e) {
         assert.instanceOf(e, WalletStateError);
@@ -469,7 +458,7 @@ describe('WTLibs.Wallet', () => {
     it('should throw on a locked wallet', async () => {
       wallet.lock();
       try {
-        await wallet.encodeAndSignData(data, 'signer');
+        await wallet.signData('random string');
         assert(false);
       } catch (e) {
         assert.instanceOf(e, WalletStateError);
@@ -480,7 +469,7 @@ describe('WTLibs.Wallet', () => {
     it('should throw when signing throws', async () => {
       sinon.stub(wallet._account, 'sign').rejects({ message: 'Invalid JSON RPC response' });
       try {
-        await wallet.encodeAndSignData(data, 'signer');
+        await wallet.signData('random string');
         assert(false);
       } catch (e) {
         assert.instanceOf(e, WalletSigningError);
@@ -490,39 +479,13 @@ describe('WTLibs.Wallet', () => {
       }
       sinon.stub(wallet._account, 'sign').rejects(new Error('Invalid JSON RPC response'));
       try {
-        await wallet.encodeAndSignData(data, 'signer');
+        await wallet.signData('random string');
         assert(false);
       } catch (e) {
         assert.instanceOf(e, WalletSigningError);
         assert.match(e, /Invalid JSON RPC response/i);
       } finally {
         wallet._account.sign.restore();
-      }
-    });
-
-    it('should add a signer field to the original data', async () => {
-      // this depends on the order of the original data -
-      // signer has to be a last field for the signatures to be the same
-      delete data.signer;
-      const result = await wallet.encodeAndSignData(data, 'signer');
-      assert.isDefined(result.claim);
-      assert.isDefined(result.signature);
-      assert.equal(result.claim, '0x7b2263697479223a2249736c616d61626164222c22636f756e747279223a2250616b697374616e222c227369676e6572223a22307844333943613764313836613337626236426634384145386162466542346336383764633846393036227d');
-      assert.equal(result.signature, '0xbdf4103642a7449ecca41ac4ab7a00cddd0e7cc07b8ea6845e1c78c76f4c20723fb5e533c11cfc5fdae9d6d428a7118f50185f1a7bf8e127b0d4e969d88127f61c');
-      const decodedClaim = JSON.parse(Web3Utils.hexToUtf8(result.claim));
-      assert.equal(decodedClaim.city, data.city);
-      assert.equal(decodedClaim.country, data.country);
-      assert.equal(decodedClaim.signer, wallet.getAddress());
-    });
-
-    it('should throw if signer field is in the original data but does not match wallet address', async () => {
-      try {
-        data.signer = '0x5808b3232de474e155a8d915cc588D5095C13631';
-        await wallet.encodeAndSignData(data, 'signer');
-        assert(false);
-      } catch (e) {
-        assert.instanceOf(e, WalletSigningError);
-        assert.match(e, /does not match the wallet address/i);
       }
     });
   });

@@ -156,45 +156,47 @@ export class TrustClueClient {
   }
 
   /**
-   * Verifies `signature` of `signedData` against the contents of `signerField` in `signedData`.
+   * Verifies the signature and actual signer.
    *
-   * @param {string} Strictly hex encoded (starting with 0x) valid JSON document.
-   * @param {string} Strictly hex encoded (starting with 0x) signature of `signedData`.
-   * @param {string} Field name in `signedData` JSON that should contain Ethereum address that
-   * the decoded signature producer is compared to.
+   * @param {string} serializedData String data to be signed.
+   * @param {string} signature Strictly hex encoded (starting with 0x) signature of `serializedData`.
+   * @param {function} verificationFn Optional verification function. Is called with the actual
+   * signer and should throw when verification fails. The return value is ignored.
+   * Default: Parse `serializedData` as JSON and compare the actual signer to checksum
+   * address of the `signer` field.
+   *
+   * Default verification fn expects the `serializedData` is string containing JSON with `signer` field
+   * Provide custom `verificationFn` if needed.
    *
    * @throws {TrustClueRuntimeError} When any of arguments is missing, or the signature recovery
-   * fails or the signature verification fails or any other decoding error occurs.
-   *
-   * @returns {Object} parsed contents of `signedData`
+   * fails or the signature verification fails or any other error occurs.
    */
-  verifyAndDecodeSignedData (signedData: string, signature: string, signerField: string): Object {
-    if (!signedData || !Web3Utils.isHexStrict(signedData)) {
-      throw new TrustClueRuntimeError('signedData is either missing or not hex encoded with 0x prefix.');
+  verifySignedData (serializedData: string, signature: string, verificationFn?: (string) => mixed) {
+    if (!serializedData) {
+      throw new TrustClueRuntimeError('serializedData is missing.');
     }
     
     if (!signature || !Web3Utils.isHexStrict(signature)) {
       throw new TrustClueRuntimeError('signature is either missing or not hex encoded with 0x prefix.');
     }
-    if (!signerField) {
-      throw new TrustClueRuntimeError('signerField is a mandator argument.');
+    if (!verificationFn) {
+      verificationFn = (_actualSigner) => {
+        let data = JSON.parse(serializedData);
+        let expectedSigner = data.signer;
+        if (Web3Utils.toChecksumAddress(expectedSigner) !== _actualSigner) {
+          throw new TrustClueRuntimeError(`Expected signer '${expectedSigner}' does not match the recovered one '${_actualSigner}'`);
+        }
+      };
     }
 
     try {
-      const message = JSON.parse(Web3Utils.hexToUtf8(signedData));
-      const expectedSigner = message[signerField];
-      if (!expectedSigner) {
-        throw new TrustClueRuntimeError(`signerField '${signerField}' is not part of the decoded data`);
+      const actualSigner = this.web3Eth.accounts.recover(serializedData, signature);
+      try {
+        verificationFn(actualSigner);
+      } catch (e) {
+        throw new TrustClueRuntimeError(`Verification function failed: ${e.toString()}`, e);
       }
-      const actualSigner = this.web3Eth.accounts.recover(signedData, signature);
-      if (Web3Utils.toChecksumAddress(expectedSigner) !== actualSigner) {
-        throw new TrustClueRuntimeError(`Expected signer '${expectedSigner}' does not match the recovered one '${actualSigner}'`);
-      }
-      return message;
     } catch (e) {
-      if (e instanceof SyntaxError) {
-        throw new TrustClueRuntimeError(`signedData does not seem to be a valid JSON: ${e.toString()}`);
-      }
       throw new TrustClueRuntimeError(e);
     }
   }
