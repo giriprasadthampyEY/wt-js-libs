@@ -158,7 +158,7 @@ export class TrustClueClient {
   /**
    * Verifies the signature and actual signer.
    *
-   * @param {string} serializedData Strictly hex encoded (starting with 0x) string.
+   * @param {string} serializedData String data to be signed.
    * @param {string} signature Strictly hex encoded (starting with 0x) signature of `serializedData`.
    * @param {function} verificationFn Optional verification function. Is called with the actual
    * signer and should throw when verification fails. The return value is ignored.
@@ -194,7 +194,7 @@ export class TrustClueClient {
       try {
         verificationFn(actualSigner);
       } catch (e) {
-        throw new TrustClueRuntimeError('Verification function failed', e);
+        throw new TrustClueRuntimeError(`Verification function failed: ${e.toString()}`, e);
       }
     } catch (e) {
       throw new TrustClueRuntimeError(e);

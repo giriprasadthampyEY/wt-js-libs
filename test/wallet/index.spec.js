@@ -1,5 +1,4 @@
 import { assert } from 'chai';
-import Web3Eth from 'web3-eth';
 import sinon from 'sinon';
 import helpers from '../utils/helpers';
 import testedDataModel from '../utils/data-hotel-model-definition';
@@ -427,33 +426,28 @@ describe('WTLibs.Wallet', () => {
   });
 
   describe('signData', () => {
-    let wallet, data;
+    let wallet;
     beforeEach(async function () {
       wallet = Web3WTWallet.createInstance(jsonWallet);
       wallet.setupWeb3Eth(testedDataModel.withDataSource().onChainDataOptions.provider);
       wallet.unlock(correctPassword);
-      data = {
+    });
+
+    it('should sign the data', async () => {
+      let serializedData = JSON.stringify({
         city: 'Islamabad',
         country: 'Pakistan',
         signer: wallet.getAddress(),
-      };
-    });
-
-    it('should encode and sign the data', async () => {
-      let serializedData = JSON.stringify(data);
+      });
       const signature = await wallet.signData(serializedData);
-      const web3Eth = new Web3Eth('http://localhost:8545');
       assert.isDefined(signature);
       assert.equal(signature, '0xbdf4103642a7449ecca41ac4ab7a00cddd0e7cc07b8ea6845e1c78c76f4c20723fb5e533c11cfc5fdae9d6d428a7118f50185f1a7bf8e127b0d4e969d88127f61c');
-      const actualSigner = web3Eth.accounts.recover(serializedData, signature);
-      assert.equal(actualSigner, data.signer);
     });
 
     it('should throw on a destroyed wallet', async () => {
       wallet.destroy();
       try {
-        let serializedData = JSON.stringify(data);
-        await wallet.signData(serializedData);
+        await wallet.signData('random string');
         assert(false);
       } catch (e) {
         assert.instanceOf(e, WalletStateError);
@@ -464,8 +458,7 @@ describe('WTLibs.Wallet', () => {
     it('should throw on a locked wallet', async () => {
       wallet.lock();
       try {
-        let serializedData = JSON.stringify(data);
-        await wallet.signData(serializedData);
+        await wallet.signData('random string');
         assert(false);
       } catch (e) {
         assert.instanceOf(e, WalletStateError);
@@ -475,9 +468,8 @@ describe('WTLibs.Wallet', () => {
 
     it('should throw when signing throws', async () => {
       sinon.stub(wallet._account, 'sign').rejects({ message: 'Invalid JSON RPC response' });
-      let serializedData = JSON.stringify(data);
       try {
-        await wallet.signData(serializedData);
+        await wallet.signData('random string');
         assert(false);
       } catch (e) {
         assert.instanceOf(e, WalletSigningError);
@@ -487,7 +479,7 @@ describe('WTLibs.Wallet', () => {
       }
       sinon.stub(wallet._account, 'sign').rejects(new Error('Invalid JSON RPC response'));
       try {
-        await wallet.signData(serializedData);
+        await wallet.signData('random string');
         assert(false);
       } catch (e) {
         assert.instanceOf(e, WalletSigningError);

@@ -2075,7 +2075,7 @@ Verifies the signature and actual signer.
 
 #### Parameters
 
--   `serializedData` **[string][275]** Strictly hex encoded (starting with 0x) string.
+-   `serializedData` **[string][275]** String data to be signed.
 -   `signature` **[string][275]** Strictly hex encoded (starting with 0x) signature of `serializedData`.
 -   `verificationFn` **[function][332]** Optional verification function. Is called with the actual
     signer and should throw when verification fails. The return value is ignored.
