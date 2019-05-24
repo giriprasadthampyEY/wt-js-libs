@@ -1,6 +1,5 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import Web3Utils from 'web3-utils';
 import Web3Eth from 'web3-eth';
 import { TrustClueClient } from '../../src/trust-clue-client';
 import { TrustClueRuntimeError, TrustClueConfigurationError } from '../../src/trust-clue-client/errors';
@@ -165,181 +164,142 @@ describe('WTLibs.TrustClueClient', () => {
     });
   });
 
-  describe('verifyAndDecodeSignedData', () => {
-    let data, signedData, signature;
+  describe('verifySignedData', () => {
+    let data, serializedData, signature, decryptedWallet;
 
     beforeAll(() => {
       data = {
-        id: '0xD39Ca7d186a37bb6Bf48AE8abFeB4c687dc8F906',
+        signer: '0xD39Ca7d186a37bb6Bf48AE8abFeB4c687dc8F906',
         data: {
           random: 'thing',
           winding: 'tree',
         },
       };
       const web3eth = new Web3Eth('http://localhost:8545');
-      const decryptedWallet = web3eth.accounts.decrypt(wallet, 'test123');
-      signedData = Web3Utils.utf8ToHex(JSON.stringify(data));
-      const signingResult = decryptedWallet.sign(signedData);
+      decryptedWallet = web3eth.accounts.decrypt(wallet, 'test123');
+      serializedData = JSON.stringify(data);
+      const signingResult = decryptedWallet.sign(serializedData);
       signature = signingResult.signature;
     });
 
-    it('should return the decoded data if everything goes well', () => {
-      const result = client.verifyAndDecodeSignedData(signedData, signature, 'id');
-      assert.equal(result.id, data.id);
-      assert.equal(result.data.random, data.data.random);
-      assert.equal(result.data.winding, data.data.winding);
+    it('should not throw if everything goes well with default verificationFn', () => {
+      client.verifySignedData(serializedData, signature);
     });
 
-    it('should not fail when address in signerField is not checksummed', () => {
+    it('should not fail when address in signer field is not checksummed and no custom verificationFn is used', () => {
       const myData = {
-        id: '0xd39ca7d186A37BB6bf48ae8abfeb4c687dc8f906',
+        signer: '0xd39ca7d186A37BB6bf48ae8abfeb4c687dc8f906',
         data: {
           random: 'thing',
           winding: 'tree',
         },
       };
-      const web3eth = new Web3Eth('http://localhost:8545');
-      const decryptedWallet = web3eth.accounts.decrypt(wallet, 'test123');
-      const mySignedData = Web3Utils.utf8ToHex(JSON.stringify(myData));
-      const signingResult = decryptedWallet.sign(mySignedData);
-      const mySignature = signingResult.signature;
-      const result = client.verifyAndDecodeSignedData(mySignedData, mySignature, 'id');
-      assert.equal(result.id, myData.id);
-      assert.equal(result.data.random, myData.data.random);
-      assert.equal(result.data.winding, myData.data.winding);
+      const serializedData = JSON.stringify(myData);
+      const signingResult = decryptedWallet.sign(serializedData);
+      client.verifySignedData(serializedData, signingResult.signature);
     });
 
-    it('should throw when signerField does not contain address', () => {
+    it('should throw when signer field does not contain address', () => {
       const myData = {
-        id: '0xd39ca7d186A37BB6bf48ae8abfeb4c687dc8f906',
+        signer: 'aaaaaaaaaaaaaa',
         data: {
           random: 'thing',
           winding: 'tree',
         },
       };
-      const web3eth = new Web3Eth('http://localhost:8545');
-      const decryptedWallet = web3eth.accounts.decrypt(wallet, 'test123');
-      const mySignedData = Web3Utils.utf8ToHex(JSON.stringify(myData));
-      const signingResult = decryptedWallet.sign(mySignedData);
-      const mySignature = signingResult.signature;
+      const mySerializedData = JSON.stringify(myData);
+      const signingResult = decryptedWallet.sign(mySerializedData);
       try {
-        client.verifyAndDecodeSignedData(mySignedData, mySignature, 'id');
+        client.verifySignedData(mySerializedData, signingResult.signature);
       } catch (e) {
         assert.match(e.message, /ethereum address/i);
         assert.instanceOf(e, TrustClueRuntimeError);
       }
     });
 
-    it('should throw when any of the arguments is missing', () => {
+    it('should call custom verificationFn', () => {
+      const verificationFn = sinon.stub().returns(true);
+      client.verifySignedData(serializedData, signature, verificationFn);
+      assert.equal(verificationFn.callCount, 1);
+      const throwingVerificationFn = sinon.stub().throws(new Error('random error'));
       try {
-        client.verifyAndDecodeSignedData(undefined, signature, 'id');
+        client.verifySignedData(serializedData, signature, throwingVerificationFn);
         assert(false);
       } catch (e) {
-        assert.match(e.message, /signedData/i);
-        assert.instanceOf(e, TrustClueRuntimeError);
-      }
-
-      try {
-        client.verifyAndDecodeSignedData(signedData, undefined, 'id');
-        assert(false);
-      } catch (e) {
-        assert.match(e.message, /signature/i);
-        assert.instanceOf(e, TrustClueRuntimeError);
-      }
-
-      try {
-        client.verifyAndDecodeSignedData(signedData, signature);
-        assert(false);
-      } catch (e) {
-        assert.match(e.message, /signerField/i);
-        assert.instanceOf(e, TrustClueRuntimeError);
+        assert.equal(throwingVerificationFn.callCount, 1);
+        assert.match(e.message, /random error/i);
       }
     });
 
-    it('should not accept not-hex encoded signedData', () => {
+    it('should throw when any of the required arguments is missing', () => {
       try {
-        client.verifyAndDecodeSignedData('random data', signature, 'id');
+        client.verifySignedData(undefined, signature);
         assert(false);
       } catch (e) {
-        assert.match(e.message, /signedData/i);
+        assert.match(e.message, /serializedData/i);
+        assert.instanceOf(e, TrustClueRuntimeError);
+      }
+
+      try {
+        client.verifySignedData(serializedData, undefined);
+        assert(false);
+      } catch (e) {
+        assert.match(e.message, /signature/i);
         assert.instanceOf(e, TrustClueRuntimeError);
       }
     });
 
     it('should not accept not-hex encoded signature', () => {
       try {
-        client.verifyAndDecodeSignedData(signedData, 'random string', 'id');
+        client.verifySignedData(serializedData, 'random string');
       } catch (e) {
         assert.match(e.message, /signature/i);
         assert.instanceOf(e, TrustClueRuntimeError);
       }
     });
 
-    it('should throw when decoded signedData is not a valid JSON', () => {
-      const myData = '0xd39ca7d186A37BB6bf48ae8abfeb4c687dc8f906';
-      const web3eth = new Web3Eth('http://localhost:8545');
-      const decryptedWallet = web3eth.accounts.decrypt(wallet, 'test123');
-      const mySignedData = Web3Utils.utf8ToHex(myData);
-      const signingResult = decryptedWallet.sign(mySignedData);
+    it('should fail verification when serializedData is not a valid JSON with default verification function', () => {
+      const mySerializedData = '0xd39ca7d186A37BB6bf48ae8abfeb4c687dc8f906';
+      const signingResult = decryptedWallet.sign(mySerializedData);
       const mySignature = signingResult.signature;
       try {
-        client.verifyAndDecodeSignedData(mySignedData, mySignature, 'id');
+        client.verifySignedData(mySerializedData, mySignature);
         assert(false);
       } catch (e) {
-        assert.match(e.message, /signedData does not seem to be a valid json/i);
+        assert.match(e.message, /verification function failed/i);
         assert.instanceOf(e, TrustClueRuntimeError);
+      }
+      try {
+        client.verifySignedData(mySerializedData, mySignature, () => {});
+      } catch (e) {
+        assert(false);
       }
     });
 
-    it('should throw when signerField is not present in the decoded data', () => {
+    it('should fail verification when signer field is not present with default validation function', () => {
       const myData = {
         data: {
           random: 'thing',
           winding: 'tree',
         },
       };
-      const web3eth = new Web3Eth('http://localhost:8545');
-      const decryptedWallet = web3eth.accounts.decrypt(wallet, 'test123');
-      const mySignedData = Web3Utils.utf8ToHex(JSON.stringify(myData));
-      const signingResult = decryptedWallet.sign(mySignedData);
-      const mySignature = signingResult.signature;
+      const mySerializedData = JSON.stringify(myData);
+      const signingResult = decryptedWallet.sign(mySerializedData);
       try {
-        client.verifyAndDecodeSignedData(mySignedData, mySignature, 'id');
+        client.verifySignedData(mySerializedData, signingResult.signature);
         assert(false);
       } catch (e) {
-        assert.match(e.message, /signerField 'id' is not part of the decoded data/i);
+        assert.match(e.message, /verification function failed/i);
         assert.instanceOf(e, TrustClueRuntimeError);
       }
     });
 
     it('should throw when address recovery fails', () => {
       try {
-        client.verifyAndDecodeSignedData(signedData, '0x', 'id');
+        client.verifySignedData(serializedData, '0x');
         assert(false);
       } catch (e) {
         assert.match(e.message, /recovery/i);
-        assert.instanceOf(e, TrustClueRuntimeError);
-      }
-    });
-
-    it('should throw when recovered address does not match signerField', () => {
-      const myData = {
-        id: '04e46f24307e4961157b986a0b653a0d88f9dbd6',
-        data: {
-          random: 'thing',
-          winding: 'tree',
-        },
-      };
-      const web3eth = new Web3Eth('http://localhost:8545');
-      const decryptedWallet = web3eth.accounts.decrypt(wallet, 'test123');
-      const mySignedData = Web3Utils.utf8ToHex(JSON.stringify(myData));
-      const signingResult = decryptedWallet.sign(mySignedData);
-      const mySignature = signingResult.signature;
-      try {
-        client.verifyAndDecodeSignedData(mySignedData, mySignature, 'id');
-        assert(false);
-      } catch (e) {
-        assert.match(e.message, /expected signer/i);
         assert.instanceOf(e, TrustClueRuntimeError);
       }
     });
