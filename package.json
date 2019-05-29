@@ -1,6 +1,6 @@
 {
   "name": "@windingtree/wt-js-libs",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "Javascript libraries to interact with the Winding Tree contracts",
   "main": "dist/cjs/wt-js-libs.js",
   "browser": "dist/umd/wt-js-libs.js",
