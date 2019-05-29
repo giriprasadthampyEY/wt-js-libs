@@ -8,6 +8,7 @@ import type { WTHotelIndexInterface } from './interfaces/hotel-interfaces';
 import type { WTAirlineIndexInterface } from './interfaces/airline-interfaces';
 
 import { OnChainDataClient } from './on-chain-data-client';
+import StoragePointer from './on-chain-data-client/storage-pointer';
 import { OffChainDataClient } from './off-chain-data-client';
 import { TrustClueClient } from './trust-clue-client';
 import Wallet from './wallet';
@@ -169,4 +170,15 @@ export const errors = {
   TransactionDidNotComeThroughError,
   NoReceiptError,
   InaccessibleEthereumNodeError,
+};
+
+/**
+ * Export important classes for convenience.
+ */
+export {
+  OffChainDataClient,
+  OnChainDataClient,
+  TrustClueClient,
+  StoragePointer,
+  Wallet,
 };
