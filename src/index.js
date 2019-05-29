@@ -170,3 +170,10 @@ export const errors = {
   NoReceiptError,
   InaccessibleEthereumNodeError,
 };
+
+/**
+ * Export trust-clue-client classes for easier test mocking.
+ */
+export const trustClueClient = {
+  TrustClueClient,
+};
