@@ -8,6 +8,7 @@ import type { WTHotelIndexInterface } from './interfaces/hotel-interfaces';
 import type { WTAirlineIndexInterface } from './interfaces/airline-interfaces';
 
 import { OnChainDataClient } from './on-chain-data-client';
+import StoragePointer from './on-chain-data-client/storage-pointer';
 import { OffChainDataClient } from './off-chain-data-client';
 import { TrustClueClient } from './trust-clue-client';
 import Wallet from './wallet';
@@ -172,8 +173,12 @@ export const errors = {
 };
 
 /**
- * Export trust-clue-client classes for easier test mocking.
+ * Export important classes for convenience.
  */
-export const trustClueClient = {
+export {
+  OffChainDataClient,
+  OnChainDataClient,
   TrustClueClient,
+  StoragePointer,
+  Wallet,
 };
