@@ -14,13 +14,13 @@ cleanup() {
   # Kill the npm instance that we started (if we started one and if it's still running).
   if [ -n "$npm_pid" ] && ps -p $npm_pid > /dev/null; then
     kill -9 $npm_pid
-  fi  
+  fi
 }
 
 ganache_port=8545
 
 ganache_running() {
-  nc -z localhost "$ganache_port"
+  netstat -a | grep ":$ganache_port" | grep -i listen
 }
 
 start_ganache() {
