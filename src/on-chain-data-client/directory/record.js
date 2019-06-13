@@ -65,15 +65,11 @@ class OnChainRecord {
     throw new Error('Cannot call _getRecordContractFactory on class');
   }
 
-  // _changeOrgJsonUriFactory (data: string) {
-  //   throw new Error('Cannot call _changeOrgJsonUriFactory on class');
-  // }
-
-  async _createRecordFactory (orgJsonUri) {
+  _createRecordFactory (orgJsonUri) {
     throw new Error('Cannot call _createRecordFactory on class');
   }
 
-  async _createAndAddRecordFactory (orgJsonUri) {
+  _createAndAddRecordFactory (orgJsonUri) {
     throw new Error('Cannot call _createAndAddRecordFactory on class');
   }
 
@@ -86,7 +82,7 @@ class OnChainRecord {
    * Since it has to eventually access the `orgJsonUri`
    * field stored on-chain, it is lazy loaded.
    */
-  get dataIndex () { // TODO rename?
+  get dataIndex () {
     return (async () => {
       if (!this._dataIndex) {
         this._dataIndex = StoragePointer.createInstance(await this.orgJsonUri, this._getStoragePointerLayoutFactory());
@@ -266,6 +262,9 @@ class OnChainRecord {
       onReceipt: (receipt) => {
         this.onChainDataset.markDeployed();
         if (receipt && receipt.logs) {
+          // TODO web3Eth.abi.decodeLog timeouts even though the signature of OrganizationCreated
+          // coming from the receipt logs is the same as in event registry. maybe gas problem?
+          // (0x47b688936cae1ca5de00ac709e05309381fb9f18b4c5adb358a5b542ce67caea)
           // let decodedLogs = this.web3Contracts.decodeLogs(receipt.logs);
           // this.address = decodedLogs[0].attributes[0].value;
           this.address = receipt.logs[0].address;
@@ -282,31 +281,6 @@ class OnChainRecord {
   async _hasDelegate (delegateAddress, transactionOptions) {
     const contract = await this._getContractInstance();
     return contract.methods.hasDelegate(delegateAddress).call(transactionOptions);
-    // const estimate = contract.methods.hasDelegate(delegateAddress).estimateGas(transactionOptions);
-    // const transactionData = {
-    //   nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
-    //   data: data,
-    //   from: transactionOptions.from,
-    //   to: contract._address,
-    //   gas: this.web3Utils.applyGasModifier(await estimate),
-    // };
-    // const eventCallbacks: TransactionCallbacksInterface = {
-    //   onReceipt: (receipt: TxReceiptInterface) => {
-    //       console.warn('on receipt');
-    //       console.log(receipt);
-    //     this.onChainDataset.markDeployed();
-    //     if (receipt && receipt.logs) {
-    //       // let decodedLogs = this.web3Contracts.decodeLogs(receipt.logs);
-    //       // this.address = decodedLogs[0].attributes[0].value;
-    //       // this.address = receipt.logs[0].address;
-    //     }
-    //   },
-    // };
-    // return {
-    //   record: (this: OnChainRecord),
-    //   transactionData: transactionData,
-    //   eventCallbacks: eventCallbacks,
-    // };
   }
 
   /**

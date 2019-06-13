@@ -71,7 +71,6 @@ export class WtJsLibs {
    * @type HotelDirectoryInterface | AirlineDirectoryInterface
    */
   getDirectory (segment, address) {
-    // TODO use Entrypoint
     const dataModel = OnChainDataClient.getDataModel(segment);
     return dataModel.getDirectory(address);
   }

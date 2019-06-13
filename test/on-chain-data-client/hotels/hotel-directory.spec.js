@@ -33,7 +33,7 @@ describe('WTLibs.on-chain-data.hotels.HotelDirectory', () => {
     }
   });
 
-  describe('getOrganization', () => {
+  describe('getRecord', () => {
     it('should throw if address is malformed', async () => {
       try {
         directoryProvider.web3Contracts.getHotelDirectoryInstance = sinon.stub().resolves({
@@ -43,7 +43,7 @@ describe('WTLibs.on-chain-data.hotels.HotelDirectory', () => {
             },
           },
         });
-        await directoryProvider.getOrganization('random-address');
+        await directoryProvider.getRecord('random-address');
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot find hotel/i);
@@ -58,7 +58,7 @@ describe('WTLibs.on-chain-data.hotels.HotelDirectory', () => {
             organizationsIndex: helpers.stubContractMethodResult(0),
           },
         });
-        await directoryProvider.getOrganization('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA');
+        await directoryProvider.getRecord('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA');
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot find hotel/i);
@@ -69,7 +69,7 @@ describe('WTLibs.on-chain-data.hotels.HotelDirectory', () => {
     it('should throw if hotel contract cannot be instantiated', async () => {
       try {
         sinon.stub(directoryProvider, '_createRecordInstanceFactory').rejects();
-        await directoryProvider.getOrganization('0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
+        await directoryProvider.getRecord('0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot find hotel/i);
@@ -87,7 +87,7 @@ describe('WTLibs.on-chain-data.hotels.HotelDirectory', () => {
       });
       // There is not a valid hotel on this address
       const address = '0x994afd347b160be3973b41f0a144819496d175e9';
-      const hotel = await directoryProvider.getOrganization(address);
+      const hotel = await directoryProvider.getRecord(address);
 
       try {
         await hotel.dataIndex;

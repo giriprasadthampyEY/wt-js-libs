@@ -28,16 +28,7 @@ class HotelDirectory extends AbstractDirectory {
     return this.web3Contracts.getHotelDirectoryInstance(this.address);
   }
 
-  async _createRecordInDirectoryFactory (orgJsonUri) {
-    const directory = await this._getDeployedDirectory();
-    return directory.methods.create(orgJsonUri).call();
-  }
-
   async _createRecordInstanceFactory (address) {
-    return OnChainHotel.createInstance(this.web3Utils, this.web3Contracts, await this._getDeployedDirectory(), address);
-  }
-
-  async _createAndAddRecordInstanceFactory (address) {
     return OnChainHotel.createInstance(this.web3Utils, this.web3Contracts, await this._getDeployedDirectory(), address);
   }
 
@@ -49,6 +40,11 @@ class HotelDirectory extends AbstractDirectory {
   async _getRecordsAddressListFactory () {
     const directory = await this._getDeployedDirectory();
     return directory.methods.getOrganizations().call();
+  }
+
+  async _getSegmentFactory (transactionOptions) {
+    const directory = await this._getDeployedDirectory();
+    return directory.methods.getSegment().call(transactionOptions);
   }
 
   async getSegment (transactionOptions) {
@@ -65,11 +61,15 @@ class HotelDirectory extends AbstractDirectory {
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
   async add (hotelData) {
-    return this.addRecord(hotelData);
+    return this._addRecord(hotelData);
   }
 
-  async create(hotelData, alsoAdd = false) {
-    return this.createRecord(hotelData, alsoAdd);
+  async create(hotelData) {
+    return this._createRecord(hotelData, false);
+  }
+
+  async createAndAdd(hotelData) {
+    return this._createRecord(hotelData, true);
   }
 
   /**
@@ -82,7 +82,7 @@ class HotelDirectory extends AbstractDirectory {
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
   async update (hotel) {
-    return this.updateRecord(hotel);
+    return this._updateRecord(hotel);
   }
 
   /**
@@ -94,8 +94,8 @@ class HotelDirectory extends AbstractDirectory {
    * @throws {InputDataError} When hotel does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
-  async remove (hotel, transactionOptions) {
-    return this.removeRecord(hotel);
+  async remove (hotel) {
+    return this._removeRecord(hotel);
   }
 
   /**
@@ -107,9 +107,9 @@ class HotelDirectory extends AbstractDirectory {
    * @throws {HotelNotInstantiableError} When the hotel class cannot be constructed.
    * @throws {WTLibsError} When something breaks in the network communication.
    */
-  async getOrganization (address) { // TODO change to/use organizationsIndex+organizations
+  async getRecord (address) {
     try {
-      const record = await this.getRecord(address);
+      const record = await this._getRecord(address);
       return record;
     } catch (e) {
       if (e instanceof RecordNotFoundError) {
@@ -129,8 +129,8 @@ class HotelDirectory extends AbstractDirectory {
    * Currently any inaccessible hotel is silently ignored.
    * Subject to change.
    */
-  async getOrganizations () {
-    return this.getAllRecords();
+  async getRecords () {
+    return this._getRecords();
   }
 }
 

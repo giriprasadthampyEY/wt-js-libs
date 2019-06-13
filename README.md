@@ -108,7 +108,7 @@ const libs = WtJsLibs.createInstance({
 
 
 const directory = libs.getDirectory('hotels', '0x...');
-const hotel = await directory.getOrganization('0x...');
+const hotel = await directory.getRecord('0x...');
 
 // You can get all the off-chain data at once
 // This approach might be a little slow as all off-chain data gets downloaded
@@ -146,13 +146,13 @@ try {
 
 // Working with airline data is very similar. Just change the segment and a few method names:
 const directory = libs.getDirectory('airlines', '0x...');
-const airline = await directory.getOrganization('0x...');
+const airline = await directory.getRecord('0x...');
 
 try {
-  const { airline, transactionData, eventCallbacks } = await directory.create({
+  const { airline, transactionData, eventCallbacks } = await directory.createAndAdd({
     orgJsonUri: 'https://example.com/my-airline-data.json',
     owner: '0x...',
-  }, true);
+  });
   const result = await wallet.signAndSendTransaction(transactionData, eventCallbacks);
   // After the transaction is confirmed, one of the callbacks
   // will set the address of the airline.
@@ -168,7 +168,7 @@ If you want, you can create the airline contract first and add it later:
 const createHotel = await directory.create({
   owner: hotelOwner,
   orgJsonUri: orgJsonUri,
-}, false);
+});
 const hotel = createHotel.hotel;
 const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
 

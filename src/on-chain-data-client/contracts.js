@@ -88,10 +88,7 @@ class Contracts {
       let indexedEvents = {};
       for (let event of events) {
         // kudos https://github.com/ConsenSys/abi-decoder/blob/master/index.js#L19
-        const eventSignature = event.name + '(' + event.inputs.map(function (input) { return input.type; }).join(',') + ')';
-        const signature = Web3Utils.sha3(eventSignature);
-        if (event.name === 'OrganizationCreated') {
-        }
+        const signature = Web3Utils.sha3(event.name + '(' + event.inputs.map(function (input) { return input.type; }).join(',') + ')');
         indexedEvents[signature] = event;
       }
       return indexedEvents;
@@ -117,20 +114,14 @@ class Contracts {
     const result = [];
     const eventRegistry = this._initEventRegistry();
     for (let log of logs) {
-      if (log.topics && log.topics[0] && eventRegistry[log.topics[0]] && eventRegistry[log.topics[0]].name === 'OrganizationCreated') {
-        console.warn(`decoding event type`);
+      if (log.topics && log.topics[0] && eventRegistry[log.topics[0]]) {
         const eventAbi = eventRegistry[log.topics[0]];
         let topics = log.topics;
         // @see https://web3js.readthedocs.io/en/1.0/web3-eth-abi.html#id22
         if (!eventAbi.anonymous) {
           topics = log.topics.slice(1);
         }
-        console.warn('log decoding');
-        console.log(eventAbi.inputs);
-        console.log(log);
-        console.log(topics);
         const decoded = this.web3Eth.abi.decodeLog(eventAbi.inputs, log.data, topics);
-        console.warn('log decoded');
         let parsedAttributes = eventAbi.inputs.map((input) => {
           return {
             name: input.name,

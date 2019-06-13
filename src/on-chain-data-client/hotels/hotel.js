@@ -42,25 +42,12 @@ class OnChainHotel extends OnChainRecord {
     return this.web3Contracts.getOrganizationInstance(this.address);
   }
 
-  // _changeOrgJsonUriFactory (data: string): Object {
-  //   return this.directoryContract.methods.call(this.address, data);
-  // }
-
   _createRecordFactory (orgJsonUri) {
     return this.directoryContract.methods.create(orgJsonUri);
   }
 
-  // _hasDelegateFactory (delegateAddress: ?string): Object {
-  //   return this.directoryContract.methods.hasDelegate(delegateAddress);
-  // }
-
   _createAndAddRecordFactory (orgJsonUri) {
     return this.directoryContract.methods.createAndAdd(orgJsonUri);
-  }
-
-  _registerRecordInDirectoryFactory (address) { // TODO rename to add
-    let res = this.directoryContract.methods.add(address);
-    return res;
   }
 
   _deleteRecordInDirectoryFactory () {

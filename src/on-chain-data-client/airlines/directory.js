@@ -47,7 +47,7 @@ class AirlineDirectory extends AbstractDirectory {
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
   async add (airlineData) {
-    return this.addRecord(airlineData);
+    return this._addRecord(airlineData);
   }
 
   async createAndAdd(orgJsonUri) {
@@ -65,7 +65,7 @@ class AirlineDirectory extends AbstractDirectory {
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
   async update (airline) {
-    return this.updateRecord(airline);
+    return this._updateRecord(airline);
   }
 
   /**
@@ -78,7 +78,7 @@ class AirlineDirectory extends AbstractDirectory {
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
   async remove (airline) {
-    return this.removeRecord(airline);
+    return this._removeRecord(airline);
   }
 
   // /**
@@ -128,7 +128,7 @@ class AirlineDirectory extends AbstractDirectory {
   //  * Subject to change.
   //  */
   // async getOrganizations (): Promise<Array<AirlineInterface>> {
-  //   return this.getAllRecords();
+  //   return this._getRecords();
   // }
 }
 

@@ -5,8 +5,6 @@
  * airlines, OTAs etc.
  */
 export class AbstractDataModel {
-
-
   /**
    * Returns new and configured instance
    */

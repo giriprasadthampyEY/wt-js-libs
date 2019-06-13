@@ -40,7 +40,7 @@ describe('WTLibs.on-chain-data.AbstractDirectory', () => {
     it('should throw when _createRecordInstanceFactory is called on an abstract class', async () => {
       try {
         const directory = new AbstractDirectory('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', dataModel.web3Utils, dataModel.web3Contracts);
-        await directory.addRecord({
+        await directory._addRecord({
           orgJsonUri: '1234',
           owner: '1234',
         });
@@ -146,14 +146,14 @@ describe('WTLibs.on-chain-data.AbstractDirectory', () => {
       });
     });
 
-    describe('addRecord', () => {
+    describe('_addRecord', () => {
       it('should throw generic error when something does not work during tx data preparation', async () => {
         try {
           sinon.stub(directoryProvider, '_createRecordInstanceFactory').resolves({
             setLocalData: sinon.stub().resolves(),
             createOnChainData: sinon.stub().rejects(),
           });
-          await directoryProvider.addRecord({ owner: 'b', orgJsonUri: 'aaa' });
+          await directoryProvider._addRecord({ owner: 'b', orgJsonUri: 'aaa' });
           assert(false);
         } catch (e) {
           assert.match(e.message, /cannot add dragon/i);
@@ -165,7 +165,7 @@ describe('WTLibs.on-chain-data.AbstractDirectory', () => {
 
       it('should throw when orgJsonUri is not provided', async () => {
         try {
-          await directoryProvider.addRecord({ owner: 'b' });
+          await directoryProvider._addRecord({ owner: 'b' });
           assert(false);
         } catch (e) {
           assert.match(e.message, /cannot add dragon/i);
@@ -175,7 +175,7 @@ describe('WTLibs.on-chain-data.AbstractDirectory', () => {
 
       it('should throw when owner is not provided', async () => {
         try {
-          await directoryProvider.addRecord({ orgJsonUri: 'b' });
+          await directoryProvider._addRecord({ orgJsonUri: 'b' });
           assert(false);
         } catch (e) {
           assert.match(e.message, /cannot add dragon/i);
@@ -184,10 +184,10 @@ describe('WTLibs.on-chain-data.AbstractDirectory', () => {
       });
     });
 
-    describe('updateRecord', () => {
+    describe('_updateRecord', () => {
       it('should throw generic error when something does not work during tx data preparation', async () => {
         try {
-          await directoryProvider.updateRecord({
+          await directoryProvider._updateRecord({
             owner: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
             address: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
             updateOnChainData: sinon.stub().rejects('some original error'),
@@ -203,7 +203,7 @@ describe('WTLibs.on-chain-data.AbstractDirectory', () => {
 
       it('should throw when owner is not provided', async () => {
         try {
-          await directoryProvider.updateRecord({ address: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769', orgJsonUri: 'b' });
+          await directoryProvider._updateRecord({ address: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769', orgJsonUri: 'b' });
           assert(false);
         } catch (e) {
           assert.match(e.message, /cannot update dragon/i);
@@ -213,7 +213,7 @@ describe('WTLibs.on-chain-data.AbstractDirectory', () => {
 
       it('should throw when address is not provided', async () => {
         try {
-          await directoryProvider.updateRecord({ orgJsonUri: 'b', owner: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769' });
+          await directoryProvider._updateRecord({ orgJsonUri: 'b', owner: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769' });
           assert(false);
         } catch (e) {
           assert.match(e.message, /cannot update dragon/i);
@@ -222,10 +222,10 @@ describe('WTLibs.on-chain-data.AbstractDirectory', () => {
       });
     });
 
-    describe('removeRecord', () => {
+    describe('_removeRecord', () => {
       it('should throw generic error when something does not work during tx data preparation', async () => {
         try {
-          await directoryProvider.removeRecord({
+          await directoryProvider._removeRecord({
             removeOnChainData: sinon.stub().rejects(),
             owner: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
             address: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
@@ -239,7 +239,7 @@ describe('WTLibs.on-chain-data.AbstractDirectory', () => {
 
       it('should throw error when trying to remove a hotel without owner', async () => {
         try {
-          await directoryProvider.removeRecord({
+          await directoryProvider._removeRecord({
             address: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
           });
           assert(false);
@@ -251,7 +251,7 @@ describe('WTLibs.on-chain-data.AbstractDirectory', () => {
 
       it('should throw error when trying to remove a hotel without address', async () => {
         try {
-          await directoryProvider.removeRecord({
+          await directoryProvider._removeRecord({
             owner: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
           });
           assert(false);

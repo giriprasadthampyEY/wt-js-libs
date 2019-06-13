@@ -33,7 +33,7 @@ describe('WTLibs.on-chain-data.airlines.spec.js.AirlineDirectory', () => {
     }
   });
 
-  describe('getOrganization', () => {
+  describe('getRecord', () => {
     it('should throw if address is malformed', async () => {
       try {
         directoryProvider.web3Contracts.getAirlineDirectoryInstance = sinon.stub().resolves({
@@ -43,7 +43,7 @@ describe('WTLibs.on-chain-data.airlines.spec.js.AirlineDirectory', () => {
             },
           },
         });
-        await directoryProvider.getOrganization('random-address');
+        await directoryProvider.getRecord('random-address');
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot find airline/i);
@@ -58,7 +58,7 @@ describe('WTLibs.on-chain-data.airlines.spec.js.AirlineDirectory', () => {
             organizationsIndex: helpers.stubContractMethodResult(0),
           },
         });
-        await directoryProvider.getOrganization('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA');
+        await directoryProvider.getRecord('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA');
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot find airline/i);
@@ -69,7 +69,7 @@ describe('WTLibs.on-chain-data.airlines.spec.js.AirlineDirectory', () => {
     it('should throw if airline contract cannot be instantiated', async () => {
       try {
         sinon.stub(directoryProvider, '_createRecordInstanceFactory').rejects();
-        await directoryProvider.getOrganization('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
+        await directoryProvider.getRecord('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot find airline/i);
@@ -87,7 +87,7 @@ describe('WTLibs.on-chain-data.airlines.spec.js.AirlineDirectory', () => {
       });
       // There is not a valid airline on this address
       const address = '0x994afd347b160be3973b41f0a144819496d175e9';
-      const airline = await directoryProvider.getOrganization(address);
+      const airline = await directoryProvider.getRecord(address);
 
       try {
         await airline.dataIndex;

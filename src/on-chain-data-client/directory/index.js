@@ -24,16 +24,16 @@ class AbstractDirectory {
     throw new Error('Cannot call _createRecordInstanceFactory on the class');
   }
 
-  async _createRecordInDirectoryFactory (orgJsonUri) {
-    throw new Error('Cannot call _createRecordInDirectoryFactory on the class');
-  }
-
   async _getDirectoryRecordPositionFactory (address) {
     throw new Error('Cannot call _getDirectoryRecordPositionFactory on the class');
   }
 
   async _getRecordsAddressListFactory () {
     throw new Error('Cannot call _getRecordsAddressListFactory on the class');
+  }
+
+  async _getSegmentFactory (transactionOptions) {
+    throw new Error('Cannot call _getSegmentFactory on the class');
   }
 
   async _getDeployedDirectory () {
@@ -44,32 +44,7 @@ class AbstractDirectory {
   }
 
   async _getSegment(transactionOptions) {
-    const directory = await this._getDeployedDirectory();
-    return directory.methods.getSegment().call(transactionOptions);
-    // const data = directory.methods.getSegment().encodeABI();
-    // const estimate = directory.methods.getSegment().estimateGas(transactionOptions);
-    // const transactionData = {
-    //   nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
-    //   data: data,
-    //   from: transactionOptions.from,
-    //   to: directory._address,
-    //   gas: this.web3Utils.applyGasModifier(await estimate),
-    // };
-    // const eventCallbacks: TransactionCallbacksInterface = {
-    //   onReceipt: (receipt: TxReceiptInterface) => {
-    //     console.log(receipt);
-    //     if (receipt && receipt.logs) {
-    //       // let decodedLogs = this.web3Contracts.decodeLogs(receipt.logs);
-    //       // this.address = decodedLogs[0].attributes[0].value;
-    //       this.address = receipt.logs[0].address;
-    //     }
-    //   },
-    // };
-    // return {
-    //   record: (this: OnChainRecord),
-    //   transactionData: transactionData,
-    //   eventCallbacks: eventCallbacks,
-    // };
+    return this._getSegmentFactory(transactionOptions);
   }
 
   /**
@@ -81,7 +56,7 @@ class AbstractDirectory {
    * @throws {InputDataError} When recordData does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
-  async addRecord (recordData) {
+  async _addRecord (recordData) {
     if (!recordData.address) {
       throw new InputDataError(`Cannot add ${this.RECORD_TYPE} without address.`);
     }
@@ -105,7 +80,7 @@ class AbstractDirectory {
     };
   }
 
-  async createRecord(recordData, alsoAdd = false) {
+  async _createRecord(recordData, alsoAdd = false) {
     const orgJsonUri = await recordData.orgJsonUri;
     if (!orgJsonUri) {
       throw new InputDataError(`Cannot create ${this.RECORD_TYPE}: Missing orgJsonUri`);
@@ -132,7 +107,7 @@ class AbstractDirectory {
    * @throws {InputDataError} When <record> does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
-  async updateRecord (record) {
+  async _updateRecord (record) {
     if (!record.address) {
       throw new InputDataError(`Cannot update ${this.RECORD_TYPE} without address.`);
     }
@@ -156,7 +131,7 @@ class AbstractDirectory {
    * @throws {InputDataError} When <record> does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
-  async removeRecord (record) {
+  async _removeRecord (record) {
     if (!record.address) {
       throw new InputDataError(`Cannot remove ${this.RECORD_TYPE} without address.`);
     }
@@ -173,7 +148,6 @@ class AbstractDirectory {
     });
   }
 
-
   /**
    * Gets <record> representation of a <record> on a given address. If <record>
    * on such address is not registered through this Winding Tree index
@@ -183,7 +157,7 @@ class AbstractDirectory {
    * @throws {RecordNotInstantiableError} When the <record> class cannot be constructed.
    * @throws {WTLibsError} When something breaks in the network communication.
    */
-  async getRecord (address) {
+  async _getRecord (address) {
     let recordIndex;
     try {
       // This returns strings
@@ -208,7 +182,7 @@ class AbstractDirectory {
    * Currently any inaccessible <record> is silently ignored.
    * Subject to change.
    */
-  async getAllRecords () {
+  async _getRecords () {
     const recordsAddressList = await this._getRecordsAddressListFactory();
     let getRecordDetails = recordsAddressList
       // Filtering null addresses beforehand improves efficiency
