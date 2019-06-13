@@ -4,7 +4,7 @@ import {
   HotelNotFoundError,
   HotelNotInstantiableError,
   RecordNotFoundError,
-  RecordNotInstantiableError
+  RecordNotInstantiableError,
 } from '../errors';
 import AbstractDirectory from '../directory';
 
@@ -64,11 +64,11 @@ class HotelDirectory extends AbstractDirectory {
     return this._addRecord(hotelData);
   }
 
-  async create(hotelData) {
+  async create (hotelData) {
     return this._createRecord(hotelData, false);
   }
 
-  async createAndAdd(hotelData) {
+  async createAndAdd (hotelData) {
     return this._createRecord(hotelData, true);
   }
 

@@ -1,6 +1,4 @@
-import Utils from '../utils';
 import OnChainRecord from '../directory/record';
-import Contracts from '../contracts';
 
 /**
  * Wrapper class for an airline backed by a smart contract on

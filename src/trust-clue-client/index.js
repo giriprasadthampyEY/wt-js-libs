@@ -14,7 +14,6 @@ import {
  * configuration is shared during the whole runtime.
  */
 export class TrustClueClient {
-
   /**
    * Initializes the map of `TrustClue`s.
    *

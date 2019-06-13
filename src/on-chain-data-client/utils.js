@@ -6,7 +6,6 @@ import Web3Utils from 'web3-utils';
  * communication with Ethereum network.
  */
 class Utils {
-
   /**
    * Returns an initialized instance
    *

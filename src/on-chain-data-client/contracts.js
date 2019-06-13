@@ -59,7 +59,7 @@ class Contracts {
    * @return {web3.eth.Contract} Instance of an Directory
    */
   async getHotelDirectoryInstance (address) {
-    return await this._getInstance('hotelDirectory', SegmentDirectoryMetadata.abi, address);
+    return this._getInstance('hotelDirectory', SegmentDirectoryMetadata.abi, address);
   }
 
   /**
@@ -69,7 +69,7 @@ class Contracts {
    * @return {web3.eth.Contract} Instance of an Directory
    */
   async getAirlineDirectoryInstance (address) {
-    return await this._getInstance('airlineDirectory', SegmentDirectoryMetadata.abi, address);
+    return this._getInstance('airlineDirectory', SegmentDirectoryMetadata.abi, address);
   }
 
   /**

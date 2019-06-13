@@ -47,7 +47,6 @@ import {
  * Main public interface of wt-libs-js.
  */
 export class WtJsLibs {
-
   /**
    * Call this to create wt-libs-js instance.
    * @param options

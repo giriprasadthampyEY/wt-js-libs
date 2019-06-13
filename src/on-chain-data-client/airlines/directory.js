@@ -4,7 +4,7 @@ import {
   AirlineNotFoundError,
   AirlineNotInstantiableError,
   RecordNotFoundError,
-  RecordNotInstantiableError
+  RecordNotInstantiableError,
 } from '../errors';
 import AbstractDirectory from '../directory';
 
@@ -64,11 +64,11 @@ class AirlineDirectory extends AbstractDirectory {
     return this._addRecord(airlineData);
   }
 
-  async create(airlineData) {
+  async create (airlineData) {
     return this._createRecord(airlineData, false);
   }
 
-  async createAndAdd(airlineData) {
+  async createAndAdd (airlineData) {
     return this._createRecord(airlineData, true);
   }
 

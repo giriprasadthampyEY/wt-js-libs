@@ -43,7 +43,7 @@ class AbstractDirectory {
     return this.deployedDirectory;
   }
 
-  async _getSegment(transactionOptions) {
+  async _getSegment (transactionOptions) {
     return this._getSegmentFactory(transactionOptions);
   }
 
@@ -80,7 +80,7 @@ class AbstractDirectory {
     };
   }
 
-  async _createRecord(recordData, alsoAdd = false) {
+  async _createRecord (recordData, alsoAdd = false) {
     const orgJsonUri = await recordData.orgJsonUri;
     if (!orgJsonUri) {
       throw new InputDataError(`Cannot create ${this.RECORD_TYPE}: Missing orgJsonUri`);
@@ -91,7 +91,7 @@ class AbstractDirectory {
     }
     const record = await this._createRecordInstanceFactory();
     record.orgJsonUri = orgJsonUri;
-    return await record.createOnChainData({
+    return record.createOnChainData({
       from: recordOwner,
     }, alsoAdd).catch((err) => {
       throw new WTLibsError(`Cannot add ${this.RECORD_TYPE}: ${err.message}`, err);

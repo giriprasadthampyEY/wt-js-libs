@@ -12,7 +12,6 @@ import {
  * configuration is shared during the whole runtime.
  */
 export class OffChainDataClient {
-
   /**
    * Initializes the map of OffChainDataAdapters.
    *
