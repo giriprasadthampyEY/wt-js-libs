@@ -17,14 +17,14 @@ class OnChainHotel extends OnChainRecord {
    * Create new configured instance.
    * @param  {Utils} web3Utils
    * @param  {Contracts} web3Contracts
-   * @param  {web3.eth.Contract} indexContract Representation of Winding Tree index
-   * @param  {string} address is an optional pointer to Ethereum network where the hotle lives.
+   * @param  {web3.eth.Contract} directoryContract Representation of Winding Tree directory
+   * @param  {string} address is an optional pointer to Ethereum network where the hotel lives.
    * It is used as a reference for on-chain stored data. If it is not provided, an hotel has
    * to be created on chain to behave as expected.
    * @return {OnChainHotel}
    */
-  static createInstance (web3Utils, web3Contracts, indexContract, address) {
-    const hotel = new OnChainHotel(web3Utils, web3Contracts, indexContract, address);
+  static createInstance (web3Utils, web3Contracts, directoryContract, address) {
+    const hotel = new OnChainHotel(web3Utils, web3Contracts, directoryContract, address);
     hotel.RECORD_TYPE = 'hotel';
     hotel.initialize();
     return hotel;

@@ -61,7 +61,7 @@ describe('WtJsLibs usage - hotels', () => {
       // Don't bother with checksummed address format
       assert.equal((await hotel.owner), hotelOwner);
       assert.equal((await hotel.orgJsonUri).toLowerCase(), orgJsonUri);
-      assert.equal((await hotel.created), 20);
+      assert.equal((await hotel.created), 21);
       const dataIndex = await hotel.dataIndex;
       const description = (await dataIndex.contents).descriptionUri;
       assert.equal((await description.contents).name, 'Premium hotel');

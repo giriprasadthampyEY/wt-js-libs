@@ -79,7 +79,7 @@
   ],
   "airline-flights-one": {
     "updatedAt": "2019-01-01 12:00:00",
-    "flights": [
+    "items": [
       {
         "id": "OK0965",
         "origin": "PRG",
@@ -115,7 +115,7 @@
   },
   "airline-flights-two": {
     "updatedAt": "2019-01-10 12:00:00",
-    "flights": [
+    "items": [
       {
         "id": "CN9000",
         "origin": "PEK",

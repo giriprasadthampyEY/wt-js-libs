@@ -41,12 +41,12 @@ class OnChainAirline extends OnChainRecord {
     return this.web3Contracts.getOrganizationInstance(this.address);
   }
 
-  // _changeOrgJsonUriFactory (data: string): Object {
-  //   return this.directoryContract.methods.changeOrgJsonUri(this.address, data);
-  // }
+  _createRecordFactory (orgJsonUri) {
+    return this.directoryContract.methods.create(orgJsonUri);
+  }
 
-  _registerRecordInDirectoryFactory (orgJsonUri) {
-    return this.directoryContract.methods.add(orgJsonUri);
+  _createAndAddRecordFactory (orgJsonUri) {
+    return this.directoryContract.methods.createAndAdd(orgJsonUri);
   }
 
   _deleteRecordInDirectoryFactory () {
@@ -60,28 +60,8 @@ class OnChainAirline extends OnChainRecord {
    * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
    * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created airline instance.
    */
-  async createOnChainData (transactionOptions) {
-    const result = await this._createOnChainData(transactionOptions);
-    result.airline = result.record;
-    delete result.record;
-    return result;
-  }
-
-  /**
-   * This is potentially devastating, so it's better to name
-   * this operation explicitly instead of hiding it under updateOnChainData.
-   *
-   * Generates transaction data and metadata required for a airline ownership
-   * transfer.
-   *
-   * @param {string} newOwner Address of a new owner
-   * @param {TransactionOptionsInterface} transactionOptions Options object, only `from` property is currently used, all others are ignored in this implementation
-   * @throws {SmartContractInstantiationError} When the underlying contract is not yet deployed.
-   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created airline instance.
-   *
-   */
-  async transferOnChainOwnership (newOwner, transactionOptions) {
-    const result = await this._transferOnChainOwnership(newOwner, transactionOptions);
+  async createOnChainData (transactionOptions, alsoAdd = false) {
+    const result = await this._createOnChainData(transactionOptions, alsoAdd);
     result.airline = result.record;
     delete result.record;
     return result;
@@ -120,12 +100,9 @@ class OnChainAirline extends OnChainRecord {
     return results;
   }
 
-  // async getOrgJsonUri (transactionOptions: TransactionOptionsInterface): Promise<?string> | ?string {
-  //   console.log('OnChainAirline.getOrgJsonUri');
-  //   return this._orgJsonUri;
-  //   // const contract = await this._getRecordContractFactory();
-  //   // return contract.getOrgJsonUri();
-  // }
+  async hasDelegate (delegateAddress, transactionOptions) {
+    return this._hasDelegate(delegateAddress, transactionOptions);
+  }
 }
 
 export default OnChainAirline;
