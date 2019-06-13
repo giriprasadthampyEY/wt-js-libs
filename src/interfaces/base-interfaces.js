@@ -2,8 +2,8 @@
 
 import BigNumber from 'bignumber.js';
 
-import type { WTHotelIndexInterface } from './hotel-interfaces';
-import type { WTAirlineIndexInterface } from './airline-interfaces';
+import type { HotelDirectoryInterface } from './hotel-interfaces';
+import type { AirlineDirectoryInterface } from './airline-interfaces';
 import StoragePointer from '../on-chain-data-client/storage-pointer';
 
 /**
@@ -11,17 +11,20 @@ import StoragePointer from '../on-chain-data-client/storage-pointer';
  * about every hotel/airline.
  *
  * - `address` is the network address.
- * - `manager` is the network address of airline manager.
- * - `dataUri` holds a pointer to the off-chain storage
+ * - `owner` is the network address of airline owner.
+ * - `orgJsonUri` holds a pointer to the off-chain storage
  * that is used internally to store data.
  */
 export interface BaseOnChainDataInterface {
   +dataIndex: Promise<StoragePointer>,
   address: Promise<?string> | ?string,
-  manager: Promise<?string> | ?string,
-  dataUri: Promise<?string> | ?string,
+  owner: Promise<?string> | ?string,
+  created: Promise<number> | number,
+  delegates: Promise<string[]> | string[],
+  orgJsonUri: Promise<?string> | ?string,
 
-  toPlainObject(): Promise<Object>
+  toPlainObject(): Promise<Object>,
+  getOrgJsonUri: Promise<?string> | ?string
 }
 
 export interface BasePreparedTransactionMetadataInterface {
@@ -35,13 +38,15 @@ export interface BaseOnChainRecordInterface extends BaseOnChainDataInterface {
   createOnChainData(transactionOptions: TransactionOptionsInterface): Promise<BasePreparedTransactionMetadataInterface>,
   updateOnChainData(transactionOptions: TransactionOptionsInterface): Promise<Array<BasePreparedTransactionMetadataInterface>>,
   removeOnChainData(transactionOptions: TransactionOptionsInterface): Promise<BasePreparedTransactionMetadataInterface>,
-  transferOnChainOwnership(newManager: string, transactionOptions: TransactionOptionsInterface): Promise<BasePreparedTransactionMetadataInterface>
+  transferOnChainOwnership(newOwner: string, transactionOptions: TransactionOptionsInterface): Promise<BasePreparedTransactionMetadataInterface>
 }
 
 export interface PlainDataInterface {
   address: Promise<?string> | ?string,
-  manager: Promise<?string> | ?string,
-  dataUri: Promise<{ref: string, contents: Object}> | {ref: string, contents: Object}
+  owner: Promise<?string> | ?string,
+  created: Promise<number> | number,
+  delegates: Promise<string[]> | string[],
+  orgJsonUri: Promise<{ref: string, contents: Object}> | {ref: string, contents: Object}
 }
 
 /**
@@ -72,7 +77,7 @@ export interface TransactionCallbacksInterface {
  * Formalization of AbstractDataModel's public interface.
  */
 export interface DataModelInterface {
-  getWindingTreeIndex(address: string): WTHotelIndexInterface | WTAirlineIndexInterface
+  getDirectory(address: string): HotelDirectoryInterface | AirlineDirectoryInterface
 //   getTransactionsStatus(transactionHashes: Array<string>): Promise<AdaptedTxResultsInterface>
 }
 

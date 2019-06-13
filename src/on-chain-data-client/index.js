@@ -8,7 +8,7 @@ import Contracts from './contracts';
 import HotelDataModel from './hotels/data-model';
 import AirlineDataModel from './airlines/data-model';
 import { OnChainDataRuntimeError } from './errors';
-import { AbstractDataModel } from './wt-index/data-model';
+import { AbstractDataModel } from './directory/data-model';
 
 /**
  * OnChainDataClientOptionsType options. May look like this:
@@ -97,7 +97,7 @@ export class OnChainDataClient {
    * Finds out in what state are Ethereum transactions. All logs
    * are decoded along the way and some metrics such as min/max blockAge
    * are computed. If you pass all transactions related to a single
-   * operation (such as updateHotel), you may benefit from the computed
+   * operation (such as update), you may benefit from the computed
    * metrics.
    */
   static async getTransactionsStatus (txHashes: Array<string>): Promise<AdaptedTxResultsInterface> {

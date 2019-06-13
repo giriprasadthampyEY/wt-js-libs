@@ -6,14 +6,15 @@ import testedDataModel from '../utils/data-hotel-model-definition';
 import OffChainDataClient from '../../src/off-chain-data-client';
 
 describe('WtJsLibs usage - hotels', () => {
-  let libs, wallet, index, emptyIndex,
-    hotelManager = '0xD39Ca7d186a37bb6Bf48AE8abFeB4c687dc8F906';
+  let libs, wallet, directory, emptyDirectory;
+  const hotelOwner = '0xD39Ca7d186a37bb6Bf48AE8abFeB4c687dc8F906';
+  const hotelAddress = '0xBF18B616aC81830dd0C5D4b771F22FD8144fe769';
 
   beforeEach(() => {
     libs = WtJsLibs.createInstance(testedDataModel.withDataSource());
-    index = libs.getWTIndex('hotels', testedDataModel.indexAddress);
+    directory = libs.getDirectory('hotels', testedDataModel.directoryAddress);
     wallet = libs.createWallet(jsonWallet);
-    emptyIndex = libs.getWTIndex('hotels', testedDataModel.emptyIndexAddress);
+    emptyDirectory = libs.getDirectory('hotels', testedDataModel.emptyDirectoryAddress);
     wallet.unlock('test123');
   });
 
@@ -22,8 +23,17 @@ describe('WtJsLibs usage - hotels', () => {
     OffChainDataClient._reset();
   });
 
-  describe('addHotel', () => {
-    it('should add hotel', async () => {
+  describe('segment', () => {
+    it('should get correct segment', async () => {
+      const segment = await directory.getSegment({
+        from: hotelOwner,
+      });
+      assert.equal(segment, 'hotels');
+    });
+  });
+
+  describe('create and add', () => {
+    it('should create and add hotel', async () => {
       const jsonClient = libs.getOffChainDataClient('in-memory');
       const descUrl = await jsonClient.upload({
         name: 'Premium hotel',
@@ -33,13 +43,13 @@ describe('WtJsLibs usage - hotels', () => {
           longitude: 'long',
         },
       });
-      const dataUri = await jsonClient.upload({
+      const orgJsonUri = await jsonClient.upload({
         descriptionUri: descUrl,
       });
-      const createHotel = await index.addHotel({
-        manager: hotelManager,
-        dataUri: dataUri,
-      });
+      const createHotel = await directory.create({
+        owner: hotelOwner,
+        orgJsonUri: orgJsonUri,
+      }, true);
       const hotel = createHotel.hotel;
       const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
 
@@ -48,140 +58,190 @@ describe('WtJsLibs usage - hotels', () => {
       assert.isDefined(result.transactionHash);
 
       // Don't bother with checksummed address format
-      assert.equal((await hotel.manager), hotelManager);
-      assert.equal((await hotel.dataUri).toLowerCase(), dataUri);
+      assert.equal((await hotel.owner), hotelOwner);
+      assert.equal((await hotel.orgJsonUri).toLowerCase(), orgJsonUri);
       assert.equal((await hotel.created), 20);
       const dataIndex = await hotel.dataIndex;
       const description = (await dataIndex.contents).descriptionUri;
       assert.equal((await description.contents).name, 'Premium hotel');
 
       // We're removing the hotel to ensure clean slate after this test is run.
-      // It is too possibly expensive to re-set on-chain WTIndex after each test.
-      const removeHotel = await index.removeHotel(hotel);
+      // It is too possibly expensive to re-set on-chain directory after each test.
+      const removeHotel = await directory.remove(hotel);
+      const removalResult = await wallet.signAndSendTransaction(removeHotel.transactionData, removeHotel.eventCallbacks);
+      const removalTxResults = await libs.getTransactionsStatus([removalResult.transactionHash]);
+      assert.equal(removalTxResults.meta.allPassed, true);
+    });
+
+    it('should create then add hotel', async () => {
+      const jsonClient = libs.getOffChainDataClient('in-memory');
+      const descUrl = await jsonClient.upload({
+        name: 'Premium hotel',
+        description: 'Great hotel',
+        location: {
+          latitude: 'lat',
+          longitude: 'long',
+        },
+      });
+      const orgJsonUri = await jsonClient.upload({
+        descriptionUri: descUrl,
+      });
+      const createHotel = await directory.create({
+        owner: hotelOwner,
+        orgJsonUri: orgJsonUri,
+      }, false);
+      const hotel = createHotel.hotel;
+      const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
+
+      assert.isDefined(result);
+      assert.isDefined(hotel.address);
+      assert.isDefined(result.transactionHash);
+
+      const addHotel = await directory.add(hotel);
+      await wallet.signAndSendTransaction(addHotel.transactionData, addHotel.eventCallbacks);
+
+      // verify
+      let list = (await directory.getOrganizations());
+      assert.equal(list.length, 3);
+
+      // We're removing the hotel to ensure clean slate after this test is run.
+      // It is too possibly expensive to re-set on-chain directory after each test.
+      const removeHotel = await directory.remove(hotel);
       const removalResult = await wallet.signAndSendTransaction(removeHotel.transactionData, removeHotel.eventCallbacks);
       const removalTxResults = await libs.getTransactionsStatus([removalResult.transactionHash]);
       assert.equal(removalTxResults.meta.allPassed, true);
     });
   });
 
-  describe('removeHotel', () => {
+  describe('remove', () => {
     it('should remove hotel', async () => {
-      const manager = hotelManager;
-      const createHotel = await index.addHotel({
-        dataUri: 'in-memory://some-data-hash',
-        manager: manager,
-      });
+      const owner = hotelOwner;
+      const createHotel = await directory.create({
+        orgJsonUri: 'in-memory://some-data-hash',
+        owner: owner,
+      }, true);
       const origHotel = createHotel.hotel;
       await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
       assert.isDefined(origHotel.address);
 
       // Verify that it has been added
-      let list = (await index.getAllHotels());
+      let list = (await directory.getOrganizations());
       assert.equal(list.length, 3);
       assert.include(await Promise.all(list.map(async (a) => a.address)), origHotel.address);
-      const hotel = await index.getHotel(origHotel.address);
+      const hotel = await directory.getOrganization(origHotel.address);
       // Remove
-      const removeHotel = await index.removeHotel(hotel);
+      const removeHotel = await directory.remove(hotel);
       const removalResult = await wallet.signAndSendTransaction(removeHotel.transactionData, removeHotel.eventCallbacks);
       assert.isDefined(removalResult);
       // Verify that it has been removed
-      list = await index.getAllHotels();
+      list = await directory.getOrganizations();
       assert.equal(list.length, 2);
       assert.notInclude(list.map(async (a) => a.address), await hotel.address);
     });
   });
 
-  describe('getHotel', () => {
+  describe('getOrganization', () => {
     it('should get hotel', async () => {
-      const address = '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769';
-      const hotel = await index.getHotel(address);
+      const hotel = await directory.getOrganization(hotelAddress);
       assert.isNotNull(hotel);
-      assert.equal(await hotel.dataUri, 'in-memory://hotel-url-one');
-      assert.equal(await hotel.address, address);
+      assert.equal(await hotel.orgJsonUri, 'in-memory://hotel-url-one');
+      assert.equal(await hotel.address, hotelAddress);
     });
+
+    // TODO get index by address, get hotel by index, getOrganizationsLength?
   });
 
-  describe('updateHotel', () => {
-    const hotelAddress = '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769';
-
+  describe('update', () => {
     it('should update hotel', async () => {
       const newUri = 'in-memory://another-url';
-      const hotel = await index.getHotel(hotelAddress);
-      const oldUri = await hotel.dataUri;
-      hotel.dataUri = newUri;
+      const hotel = await directory.getOrganization(hotelAddress);
+      const oldUri = await hotel.orgJsonUri;
+      hotel.orgJsonUri = newUri;
       // Change the data
-      const updateHotelSet = await index.updateHotel(hotel);
+      const updateHotelSet = await directory.update(hotel);
       let updateResult;
       for (let updateHotel of updateHotelSet) {
         updateResult = await wallet.signAndSendTransaction(updateHotel.transactionData, updateHotel.eventCallbacks);
         assert.isDefined(updateResult);
       }
       // Verify
-      const hotel2 = await index.getHotel(hotelAddress);
-      assert.equal(await hotel2.dataUri, newUri);
+      const hotel2 = await directory.getOrganization(hotelAddress);
+      assert.equal(await hotel2.orgJsonUri, newUri);
       // Change it back to keep data in line
-      hotel.dataUri = oldUri;
-      const updateHotelSet2 = await index.updateHotel(hotel);
+      hotel.orgJsonUri = oldUri;
+      const updateHotelSet2 = await directory.update(hotel);
       for (let updateHotel of updateHotelSet2) {
         updateResult = await wallet.signAndSendTransaction(updateHotel.transactionData, updateHotel.eventCallbacks);
         assert.isDefined(updateResult);
       }
       // Verify it changed properly
-      const hotel3 = await index.getHotel(hotelAddress);
-      assert.equal(await hotel3.dataUri, oldUri);
+      const hotel3 = await directory.getOrganization(hotelAddress);
+      assert.equal(await hotel3.orgJsonUri, oldUri);
     });
   });
 
-  describe('transferHotelOwnership', () => {
-    const hotelAddress = '0xBF18B616aC81830dd0C5D4b771F22FD8144fe769',
-      newHotelOwner = '0x04e46F24307E4961157B986a0b653a0D88F9dBd6';
-
-    it('should transfer hotel', async () => {
-      const hotel = await index.getHotel(hotelAddress);
-      const hotelContract = await hotel._getContractInstance();
-
-      assert.equal(await hotel.manager, hotelManager);
-      assert.equal(await hotelContract.methods.manager().call(), hotelManager);
-      
-      const updateHotel = await index.transferHotelOwnership(hotel, newHotelOwner);
-      await wallet.signAndSendTransaction(updateHotel.transactionData, updateHotel.eventCallbacks);
-      // Verify
-      const hotel2 = await index.getHotel(hotelAddress);
-      const hotel2Contract = await hotel2._getContractInstance();
-      assert.equal(await hotel2.manager, newHotelOwner);
-      assert.equal(await hotel2Contract.methods.manager().call(), newHotelOwner);
-      
-      // Change it back to keep data in line
-      const updateHotel2 = await index.transferHotelOwnership(hotel, hotelManager);
-      const wallet2 = libs.createWallet(jsonWallet2);
-      wallet2.unlock('test123');
-      await wallet2.signAndSendTransaction(updateHotel2.transactionData, updateHotel2.eventCallbacks);
-      // Verify
-      const hotel3 = await index.getHotel(hotelAddress);
-      const hotel3Contract = await hotel3._getContractInstance();
-      assert.equal(await hotel3.manager, hotelManager);
-      assert.equal(await hotel3Contract.methods.manager().call(), hotelManager);
-    });
-  });
-
-  describe('getAllHotels', () => {
+  describe('getOrganizations', () => {
     it('should get all hotels', async () => {
-      const hotels = await index.getAllHotels();
+      const hotels = await directory.getOrganizations();
       assert.equal(hotels.length, 2);
       for (let hotel of hotels) {
         assert.isDefined(hotel.toPlainObject);
         assert.isDefined((await hotel.dataIndex).ref);
         const plainHotel = await hotel.toPlainObject();
         assert.equal(plainHotel.address, await hotel.address);
-        assert.equal(plainHotel.manager, await hotel.manager);
-        assert.isDefined(plainHotel.dataUri.ref);
-        assert.isDefined(plainHotel.dataUri.contents);
+        assert.equal(plainHotel.owner, await hotel.owner);
+        assert.isDefined(plainHotel.orgJsonUri.ref);
+        assert.isDefined(plainHotel.orgJsonUri.contents);
       }
     });
 
     it('should get empty list if no hotels are set', async () => {
-      const hotels = await emptyIndex.getAllHotels();
+      const hotels = await emptyDirectory.getOrganizations();
       assert.equal(hotels.length, 0);
+    });
+  });
+
+  describe('owner', () => {
+    it('should get owner', async () => {
+      const hotel = await directory.getOrganization(hotelAddress);
+      assert.isNotNull(hotel);
+      assert.equal(await hotel.owner, hotelOwner);
+    });
+  });
+
+  describe('hasDelegate', () => {
+    const delegateAddress = '0x04e46F24307E4961157B986a0b653a0D88F9dBd6';
+
+    it('should return true if is delegate', async () => {
+      const hotel = await directory.getOrganization(hotelAddress);
+      const hasDelegate = await hotel.hasDelegate(delegateAddress, {
+        from: hotelOwner,
+      });
+      assert.equal(hasDelegate, true);
+    });
+
+    it('should return true if is delegate whoever asks', async () => {
+      const hotel = await directory.getOrganization(hotelAddress);
+      const hasDelegate = await hotel.hasDelegate(delegateAddress, {
+        from: delegateAddress,
+      });
+      assert.equal(hasDelegate, true);
+    });
+
+    it('should return false if is not delegate', async () => {
+      const hotel = await directory.getOrganization(hotelAddress);
+      const hasDelegate = await hotel.hasDelegate(hotelOwner, {
+        from: hotelOwner,
+      });
+      assert.equal(hasDelegate, false);
+    });
+
+    it('should return false if is not delegate whoever asks', async () => {
+      const hotel = await directory.getOrganization(hotelAddress);
+      const hasDelegate = await hotel.hasDelegate(hotelOwner, {
+        from: delegateAddress,
+      });
+      assert.equal(hasDelegate, false);
     });
   });
 });

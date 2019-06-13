@@ -19,8 +19,8 @@ export const Web3UriBackedDataModel = {
       },
     },
   }),
-  indexAddress: '0xAc0fE06EC39F677f634F40D5DeE43440e433A5B7',
-  emptyIndexAddress: '0x83Ec0A54244865Dc84de0c521f10b727aa34275a',
+  directoryAddress: '0xAc0fE06EC39F677f634F40D5DeE43440e433A5B7',
+  emptyDirectoryAddress: '0x83Ec0A54244865Dc84de0c521f10b727aa34275a',
 };
 
 for (let key in offChainData) {

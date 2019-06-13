@@ -2,10 +2,10 @@
 
 import type { OnChainDataClientOptionsType } from '../index';
 
-import { AbstractDataModel } from '../wt-index/data-model';
+import { AbstractDataModel } from '../directory/data-model';
 import Utils from '../utils';
 import Contracts from '../contracts';
-import WTAirlineIndex from './wt-index';
+import AirlineDirectory from './directory';
 
 /**
  * An entry-point abstraction for interacting with airlines.
@@ -18,8 +18,8 @@ export class AirlineDataModel extends AbstractDataModel {
     return new AirlineDataModel(options, web3Utils, web3Contracts);
   }
 
-  _indexContractFactory (address: string): WTAirlineIndex {
-    return WTAirlineIndex.createInstance(address, this.web3Utils, this.web3Contracts);
+  _directoryContractFactory (address: string): AirlineDirectory {
+    return AirlineDirectory.createInstance(address, this.web3Utils, this.web3Contracts);
   }
 }
 

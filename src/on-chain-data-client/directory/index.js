@@ -5,6 +5,8 @@ import Contracts from '../contracts';
 
 import { WTLibsError } from '../../errors';
 import { InputDataError, RecordNotFoundError, RecordNotInstantiableError } from '../errors';
+import type { HotelInterface, PreparedTransactionMetadataInterface } from '../../interfaces/hotel-interfaces';
+import OnChainHotel from '../hotels/hotel';
 
 /**
  * Ethereum smart contract backed implementation of Winding Tree
@@ -14,11 +16,11 @@ import { InputDataError, RecordNotFoundError, RecordNotInstantiableError } from 
  * This should be extended by particular data types, such as hotels,
  * airlines, OTAs etc.
  */
-class AbstractWTIndex {
+class AbstractDirectory {
   address: string;
   web3Utils: Utils;
   web3Contracts: Contracts;
-  deployedIndex: Object; // TODO get rid of Object type
+  deployedDirectory: Object; // TODO get rid of Object type
   RECORD_TYPE: string;
 
   constructor (indexAddress: string, web3Utils: Utils, web3Contracts: Contracts) {
@@ -27,51 +29,109 @@ class AbstractWTIndex {
     this.web3Contracts = web3Contracts;
   }
 
-  async _getDeployedIndexFactory (): Promise<Object> {
-    throw new Error('Cannot call _getDeployedIndexFactory on the class');
+  async _getDeployedDirectoryFactory (): Promise<Object> {
+    throw new Error('Cannot call _getDeployedDirectoryFactory on the class');
   }
 
   async _createRecordInstanceFactory (address?: string): Promise<BaseOnChainRecordInterface> {
     throw new Error('Cannot call _createRecordInstanceFactory on the class');
   }
 
-  async _getIndexRecordPositionFactory (address: string): Promise<number> {
-    throw new Error('Cannot call _getIndexRecordPositionFactory on the class');
+  async _createRecordInDirectoryFactory (orgJsonUri: ?string): Object {
+    throw new Error('Cannot call _createRecordInDirectoryFactory on the class');
+  }
+
+  async _getDirectoryRecordPositionFactory (address: string): Promise<number> {
+    throw new Error('Cannot call _getDirectoryRecordPositionFactory on the class');
   }
 
   async _getRecordsAddressListFactory (): Promise<Array<string>> {
     throw new Error('Cannot call _getRecordsAddressListFactory on the class');
   }
 
-  async _getDeployedIndex (): Promise<Object> {
-    if (!this.deployedIndex) {
-      this.deployedIndex = await this._getDeployedIndexFactory();
+  async _getDeployedDirectory (): Promise<Object> {
+    if (!this.deployedDirectory) {
+      this.deployedDirectory = await this._getDeployedDirectoryFactory();
     }
-    return this.deployedIndex;
+    return this.deployedDirectory;
+  }
+
+  async _getSegment(transactionOptions) {
+    const directory = await this._getDeployedDirectory();
+    return directory.methods.getSegment().call(transactionOptions);
+    // const data = directory.methods.getSegment().encodeABI();
+    // const estimate = directory.methods.getSegment().estimateGas(transactionOptions);
+    // const transactionData = {
+    //   nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
+    //   data: data,
+    //   from: transactionOptions.from,
+    //   to: directory._address,
+    //   gas: this.web3Utils.applyGasModifier(await estimate),
+    // };
+    // const eventCallbacks: TransactionCallbacksInterface = {
+    //   onReceipt: (receipt: TxReceiptInterface) => {
+    //     console.log(receipt);
+    //     if (receipt && receipt.logs) {
+    //       // let decodedLogs = this.web3Contracts.decodeLogs(receipt.logs);
+    //       // this.address = decodedLogs[0].attributes[0].value;
+    //       this.address = receipt.logs[0].address;
+    //     }
+    //   },
+    // };
+    // return {
+    //   record: (this: OnChainRecord),
+    //   transactionData: transactionData,
+    //   eventCallbacks: eventCallbacks,
+    // };
   }
 
   /**
-   * Generates transaction data required for adding a totally new <record>
+   * Generates transaction data required for adding a totally new <recordData>
    * and more metadata required for sucessful mining of that transaction.
    * Does not sign or send the transaction.
    *
-   * @throws {InputDataError} When recordData does not contain dataUri property.
-   * @throws {InputDataError} When recordData does not contain a manager property.
+   * @throws {InputDataError} When recordData does not contain orgJsonUri property.
+   * @throws {InputDataError} When recordData does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
   async addRecord (recordData: BaseOnChainRecordInterface): Promise<BasePreparedTransactionMetadataInterface> {
-    if (!await recordData.dataUri) {
-      throw new InputDataError(`Cannot add ${this.RECORD_TYPE}: Missing dataUri`);
+    if (!recordData.address) {
+      throw new InputDataError(`Cannot add ${this.RECORD_TYPE} without address.`);
     }
-    const recordManager = await recordData.manager;
-    if (!recordManager) {
-      throw new InputDataError(`Cannot add ${this.RECORD_TYPE}: Missing manager`);
+    const owner = await recordData.owner;
+    if (!owner) {
+      throw new InputDataError(`Cannot add ${this.RECORD_TYPE} without owner.`);
     }
-    const record: BaseOnChainRecordInterface = await this._createRecordInstanceFactory();
-    await record.setLocalData(recordData);
-    return record.createOnChainData({
-      from: recordManager,
-    }).catch((err) => {
+    const directory = await this._getDeployedDirectory();
+    const data = directory.methods.add(recordData.address).encodeABI();
+    const estimate = directory.methods.add(recordData.address).estimateGas({ from: owner });
+    const transactionData = {
+      nonce: await this.web3Utils.determineCurrentAddressNonce(owner),
+      data: data,
+      from: owner,
+      to: this.address,
+      gas: this.web3Utils.applyGasModifier(await estimate),
+    };
+    return {
+      record: (this: OnChainRecord),
+      transactionData: transactionData,
+    };
+  }
+
+  async createRecord(recordData: BaseOnChainRecordInterface, alsoAdd: boolean = false): Process<PreparedTransactionMetadataInterface> {
+    const orgJsonUri = await recordData.orgJsonUri;
+    if (!orgJsonUri) {
+      throw new InputDataError(`Cannot create ${this.RECORD_TYPE}: Missing orgJsonUri`);
+    }
+    const recordOwner = await recordData.owner;
+    if (!recordOwner) {
+      throw new InputDataError(`Cannot create ${this.RECORD_TYPE}: Missing owner`);
+    }
+    const record = await this._createRecordInstanceFactory();
+    record.orgJsonUri = orgJsonUri;
+    return await record.createOnChainData({
+      from: recordOwner,
+    }, alsoAdd).catch((err) => {
       throw new WTLibsError(`Cannot add ${this.RECORD_TYPE}: ${err.message}`, err);
     });
   }
@@ -81,20 +141,20 @@ class AbstractWTIndex {
    * and more metadata required for sucessful mining of those transactions.
    * Does not sign or send any of the transactions.
    *
-   * @throws {InputDataError} When <record> does not have a manager field.
-   * @throws {InputDataError} When <record> does not contain a manager property.
+   * @throws {InputDataError} When <record> does not have a owner field.
+   * @throws {InputDataError} When <record> does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
   async updateRecord (record: BaseOnChainRecordInterface): Promise<Array<BasePreparedTransactionMetadataInterface>> {
     if (!record.address) {
       throw new InputDataError(`Cannot update ${this.RECORD_TYPE} without address.`);
     }
-    const recordManager = await record.manager;
-    if (!recordManager) {
-      throw new InputDataError(`Cannot update ${this.RECORD_TYPE} without manager.`);
+    const recordOwner = await record.owner;
+    if (!recordOwner) {
+      throw new InputDataError(`Cannot update ${this.RECORD_TYPE} without owner.`);
     }
     return record.updateOnChainData({
-      from: recordManager,
+      from: recordOwner,
     }).catch((err) => {
       throw new WTLibsError(`Cannot update ${this.RECORD_TYPE}: ${err.message}`, err);
     });
@@ -105,63 +165,27 @@ class AbstractWTIndex {
    * and more metadata required for successful mining of that transaction.
    * Does not sign or send the transaction.
    *
-   * @throws {InputDataError} When <record> does not contain dataUri property.
-   * @throws {InputDataError} When <record> does not contain a manager property.
+   * @throws {InputDataError} When <record> does not contain orgJsonUri property.
+   * @throws {InputDataError} When <record> does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
   async removeRecord (record: BaseOnChainRecordInterface): Promise<BasePreparedTransactionMetadataInterface> {
     if (!record.address) {
       throw new InputDataError(`Cannot remove ${this.RECORD_TYPE} without address.`);
     }
-    const recordManager = await record.manager;
-    if (!recordManager) {
-      throw new InputDataError(`Cannot remove ${this.RECORD_TYPE} without manager.`);
+    const recordOwner = await record.owner;
+    if (!recordOwner) {
+      throw new InputDataError(`Cannot remove ${this.RECORD_TYPE} without owner.`);
     }
     return record.removeOnChainData({
-      from: recordManager,
+      from: recordOwner,
     }).catch((err) => {
       // invalid opcode -> non-existent record
-      // invalid opcode -> failed check for manager
+      // invalid opcode -> failed check for owner
       throw new WTLibsError(`Cannot remove ${this.RECORD_TYPE}: ${err.message}`, err);
     });
   }
 
-  /**
-   * Generates transaction data required for transferring a <record>
-   * ownership and more metadata required for successful mining of that
-   * transactoin. Does not sign or send the transaction.
-   *
-   * @throws {InputDataError} When record does not have an address.
-   * @throws {InputDataError} When record does not contain a manager property.
-   * @throws {InputDataError} When the new manager address is the same as the old manager.
-   * @throws {InputDataError} When the new manager address is not a valid address.
-   * @throws {WTLibsError} When anything goes wrong during data preparation phase.
-   */
-  async transferRecordOwnership (record: BaseOnChainRecordInterface, newManager: string): Promise<BasePreparedTransactionMetadataInterface> {
-    if (!record.address) {
-      throw new InputDataError(`Cannot transfer ${this.RECORD_TYPE} without address.`);
-    }
-    const recordManager = await record.manager;
-    if (!recordManager) {
-      throw new InputDataError(`Cannot transfer ${this.RECORD_TYPE} without manager.`);
-    }
-
-    if (recordManager.toLowerCase() === newManager.toLowerCase()) {
-      throw new InputDataError(`Cannot transfer ${this.RECORD_TYPE} to the same manager.`);
-    }
-
-    if (this.web3Utils.isZeroAddress(newManager)) {
-      throw new InputDataError(`Cannot transfer ${this.RECORD_TYPE} to an invalid newManager address.`);
-    }
-
-    return record.transferOnChainOwnership(newManager, {
-      from: recordManager,
-    }).catch((err) => {
-      // invalid opcode -> non-existent record
-      // invalid opcode -> failed check for manager
-      throw new WTLibsError(`Cannot transfer ${this.RECORD_TYPE}: ${err.message}`, err);
-    });
-  }
 
   /**
    * Gets <record> representation of a <record> on a given address. If <record>
@@ -176,7 +200,7 @@ class AbstractWTIndex {
     let recordIndex;
     try {
       // This returns strings
-      recordIndex = await this._getIndexRecordPositionFactory(address);
+      recordIndex = await this._getDirectoryRecordPositionFactory(address);
     } catch (err) {
       throw new WTLibsError(`Cannot find ${this.RECORD_TYPE} at ${address}: ${err.message}`, err);
     }
@@ -216,9 +240,9 @@ class AbstractWTIndex {
   }
 
   async getLifTokenAddress (): Promise<string> {
-    const index = await this._getDeployedIndex();
+    const index = await this._getDeployedDirectory();
     return index.methods.LifToken().call();
   }
 }
 
-export default AbstractWTIndex;
+export default AbstractDirectory;

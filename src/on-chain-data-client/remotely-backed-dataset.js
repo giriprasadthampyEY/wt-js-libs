@@ -54,9 +54,9 @@ class RemotelyBackedDataset {
    *
    * ```
    * {fields: {
-   *     dataUri: {
+   *     orgJsonUri: {
    *       remoteGetter: async (): Promise<?string> => {
-   *         return (await this.contract.dataUri().call();
+   *         return (await this.contract.orgJsonUri().call();
    *       },
    *       // this will usually return a transaction ID
    *       remoteSetter: async (): Promise<string> => {

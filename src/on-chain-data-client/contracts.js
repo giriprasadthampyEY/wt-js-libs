@@ -1,7 +1,5 @@
-import WTHotelIndexContractMetadata from '@windingtree/wt-contracts/build/contracts/AbstractWTHotelIndex.json';
-import HotelContractMetadata from '@windingtree/wt-contracts/build/contracts/AbstractHotel.json';
-import WTAirlineIndexContractMetadata from '@windingtree/wt-contracts/build/contracts/AbstractWTAirlineIndex.json';
-import AirlineContractMetadata from '@windingtree/wt-contracts/build/contracts/AbstractAirline.json';
+import SegmentDirectoryMetadata from '@windingtree/wt-contracts/build/contracts/SegmentDirectory.json';
+import OrganizationMetadata from '@windingtree/wt-contracts/build/contracts/Organization.json';
 import { SmartContractInstantiationError } from './errors';
 
 import Web3Utils from 'web3-utils';
@@ -55,23 +53,23 @@ class Contracts {
   }
 
   /**
-   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.3.0/contracts/WTHotelIndex.sol">WTHotelIndex.sol</a>.
+   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.3.0/contracts/WTHotelDirectory.sol">WTHotelDirectory.sol</a>.
    *
    * @param  {string} address
-   * @return {web3.eth.Contract} Instance of an Index
+   * @return {web3.eth.Contract} Instance of an Directory
    */
-  async getHotelIndexInstance (address) {
-    return this._getInstance('hotelIndex', WTHotelIndexContractMetadata.abi, address);
+  async getHotelDirectoryInstance (address) {
+    return await this._getInstance('hotelDirectory', SegmentDirectoryMetadata.abi, address);
   }
 
   /**
-   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.3.0/contracts/WTAirlineIndex.sol">WTAirlineIndex.sol</a>.
+   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.3.0/contracts/WTAirlineDirectory.sol">WTAirlineDirectory.sol</a>.
    *
    * @param  {string} address
-   * @return {web3.eth.Contract} Instance of an Index
+   * @return {web3.eth.Contract} Instance of an Directory
    */
-  async getAirlineIndexInstance (address) {
-    return this._getInstance('airlineIndex', WTAirlineIndexContractMetadata.abi, address);
+  async getAirlineDirectoryInstance (address) {
+    return await this._getInstance('airlineDirectory', SegmentDirectoryMetadata.abi, address);
   }
 
   /**
@@ -80,18 +78,8 @@ class Contracts {
    * @param  {string} address
    * @return {web3.eth.Contract} Instance of a Hotel
    */
-  async getHotelInstance (address) {
-    return this._getInstance('hotel', HotelContractMetadata.abi, address);
-  }
-
-  /**
-   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.3.0/contracts/hotel/Airline.sol">Airline.sol</a>.
-   *
-   * @param  {string} address
-   * @return {web3.eth.Contract} Instance of an Airline
-   */
-  async getAirlineInstance (address) {
-    return this._getInstance('airline', AirlineContractMetadata.abi, address);
+  async getOrganizationInstance (address) {
+    return this._getInstance('organization', OrganizationMetadata.abi, address);
   }
 
   _initEventRegistry () {
@@ -100,7 +88,10 @@ class Contracts {
       let indexedEvents = {};
       for (let event of events) {
         // kudos https://github.com/ConsenSys/abi-decoder/blob/master/index.js#L19
-        const signature = Web3Utils.sha3(event.name + '(' + event.inputs.map(function (input) { return input.type; }).join(',') + ')');
+        const eventSignature = event.name + '(' + event.inputs.map(function (input) { return input.type; }).join(',') + ')';
+        const signature = Web3Utils.sha3(eventSignature);
+        if (event.name === 'OrganizationCreated') {
+        }
         indexedEvents[signature] = event;
       }
       return indexedEvents;
@@ -108,10 +99,8 @@ class Contracts {
     if (!this.eventRegistry) {
       this.eventRegistry = Object.assign(
         {},
-        generateEventSignatures(WTHotelIndexContractMetadata.abi),
-        generateEventSignatures(WTAirlineIndexContractMetadata.abi),
-        generateEventSignatures(HotelContractMetadata.abi),
-        generateEventSignatures(AirlineContractMetadata.abi),
+        generateEventSignatures(OrganizationMetadata.abi),
+        generateEventSignatures(SegmentDirectoryMetadata.abi),
       );
     }
     return this.eventRegistry;
@@ -119,7 +108,7 @@ class Contracts {
 
   /**
    * Decodes ethereum transaction log values. Currently supports
-   * events from Index and Hotel smart contracts.
+   * events from Directory and Hotel smart contracts.
    *
    * @param  {Array<RawLogRecordInterface>} logs in a raw format
    * @return {Array<DecodedLogRecordInterface>} Decoded logs
@@ -128,14 +117,20 @@ class Contracts {
     const result = [];
     const eventRegistry = this._initEventRegistry();
     for (let log of logs) {
-      if (log.topics && log.topics[0] && eventRegistry[log.topics[0]]) {
+      if (log.topics && log.topics[0] && eventRegistry[log.topics[0]] && eventRegistry[log.topics[0]].name === 'OrganizationCreated') {
+        console.warn(`decoding event type`);
         const eventAbi = eventRegistry[log.topics[0]];
         let topics = log.topics;
         // @see https://web3js.readthedocs.io/en/1.0/web3-eth-abi.html#id22
         if (!eventAbi.anonymous) {
           topics = log.topics.slice(1);
         }
+        console.warn('log decoding');
+        console.log(eventAbi.inputs);
+        console.log(log);
+        console.log(topics);
         const decoded = this.web3Eth.abi.decodeLog(eventAbi.inputs, log.data, topics);
+        console.warn('log decoded');
         let parsedAttributes = eventAbi.inputs.map((input) => {
           return {
             name: input.name,

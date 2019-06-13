@@ -6,12 +6,12 @@ import type {
 
 import type { AirlineInterface, PreparedTransactionMetadataInterface } from '../../interfaces/airline-interfaces';
 import Utils from '../utils';
-import OnChainRecord from '../wt-index/record';
+import OnChainRecord from '../directory/record';
 import Contracts from '../contracts';
 
 /**
  * Wrapper class for an airline backed by a smart contract on
- * Ethereum that's holding `dataUri` pointer to its data.
+ * Ethereum that's holding `orgJsonUri` pointer to its data.
  *
  * It provides an accessor to such data in a form of
  * `StoragePointer` instance under `dataIndex` property.
@@ -24,14 +24,14 @@ class OnChainAirline extends OnChainRecord implements AirlineInterface {
    * Create new configured instance.
    * @param  {Utils} web3Utils
    * @param  {Contracts} web3Contracts
-   * @param  {web3.eth.Contract} indexContract Representation of Winding Tree index
+   * @param  {web3.eth.Contract} directoryContract Representation of Winding Tree directory
    * @param  {string} address is an optional pointer to Ethereum network where the airline lives.
    * It is used as a reference for on-chain stored data. If it is not provided, an airline has
    * to be created on chain to behave as expected.
    * @return {OnChainAirline}
    */
-  static createInstance (web3Utils: Utils, web3Contracts: Contracts, indexContract: Object, address?: string): OnChainAirline {
-    const airline = new OnChainAirline(web3Utils, web3Contracts, indexContract, address);
+  static createInstance (web3Utils: Utils, web3Contracts: Contracts, directoryContract: Object, address?: string): OnChainAirline {
+    const airline = new OnChainAirline(web3Utils, web3Contracts, directoryContract, address);
     airline.RECORD_TYPE = 'airline';
     airline.initialize();
     return airline;
@@ -45,23 +45,19 @@ class OnChainAirline extends OnChainRecord implements AirlineInterface {
   }
 
   _getRecordContractFactory (): Object {
-    return this.web3Contracts.getAirlineInstance(this.address);
+    return this.web3Contracts.getOrganizationInstance(this.address);
   }
 
-  _callRecordInIndexFactory (data: string): Object {
-    return this.indexContract.methods.callAirline(this.address, data);
+  // _changeOrgJsonUriFactory (data: string): Object {
+  //   return this.directoryContract.methods.changeOrgJsonUri(this.address, data);
+  // }
+
+  _registerRecordInDirectoryFactory (orgJsonUri: ?string): Object {
+    return this.directoryContract.methods.add(orgJsonUri);
   }
 
-  _registerRecordInIndexFactory (dataUri: ?string): Object {
-    return this.indexContract.methods.registerAirline(dataUri);
-  }
-
-  _transferRecordInIndexFactory (newManager: string): Object {
-    return this.indexContract.methods.transferAirline(this.address, newManager);
-  }
-
-  _deleteRecordInIndexFactory (): Object {
-    return this.indexContract.methods.deleteAirline(this.address);
+  _deleteRecordInDirectoryFactory (): Object {
+    return this.directoryContract.methods.remove(this.address);
   }
 
   /**
@@ -85,14 +81,14 @@ class OnChainAirline extends OnChainRecord implements AirlineInterface {
    * Generates transaction data and metadata required for a airline ownership
    * transfer.
    *
-   * @param {string} Address of a new manager
-   * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
+   * @param {string} newOwner Address of a new owner
+   * @param {TransactionOptionsInterface} transactionOptions Options object, only `from` property is currently used, all others are ignored in this implementation
    * @throws {SmartContractInstantiationError} When the underlying contract is not yet deployed.
    * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created airline instance.
    *
    */
-  async transferOnChainOwnership (newManager: string, transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
-    const result = await this._transferOnChainOwnership(newManager, transactionOptions);
+  async transferOnChainOwnership (newOwner: string, transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
+    const result = await this._transferOnChainOwnership(newOwner, transactionOptions);
     result.airline = result.record;
     delete result.record;
     return result;
@@ -118,7 +114,7 @@ class OnChainAirline extends OnChainRecord implements AirlineInterface {
    *
    * @param {TransactionOptionsInterface} options object that is passed to all remote data setters
    * @throws {SmartContractInstantiationError} When the underlying contract is not yet deployed.
-   * @throws {SmartContractInstantiationError} When dataUri is empty.
+   * @throws {SmartContractInstantiationError} When orgJsonUri is empty.
    * @return {Promise<Array<PreparedTransactionMetadataInterface>>} List of transaction metadata
    */
   async updateOnChainData (transactionOptions: TransactionOptionsInterface): Promise<Array<BasePreparedTransactionMetadataInterface>> {
@@ -130,6 +126,13 @@ class OnChainAirline extends OnChainRecord implements AirlineInterface {
       });
     return results;
   }
+
+  // async getOrgJsonUri (transactionOptions: TransactionOptionsInterface): Promise<?string> | ?string {
+  //   console.log('OnChainAirline.getOrgJsonUri');
+  //   return this._orgJsonUri;
+  //   // const contract = await this._getRecordContractFactory();
+  //   // return contract.getOrgJsonUri();
+  // }
 }
 
 export default OnChainAirline;

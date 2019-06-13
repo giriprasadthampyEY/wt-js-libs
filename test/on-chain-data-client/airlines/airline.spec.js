@@ -3,10 +3,10 @@ import sinon from 'sinon';
 import helpers from '../../utils/helpers';
 import OnChainAirline from '../../../src/on-chain-data-client/airlines/airline';
 
-describe('WTLibs.on-chain-data.airlines.Airline', () => {
-  let contractsStub, createdStub, utilsStub, indexContractStub, urlStub, managerStub;
+describe('WTLibs.on-chain-data.airlines.spec.js.Airline', () => {
+  let contractsStub, createdStub, utilsStub, directoryContractStub, urlStub, ownerStub;
   const validUri = 'schema://new-url';
-  const validManager = 'manager';
+  const validOwner = 'owner';
 
   beforeEach(() => {
     utilsStub = {
@@ -15,13 +15,13 @@ describe('WTLibs.on-chain-data.airlines.Airline', () => {
       determineCurrentAddressNonce: sinon.stub().resolves(3),
     };
     urlStub = helpers.stubContractMethodResult('some-remote-url');
-    managerStub = helpers.stubContractMethodResult('some-remote-manager');
+    ownerStub = helpers.stubContractMethodResult('some-remote-owner');
     createdStub = helpers.stubContractMethodResult('created-block');
     contractsStub = {
-      getAirlineInstance: sinon.stub().resolves({
+      getOrganizationInstance: sinon.stub().resolves({
         methods: {
-          dataUri: urlStub,
-          manager: managerStub,
+          getOrgJsonUri: urlStub,
+          owner: ownerStub,
           created: createdStub,
           editInfo: helpers.stubContractMethodResult('info-edited'),
         },
@@ -29,24 +29,25 @@ describe('WTLibs.on-chain-data.airlines.Airline', () => {
       decodeLogs: sinon.stub().returns([{
         attributes: [{ value: '0xnew-airline-address' }],
       }]),
+      orgJsonUri: helpers.stubContractMethodResult('http://hooray-data-uri'),
+      created: helpers.stubContractMethodResult(1),
     };
-    indexContractStub = {
+    directoryContractStub = {
       options: {
-        address: 'index-address',
+        address: 'directory-address',
       },
       methods: {
-        callAirline: helpers.stubContractMethodResult('called-airline'),
-        registerAirline: helpers.stubContractMethodResult('registered-airline'),
-        deleteAirline: helpers.stubContractMethodResult('deleted-airline'),
-        transferAirline: helpers.stubContractMethodResult('transfer-airline'),
+        call: helpers.stubContractMethodResult('called-airline'),
+        add: helpers.stubContractMethodResult('registered-airline'),
+        remove: helpers.stubContractMethodResult('deleted-airline'),
       },
     };
   });
 
   describe('toPlainObject', () => {
     it('should return a plain JS object', async () => {
-      const provider = OnChainAirline.createInstance(utilsStub, contractsStub, indexContractStub);
-      await provider.setLocalData({ dataUri: validUri, manager: validManager });
+      const provider = OnChainAirline.createInstance(utilsStub, contractsStub, directoryContractStub);
+      await provider.setLocalData({ orgJsonUri: validUri, owner: validOwner });
       // initialize dataIndex so we're able to mock it later
       await provider.dataIndex;
       sinon.stub(provider._dataIndex, 'toPlainObject').resolves({
@@ -59,17 +60,17 @@ describe('WTLibs.on-chain-data.airlines.Airline', () => {
         },
       });
       const plainAirline = await provider.toPlainObject(); // fields?
-      assert.equal(plainAirline.manager, validManager);
+      assert.equal(plainAirline.owner, validOwner);
       assert.isUndefined(plainAirline.toPlainObject);
-      assert.equal(plainAirline.dataUri.ref, validUri);
-      assert.isDefined(plainAirline.dataUri.contents);
-      assert.isDefined(plainAirline.dataUri.contents.descriptionUri);
+      assert.equal(plainAirline.orgJsonUri.ref, validUri);
+      assert.isDefined(plainAirline.orgJsonUri.contents);
+      assert.isDefined(plainAirline.orgJsonUri.contents.descriptionUri);
     });
   });
 
   describe('createOnChainData', () => {
     it('should return transaction metadata', async () => {
-      const provider = OnChainAirline.createInstance(utilsStub, contractsStub, indexContractStub);
+      const provider = OnChainAirline.createInstance(utilsStub, contractsStub, directoryContractStub);
       const callSpy = sinon.spy(provider, '_createOnChainData');
       const result = await provider.createOnChainData({ from: 'xx' });
       assert.isDefined(result.transactionData);
@@ -84,9 +85,9 @@ describe('WTLibs.on-chain-data.airlines.Airline', () => {
 
   describe('updateOnChainData', () => {
     it('should return transaction metadata', async () => {
-      const provider = OnChainAirline.createInstance(utilsStub, contractsStub, indexContractStub, 'fake-address');
+      const provider = OnChainAirline.createInstance(utilsStub, contractsStub, directoryContractStub, 'fake-address');
       const callSpy = sinon.spy(provider, '_updateOnChainData');
-      await provider.setLocalData({ dataUri: 'in-memory://new-link' });
+      await provider.setLocalData({ orgJsonUri: 'in-memory://new-link' });
       const result = await provider.updateOnChainData({ from: 'xx' });
       assert.equal(result.length, 1);
       assert.isDefined(result[0].transactionData);
@@ -99,24 +100,9 @@ describe('WTLibs.on-chain-data.airlines.Airline', () => {
     });
   });
 
-  describe('transferOnChainOwnership', () => {
-    it('should return transaction metadata', async () => {
-      const provider = OnChainAirline.createInstance(utilsStub, contractsStub, indexContractStub, 'fake-address');
-      const callSpy = sinon.spy(provider, '_transferOnChainOwnership');
-      const result = await provider.transferOnChainOwnership('new-manager', { from: 'xx' });
-      assert.isDefined(result.transactionData);
-      assert.isDefined(result.airline);
-      assert.isUndefined(result.record);
-      assert.isDefined(result.eventCallbacks);
-      assert.isDefined(result.eventCallbacks.onReceipt);
-      assert.equal(callSpy.callCount, 1);
-      provider._transferOnChainOwnership.restore();
-    });
-  });
-
   describe('removeOnChainData', () => {
     it('should return transaction metadata', async () => {
-      const provider = OnChainAirline.createInstance(utilsStub, contractsStub, indexContractStub, 'fake-address');
+      const provider = OnChainAirline.createInstance(utilsStub, contractsStub, directoryContractStub, 'fake-address');
       const callSpy = sinon.spy(provider, '_removeOnChainData');
       const result = await provider.removeOnChainData({ from: 'xx' });
       assert.isDefined(result.transactionData);

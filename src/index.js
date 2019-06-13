@@ -4,8 +4,8 @@ import type { OnChainDataClientOptionsType } from './on-chain-data-client';
 import type { OffChainDataClientOptionsType } from './off-chain-data-client';
 import type { TrustClueClientOptionsType } from './trust-clue-client';
 import type { AdaptedTxResultsInterface, OffChainDataAdapterInterface, WalletInterface, KeystoreV3Interface } from './interfaces/base-interfaces';
-import type { WTHotelIndexInterface } from './interfaces/hotel-interfaces';
-import type { WTAirlineIndexInterface } from './interfaces/airline-interfaces';
+import type { HotelDirectoryInterface } from './interfaces/hotel-interfaces';
+import type { AirlineDirectoryInterface } from './interfaces/airline-interfaces';
 
 import { OnChainDataClient } from './on-chain-data-client';
 import StoragePointer from './on-chain-data-client/storage-pointer';
@@ -93,11 +93,12 @@ export class WtJsLibs {
    *
    * @param segment - allowed are `hotels` and `airlines`
    * @param address of the Winding Tree index
-   * @type WTHotelIndexInterface | WTAirlineIndexInterface
+   * @type HotelDirectoryInterface | AirlineDirectoryInterface
    */
-  getWTIndex (segment: string, address: string): WTHotelIndexInterface | WTAirlineIndexInterface {
+  getDirectory (segment: string, address: string): HotelDirectoryInterface | AirlineDirectoryInterface {
+    // TODO use Entrypoint
     const dataModel = OnChainDataClient.getDataModel(segment);
-    return dataModel.getWindingTreeIndex(address);
+    return dataModel.getDirectory(address);
   }
 
   /**

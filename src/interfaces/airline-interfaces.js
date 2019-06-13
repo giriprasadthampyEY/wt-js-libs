@@ -1,6 +1,5 @@
 // @flow
 import type {
-  BaseOnChainDataInterface,
   BasePreparedTransactionMetadataInterface,
   BaseOnChainRecordInterface,
   TransactionOptionsInterface,
@@ -25,24 +24,39 @@ export interface PreparedTransactionMetadataInterface extends BasePreparedTransa
  * property.
  *
  */
-export interface AirlineInterface extends BaseOnChainDataInterface, BaseOnChainRecordInterface {
+export interface AirlineInterface extends BaseOnChainRecordInterface { // TODO remove airline/hotel interfaces?
   setLocalData(newData: AirlineInterface): Promise<void>,
   createOnChainData(transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>,
   updateOnChainData(transactionOptions: TransactionOptionsInterface): Promise<Array<PreparedTransactionMetadataInterface>>,
   removeOnChainData(transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>,
-  transferOnChainOwnership(newManager: string, transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>
+  transferOnChainOwnership(newOwner: string, transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>
 }
 
+// /**
+//  * WindingTree index interface that provides all methods
+//  * necessary for interaction with the airlines.`
+//  */
+// export interface AirlineDirectoryInterface {
+//   add(airline: AirlineInterface): Promise<PreparedTransactionMetadataInterface>,
+//   getOrganization(address: string): Promise<?AirlineInterface>,
+//   getOrganizations(): Promise<Array<AirlineInterface>>,
+//   // It is possible that this operation generates multiple transactions in the future
+//   update(airline: AirlineInterface): Promise<Array<PreparedTransactionMetadataInterface>>,
+//   remove(airline: AirlineInterface): Promise<PreparedTransactionMetadataInterface>,
+//   transferOwnership(airline: AirlineInterface, newOwner: string): Promise<PreparedTransactionMetadataInterface>
+// }
+
 /**
- * WindingTree index interface that provides all methods
+ * WindingTree directory interface that provides all methods
  * necessary for interaction with the airlines.`
  */
-export interface WTAirlineIndexInterface {
-  addAirline(airline: AirlineInterface): Promise<PreparedTransactionMetadataInterface>,
-  getAirline(address: string): Promise<?AirlineInterface>,
-  getAllAirlines(): Promise<Array<AirlineInterface>>,
-  // It is possible that this operation generates multiple transactions in the future
-  updateAirline(airline: AirlineInterface): Promise<Array<PreparedTransactionMetadataInterface>>,
-  removeAirline(airline: AirlineInterface): Promise<PreparedTransactionMetadataInterface>,
-  transferAirlineOwnership(airline: AirlineInterface, newManager: string): Promise<PreparedTransactionMetadataInterface>
+export interface AirlineDirectoryInterface {
+   create(orgJsonUri: string): string,
+   createAndAdd(orgJsonUri: string): string,
+   add(airline: string): string,
+   remove(airline: string): void,
+   getOrganizationsLength(): number,
+   getOrganizations(): string[],
+   organizationsIndex(airline: string): number,
+   organizations(index: number): string
 }

@@ -1,6 +1,5 @@
 // @flow
 import type {
-  BaseOnChainDataInterface,
   BasePreparedTransactionMetadataInterface,
   BaseOnChainRecordInterface,
   TransactionOptionsInterface,
@@ -25,24 +24,39 @@ export interface PreparedTransactionMetadataInterface extends BasePreparedTransa
  * property.
  *
  */
-export interface HotelInterface extends BaseOnChainDataInterface, BaseOnChainRecordInterface {
+export interface HotelInterface extends BaseOnChainRecordInterface {
   setLocalData(newData: HotelInterface): Promise<void>,
   createOnChainData(transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>,
   updateOnChainData(transactionOptions: TransactionOptionsInterface): Promise<Array<PreparedTransactionMetadataInterface>>,
   removeOnChainData(transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>,
-  transferOnChainOwnership(newManager: string, transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>
+  transferOnChainOwnership(newOwner: string, transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface>
 }
 
+// /**
+//  * WindingTree index interface that provides all methods
+//  * necessary for interaction with the hotels.`
+//  */
+// export interface HotelDirectoryInterface {
+//   add(hotel: HotelInterface): Promise<PreparedTransactionMetadataInterface>,
+//   getOrganization(address: string): Promise<?HotelInterface>,
+//   getOrganizations(): Promise<Array<HotelInterface>>,
+//   // It is possible that this operation generates multiple transactions in the future
+//   update(hotel: HotelInterface): Promise<Array<PreparedTransactionMetadataInterface>>,
+//   remove(hotel: HotelInterface): Promise<PreparedTransactionMetadataInterface>,
+//   transferOwnership(hotel: HotelInterface, newOwner: string): Promise<PreparedTransactionMetadataInterface>
+// }
+
 /**
- * WindingTree index interface that provides all methods
+ * WindingTree directory interface that provides all methods
  * necessary for interaction with the hotels.`
  */
-export interface WTHotelIndexInterface {
-  addHotel(hotel: HotelInterface): Promise<PreparedTransactionMetadataInterface>,
-  getHotel(address: string): Promise<?HotelInterface>,
-  getAllHotels(): Promise<Array<HotelInterface>>,
-  // It is possible that this operation generates multiple transactions in the future
-  updateHotel(hotel: HotelInterface): Promise<Array<PreparedTransactionMetadataInterface>>,
-  removeHotel(hotel: HotelInterface): Promise<PreparedTransactionMetadataInterface>,
-  transferHotelOwnership(hotel: HotelInterface, newManager: string): Promise<PreparedTransactionMetadataInterface>
+export interface HotelDirectoryInterface {
+   create(hotel: HotelInterface): string,
+   createAndAdd(hotel: HotelInterface): string,
+   add(hotel: HotelInterface): string,
+   remove(hotel: HotelInterface): void,
+   getOrganizationsLength(): number,
+   getOrganizations(): string[],
+   organizationsIndex(hotel: string): number,
+   hotels(index: number): HotelInterface
 }

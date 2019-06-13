@@ -2,10 +2,10 @@
 
 import type { OnChainDataClientOptionsType } from '../index';
 
-import { AbstractDataModel } from '../wt-index/data-model';
+import { AbstractDataModel } from '../directory/data-model';
 import Utils from '../utils';
 import Contracts from '../contracts';
-import WTHotelIndex from './wt-index';
+import HotelDirectory from './directory';
 
 /**
  * An entry-point abstraction for interacting with hotels.
@@ -18,8 +18,8 @@ export class HotelDataModel extends AbstractDataModel {
     return new HotelDataModel(options, web3Utils, web3Contracts);
   }
 
-  _indexContractFactory (address: string): WTHotelIndex {
-    return WTHotelIndex.createInstance(address, this.web3Utils, this.web3Contracts);
+  _directoryContractFactory (address: string): HotelDirectory {
+    return HotelDirectory.createInstance(address, this.web3Utils, this.web3Contracts);
   }
 }
 

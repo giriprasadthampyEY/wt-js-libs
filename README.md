@@ -18,7 +18,7 @@ const libs = WtJsLibs.createInstance({
   offChainDataOptions: { ... },
   trustClueOptions: { ... },
 });
-const hotelIndex = libs.getWTIndex('hotels', '0x...');
+const hotelDirectory = libs.getDirectory('hotels', '0x...');
 ```
 
 ```html
@@ -54,7 +54,7 @@ const libs = window.WtJsLibs.createInstance({
     }
   },
 });
-const index = libs.getWTIndex('hotels', '0x...');
+const hotelDirectory = libs.getDirectory('hotels', '0x...');
 </script>
 ```
 
@@ -82,7 +82,7 @@ const libs = WtJsLibs.createInstance({
       'in-memory': {
         options: {
           // some: options
-        }
+        },
         create: (options) => {
           return new InMemoryAdapter(options);
         },
@@ -107,8 +107,8 @@ const libs = WtJsLibs.createInstance({
 });
 
 
-const index = libs.getWTIndex('hotels', '0x...');
-const hotel = await index.getHotel('0x...');
+const directory = libs.getDirectory('hotels', '0x...');
+const hotel = await directory.getOrganization('0x...');
 
 // You can get all the off-chain data at once
 // This approach might be a little slow as all off-chain data gets downloaded
@@ -128,14 +128,14 @@ const hotelDescriptionDocument = await dataIndexContents.descriptionUri.contents
 const hotelName = hotelDescriptionDocument.name;
 
 
-// How about creating a hotel?
+// How about creating a hotel and adding it to a directory?
 wallet = libs.createWallet({/*...Your wallet in a JSON format..*/});
 wallet.unlock('with-password');
 try {
-  const { hotel, transactionData, eventCallbacks } = await index.addHotel({
-    manager: wallet.getAddress(),
-    dataUri: 'https://example.com/my-hotel-data.json',
-  });
+  const { hotel, transactionData, eventCallbacks } = await directory.create({
+    orgJsonUri: 'https://example.com/my-hotel-data.json',
+    owner: '0x...',
+  }, true);
   const result = await wallet.signAndSendTransaction(transactionData, eventCallbacks);
   // After the transaction is confirmed, one of the callbacks
   // will set the address of the hotel.
@@ -145,14 +145,14 @@ try {
 }
 
 // Working with airline data is very similar. Just change the segment and a few method names:
-const index = libs.getWTIndex('hotels', '0x...');
-const airline = await index.getAirline('0x...');
+const directory = libs.getDirectory('airlines', '0x...');
+const airline = await directory.getOrganization('0x...');
 
 try {
-  const { airline, transactionData, eventCallbacks } = await index.addAirline({
-    manager: wallet.getAddress(),
-    dataUri: 'https://example.com/my-airline-data.json',
-  });
+  const { airline, transactionData, eventCallbacks } = await directory.create({
+    orgJsonUri: 'https://example.com/my-airline-data.json',
+    owner: '0x...',
+  }, true);
   const result = await wallet.signAndSendTransaction(transactionData, eventCallbacks);
   // After the transaction is confirmed, one of the callbacks
   // will set the address of the airline.
@@ -160,6 +160,21 @@ try {
 } finally {
   wallet.lock();
 }
+```
+
+If you want, you can create the airline contract first and add it later:
+```
+// create with `false` argument
+const createHotel = await directory.create({
+  owner: hotelOwner,
+  orgJsonUri: orgJsonUri,
+}, false);
+const hotel = createHotel.hotel;
+const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
+
+// and add later
+const addHotel = await directory.add(hotel);
+await wallet.signAndSendTransaction(addHotel.transactionData, addHotel.eventCallbacks);
 ```
 
 ## Documentation

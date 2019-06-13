@@ -1,9 +1,9 @@
 // @flow
 
 import type { DataModelInterface } from '../../interfaces/base-interfaces';
-import type { WTHotelIndexInterface } from '../../interfaces/hotel-interfaces';
-import type { WTAirlineIndexInterface } from '../../interfaces/airline-interfaces';
-import type { OnChainDataClientOptionsType } from '../index';
+import type { HotelDirectoryInterface } from '../../interfaces/hotel-interfaces';
+import type { AirlineDirectoryInterface } from '../../interfaces/airline-interfaces';
+import type { OnChainDataClientOptionsType } from '../directory';
 
 import Utils from '../utils';
 import Contracts from '../contracts';
@@ -19,7 +19,7 @@ export class AbstractDataModel implements DataModelInterface {
   web3Utils: Utils;
   web3Contracts: Contracts;
 
-  _wtIndexCache: {[address: string]: WTHotelIndexInterface | WTAirlineIndexInterface};
+  _wtDirectoryCache: {[address: string]: HotelDirectoryInterface | AirlineDirectoryInterface};
 
   /**
    * Returns new and configured instance
@@ -28,25 +28,25 @@ export class AbstractDataModel implements DataModelInterface {
     this.options = options || {};
     this.web3Utils = web3Utils;
     this.web3Contracts = web3Contracts;
-    this._wtIndexCache = {};
+    this._wtDirectoryCache = {};
   }
 
   /**
-   * Returns an Ethereum backed Winding Tree index.
+   * Returns an Ethereum backed Winding Tree directory.
    */
-  _indexContractFactory (address: string): WTHotelIndexInterface | WTAirlineIndexInterface {
+  _directoryContractFactory (address: string): HotelDirectoryInterface | AirlineDirectoryInterface {
     throw Error('Not implemented. Should be called on a subclass instance.');
   }
 
   /**
-   * Returns a cached Ethereum backed Winding Tree index. Caching is done based
+   * Returns a cached Ethereum backed Winding Tree directory. Caching is done based
    * on ethereum address.
    */
-  getWindingTreeIndex (address: string): WTHotelIndexInterface | WTAirlineIndexInterface {
-    if (!this._wtIndexCache[address]) {
-      this._wtIndexCache[address] = this._indexContractFactory(address);
+  getDirectory (address: string): HotelDirectoryInterface | AirlineDirectoryInterface {
+    if (!this._wtDirectoryCache[address]) {
+      this._wtDirectoryCache[address] = this._directoryContractFactory(address);
     }
-    return this._wtIndexCache[address];
+    return this._wtDirectoryCache[address];
   }
 }
 
