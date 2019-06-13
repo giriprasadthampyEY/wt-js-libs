@@ -1,13 +1,3 @@
-// @flow
-import type {
-  BaseOnChainRecordInterface,
-  PlainDataInterface,
-  TransactionCallbacksInterface,
-  TransactionOptionsInterface,
-  TxReceiptInterface,
-} from '../../interfaces/base-interfaces';
-import Utils from '../utils';
-import Contracts from '../contracts';
 import RemotelyBackedDataset from '../remotely-backed-dataset';
 import StoragePointer from '../storage-pointer';
 
@@ -26,25 +16,7 @@ import { InputDataError, SmartContractInstantiationError } from '../errors';
  * airlines, OTAs etc.
  */
 class OnChainRecord {
-  RECORD_TYPE: string;
-  address: Promise<?string> | ?string;
-
-  // provided by eth backed dataset
-  _orgJsonUri: Promise<?string> | ?string;
-  _owner: Promise<?string> | ?string;
-  _created: Promise<?string> | ?string;
-
-  web3Utils: Utils;
-  web3Contracts: Contracts;
-  directoryContract: Object;
-  contractInstance: Object;
-  onChainDataset: RemotelyBackedDataset;
-
-  // Representation of data stored on orgJsonUri
-  _dataIndex: ?StoragePointer;
-  _initialized: boolean;
-
-  constructor (web3Utils: Utils, web3Contracts: Contracts, directoryContract: Object, address?: string) {
+  constructor (web3Utils, web3Contracts, directoryContract, address) {
     this.address = address;
     this.web3Utils = web3Utils;
     this.web3Contracts = web3Contracts;
@@ -62,18 +34,18 @@ class OnChainRecord {
     this.onChainDataset.bindProperties({
       fields: {
         _orgJsonUri: {
-          remoteGetter: async (): Promise<?string> => {
+          remoteGetter: async () => {
             return (await this._getContractInstance()).methods.getOrgJsonUri().call();
           },
           remoteSetter: this._changeOrgJsonUri.bind(this),
         },
         _owner: {
-          remoteGetter: async (): Promise<?string> => {
+          remoteGetter: async () => {
             return (await this._getContractInstance()).methods.owner().call();
           },
         },
         _created: {
-          remoteGetter: async (): Promise<?string> => {
+          remoteGetter: async () => {
             return (await this._getContractInstance()).methods.created().call();
           },
         },
@@ -97,11 +69,11 @@ class OnChainRecord {
   //   throw new Error('Cannot call _changeOrgJsonUriFactory on class');
   // }
 
-  async _createRecordFactory (orgJsonUri: ?string) {
+  async _createRecordFactory (orgJsonUri) {
     throw new Error('Cannot call _createRecordFactory on class');
   }
 
-  async _createAndAddRecordFactory (orgJsonUri: ?string) {
+  async _createAndAddRecordFactory (orgJsonUri) {
     throw new Error('Cannot call _createAndAddRecordFactory on class');
   }
 
@@ -114,7 +86,7 @@ class OnChainRecord {
    * Since it has to eventually access the `orgJsonUri`
    * field stored on-chain, it is lazy loaded.
    */
-  get dataIndex (): Promise<StoragePointer> { // TODO rename?
+  get dataIndex () { // TODO rename?
     return (async () => {
       if (!this._dataIndex) {
         this._dataIndex = StoragePointer.createInstance(await this.orgJsonUri, this._getStoragePointerLayoutFactory());
@@ -123,7 +95,7 @@ class OnChainRecord {
     })();
   }
 
-  get orgJsonUri (): Promise<?string> | ?string {
+  get orgJsonUri () {
     if (!this._initialized) {
       return;
     }
@@ -133,7 +105,7 @@ class OnChainRecord {
     })();
   }
 
-  set orgJsonUri (newOrgJsonUri: Promise<?string> | ?string) {
+  set orgJsonUri (newOrgJsonUri) {
     if (!newOrgJsonUri) {
       throw new InputDataError(
         `Cannot update ${this.RECORD_TYPE}: Cannot set orgJsonUri when it is not provided`
@@ -151,7 +123,7 @@ class OnChainRecord {
     this._orgJsonUri = newOrgJsonUri;
   }
 
-  get created (): Promise<?string> | ?string {
+  get created () {
     if (!this._initialized) {
       return;
     }
@@ -161,7 +133,7 @@ class OnChainRecord {
     })();
   }
 
-  get owner (): Promise<?string> | ?string {
+  get owner () {
     if (!this._initialized) {
       return;
     }
@@ -171,7 +143,7 @@ class OnChainRecord {
     })();
   }
 
-  set owner (newOwner: Promise<?string> | ?string) {
+  set owner (newOwner) {
     if (!newOwner) {
       throw new InputDataError(`Cannot update ${this.RECORD_TYPE}: Cannot set owner when it is not provided`);
     }
@@ -187,7 +159,7 @@ class OnChainRecord {
    * contract (without address).
    * @param {BaseOnChainRecordInterface} newData
    */
-  async setLocalData (newData: BaseOnChainRecordInterface) {
+  async setLocalData (newData) {
     const newOwner = await newData.owner;
     if (newOwner) {
       this.owner = newOwner;
@@ -224,7 +196,7 @@ class OnChainRecord {
    *
    * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
    */
-  async toPlainObject (resolvedFields: ?Array<string>, depth?: number): Promise<PlainDataInterface> {
+  async toPlainObject (resolvedFields, depth) {
     const dataIndex = await this.dataIndex;
     const offChainData = await dataIndex.toPlainObject(resolvedFields, depth);
     let result = {
@@ -235,7 +207,7 @@ class OnChainRecord {
     return result;
   }
 
-  async _getContractInstance (): Promise<Object> {
+  async _getContractInstance () {
     if (!this.address) {
       throw new SmartContractInstantiationError(`Cannot get ${this.RECORD_TYPE} instance without address`);
     }
@@ -253,9 +225,7 @@ class OnChainRecord {
    * @param {TransactionOptionsInterface} transactionOptions object, only `from` property is currently used, all others are ignored in this implementation
    * @return {Promise<BasePreparedTransactionMetadataInterface>} resulting transaction metadata
    */
-  // because flow is buggy
-  // eslint-disable-next-line flowtype/require-return-type
-  async _changeOrgJsonUri (transactionOptions: TransactionOptionsInterface) {
+  async _changeOrgJsonUri (transactionOptions) {
     const uri = await this.orgJsonUri;
     const contract = await this._getContractInstance();
     const data = contract.methods.changeOrgJsonUri(uri).encodeABI();
@@ -268,7 +238,7 @@ class OnChainRecord {
       gas: this.web3Utils.applyGasModifier(await estimate),
     };
     return {
-      record: (this: OnChainRecord),
+      record: (this),
       transactionData: transactionData,
     };
   }
@@ -280,9 +250,7 @@ class OnChainRecord {
    * @param {TransactionOptionsInterface} transactionOptions object, only `from` property is currently used, all others are ignored in this implementation
    * @return {Promise<BasePreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created <record> instance.
    */
-  // because flow is buggy
-  // eslint-disable-next-line flowtype/require-return-type
-  async _createOnChainData (transactionOptions: TransactionOptionsInterface, alsoAdd: boolean = false) {
+  async _createOnChainData (transactionOptions, alsoAdd = false) {
     const orgJsonUri = await this.orgJsonUri;
     const fn = alsoAdd ? (await this._createAndAddRecordFactory(orgJsonUri)) : (await this._createRecordFactory(orgJsonUri));
     const estimate = fn.estimateGas(transactionOptions);
@@ -294,8 +262,8 @@ class OnChainRecord {
       to: this.directoryContract.options.address,
       gas: this.web3Utils.applyGasModifier(await estimate),
     };
-    const eventCallbacks: TransactionCallbacksInterface = {
-      onReceipt: (receipt: TxReceiptInterface) => {
+    const eventCallbacks = {
+      onReceipt: (receipt) => {
         this.onChainDataset.markDeployed();
         if (receipt && receipt.logs) {
           // let decodedLogs = this.web3Contracts.decodeLogs(receipt.logs);
@@ -305,13 +273,13 @@ class OnChainRecord {
       },
     };
     return {
-      record: (this: OnChainRecord),
+      record: this,
       transactionData: transactionData,
       eventCallbacks: eventCallbacks,
     };
   }
 
-  async _hasDelegate (delegateAddress: string, transactionOptions: TransactionOptionsInterface) {
+  async _hasDelegate (delegateAddress, transactionOptions) {
     const contract = await this._getContractInstance();
     return contract.methods.hasDelegate(delegateAddress).call(transactionOptions);
     // const estimate = contract.methods.hasDelegate(delegateAddress).estimateGas(transactionOptions);
@@ -350,9 +318,7 @@ class OnChainRecord {
    * @throws {SmartContractInstantiationError} When orgJsonUri is empty.
    * @return {Promise<Array<BasePreparedTransactionMetadataInterface>>} List of transaction metadata
    */
-  // because flow is buggy
-  // eslint-disable-next-line flowtype/require-return-type
-  async _updateOnChainData (transactionOptions: TransactionOptionsInterface) {
+  async _updateOnChainData (transactionOptions) {
     // pre-check if contract is available at all and fail fast
     await this._getContractInstance();
     // We have to clone options for each dataset as they may get modified
@@ -368,9 +334,7 @@ class OnChainRecord {
    * @throws {SmartContractInstantiationError} When the underlying contract is not yet deployed.
    * @return {Promise<BasePreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created <record> instance.
    */
-  // because flow is buggy
-  // eslint-disable-next-line flowtype/require-return-type
-  async _removeOnChainData (transactionOptions: TransactionOptionsInterface) {
+  async _removeOnChainData (transactionOptions) {
     if (!this.onChainDataset.isDeployed()) {
       throw new SmartContractInstantiationError(`Cannot remove ${this.RECORD_TYPE}: not deployed`);
     }
@@ -383,13 +347,13 @@ class OnChainRecord {
       to: this.directoryContract.options.address,
       gas: this.web3Utils.applyGasModifier(await estimate),
     };
-    const eventCallbacks: TransactionCallbacksInterface = {
-      onReceipt: (receipt: TxReceiptInterface) => {
+    const eventCallbacks = {
+      onReceipt: (receipt) => {
         this.onChainDataset.markObsolete();
       },
     };
     return {
-      record: (this: OnChainRecord),
+      record: (this),
       transactionData: transactionData,
       eventCallbacks: eventCallbacks,
     };

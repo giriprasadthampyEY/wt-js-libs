@@ -1,10 +1,3 @@
-// @flow
-import type {
-  TransactionOptionsInterface,
-  BasePreparedTransactionMetadataInterface,
-} from '../../interfaces/base-interfaces';
-
-import type { AirlineInterface, PreparedTransactionMetadataInterface } from '../../interfaces/airline-interfaces';
 import Utils from '../utils';
 import OnChainRecord from '../directory/record';
 import Contracts from '../contracts';
@@ -19,7 +12,7 @@ import Contracts from '../contracts';
  * are dealt with in StoragePointer.
  *
  */
-class OnChainAirline extends OnChainRecord implements AirlineInterface {
+class OnChainAirline extends OnChainRecord {
   /**
    * Create new configured instance.
    * @param  {Utils} web3Utils
@@ -30,21 +23,21 @@ class OnChainAirline extends OnChainRecord implements AirlineInterface {
    * to be created on chain to behave as expected.
    * @return {OnChainAirline}
    */
-  static createInstance (web3Utils: Utils, web3Contracts: Contracts, directoryContract: Object, address?: string): OnChainAirline {
+  static createInstance (web3Utils, web3Contracts, directoryContract, address) {
     const airline = new OnChainAirline(web3Utils, web3Contracts, directoryContract, address);
     airline.RECORD_TYPE = 'airline';
     airline.initialize();
     return airline;
   }
 
-  _getStoragePointerLayoutFactory (): Object {
+  _getStoragePointerLayoutFactory () {
     return {
       descriptionUri: { required: true },
       flightsUri: { required: false, children: { items: { children: { flightInstancesUri: { required: false } } } } },
     };
   }
 
-  _getRecordContractFactory (): Object {
+  _getRecordContractFactory () {
     return this.web3Contracts.getOrganizationInstance(this.address);
   }
 
@@ -52,11 +45,11 @@ class OnChainAirline extends OnChainRecord implements AirlineInterface {
   //   return this.directoryContract.methods.changeOrgJsonUri(this.address, data);
   // }
 
-  _registerRecordInDirectoryFactory (orgJsonUri: ?string): Object {
+  _registerRecordInDirectoryFactory (orgJsonUri) {
     return this.directoryContract.methods.add(orgJsonUri);
   }
 
-  _deleteRecordInDirectoryFactory (): Object {
+  _deleteRecordInDirectoryFactory () {
     return this.directoryContract.methods.remove(this.address);
   }
 
@@ -67,7 +60,7 @@ class OnChainAirline extends OnChainRecord implements AirlineInterface {
    * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
    * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created airline instance.
    */
-  async createOnChainData (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
+  async createOnChainData (transactionOptions) {
     const result = await this._createOnChainData(transactionOptions);
     result.airline = result.record;
     delete result.record;
@@ -87,7 +80,7 @@ class OnChainAirline extends OnChainRecord implements AirlineInterface {
    * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created airline instance.
    *
    */
-  async transferOnChainOwnership (newOwner: string, transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
+  async transferOnChainOwnership (newOwner, transactionOptions) {
     const result = await this._transferOnChainOwnership(newOwner, transactionOptions);
     result.airline = result.record;
     delete result.record;
@@ -101,7 +94,7 @@ class OnChainAirline extends OnChainRecord implements AirlineInterface {
    * @throws {SmartContractInstantiationError} When the underlying contract is not yet deployed.
    * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created airline instance.
    */
-  async removeOnChainData (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
+  async removeOnChainData (transactionOptions) {
     const result = await this._removeOnChainData(transactionOptions);
     result.airline = result.record;
     delete result.record;
@@ -117,7 +110,7 @@ class OnChainAirline extends OnChainRecord implements AirlineInterface {
    * @throws {SmartContractInstantiationError} When orgJsonUri is empty.
    * @return {Promise<Array<PreparedTransactionMetadataInterface>>} List of transaction metadata
    */
-  async updateOnChainData (transactionOptions: TransactionOptionsInterface): Promise<Array<BasePreparedTransactionMetadataInterface>> {
+  async updateOnChainData (transactionOptions) {
     const results = (await this._updateOnChainData(transactionOptions))
       .map((result) => {
         result.airline = result.record;

@@ -1,10 +1,4 @@
-// @flow
-
-import type { OnChainDataClientOptionsType } from '../index';
-
 import { AbstractDataModel } from '../directory/data-model';
-import Utils from '../utils';
-import Contracts from '../contracts';
 import AirlineDirectory from './directory';
 
 /**
@@ -14,11 +8,11 @@ export class AirlineDataModel extends AbstractDataModel {
   /**
    * Creates a configured AirlineDataModel instance.
    */
-  static createInstance (options: OnChainDataClientOptionsType, web3Utils: Utils, web3Contracts: Contracts): AbstractDataModel {
+  static createInstance (options, web3Utils, web3Contracts) {
     return new AirlineDataModel(options, web3Utils, web3Contracts);
   }
 
-  _directoryContractFactory (address: string): AirlineDirectory {
+  _directoryContractFactory (address) {
     return AirlineDirectory.createInstance(address, this.web3Utils, this.web3Contracts);
   }
 }

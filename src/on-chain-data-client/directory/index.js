@@ -1,12 +1,5 @@
-// @flow
-import type { BaseOnChainRecordInterface, BasePreparedTransactionMetadataInterface } from '../../interfaces/base-interfaces';
-import Utils from '../utils';
-import Contracts from '../contracts';
-
 import { WTLibsError } from '../../errors';
 import { InputDataError, RecordNotFoundError, RecordNotInstantiableError } from '../errors';
-import type { HotelInterface, PreparedTransactionMetadataInterface } from '../../interfaces/hotel-interfaces';
-import OnChainHotel from '../hotels/hotel';
 
 /**
  * Ethereum smart contract backed implementation of Winding Tree
@@ -17,39 +10,33 @@ import OnChainHotel from '../hotels/hotel';
  * airlines, OTAs etc.
  */
 class AbstractDirectory {
-  address: string;
-  web3Utils: Utils;
-  web3Contracts: Contracts;
-  deployedDirectory: Object; // TODO get rid of Object type
-  RECORD_TYPE: string;
-
-  constructor (indexAddress: string, web3Utils: Utils, web3Contracts: Contracts) {
+  constructor (indexAddress, web3Utils, web3Contracts) {
     this.address = indexAddress;
     this.web3Utils = web3Utils;
     this.web3Contracts = web3Contracts;
   }
 
-  async _getDeployedDirectoryFactory (): Promise<Object> {
+  async _getDeployedDirectoryFactory () {
     throw new Error('Cannot call _getDeployedDirectoryFactory on the class');
   }
 
-  async _createRecordInstanceFactory (address?: string): Promise<BaseOnChainRecordInterface> {
+  async _createRecordInstanceFactory (address) {
     throw new Error('Cannot call _createRecordInstanceFactory on the class');
   }
 
-  async _createRecordInDirectoryFactory (orgJsonUri: ?string): Object {
+  async _createRecordInDirectoryFactory (orgJsonUri) {
     throw new Error('Cannot call _createRecordInDirectoryFactory on the class');
   }
 
-  async _getDirectoryRecordPositionFactory (address: string): Promise<number> {
+  async _getDirectoryRecordPositionFactory (address) {
     throw new Error('Cannot call _getDirectoryRecordPositionFactory on the class');
   }
 
-  async _getRecordsAddressListFactory (): Promise<Array<string>> {
+  async _getRecordsAddressListFactory () {
     throw new Error('Cannot call _getRecordsAddressListFactory on the class');
   }
 
-  async _getDeployedDirectory (): Promise<Object> {
+  async _getDeployedDirectory () {
     if (!this.deployedDirectory) {
       this.deployedDirectory = await this._getDeployedDirectoryFactory();
     }
@@ -94,7 +81,7 @@ class AbstractDirectory {
    * @throws {InputDataError} When recordData does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
-  async addRecord (recordData: BaseOnChainRecordInterface): Promise<BasePreparedTransactionMetadataInterface> {
+  async addRecord (recordData) {
     if (!recordData.address) {
       throw new InputDataError(`Cannot add ${this.RECORD_TYPE} without address.`);
     }
@@ -113,12 +100,12 @@ class AbstractDirectory {
       gas: this.web3Utils.applyGasModifier(await estimate),
     };
     return {
-      record: (this: OnChainRecord),
+      record: this,
       transactionData: transactionData,
     };
   }
 
-  async createRecord(recordData: BaseOnChainRecordInterface, alsoAdd: boolean = false): Process<PreparedTransactionMetadataInterface> {
+  async createRecord(recordData, alsoAdd = false) {
     const orgJsonUri = await recordData.orgJsonUri;
     if (!orgJsonUri) {
       throw new InputDataError(`Cannot create ${this.RECORD_TYPE}: Missing orgJsonUri`);
@@ -145,7 +132,7 @@ class AbstractDirectory {
    * @throws {InputDataError} When <record> does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
-  async updateRecord (record: BaseOnChainRecordInterface): Promise<Array<BasePreparedTransactionMetadataInterface>> {
+  async updateRecord (record) {
     if (!record.address) {
       throw new InputDataError(`Cannot update ${this.RECORD_TYPE} without address.`);
     }
@@ -169,7 +156,7 @@ class AbstractDirectory {
    * @throws {InputDataError} When <record> does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
-  async removeRecord (record: BaseOnChainRecordInterface): Promise<BasePreparedTransactionMetadataInterface> {
+  async removeRecord (record) {
     if (!record.address) {
       throw new InputDataError(`Cannot remove ${this.RECORD_TYPE} without address.`);
     }
@@ -196,7 +183,7 @@ class AbstractDirectory {
    * @throws {RecordNotInstantiableError} When the <record> class cannot be constructed.
    * @throws {WTLibsError} When something breaks in the network communication.
    */
-  async getRecord (address: string): Promise<?BaseOnChainRecordInterface> {
+  async getRecord (address) {
     let recordIndex;
     try {
       // This returns strings
@@ -221,25 +208,25 @@ class AbstractDirectory {
    * Currently any inaccessible <record> is silently ignored.
    * Subject to change.
    */
-  async getAllRecords (): Promise<Array<BaseOnChainRecordInterface>> {
+  async getAllRecords () {
     const recordsAddressList = await this._getRecordsAddressListFactory();
     let getRecordDetails = recordsAddressList
       // Filtering null addresses beforehand improves efficiency
-      .filter((addr: string): boolean => !this.web3Utils.isZeroAddress(addr))
-      .map((addr: string): Promise<?BaseOnChainRecordInterface> => {
+      .filter((addr) => !this.web3Utils.isZeroAddress(addr))
+      .map((addr) => {
         return this.getRecord(addr) // eslint-disable-line promise/no-nesting
           // We don't really care why the <record> is inaccessible
           // and we need to catch exceptions here on each individual <record>
-          .catch((err: Error): null => { // eslint-disable-line
+          .catch((err) => { // eslint-disable-line
             return null;
           });
       });
-    const recordDetails: Array<?BaseOnChainRecordInterface> = await (Promise.all(getRecordDetails): any); // eslint-disable-line flowtype/no-weak-types
-    const recordList: Array<BaseOnChainRecordInterface> = (recordDetails.filter((a: ?BaseOnChainRecordInterface): boolean => a != null): any); // eslint-disable-line flowtype/no-weak-types
+    const recordDetails = await (Promise.all(getRecordDetails));
+    const recordList = (recordDetails.filter(a => a != null));
     return recordList;
   }
 
-  async getLifTokenAddress (): Promise<string> {
+  async getLifTokenAddress () {
     const index = await this._getDeployedDirectory();
     return index.methods.LifToken().call();
   }

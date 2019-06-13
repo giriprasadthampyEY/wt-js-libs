@@ -1,20 +1,7 @@
-// @flow
-import type { OffChainDataAdapterInterface } from '../interfaces/base-interfaces';
-
 import {
   OffChainDataConfigurationError,
   OffChainDataRuntimeError,
 } from './errors';
-
-/**
- * OffChainDataClientOptionsType
- */
-export type OffChainDataClientOptionsType = {
-  adapters: {[schema: string]: {
-    options: Object,
-    create: (options: Object) => OffChainDataAdapterInterface
-  }}
-};
 
 /**
  * OffChainDataClient is a static factory class that is responsible
@@ -25,8 +12,6 @@ export type OffChainDataClientOptionsType = {
  * configuration is shared during the whole runtime.
  */
 export class OffChainDataClient {
-  static options: OffChainDataClientOptionsType;
-  static adapters: {[key: string]: Object};
 
   /**
    * Initializes the map of OffChainDataAdapters.
@@ -34,7 +19,7 @@ export class OffChainDataClient {
    * @param  {OffChainDataClientOptionsType}
    * @throws {OffChainDataConfigurationError} when there are multiple adapters with the same name
    */
-  static setup (options: OffChainDataClientOptionsType) {
+  static setup (options) {
     OffChainDataClient.adapters = {};
     OffChainDataClient.options = options || {};
     // Convert all adapter keys (i.e. URL schemes) to lowercase.
@@ -61,7 +46,7 @@ export class OffChainDataClient {
    *
    * @throws {OffChainDataRuntimeError} when schema is not defined or adapter for this schema does not exist
    */
-  static getAdapter (schema: ?string): OffChainDataAdapterInterface {
+  static getAdapter (schema) {
     schema = schema && schema.toLowerCase();
     if (!schema || !OffChainDataClient.adapters[schema]) {
       throw new OffChainDataRuntimeError(`Unsupported data storage type: ${schema || 'null'}`);

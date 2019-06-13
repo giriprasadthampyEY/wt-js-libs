@@ -1,7 +1,3 @@
-// @flow
-import type { AirlineDirectoryInterface, AirlineInterface, PreparedTransactionMetadataInterface } from '../../interfaces/airline-interfaces';
-import Utils from '../utils';
-import Contracts from '../contracts';
 import OnChainAirline from './airline';
 
 import { AirlineNotFoundError, AirlineNotInstantiableError, RecordNotFoundError, RecordNotInstantiableError } from '../errors';
@@ -12,31 +8,31 @@ import AbstractDirectory from '../directory';
  * index wrapper. It provides methods for working with airline
  * contracts.
  */
-class AirlineDirectory extends AbstractDirectory implements AirlineDirectoryInterface {
+class AirlineDirectory extends AbstractDirectory {
   /**
    * Returns a configured instance of AirlineDirectory
    * representing a Winding Tree index contract on a given `directoryAddress`.
    */
-  static createInstance (indexAddress: string, web3Utils: Utils, web3Contracts: Contracts): AirlineDirectory {
+  static createInstance (indexAddress, web3Utils, web3Contracts) {
     const instance = new AirlineDirectory(indexAddress, web3Utils, web3Contracts);
     instance.RECORD_TYPE = 'airline';
     return instance;
   }
 
-  async _getDeployedDirectoryFactory (): Promise<Object> {
+  async _getDeployedDirectoryFactory () {
     return this.web3Contracts.getAirlineDirectoryInstance(this.address);
   }
 
-  async _createRecordInstanceFactory (address?: string): Promise<Object> {
+  async _createRecordInstanceFactory (address) {
     return OnChainAirline.createInstance(this.web3Utils, this.web3Contracts, await this._getDeployedDirectory(), address);
   }
 
-  async _getDirectoryRecordPositionFactory (address: string): Promise<number> {
+  async _getDirectoryRecordPositionFactory (address) {
     const index = await this._getDeployedDirectory();
     return parseInt(await index.methods.organizationsIndex(address).call(), 10);
   }
 
-  async _getRecordsAddressListFactory (): Promise<Array<string>> {
+  async _getRecordsAddressListFactory () {
     const index = await this._getDeployedDirectory();
     return index.methods.getOrganizations().call();
   }
@@ -50,11 +46,11 @@ class AirlineDirectory extends AbstractDirectory implements AirlineDirectoryInte
    * @throws {InputDataError} When airlineData does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
-  async add (airlineData: AirlineInterface): Promise<PreparedTransactionMetadataInterface> {
+  async add (airlineData) {
     return this.addRecord(airlineData);
   }
 
-  async createAndAdd(orgJsonUri: string): Process<PreparedTransactionMetadataInterface> {
+  async createAndAdd(orgJsonUri) {
     this.create(orgJsonUri); // TODO
     return this.add(orgJsonUri); // TODO
   }
@@ -68,7 +64,7 @@ class AirlineDirectory extends AbstractDirectory implements AirlineDirectoryInte
    * @throws {InputDataError} When airline does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
-  async update (airline: AirlineInterface): Promise<Array<PreparedTransactionMetadataInterface>> {
+  async update (airline) {
     return this.updateRecord(airline);
   }
 
@@ -81,7 +77,7 @@ class AirlineDirectory extends AbstractDirectory implements AirlineDirectoryInte
    * @throws {InputDataError} When airline does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
-  async remove (airline: AirlineInterface): Promise<PreparedTransactionMetadataInterface> {
+  async remove (airline) {
     return this.removeRecord(airline);
   }
 
@@ -109,7 +105,7 @@ class AirlineDirectory extends AbstractDirectory implements AirlineDirectoryInte
    * @throws {AirlineNotInstantiableError} When the airline class cannot be constructed.
    * @throws {WTLibsError} When something breaks in the network communication.
    */
-  async getOrganization (address: string): Promise<?AirlineInterface> { // TODO change to/use organizationsIndex+organizations
+  async getOrganization (address) { // TODO change to/use organizationsIndex+organizations
     try {
       const record = await this.getRecord(address);
       return record;

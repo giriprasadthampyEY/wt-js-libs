@@ -8,7 +8,6 @@
     "test": "test"
   },
   "scripts": {
-    "flow": "flow",
     "lint": "eslint src test",
     "test": "rimraf coverage && ./test/utils/scripts/localtestnet.sh",
     "test:watch": "rimraf coverage && ./test/utils/scripts/localtestnet.sh --watch",
@@ -45,11 +44,11 @@
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.4.4",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
     "@babel/plugin-transform-runtime": "^7.0.0",
     "@babel/polyfill": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
-    "@babel/preset-flow": "^7.0.0",
     "@babel/register": "^7.0.0",
     "@windingtree/off-chain-adapter-in-memory": "^5.0.1",
     "babel-eslint": "^10.0.1",
@@ -64,12 +63,10 @@
     "documentation": "^11.0.0",
     "eslint": "^5.2.0",
     "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-flowtype": "^3.2.1",
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-node": "^9.0.0",
     "eslint-plugin-promise": "^4.0.0",
     "eslint-plugin-standard": "^4.0.0",
-    "flow-bin": "^0.100.0",
     "ganache-cli": "^6.2.1",
     "jest": "^24.7.1",
     "jsdom": "^15.0.0",

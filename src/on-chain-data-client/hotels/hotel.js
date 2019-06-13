@@ -1,10 +1,3 @@
-// @flow
-import type {
-  TransactionOptionsInterface,
-  BasePreparedTransactionMetadataInterface, BaseOnChainRecordInterface,
-} from '../../interfaces/base-interfaces';
-
-import type { HotelInterface, PreparedTransactionMetadataInterface } from '../../interfaces/hotel-interfaces';
 import Utils from '../utils';
 import OnChainRecord from '../directory/record';
 import Contracts from '../contracts';
@@ -19,7 +12,7 @@ import Contracts from '../contracts';
  * are dealt with in StoragePointer.
  *
  */
-class OnChainHotel extends OnChainRecord implements HotelInterface {
+class OnChainHotel extends OnChainRecord {
   /**
    * Create new configured instance.
    * @param  {Utils} web3Utils
@@ -30,14 +23,14 @@ class OnChainHotel extends OnChainRecord implements HotelInterface {
    * to be created on chain to behave as expected.
    * @return {OnChainHotel}
    */
-  static createInstance (web3Utils: Utils, web3Contracts: Contracts, indexContract: Object, address?: string): OnChainHotel {
+  static createInstance (web3Utils, web3Contracts, indexContract, address) {
     const hotel = new OnChainHotel(web3Utils, web3Contracts, indexContract, address);
     hotel.RECORD_TYPE = 'hotel';
     hotel.initialize();
     return hotel;
   }
 
-  _getStoragePointerLayoutFactory (): Object {
+  _getStoragePointerLayoutFactory () {
     return {
       descriptionUri: { required: true },
       ratePlansUri: { required: false },
@@ -45,7 +38,7 @@ class OnChainHotel extends OnChainRecord implements HotelInterface {
     };
   }
 
-  _getRecordContractFactory (): Object {
+  _getRecordContractFactory () {
     return this.web3Contracts.getOrganizationInstance(this.address);
   }
 
@@ -53,7 +46,7 @@ class OnChainHotel extends OnChainRecord implements HotelInterface {
   //   return this.directoryContract.methods.call(this.address, data);
   // }
 
-  _createRecordFactory (orgJsonUri: ?string): Object {
+  _createRecordFactory (orgJsonUri) {
     return this.directoryContract.methods.create(orgJsonUri);
   }
 
@@ -61,16 +54,16 @@ class OnChainHotel extends OnChainRecord implements HotelInterface {
   //   return this.directoryContract.methods.hasDelegate(delegateAddress);
   // }
 
-  _createAndAddRecordFactory (orgJsonUri: ?string): Object {
+  _createAndAddRecordFactory (orgJsonUri) {
     return this.directoryContract.methods.createAndAdd(orgJsonUri);
   }
 
-  _registerRecordInDirectoryFactory (address: ?string): Object { // TODO rename to add
+  _registerRecordInDirectoryFactory (address) { // TODO rename to add
     let res = this.directoryContract.methods.add(address);
     return res;
   }
 
-  _deleteRecordInDirectoryFactory (): Object {
+  _deleteRecordInDirectoryFactory () {
     return this.directoryContract.methods.remove(this.address);
   }
 
@@ -81,7 +74,7 @@ class OnChainHotel extends OnChainRecord implements HotelInterface {
    * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
    * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created hotel instance.
    */
-  async createOnChainData (transactionOptions: TransactionOptionsInterface, alsoAdd: boolean = false): Promise<PreparedTransactionMetadataInterface> {
+  async createOnChainData (transactionOptions, alsoAdd = false) {
     const result = await this._createOnChainData(transactionOptions, alsoAdd);
     result.hotel = result.record;
     delete result.record;
@@ -95,7 +88,7 @@ class OnChainHotel extends OnChainRecord implements HotelInterface {
    * @throws {SmartContractInstantiationError} When the underlying contract is not yet deployed.
    * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created hotel instance.
    */
-  async removeOnChainData (transactionOptions: TransactionOptionsInterface): Promise<PreparedTransactionMetadataInterface> {
+  async removeOnChainData (transactionOptions) {
     const result = await this._removeOnChainData(transactionOptions);
     result.hotel = result.record;
     delete result.record;
@@ -111,7 +104,7 @@ class OnChainHotel extends OnChainRecord implements HotelInterface {
    * @throws {SmartContractInstantiationError} When orgJsonUri is empty.
    * @return {Promise<Array<PreparedTransactionMetadataInterface>>} List of transaction metadata
    */
-  async updateOnChainData (transactionOptions: TransactionOptionsInterface): Promise<Array<BasePreparedTransactionMetadataInterface>> {
+  async updateOnChainData (transactionOptions) {
     const results = (await this._updateOnChainData(transactionOptions))
       .map((result) => {
         result.hotel = result.record;
@@ -121,7 +114,7 @@ class OnChainHotel extends OnChainRecord implements HotelInterface {
     return results;
   }
 
-  async hasDelegate (delegateAddress: string, transactionOptions: TransactionOptionsInterface): boolean {
+  async hasDelegate (delegateAddress, transactionOptions) {
     return this._hasDelegate(delegateAddress, transactionOptions);
   }
 }

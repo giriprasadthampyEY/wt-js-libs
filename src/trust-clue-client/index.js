@@ -1,27 +1,9 @@
-// @flow
-import type { TrustClueInterface } from '../interfaces/base-interfaces';
-
 import Web3Eth from 'web3-eth';
 import Web3Utils from 'web3-utils';
 import {
   TrustClueConfigurationError,
   TrustClueRuntimeError,
 } from './errors';
-
-/**
- * TrustClueClientOptionsType. `provider` is required in order to
- * properly recover signatures.
- */
-export type TrustClueClientOptionsType = {
-  provider: string | Object,
-  clues: {[name: string]: {
-    options: {
-      // eslint-disable-next-line flowtype/no-weak-types
-      interpret?: (value: any) => Promise<boolean | number | string>
-    },
-    create: (options: Object) => Promise<TrustClueInterface>
-  }}
-};
 
 /**
  * TrustClueClient is a static factory class that is responsible
@@ -32,10 +14,6 @@ export type TrustClueClientOptionsType = {
  * configuration is shared during the whole runtime.
  */
 export class TrustClueClient {
-  options: TrustClueClientOptionsType;
-  web3Eth: Web3Eth;
-  clueNameList: Array<string>;
-  _clues: {[key: ?string]: TrustClueInterface};
 
   /**
    * Initializes the map of `TrustClue`s.
@@ -43,7 +21,7 @@ export class TrustClueClient {
    * @param  {TrustClueClientOptionsType}
    * @throws {TrustClueConfigurationError} when there are multiple clues with the same name
    */
-  static createInstance (options: TrustClueClientOptionsType): TrustClueClient {
+  static createInstance (options) {
     options = options || {};
     let clues = {};
     // Convert all trust clue names to lowercase.
@@ -58,7 +36,7 @@ export class TrustClueClient {
     return new TrustClueClient(options);
   }
 
-  constructor (options: TrustClueClientOptionsType) {
+  constructor (options) {
     this._clues = {};
     this.options = options || {};
     this.clueNameList = Object.keys(options.clues);
@@ -71,7 +49,7 @@ export class TrustClueClient {
    *
    * @throws {TrustClueRuntimeError} when name is not defined or a clue with such name does not exist
    */
-  async getClue (name: ?string): Promise<TrustClueInterface> {
+  async getClue (name) {
     name = name && name.toLowerCase();
 
     if (this._clues[name]) {
@@ -91,7 +69,7 @@ export class TrustClueClient {
   /**
    * Returns a list of metadata for all clues.
    */
-  async getMetadataForAllClues (): Promise<Object> {
+  async getMetadataForAllClues () {
     const trustClues = [];
     for (let i = 0; i < this.clueNameList.length; i++) {
       const clue = await this.getClue(this.clueNameList[i]);
@@ -107,8 +85,7 @@ export class TrustClueClient {
    * @returns A list of objects with either value or error:
    * `{name: clue-name, value: value, error: error message}`
    */
-  // eslint-disable-next-line flowtype/no-weak-types
-  async getAllValues (address: string): Promise<Array<{name: string, value?: any, error?: string}>> {
+  async getAllValues (address) {
     let promises = [];
     for (let i = 0; i < this.clueNameList.length; i++) {
       const getClueValue = this.getClue(this.clueNameList[i])
@@ -135,7 +112,7 @@ export class TrustClueClient {
    * @returns A list of objects with either value or error:
    * `{name: clue-name, value: value, error: error message}`
    */
-  async interpretAllValues (address: string): Promise<Array<{name: string, value?: boolean | number | string, error?: string}>> {
+  async interpretAllValues (address) {
     let promises = [];
     for (let i = 0; i < this.clueNameList.length; i++) {
       const getClueValue = this.getClue(this.clueNameList[i])
@@ -171,7 +148,7 @@ export class TrustClueClient {
    * @throws {TrustClueRuntimeError} When any of arguments is missing, or the signature recovery
    * fails or the signature verification fails or any other error occurs.
    */
-  verifySignedData (serializedData: string, signature: string, verificationFn?: (string) => mixed) {
+  verifySignedData (serializedData, signature, verificationFn) {
     if (!serializedData) {
       throw new TrustClueRuntimeError('serializedData is missing.');
     }

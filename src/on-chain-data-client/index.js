@@ -1,52 +1,26 @@
-// @flow
-
-import type { AdaptedTxResultInterface, AdaptedTxResultsInterface } from '../interfaces/base-interfaces';
-
 import { AIRLINE_SEGMENT_ID, HOTEL_SEGMENT_ID } from './constants';
 import Utils from './utils';
 import Contracts from './contracts';
 import HotelDataModel from './hotels/data-model';
 import AirlineDataModel from './airlines/data-model';
 import { OnChainDataRuntimeError } from './errors';
-import { AbstractDataModel } from './directory/data-model';
-
-/**
- * OnChainDataClientOptionsType options. May look like this:
- *
- * ```
- * {
- *   "provider": 'http://localhost:8545',// or another Web3 provider
- *   "gasCoefficient": 2 // Optional, defaults to 2
- * }
- * ```
- */
-export type OnChainDataClientOptionsType = {
-  // URL of currently used RPC provider for Web3.
-  provider: string | Object,
-  // Gas coefficient that is used as a multiplier when setting
-  // a transaction gas.
-  gasCoefficient?: number,
-  // Gas margin that is added to a computed gas amount when
-  // setting a transaction gas.
-  gasMargin?: number
-};
 
 /**
  * A factory class used to access various on-chain data
  * represented by Winding Tree index.
  */
 export class OnChainDataClient {
-  static dataModels: {[key: string]: AbstractDataModel};
-  static options: OnChainDataClientOptionsType;
-  static web3Utils: Utils;
-  static web3Contracts: Contracts;
+  static dataModels;
+  static options;
+  static web3Utils;
+  static web3Contracts;
 
   /**
    * Sets up Utils and Contracts with given web3 provider.
    * Sets up gasCoefficient or gasMargin. If neither is provided,
    * sets gasCoefficient to a default of 2.
    */
-  static setup (options: OnChainDataClientOptionsType) {
+  static setup (options) {
     options = options || {};
     if (!options.gasMargin && !options.gasCoefficient) {
       options.gasCoefficient = 2;
@@ -75,7 +49,7 @@ export class OnChainDataClient {
    * @throws OnChainDataRuntimeError when an unknown segment is encountered.
    * @param segment - allowed values are hotels and airlines
    */
-  static getDataModel (segment: string): AbstractDataModel {
+  static getDataModel (segment) {
     segment = segment && segment.toLowerCase();
     if (OnChainDataClient.dataModels[segment]) {
       return OnChainDataClient.dataModels[segment];
@@ -100,7 +74,7 @@ export class OnChainDataClient {
    * operation (such as update), you may benefit from the computed
    * metrics.
    */
-  static async getTransactionsStatus (txHashes: Array<string>): Promise<AdaptedTxResultsInterface> {
+  static async getTransactionsStatus (txHashes) {
     let receiptsPromises = [];
     let txDataPromises = [];
     for (let hash of txHashes) {
@@ -125,7 +99,7 @@ export class OnChainDataClient {
         raw: receipt,
       };
     }
-    const resultsValues: Array<AdaptedTxResultInterface> = (Object.values(results): Array<any>); // eslint-disable-line flowtype/no-weak-types
+    const resultsValues = Object.values(results);
     return {
       meta: {
         total: txHashes.length,
