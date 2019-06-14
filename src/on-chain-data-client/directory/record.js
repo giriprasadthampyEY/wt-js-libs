@@ -262,12 +262,8 @@ class OnChainRecord {
       onReceipt: (receipt) => {
         this.onChainDataset.markDeployed();
         if (receipt && receipt.logs) {
-          // TODO web3Eth.abi.decodeLog timeouts even though the signature of OrganizationCreated
-          // coming from the receipt logs is the same as in event registry. maybe gas problem?
-          // (0x47b688936cae1ca5de00ac709e05309381fb9f18b4c5adb358a5b542ce67caea)
-          // let decodedLogs = this.web3Contracts.decodeLogs(receipt.logs);
-          // this.address = decodedLogs[0].attributes[0].value;
-          this.address = receipt.logs[0].address;
+          let decodedLogs = this.web3Contracts.decodeLogs(receipt.logs);
+          this.address = decodedLogs[2].attributes[0].value;
         }
       },
     };

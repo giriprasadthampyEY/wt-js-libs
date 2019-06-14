@@ -70,9 +70,8 @@ describe('WtJsLibs usage - hotels', () => {
       // It is too possibly expensive to re-set on-chain directory after each test.
       const removeHotel = await directory.remove(hotel);
       const removalResult = await wallet.signAndSendTransaction(removeHotel.transactionData, removeHotel.eventCallbacks);
-      // TODO decode logs
-      // const removalTxResults = await libs.getTransactionsStatus([removalResult.transactionHash]);
-      // assert.equal(removalTxResults.meta.allPassed, true);
+      const removalTxResults = await libs.getTransactionsStatus([removalResult.transactionHash]);
+      assert.equal(removalTxResults.meta.allPassed, true);
     });
 
     it('should create then add hotel', async () => {
@@ -110,9 +109,8 @@ describe('WtJsLibs usage - hotels', () => {
       // It is too possibly expensive to re-set on-chain directory after each test.
       const removeHotel = await directory.remove(hotel);
       const removalResult = await wallet.signAndSendTransaction(removeHotel.transactionData, removeHotel.eventCallbacks);
-      // TODO decode logs
-      // const removalTxResults = await libs.getTransactionsStatus([removalResult.transactionHash]);
-      // assert.equal(removalTxResults.meta.allPassed, true);
+      const removalTxResults = await libs.getTransactionsStatus([removalResult.transactionHash]);
+      assert.equal(removalTxResults.meta.allPassed, true);
     });
   });
 

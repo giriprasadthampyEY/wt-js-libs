@@ -70,9 +70,8 @@ describe('WtJsLibs usage - airlines', () => {
       // It is too possibly expensive to re-set on-chain directory after each test.
       const removeAirline = await directory.remove(airline);
       const removalResult = await wallet.signAndSendTransaction(removeAirline.transactionData, removeAirline.eventCallbacks);
-      // TODO decode logs
-      // const removalTxResults = await libs.getTransactionsStatus([removalResult.transactionHash]);
-      // assert.equal(removalTxResults.meta.allPassed, true);
+      const removalTxResults = await libs.getTransactionsStatus([removalResult.transactionHash]);
+      assert.equal(removalTxResults.meta.allPassed, true);
     });
 
     it('should create then add airline', async () => {
@@ -110,9 +109,8 @@ describe('WtJsLibs usage - airlines', () => {
       // It is too possibly expensive to re-set on-chain directory after each test.
       const removeAirline = await directory.remove(airline);
       const removalResult = await wallet.signAndSendTransaction(removeAirline.transactionData, removeAirline.eventCallbacks);
-      // TODO decode logs
-      // const removalTxResults = await libs.getTransactionsStatus([removalResult.transactionHash]);
-      // assert.equal(removalTxResults.meta.allPassed, true);
+      const removalTxResults = await libs.getTransactionsStatus([removalResult.transactionHash]);
+      assert.equal(removalTxResults.meta.allPassed, true);
     });
   });
 
