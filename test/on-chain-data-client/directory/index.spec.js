@@ -40,7 +40,7 @@ describe('WTLibs.on-chain-data.AbstractDirectory', () => {
     it('should throw when _createRecordInstanceFactory is called on an abstract class', async () => {
       try {
         const directory = new AbstractDirectory('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', dataModel.web3Utils, dataModel.web3Contracts);
-        await directory._addRecord({
+        await directory._createRecord({
           orgJsonUri: '1234',
           owner: '1234',
         });
@@ -53,7 +53,7 @@ describe('WTLibs.on-chain-data.AbstractDirectory', () => {
     it('should throw when _getDirectoryRecordPositionFactory is called on an abstract class', async () => {
       try {
         const directory = new AbstractDirectory('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', dataModel.web3Utils, dataModel.web3Contracts);
-        await directory.getRecord();
+        await directory._getRecord();
         assert(false);
       } catch (e) {
         assert.match(e.message, /Cannot call _getDirectoryRecordPositionFactory/i);
@@ -63,7 +63,7 @@ describe('WTLibs.on-chain-data.AbstractDirectory', () => {
     it('should throw when _getRecordsAddressListFactory is called on an abstract class', async () => {
       try {
         const directory = new AbstractDirectory('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', dataModel.web3Utils, dataModel.web3Contracts);
-        await directory.getOrganizations();
+        await directory._getRecords();
         assert(false);
       } catch (e) {
         assert.match(e.message, /Cannot call _getRecordsAddressListFactory/i);
@@ -113,7 +113,7 @@ describe('WTLibs.on-chain-data.AbstractDirectory', () => {
       it('should throw if address is malformed', async () => {
         try {
           sinon.stub(directoryProvider, '_getDirectoryRecordPositionFactory').rejects();
-          await directoryProvider.getRecord('random-address');
+          await directoryProvider._getRecord('random-address');
           assert(false);
         } catch (e) {
           assert.match(e.message, /cannot find dragon/i);
@@ -124,21 +124,26 @@ describe('WTLibs.on-chain-data.AbstractDirectory', () => {
       it('should throw if no record exists on that address', async () => {
         try {
           sinon.stub(directoryProvider, '_getDirectoryRecordPositionFactory').resolves(0);
-          await directoryProvider.getRecord('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA');
+          await directoryProvider._getRecord('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA');
           assert(false);
         } catch (e) {
           assert.match(e.message, /cannot find dragon/i);
           assert.instanceOf(e, RecordNotFoundError);
         }
       });
+    });
 
+    describe('_createRecord', () => {
       it('should throw if record contract cannot be instantiated', async () => {
         try {
           sinon.stub(directoryProvider, '_createRecordInstanceFactory').rejects();
-          await directoryProvider.getRecord('0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
+          await directoryProvider._createRecord({
+            orgJsonUri: 'http://some-uri/',
+            owner: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
+          });
           assert(false);
         } catch (e) {
-          assert.match(e.message, /cannot find dragon/i);
+          assert.match(e.message, /cannot create dragon/i);
           assert.instanceOf(e, RecordNotInstantiableError);
         } finally {
           directoryProvider._createRecordInstanceFactory.restore();
@@ -275,7 +280,7 @@ describe('WTLibs.on-chain-data.AbstractDirectory', () => {
           '0xBF18B616aC81830dd0C5D4b771F22FD8144fe769',
           '0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', // This is not an address of a hotel
         ]);
-        const records = await directoryProvider.getOrganizations();
+        const records = await directoryProvider._getRecords();
         // Attempting to get two hotels for two valid addresses
         assert.equal(directoryProvider._createRecordInstanceFactory.callCount, 2);
         // But we know there's only one actual hotel

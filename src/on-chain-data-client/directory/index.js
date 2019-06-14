@@ -93,12 +93,17 @@ class AbstractDirectory {
     if (!recordOwner) {
       throw new InputDataError(`Cannot create ${this.RECORD_TYPE}: Missing owner`);
     }
-    const record = await this._createRecordInstanceFactory();
+    let record;
+    try {
+      record = await this._createRecordInstanceFactory();
+    } catch (err) {
+      throw new RecordNotInstantiableError(`Cannot create ${this.RECORD_TYPE}: ${err.message}`, err);
+    }
     record.orgJsonUri = orgJsonUri;
     return record.createOnChainData({
       from: recordOwner,
     }, alsoAdd).catch((err) => {
-      throw new WTLibsError(`Cannot add ${this.RECORD_TYPE}: ${err.message}`, err);
+      throw new WTLibsError(`Cannot create ${this.RECORD_TYPE}: ${err.message}`, err);
     });
   }
 
@@ -201,7 +206,7 @@ class AbstractDirectory {
       // Filtering null addresses beforehand improves efficiency
       .filter((addr) => !this.web3Utils.isZeroAddress(addr))
       .map((addr) => {
-        return this.getRecord(addr) // eslint-disable-line promise/no-nesting
+        return this._getRecord(addr) // eslint-disable-line promise/no-nesting
           // We don't really care why the <record> is inaccessible
           // and we need to catch exceptions here on each individual <record>
           .catch((err) => { // eslint-disable-line
