@@ -67,7 +67,6 @@ export class WtJsLibs {
    *
    * @param segment - allowed are `hotels` and `airlines`
    * @param address of the Winding Tree index
-   * @type HotelDirectoryInterface | AirlineDirectoryInterface
    */
   getDirectory (segment, address) {
     const dataModel = OnChainDataClient.getDataModel(segment);

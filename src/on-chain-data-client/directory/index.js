@@ -28,6 +28,10 @@ class AbstractDirectory {
     throw new Error('Cannot call _getDirectoryRecordPositionFactory on the class');
   }
 
+  async _getDirectoryRecordByPositionFactory (idx) {
+    throw new Error('Cannot call _getDirectoryRecordByPositionFactory on the class');
+  }
+
   async _getRecordsAddressListFactory () {
     throw new Error('Cannot call _getRecordsAddressListFactory on the class');
   }
@@ -173,6 +177,15 @@ class AbstractDirectory {
         throw new RecordNotInstantiableError(`Cannot find ${this.RECORD_TYPE} at ${address}: ${err.message}`, err);
       });
     }
+  }
+
+  async _getRecordIndex (address) {
+    return this._getDirectoryRecordPositionFactory(address);
+  }
+
+  async _getRecordByIndex (recordIndex) {
+    const address = await this._getDirectoryRecordByPositionFactory(recordIndex);
+    return this._getRecord(address);
   }
 
   /**

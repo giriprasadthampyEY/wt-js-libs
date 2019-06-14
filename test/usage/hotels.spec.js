@@ -142,11 +142,27 @@ describe('WtJsLibs usage - hotels', () => {
   });
 
   describe('getRecord', () => {
-    it('should get hotel', async () => {
+    it('should get hotel by address', async () => {
       const hotel = await directory.getRecord(hotelAddress);
       assert.isNotNull(hotel);
       assert.equal(await hotel.orgJsonUri, 'in-memory://hotel-url-one');
       assert.equal(await hotel.address, hotelAddress);
+    });
+
+    it('should get hotel index by address', async () => {
+      const idx = await directory.getRecordIndex(hotelAddress);
+      assert.equal(idx, 1);
+    });
+
+    it('should get hotel by index', async () => {
+      const firstHotel = await directory.getRecordByIndex(1);
+      assert.isNotNull(firstHotel);
+      assert.equal(await firstHotel.orgJsonUri, 'in-memory://hotel-url-one');
+      assert.equal(await firstHotel.address, hotelAddress);
+      const secondHotel = await directory.getRecordByIndex(2);
+      assert.isNotNull(secondHotel);
+      assert.equal(await secondHotel.orgJsonUri, 'in-memory://hotel-url-two');
+      assert.equal(await secondHotel.address, '0x4A763F50DFe5cF4468B4171539E021A26FCee0cC');
     });
   });
 

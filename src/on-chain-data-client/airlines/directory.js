@@ -37,6 +37,11 @@ class AirlineDirectory extends AbstractDirectory {
     return parseInt(await directory.methods.organizationsIndex(address).call(), 10);
   }
 
+  async _getDirectoryRecordByPositionFactory (idx) {
+    const directory = await this._getDeployedDirectory();
+    return directory.methods.organizations(idx).call();
+  }
+
   async _getRecordsAddressListFactory () {
     const directory = await this._getDeployedDirectory();
     return directory.methods.getOrganizations().call();
@@ -131,6 +136,15 @@ class AirlineDirectory extends AbstractDirectory {
    */
   async getRecords () {
     return this._getRecords();
+  }
+
+  // TODO error handling
+  async getRecordIndex (address) {
+    return this._getRecordIndex(address);
+  }
+
+  async getRecordByIndex (idx) {
+    return this._getRecordByIndex(idx);
   }
 }
 

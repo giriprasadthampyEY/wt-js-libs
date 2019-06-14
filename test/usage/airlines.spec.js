@@ -142,11 +142,27 @@ describe('WtJsLibs usage - airlines', () => {
   });
 
   describe('getRecord', () => {
-    it('should get airline', async () => {
+    it('should get airline by address', async () => {
       const airline = await directory.getRecord(airlineAddress);
       assert.isNotNull(airline);
       assert.equal(await airline.orgJsonUri, 'in-memory://airline-url-one');
       assert.equal(await airline.address, airlineAddress);
+    });
+
+    it('should get airline index by address', async () => {
+      const idx = await directory.getRecordIndex(airlineAddress);
+      assert.equal(idx, 1);
+    });
+
+    it('should get airline by index', async () => {
+      const firstAirline = await directory.getRecordByIndex(1);
+      assert.isNotNull(firstAirline);
+      assert.equal(await firstAirline.orgJsonUri, 'in-memory://airline-url-one');
+      assert.equal(await firstAirline.address, airlineAddress);
+      const secondAirline = await directory.getRecordByIndex(2);
+      assert.isNotNull(secondAirline);
+      assert.equal(await secondAirline.orgJsonUri, 'in-memory://airline-url-two');
+      assert.equal(await secondAirline.address, '0xa9e131d144EaF885DE074409C668f1e8895fcFdB');
     });
   });
 
