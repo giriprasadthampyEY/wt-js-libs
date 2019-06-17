@@ -274,9 +274,9 @@ class OnChainRecord {
     };
   }
 
-  async _hasDelegate (delegateAddress, transactionOptions) {
+  async _hasAssociatedKey (associatedAddress, transactionOptions) {
     const contract = await this._getContractInstance();
-    return contract.methods.hasDelegate(delegateAddress).call(transactionOptions);
+    return contract.methods.hasAssociatedKey(associatedAddress).call(transactionOptions);
   }
 
   /**

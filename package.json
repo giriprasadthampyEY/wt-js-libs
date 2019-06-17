@@ -79,7 +79,8 @@
     "webpack": "^4.21.0",
     "webpack-bundle-size-analyzer": "^3.0.0",
     "webpack-cli": "^3.1.0",
-    "webpack-node-externals": "^1.7.2"
+    "webpack-node-externals": "^1.7.2",
+    "zos-lib": "^2.3.1"
   },
   "engines": {
     "node": ">=10.0.0"

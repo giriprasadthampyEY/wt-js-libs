@@ -1,5 +1,6 @@
 import SegmentDirectoryMetadata from '@windingtree/wt-contracts/build/contracts/SegmentDirectory.json';
 import OrganizationMetadata from '@windingtree/wt-contracts/build/contracts/Organization.json';
+import OrganizationFactoryMetadata from '@windingtree/wt-contracts/build/contracts/OrganizationFactory.json';
 import { SmartContractInstantiationError } from './errors';
 
 import Web3Utils from 'web3-utils';
@@ -97,6 +98,7 @@ class Contracts {
       this.eventRegistry = Object.assign(
         {},
         generateEventSignatures(OrganizationMetadata.abi),
+        generateEventSignatures(OrganizationFactoryMetadata.abi),
         generateEventSignatures(SegmentDirectoryMetadata.abi),
       );
     }

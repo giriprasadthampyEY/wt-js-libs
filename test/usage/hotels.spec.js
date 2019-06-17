@@ -114,7 +114,7 @@ describe('WtJsLibs usage - hotels', () => {
     });
   });
 
-  describe('remove', () => {
+  xdescribe('remove', () => {
     it('should remove hotel', async () => {
       const owner = hotelOwner;
       const createHotel = await directory.createAndAdd({
@@ -224,39 +224,39 @@ describe('WtJsLibs usage - hotels', () => {
     });
   });
 
-  describe('hasDelegate', () => {
-    const delegateAddress = '0x04e46F24307E4961157B986a0b653a0D88F9dBd6';
+  describe('hasAssociatedKey', () => {
+    const associatedKeyAddress = '0x04e46F24307E4961157B986a0b653a0D88F9dBd6';
 
-    it('should return true if is delegate', async () => {
+    it('should return true if is associatedKey', async () => {
       const hotel = await directory.getRecord(hotelAddress);
-      const hasDelegate = await hotel.hasDelegate(delegateAddress, {
+      const hasAssociatedKey = await hotel.hasAssociatedKey(associatedKeyAddress, {
         from: hotelOwner,
       });
-      assert.equal(hasDelegate, true);
+      assert.equal(hasAssociatedKey, true);
     });
 
-    it('should return true if is delegate whoever asks', async () => {
+    it('should return true if is associatedKey whoever asks', async () => {
       const hotel = await directory.getRecord(hotelAddress);
-      const hasDelegate = await hotel.hasDelegate(delegateAddress, {
-        from: delegateAddress,
+      const hasAssociatedKey = await hotel.hasAssociatedKey(associatedKeyAddress, {
+        from: '0xB309875d8b24D522Ea0Ac57903c8A0b0C93C414A',
       });
-      assert.equal(hasDelegate, true);
+      assert.equal(hasAssociatedKey, true);
     });
 
-    it('should return false if is not delegate', async () => {
+    it('should return false if is not associatedKey', async () => {
       const hotel = await directory.getRecord(hotelAddress);
-      const hasDelegate = await hotel.hasDelegate(hotelOwner, {
+      const hasAssociatedKey = await hotel.hasAssociatedKey(hotelOwner, {
         from: hotelOwner,
       });
-      assert.equal(hasDelegate, false);
+      assert.equal(hasAssociatedKey, false);
     });
 
-    it('should return false if is not delegate whoever asks', async () => {
+    it('should return false if is not associatedKey whoever asks', async () => {
       const hotel = await directory.getRecord(hotelAddress);
-      const hasDelegate = await hotel.hasDelegate(hotelOwner, {
-        from: delegateAddress,
+      const hasAssociatedKey = await hotel.hasAssociatedKey(hotelOwner, {
+        from: '0xB309875d8b24D522Ea0Ac57903c8A0b0C93C414A',
       });
-      assert.equal(hasDelegate, false);
+      assert.equal(hasAssociatedKey, false);
     });
   });
 });

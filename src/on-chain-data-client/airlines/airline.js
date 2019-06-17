@@ -98,8 +98,8 @@ class OnChainAirline extends OnChainRecord {
     return results;
   }
 
-  async hasDelegate (delegateAddress, transactionOptions) {
-    return this._hasDelegate(delegateAddress, transactionOptions);
+  async hasAssociatedKey (associatedAddress, transactionOptions) {
+    return this._hasAssociatedKey(associatedAddress, transactionOptions);
   }
 }
 
