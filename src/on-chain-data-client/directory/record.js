@@ -37,16 +37,15 @@ class OnChainRecord {
           remoteGetter: async () => {
             return (await this._getContractInstance()).methods.getOrgJsonUri().call();
           },
-          remoteSetter: this._changeOrgJsonUri.bind(this),
         },
         _owner: {
           remoteGetter: async () => {
             return (await this._getContractInstance()).methods.owner().call();
           },
         },
-        _created: {
+        _associatedKeys: {
           remoteGetter: async () => {
-            return (await this._getContractInstance()).methods.created().call();
+            return (await this._getContractInstance()).methods.getAssociatedKeys().call();
           },
         },
       },
@@ -63,18 +62,6 @@ class OnChainRecord {
 
   _getRecordContractFactory () {
     throw new Error('Cannot call _getRecordContractFactory on class');
-  }
-
-  _createRecordFactory (orgJsonUri) {
-    throw new Error('Cannot call _createRecordFactory on class');
-  }
-
-  _createAndAddRecordFactory (orgJsonUri) {
-    throw new Error('Cannot call _createAndAddRecordFactory on class');
-  }
-
-  _deleteRecordInDirectoryFactory () {
-    throw new Error('Cannot call _deleteRecordInDirectoryFactory on class');
   }
 
   /**
@@ -101,34 +88,6 @@ class OnChainRecord {
     })();
   }
 
-  set orgJsonUri (newOrgJsonUri) {
-    if (!newOrgJsonUri) {
-      throw new InputDataError(
-        `Cannot update ${this.RECORD_TYPE}: Cannot set orgJsonUri when it is not provided`
-      );
-    }
-    if (typeof newOrgJsonUri === 'string' && !newOrgJsonUri.match(/([a-z-]+):\/\//)) {
-      throw new InputDataError(
-        `Cannot update ${this.RECORD_TYPE}: Cannot set orgJsonUri with invalid format`
-      );
-    }
-    if (newOrgJsonUri !== this._orgJsonUri) {
-      this._dataIndex = null;
-    }
-
-    this._orgJsonUri = newOrgJsonUri;
-  }
-
-  get created () {
-    if (!this._initialized) {
-      return;
-    }
-    return (async () => {
-      const created = await this._created;
-      return created;
-    })();
-  }
-
   get owner () {
     if (!this._initialized) {
       return;
@@ -139,14 +98,14 @@ class OnChainRecord {
     })();
   }
 
-  set owner (newOwner) {
-    if (!newOwner) {
-      throw new InputDataError(`Cannot update ${this.RECORD_TYPE}: Cannot set owner when it is not provided`);
+  get associatedKeys () {
+    if (!this._initialized) {
+      return;
     }
-    if (this.address) {
-      throw new InputDataError(`Cannot update ${this.RECORD_TYPE}: Cannot set owner when ${this.RECORD_TYPE} is deployed`);
-    }
-    this._owner = newOwner;
+    return (async () => {
+      const associatedKeys = await this._associatedKeys;
+      return associatedKeys;
+    })();
   }
 
   /**
@@ -213,121 +172,11 @@ class OnChainRecord {
     return this.contractInstance;
   }
 
-  /**
-   * Generates transaction data and metadata for updating orgJsonUri on-chain.
-   * Used internally as a remoteSetter for `orgJsonUri` property.
-   * Transaction is not signed nor sent here.
-   *
-   * @param {TransactionOptionsInterface} transactionOptions object, only `from` property is currently used, all others are ignored in this implementation
-   * @return {Promise<BasePreparedTransactionMetadataInterface>} resulting transaction metadata
-   */
-  async _changeOrgJsonUri (transactionOptions) {
-    const uri = await this.orgJsonUri;
-    const contract = await this._getContractInstance();
-    const data = contract.methods.changeOrgJsonUri(uri).encodeABI();
-    const estimate = contract.methods.changeOrgJsonUri(uri).estimateGas(transactionOptions);
-    const transactionData = {
-      nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
-      data: data,
-      from: transactionOptions.from,
-      to: contract._address,
-      gas: this.web3Utils.applyGasModifier(await estimate),
-    };
-    return {
-      record: (this),
-      transactionData: transactionData,
-    };
-  }
-
-  /**
-   * Generates transaction data and metadata for creating new <record> contract on-chain.
-   * Transaction is not signed nor sent here.
-   *
-   * @param {TransactionOptionsInterface} transactionOptions object, only `from` property is currently used, all others are ignored in this implementation
-   * @return {Promise<BasePreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created <record> instance.
-   */
-  async _createOnChainData (transactionOptions, alsoAdd = false) {
-    const orgJsonUri = await this.orgJsonUri;
-    const fn = alsoAdd ? (await this._createAndAddRecordFactory(orgJsonUri)) : (await this._createRecordFactory(orgJsonUri));
-    const estimate = fn.estimateGas(transactionOptions);
-    const data = fn.encodeABI();
-    const transactionData = {
-      nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
-      data: data,
-      from: transactionOptions.from,
-      to: this.directoryContract.options.address,
-      gas: this.web3Utils.applyGasModifier(await estimate),
-    };
-    const eventCallbacks = {
-      onReceipt: (receipt) => {
-        this.onChainDataset.markDeployed();
-        if (receipt && receipt.logs) {
-          let decodedLogs = this.web3Contracts.decodeLogs(receipt.logs);
-          this.address = decodedLogs[2].attributes[0].value;
-        }
-      },
-    };
-    return {
-      record: this,
-      transactionData: transactionData,
-      eventCallbacks: eventCallbacks,
-    };
-  }
-
-  async _hasAssociatedKey (associatedAddress, transactionOptions) {
+  async _hasAssociatedKey (associatedAddress, transactionOptions = {}) {
     const contract = await this._getContractInstance();
     return contract.methods.hasAssociatedKey(associatedAddress).call(transactionOptions);
   }
 
-  /**
-   * Generates transaction data and metadata required for all <record>-related data modification
-   * by calling `updateRemoteData` on a `RemotelyBackedDataset`.
-   *
-   * @param {TransactionOptionsInterface} options object that is passed to all remote data setters
-   * @throws {SmartContractInstantiationError} When the underlying contract is not yet deployed.
-   * @throws {SmartContractInstantiationError} When orgJsonUri is empty.
-   * @return {Promise<Array<BasePreparedTransactionMetadataInterface>>} List of transaction metadata
-   */
-  async _updateOnChainData (transactionOptions) {
-    // pre-check if contract is available at all and fail fast
-    await this._getContractInstance();
-    // We have to clone options for each dataset as they may get modified
-    // along the way
-    let res = await this.onChainDataset.updateRemoteData(Object.assign({}, transactionOptions));
-    return res;
-  }
-
-  /**
-   * Generates transaction data and metadata required for destroying the <record> object on network.
-   *
-   * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
-   * @throws {SmartContractInstantiationError} When the underlying contract is not yet deployed.
-   * @return {Promise<BasePreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created <record> instance.
-   */
-  async _removeOnChainData (transactionOptions) {
-    if (!this.onChainDataset.isDeployed()) {
-      throw new SmartContractInstantiationError(`Cannot remove ${this.RECORD_TYPE}: not deployed`);
-    }
-    const estimate = this._deleteRecordInDirectoryFactory().estimateGas(transactionOptions);
-    const data = this._deleteRecordInDirectoryFactory().encodeABI();
-    const transactionData = {
-      nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
-      data: data,
-      from: transactionOptions.from,
-      to: this.directoryContract.options.address,
-      gas: this.web3Utils.applyGasModifier(await estimate),
-    };
-    const eventCallbacks = {
-      onReceipt: (receipt) => {
-        this.onChainDataset.markObsolete();
-      },
-    };
-    return {
-      record: (this),
-      transactionData: transactionData,
-      eventCallbacks: eventCallbacks,
-    };
-  }
 }
 
 export default OnChainRecord;

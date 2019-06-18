@@ -84,53 +84,6 @@ class AbstractDirectory {
     };
   }
 
-  async _createRecord (recordData, alsoAdd = false) {
-    const orgJsonUri = await recordData.orgJsonUri;
-    if (!orgJsonUri) {
-      throw new InputDataError(`Cannot create ${this.RECORD_TYPE}: Missing orgJsonUri`);
-    }
-    const recordOwner = await recordData.owner;
-    if (!recordOwner) {
-      throw new InputDataError(`Cannot create ${this.RECORD_TYPE}: Missing owner`);
-    }
-    let record;
-    try {
-      record = await this._createRecordInstanceFactory();
-    } catch (err) {
-      throw new RecordNotInstantiableError(`Cannot create ${this.RECORD_TYPE}: ${err.message}`, err);
-    }
-    record.orgJsonUri = orgJsonUri;
-    return record.createOnChainData({
-      from: recordOwner,
-    }, alsoAdd).catch((err) => {
-      throw new WTLibsError(`Cannot create ${this.RECORD_TYPE}: ${err.message}`, err);
-    });
-  }
-
-  /**
-   * Generates a list of transaction data required for updating a <record>
-   * and more metadata required for sucessful mining of those transactions.
-   * Does not sign or send any of the transactions.
-   *
-   * @throws {InputDataError} When <record> does not have a owner field.
-   * @throws {InputDataError} When <record> does not contain a owner property.
-   * @throws {WTLibsError} When anything goes wrong during data preparation phase.
-   */
-  async _updateRecord (record) {
-    if (!record.address) {
-      throw new InputDataError(`Cannot update ${this.RECORD_TYPE} without address.`);
-    }
-    const recordOwner = await record.owner;
-    if (!recordOwner) {
-      throw new InputDataError(`Cannot update ${this.RECORD_TYPE} without owner.`);
-    }
-    return record.updateOnChainData({
-      from: recordOwner,
-    }).catch((err) => {
-      throw new WTLibsError(`Cannot update ${this.RECORD_TYPE}: ${err.message}`, err);
-    });
-  }
-
   /**
    * Generates transaction data required for removing a <record>
    * and more metadata required for successful mining of that transaction.

@@ -69,27 +69,6 @@ class HotelDirectory extends AbstractDirectory {
     return this._addRecord(hotelData);
   }
 
-  async create (hotelData) {
-    return this._createRecord(hotelData, false);
-  }
-
-  async createAndAdd (hotelData) {
-    return this._createRecord(hotelData, true);
-  }
-
-  /**
-   * Generates a list of transaction data required for updating a hotel
-   * and more metadata required for sucessful mining of those transactions.
-   * Does not sign or send any of the transactions.
-   *
-   * @throws {InputDataError} When hotel does not have a owner field.
-   * @throws {InputDataError} When hotel does not contain a owner property.
-   * @throws {WTLibsError} When anything goes wrong during data preparation phase.
-   */
-  async update (hotel) {
-    return this._updateRecord(hotel);
-  }
-
   /**
    * Generates transaction data required for removing a hotel
    * and more metadata required for successful mining of that transaction.

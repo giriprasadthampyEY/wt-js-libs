@@ -69,27 +69,6 @@ class AirlineDirectory extends AbstractDirectory {
     return this._addRecord(airlineData);
   }
 
-  async create (airlineData) {
-    return this._createRecord(airlineData, false);
-  }
-
-  async createAndAdd (airlineData) {
-    return this._createRecord(airlineData, true);
-  }
-
-  /**
-   * Generates a list of transaction data required for updating a airline
-   * and more metadata required for sucessful mining of those transactions.
-   * Does not sign or send any of the transactions.
-   *
-   * @throws {InputDataError} When airline does not have a owner field.
-   * @throws {InputDataError} When airline does not contain a owner property.
-   * @throws {WTLibsError} When anything goes wrong during data preparation phase.
-   */
-  async update (airline) {
-    return this._updateRecord(airline);
-  }
-
   /**
    * Generates transaction data required for removing a airline
    * and more metadata required for successful mining of that transaction.

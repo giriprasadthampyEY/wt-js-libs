@@ -40,65 +40,6 @@ class OnChainHotel extends OnChainRecord {
     return this.web3Contracts.getOrganizationInstance(this.address);
   }
 
-  _createRecordFactory (orgJsonUri) {
-    return this.directoryContract.methods.create(orgJsonUri);
-  }
-
-  _createAndAddRecordFactory (orgJsonUri) {
-    return this.directoryContract.methods.createAndAdd(orgJsonUri);
-  }
-
-  _deleteRecordInDirectoryFactory () {
-    return this.directoryContract.methods.remove(this.address);
-  }
-
-  /**
-   * Generates transaction data and metadata for creating new hotel contract on-chain.
-   * Transaction is not signed nor sent here.
-   *
-   * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
-   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created hotel instance.
-   */
-  async createOnChainData (transactionOptions, alsoAdd = false) {
-    const result = await this._createOnChainData(transactionOptions, alsoAdd);
-    result.hotel = result.record;
-    delete result.record;
-    return result;
-  }
-
-  /**
-   * Generates transaction data and metadata required for destroying the hotel object on network.
-   *
-   * @param {TransactionOptionsInterface} options object, only `from` property is currently used, all others are ignored in this implementation
-   * @throws {SmartContractInstantiationError} When the underlying contract is not yet deployed.
-   * @return {Promise<PreparedTransactionMetadataInterface>} Transaction data and metadata, including the freshly created hotel instance.
-   */
-  async removeOnChainData (transactionOptions) {
-    const result = await this._removeOnChainData(transactionOptions);
-    result.hotel = result.record;
-    delete result.record;
-    return result;
-  }
-
-  /**
-   * Generates transaction data and metadata required for all hotel-related data modification
-   * by calling `updateRemoteData` on a `RemotelyBackedDataset`.
-   *
-   * @param {TransactionOptionsInterface} options object that is passed to all remote data setters
-   * @throws {SmartContractInstantiationError} When the underlying contract is not yet deployed.
-   * @throws {SmartContractInstantiationError} When orgJsonUri is empty.
-   * @return {Promise<Array<PreparedTransactionMetadataInterface>>} List of transaction metadata
-   */
-  async updateOnChainData (transactionOptions) {
-    const results = (await this._updateOnChainData(transactionOptions))
-      .map((result) => {
-        result.hotel = result.record;
-        delete result.record;
-        return result;
-      });
-    return results;
-  }
-
   async hasAssociatedKey (associatedAddress, transactionOptions) {
     return this._hasAssociatedKey(associatedAddress, transactionOptions);
   }

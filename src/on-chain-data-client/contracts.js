@@ -1,3 +1,4 @@
+// TODO inspect if we cannot use abstract/interface JSON files
 import SegmentDirectoryMetadata from '@windingtree/wt-contracts/build/contracts/SegmentDirectory.json';
 import OrganizationMetadata from '@windingtree/wt-contracts/build/contracts/Organization.json';
 import OrganizationFactoryMetadata from '@windingtree/wt-contracts/build/contracts/OrganizationFactory.json';
@@ -81,6 +82,10 @@ class Contracts {
    */
   async getOrganizationInstance (address) {
     return this._getInstance('organization', OrganizationMetadata.abi, address);
+  }
+
+  async getOrganizationFactoryInstance (address) {
+    return this._getInstance('organizationFactory', OrganizationFactoryMetadata.abi, address);
   }
 
   _initEventRegistry () {
