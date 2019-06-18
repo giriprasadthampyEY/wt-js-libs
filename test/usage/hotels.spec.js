@@ -166,35 +166,6 @@ describe('WtJsLibs usage - hotels', () => {
     });
   });
 
-  xdescribe('update', () => {
-    it('should update hotel', async () => {
-      const newUri = 'in-memory://another-url';
-      const hotel = await directory.getOrganization(hotelAddress);
-      const oldUri = await hotel.orgJsonUri;
-      hotel.orgJsonUri = newUri;
-      // Change the data
-      const updateHotelSet = await directory.update(hotel);
-      let updateResult;
-      for (let updateHotel of updateHotelSet) {
-        updateResult = await wallet.signAndSendTransaction(updateHotel.transactionData, updateHotel.eventCallbacks);
-        assert.isDefined(updateResult);
-      }
-      // Verify
-      const hotel2 = await directory.getOrganization(hotelAddress);
-      assert.equal(await hotel2.orgJsonUri, newUri);
-      // Change it back to keep data in line
-      hotel.orgJsonUri = oldUri;
-      const updateHotelSet2 = await directory.update(hotel);
-      for (let updateHotel of updateHotelSet2) {
-        updateResult = await wallet.signAndSendTransaction(updateHotel.transactionData, updateHotel.eventCallbacks);
-        assert.isDefined(updateResult);
-      }
-      // Verify it changed properly
-      const hotel3 = await directory.getOrganization(hotelAddress);
-      assert.equal(await hotel3.orgJsonUri, oldUri);
-    });
-  });
-
   describe('getOrganizations', () => {
     it('should get all hotels', async () => {
       const hotels = await directory.getOrganizations();

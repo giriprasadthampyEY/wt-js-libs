@@ -23,8 +23,8 @@ import {
   RemotelyBackedDatasetError,
   RemoteDataAccessError,
   RemoteDataReadError,
-  HotelNotFoundError,
-  HotelNotInstantiableError,
+  OrganizationNotFoundError,
+  OrganizationNotInstantiableError,
   OnChainDataRuntimeError,
   SmartContractInstantiationError,
 } from './on-chain-data-client/errors';
@@ -70,6 +70,10 @@ export class WtJsLibs {
    */
   getDirectory (segment, address) {
     return OnChainDataClient.getDirectory(segment, address);
+  }
+
+  getFactory (address) {
+    return OnChainDataClient.getFactory(address);
   }
 
   /**
@@ -126,8 +130,8 @@ export const errors = {
   RemotelyBackedDatasetError,
   RemoteDataAccessError,
   RemoteDataReadError,
-  HotelNotFoundError,
-  HotelNotInstantiableError,
+  OrganizationNotFoundError,
+  OrganizationNotInstantiableError,
   OnChainDataRuntimeError,
   SmartContractInstantiationError,
   WalletError,

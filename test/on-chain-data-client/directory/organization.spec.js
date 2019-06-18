@@ -27,8 +27,7 @@ describe.only('WTLibs.on-chain-data.directory.Organization', () => {
         },
       }),
     };
-    organization = new OnChainOrganization(utilsStub, contractsStub, 'some-address');
-    organization.initialize();
+    organization = OnChainOrganization.createInstance(utilsStub, contractsStub, 'some-address');
   });
 
   describe('initialize', () => {

@@ -5,7 +5,7 @@ import testedDataModel from '../utils/data-airline-model-definition';
 import OffChainDataClient from '../../src/off-chain-data-client';
 
 describe('WtJsLibs usage - airlines', () => {
-  let libs, wallet, directory, emptyDirectory;
+  let libs, wallet, directory, emptyDirectory, factory;
   const airlineOwner = '0x04e46F24307E4961157B986a0b653a0D88F9dBd6';
   const airlineAddress = '0x0C4c734F0Ecb92270D1ebE7b04aEC4440EB05CAa';
 
@@ -14,6 +14,7 @@ describe('WtJsLibs usage - airlines', () => {
     directory = libs.getDirectory('airlines', testedDataModel.directoryAddress);
     wallet = libs.createWallet(jsonWallet);
     emptyDirectory = libs.getDirectory('airlines', testedDataModel.emptyDirectoryAddress);
+    factory = libs.getFactory(testedDataModel.factoryAddress);
     wallet.unlock('test123');
   });
 
@@ -31,8 +32,8 @@ describe('WtJsLibs usage - airlines', () => {
     });
   });
 
-  xdescribe('create and add', () => {
-    it('should create and add airline', async () => {
+  describe('create and add', () => {
+    it.only('should create and add airline', async () => {
       const jsonClient = libs.getOffChainDataClient('in-memory');
       // airline description
       const descUrl = await jsonClient.upload({
@@ -47,12 +48,13 @@ describe('WtJsLibs usage - airlines', () => {
       const orgJsonUri = await jsonClient.upload({
         descriptionUri: descUrl,
       });
-      const createAirline = await directory.createAndAdd({
+      const createAirline = await factory.createOrganization({
         owner: airlineOwner,
         orgJsonUri: orgJsonUri,
       });
       const airline = createAirline.airline;
       const result = await wallet.signAndSendTransaction(createAirline.transactionData, createAirline.eventCallbacks);
+      console.log(result);
 
       assert.isDefined(result);
       assert.isDefined(airline.address);
@@ -163,35 +165,6 @@ describe('WtJsLibs usage - airlines', () => {
       assert.isNotNull(secondAirline);
       assert.equal(await secondAirline.orgJsonUri, 'in-memory://airline-url-two');
       assert.equal(await secondAirline.address, '0x714D6eB9B497b383afbB8204cfD948061920DA43');
-    });
-  });
-
-  xdescribe('update', () => {
-    it('should update airline', async () => {
-      const newUri = 'in-memory://another-url';
-      const airline = await directory.getOrganization(airlineAddress);
-      const oldUri = await airline.orgJsonUri;
-      airline.orgJsonUri = newUri;
-      // Change the data
-      const updateAirlineSet = await directory.update(airline);
-      let updateResult;
-      for (let updateAirline of updateAirlineSet) {
-        updateResult = await wallet.signAndSendTransaction(updateAirline.transactionData, updateAirline.eventCallbacks);
-        assert.isDefined(updateResult);
-      }
-      // Verify
-      const airline2 = await directory.getOrganization(airlineAddress);
-      assert.equal(await airline2.orgJsonUri, newUri);
-      // Change it back to keep data in line
-      airline.orgJsonUri = oldUri;
-      const updateAirlineSet2 = await directory.update(airline);
-      for (let updateAirline of updateAirlineSet2) {
-        updateResult = await wallet.signAndSendTransaction(updateAirline.transactionData, updateAirline.eventCallbacks);
-        assert.isDefined(updateResult);
-      }
-      // Verify it changed properly
-      const airline3 = await directory.getOrganization(airlineAddress);
-      assert.equal(await airline3.orgJsonUri, oldUri);
     });
   });
 

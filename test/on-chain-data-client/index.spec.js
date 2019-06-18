@@ -1,6 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import Directory from '../../src/on-chain-data-client/directory';
+import OrganizationFactory from '../../src/on-chain-data-client/organization-factory';
 
 import OnChainDataClient from '../../src/on-chain-data-client';
 import { OnChainDataRuntimeError } from '../../src/on-chain-data-client/errors';
@@ -82,6 +83,30 @@ describe('WTLibs.on-chain-data.OnChainDataClient', () => {
         assert.match(e.message, /unknown segment/i);
         assert.instanceOf(e, OnChainDataRuntimeError);
       }
+    });
+  });
+
+  describe('getFactory', () => {
+    let createFactorySpy;
+
+    beforeAll(() => {
+      OnChainDataClient.setup({ provider: 'http://localhost:8545' });
+      createFactorySpy = sinon.spy(OrganizationFactory, 'createInstance');
+    });
+
+    afterEach(() => {
+      createFactorySpy.resetHistory();
+    });
+
+    it('should cache datamodel instances', () => {
+      OnChainDataClient.getFactory('123');
+      assert.equal(createFactorySpy.callCount, 1);
+      assert.isDefined(OnChainDataClient.factories['123']);
+      OnChainDataClient.getFactory('123');
+      assert.equal(createFactorySpy.callCount, 1);
+      const model = OnChainDataClient.getFactory('456');
+      assert.equal(createFactorySpy.callCount, 2);
+      assert.instanceOf(model, OrganizationFactory);
     });
   });
 });

@@ -4,7 +4,7 @@ import SegmentDirectory from '../../../src/on-chain-data-client/directory';
 import OnChainOrganization from '../../../src/on-chain-data-client/directory/organization';
 import helpers from '../../utils/helpers';
 import { WTLibsError } from '../../../src/errors';
-import { RecordNotFoundError, RecordNotInstantiableError, InputDataError } from '../../../src/on-chain-data-client/errors';
+import { OrganizationNotFoundError, OrganizationNotInstantiableError, InputDataError } from '../../../src/on-chain-data-client/errors';
 
 describe('WTLibs.on-chain-data.Directory', () => {
   let contractsStub, utilsStub, ownerStub, addStub, removeStub;
@@ -180,7 +180,7 @@ describe('WTLibs.on-chain-data.Directory', () => {
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot find organization/i);
-        assert.instanceOf(e, RecordNotFoundError);
+        assert.instanceOf(e, OrganizationNotFoundError);
       }
     });
 
@@ -191,7 +191,7 @@ describe('WTLibs.on-chain-data.Directory', () => {
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot instantiate organization/i);
-        assert.instanceOf(e, RecordNotInstantiableError);
+        assert.instanceOf(e, OrganizationNotInstantiableError);
       } finally {
         OnChainOrganization.createInstance.restore();
       }

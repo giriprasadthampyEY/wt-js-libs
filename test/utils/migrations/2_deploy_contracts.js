@@ -74,6 +74,7 @@ module.exports = async function (deployer, network, accounts) {
     console.log('========================================');
     console.log('    Proxy owner:', accounts[4]);
     console.log('    Factory, Directory and Token owner:', accounts[0]);
+    console.log('    Factory address:', factory.address);
     console.log('    Wallet account:', accounts[1]);
     console.log('    LifToken with faucet:', LifTokenTest.address);
     console.log('    HotelDirectory:', firstHotelDirectory.address);

@@ -82,7 +82,7 @@ class OnChainOrganization {
     return {};
   }
 
-  _getRecordContractFactory () {
+  _getOrganizationContractFactory () {
     return this.web3Contracts.getOrganizationInstance(this.address);
   }
 
@@ -131,7 +131,7 @@ class OnChainOrganization {
   }
 
   /**
-   * Helper method that transforms the whole <record> into a sync simple
+   * Helper method that transforms the whole Organization into a sync simple
    * JavaScript object only with data properties.
    *
    * By default, all off-chain data is resolved recursively. If you want to
@@ -172,7 +172,7 @@ class OnChainOrganization {
       throw new SmartContractInstantiationError('Cannot get Organization instance without address');
     }
     if (!this.contractInstance) {
-      this.contractInstance = await this._getRecordContractFactory();
+      this.contractInstance = await this._getOrganizationContractFactory();
     }
     return this.contractInstance;
   }

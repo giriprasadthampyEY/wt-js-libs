@@ -1,5 +1,5 @@
 import { WTLibsError } from '../../errors';
-import { InputDataError, RecordNotFoundError, RecordNotInstantiableError } from '../errors';
+import { InputDataError, OrganizationNotFoundError, OrganizationNotInstantiableError } from '../errors';
 import OnChainOrganization from './organization';
 
 export class SegmentDirectory {
@@ -25,26 +25,26 @@ export class SegmentDirectory {
    * and more metadata required for sucessful mining of that transaction.
    * Does not sign or send the transaction.
    *
-   * @throws {InputDataError} When recordData does not contain orgJsonUri property.
-   * @throws {InputDataError} When recordData does not contain a owner property.
+   * @throws {InputDataError} When orgData does not contain orgJsonUri property.
+   * @throws {InputDataError} When orgData does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
-  async add (recordData) {
-    if (!recordData.address) {
+  async add (orgData) {
+    if (!orgData.address) {
       throw new InputDataError('Cannot add Organization without address.');
     }
-    const recordOwner = await recordData.owner;
-    if (!recordOwner) {
+    const orgOwner = await orgData.owner;
+    if (!orgOwner) {
       throw new InputDataError('Cannot add Organization without owner.');
     }
     try {
       const directory = await this._getDeployedDirectory();
-      const data = directory.methods.add(recordData.address).encodeABI();
-      const estimate = directory.methods.add(recordData.address).estimateGas({ from: recordOwner });
+      const data = directory.methods.add(orgData.address).encodeABI();
+      const estimate = directory.methods.add(orgData.address).estimateGas({ from: orgOwner });
       const transactionData = {
-        nonce: await this.web3Utils.determineCurrentAddressNonce(recordOwner),
+        nonce: await this.web3Utils.determineCurrentAddressNonce(orgOwner),
         data: data,
-        from: recordOwner,
+        from: orgOwner,
         to: this.address,
         gas: this.web3Utils.applyGasModifier(await estimate),
       };
@@ -66,22 +66,22 @@ export class SegmentDirectory {
    * @throws {InputDataError} When organization does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
-  async remove (recordData) {
-    if (!recordData.address) {
+  async remove (orgData) {
+    if (!orgData.address) {
       throw new InputDataError('Cannot remove Organization without address.');
     }
-    const recordOwner = await recordData.owner;
-    if (!recordOwner) {
+    const orgOwner = await orgData.owner;
+    if (!orgOwner) {
       throw new InputDataError('Cannot remove Organization without owner.');
     }
     try {
       const directory = await this._getDeployedDirectory();
-      const data = directory.methods.remove(recordData.address).encodeABI();
-      const estimate = directory.methods.remove(recordData.address).estimateGas({ from: recordOwner });
+      const data = directory.methods.remove(orgData.address).encodeABI();
+      const estimate = directory.methods.remove(orgData.address).estimateGas({ from: orgOwner });
       const transactionData = {
-        nonce: await this.web3Utils.determineCurrentAddressNonce(recordOwner),
+        nonce: await this.web3Utils.determineCurrentAddressNonce(orgOwner),
         data: data,
-        from: recordOwner,
+        from: orgOwner,
         to: this.address,
         gas: this.web3Utils.applyGasModifier(await estimate),
       };
@@ -99,26 +99,26 @@ export class SegmentDirectory {
    * on such address is not registered through this Winding Tree index
    * instance, the method throws immediately.
    *
-   * @throws {RecordNotFoundError} When organization does not exist.
-   * @throws {RecordNotInstantiableError} When the organization class cannot be constructed.
+   * @throws {OrganizationNotFoundError} When organization does not exist.
+   * @throws {OrganizationNotInstantiableError} When the organization class cannot be constructed.
    * @throws {WTLibsError} When something breaks in the network communication.
    */
   async getOrganization (address) {
-    let recordIndex;
+    let organizationIndex;
     try {
       // This returns strings
-      recordIndex = await this.getOrganizationIndex(address);
+      organizationIndex = await this.getOrganizationIndex(address);
     } catch (err) {
       throw new WTLibsError(`Cannot find Organization at ${address}: ${err.message}`, err);
     }
     // Zeroeth position is reserved as empty during index deployment
-    if (!recordIndex) {
-      throw new RecordNotFoundError(`Cannot find Organization at ${address}: Not found in Organization list`);
+    if (!organizationIndex) {
+      throw new OrganizationNotFoundError(`Cannot find Organization at ${address}: Not found in Organization list`);
     } else {
       try {
         return OnChainOrganization.createInstance(this.web3Utils, this.web3Contracts, address);
       } catch (err) {
-        throw new RecordNotInstantiableError(`Cannot instantiate Organization at ${address}: ${err.message}`, err);
+        throw new OrganizationNotInstantiableError(`Cannot instantiate Organization at ${address}: ${err.message}`, err);
       }
     }
   }
@@ -128,9 +128,9 @@ export class SegmentDirectory {
     return parseInt(await directory.methods.organizationsIndex(address).call(), 10);
   }
 
-  async getOrganizationByIndex (recordIndex) {
+  async getOrganizationByIndex (organizationIndex) {
     const directory = await this._getDeployedDirectory();
-    const address = await directory.methods.organizations(recordIndex).call();
+    const address = await directory.methods.organizations(organizationIndex).call();
     return this.getOrganization(address);
   }
 
@@ -143,8 +143,8 @@ export class SegmentDirectory {
    */
   async getOrganizations () {
     const directory = await this._getDeployedDirectory();
-    const recordsAddressList = await directory.methods.getOrganizations().call();
-    let getRecordDetails = recordsAddressList
+    const orgAddressList = await directory.methods.getOrganizations().call();
+    let getOrgDetails = orgAddressList
       // Filtering null addresses beforehand improves efficiency
       .filter((addr) => !this.web3Utils.isZeroAddress(addr))
       .map((addr) => {
@@ -155,9 +155,8 @@ export class SegmentDirectory {
             return null;
           });
       });
-    const recordDetails = await (Promise.all(getRecordDetails));
-    const recordList = (recordDetails.filter(a => a != null));
-    return recordList;
+    const orgDetails = await (Promise.all(getOrgDetails));
+    return (orgDetails.filter(a => a != null));
   }
 
   async getLifTokenAddress () {

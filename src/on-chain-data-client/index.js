@@ -2,6 +2,7 @@ import { AIRLINE_SEGMENT_ID, HOTEL_SEGMENT_ID } from './constants';
 import Utils from './utils';
 import Contracts from './contracts';
 import SegmentDirectory from './directory';
+import OrganizationFactory from './organization-factory';
 import { OnChainDataRuntimeError } from './errors';
 
 /**
@@ -25,6 +26,7 @@ export class OnChainDataClient {
       options.gasCoefficient = 2;
     }
     OnChainDataClient.dataModels = {};
+    OnChainDataClient.factories = {};
     OnChainDataClient.options = options;
     OnChainDataClient.web3Utils = Utils.createInstance({
       gasCoefficient: OnChainDataClient.options.gasCoefficient,
@@ -39,6 +41,7 @@ export class OnChainDataClient {
   static _reset () {
     OnChainDataClient.options = {};
     OnChainDataClient.dataModels = {};
+    OnChainDataClient.factories = {};
   }
 
   /**
@@ -62,6 +65,13 @@ export class OnChainDataClient {
       throw new OnChainDataRuntimeError(`Unknown segment: ${segment}`);
     }
     return OnChainDataClient.dataModels[`${segment}:${address}`];
+  }
+
+  static getFactory (address) {
+    if (!OnChainDataClient.factories[address]) {
+      OnChainDataClient.factories[address] = OrganizationFactory.createInstance(address, OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts);
+    }
+    return OnChainDataClient.factories[address];
   }
 
   /**
