@@ -1,6 +1,6 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import Directory from '../../src/on-chain-data-client/directory';
+import Directory from '../../src/on-chain-data-client/segment-directory';
 import OrganizationFactory from '../../src/on-chain-data-client/organization-factory';
 
 import OnChainDataClient from '../../src/on-chain-data-client';

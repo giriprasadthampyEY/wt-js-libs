@@ -1,9 +1,9 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import helpers from '../../utils/helpers';
-import OnChainOrganization from '../../../src/on-chain-data-client/directory/organization';
+import helpers from '../utils/helpers';
+import OnChainOrganization from '../../src/on-chain-data-client/organization';
 
-describe.only('WTLibs.on-chain-data.directory.Organization', () => {
+describe.only('WTLibs.on-chain-data.Organization', () => {
   let contractsStub, utilsStub, urlStub, ownerStub, associatedKeysStub, hasAssociatedKeyStub;
   let organization;
 

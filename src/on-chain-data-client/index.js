@@ -1,7 +1,7 @@
 import { AIRLINE_SEGMENT_ID, HOTEL_SEGMENT_ID } from './constants';
 import Utils from './utils';
 import Contracts from './contracts';
-import SegmentDirectory from './directory';
+import SegmentDirectory from './segment-directory';
 import OrganizationFactory from './organization-factory';
 import { OnChainDataRuntimeError } from './errors';
 

@@ -1,7 +1,6 @@
-import RemotelyBackedDataset from '../remotely-backed-dataset';
-import StoragePointer from '../storage-pointer';
-
-import { SmartContractInstantiationError } from '../errors';
+import RemotelyBackedDataset from './remotely-backed-dataset';
+import StoragePointer from './storage-pointer';
+import { SmartContractInstantiationError } from './errors';
 
 /**
  * Wrapper class for a an organization backed by a smart contract on

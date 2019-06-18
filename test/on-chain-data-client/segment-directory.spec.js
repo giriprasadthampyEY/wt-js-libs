@@ -1,12 +1,12 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import SegmentDirectory from '../../../src/on-chain-data-client/directory';
-import OnChainOrganization from '../../../src/on-chain-data-client/directory/organization';
-import helpers from '../../utils/helpers';
-import { WTLibsError } from '../../../src/errors';
-import { OrganizationNotFoundError, OrganizationNotInstantiableError, InputDataError } from '../../../src/on-chain-data-client/errors';
+import SegmentDirectory from '../../src/on-chain-data-client/segment-directory';
+import OnChainOrganization from '../../src/on-chain-data-client/organization';
+import helpers from '../utils/helpers';
+import { WTLibsError } from '../../src/errors';
+import { OrganizationNotFoundError, OrganizationNotInstantiableError, InputDataError } from '../../src/on-chain-data-client/errors';
 
-describe('WTLibs.on-chain-data.Directory', () => {
+describe('WTLibs.on-chain-data.SegmentDirectory', () => {
   let contractsStub, utilsStub, ownerStub, addStub, removeStub;
   let directory;
 

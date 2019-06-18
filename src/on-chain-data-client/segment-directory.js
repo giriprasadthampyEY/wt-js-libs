@@ -1,5 +1,5 @@
-import { WTLibsError } from '../../errors';
-import { InputDataError, OrganizationNotFoundError, OrganizationNotInstantiableError } from '../errors';
+import { WTLibsError } from '../errors';
+import { InputDataError, OrganizationNotFoundError, OrganizationNotInstantiableError } from './errors';
 import OnChainOrganization from './organization';
 
 export class SegmentDirectory {
