@@ -1,7 +1,6 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import AirlineDataModel from '../../src/on-chain-data-client/airlines/data-model';
-import HotelDataModel from '../../src/on-chain-data-client/hotels/data-model';
+import Directory from '../../src/on-chain-data-client/directory';
 
 import OnChainDataClient from '../../src/on-chain-data-client';
 import { OnChainDataRuntimeError } from '../../src/on-chain-data-client/errors';
@@ -53,25 +52,22 @@ describe('WTLibs.on-chain-data.OnChainDataClient', () => {
   });
 
   describe('getDataModel', () => {
-    let createHotelSpy, createAirlineSpy;
+    let createDataModelSpy;
 
     beforeAll(() => {
       OnChainDataClient.setup({ provider: 'http://localhost:8545' });
-      createHotelSpy = sinon.spy(HotelDataModel, 'createInstance');
-      createAirlineSpy = sinon.spy(AirlineDataModel, 'createInstance');
+      createDataModelSpy = sinon.spy(Directory, 'createInstance');
     });
 
     afterEach(() => {
-      createHotelSpy.resetHistory();
-      createAirlineSpy.resetHistory();
+      createDataModelSpy.resetHistory();
     });
 
     it('should cache datamodel instances', () => {
       OnChainDataClient.getDataModel('hotels');
+      assert.equal(createDataModelSpy.callCount, 1);
       assert.isDefined(OnChainDataClient.dataModels.hotels);
-      assert.equal(createHotelSpy.callCount, 1);
       OnChainDataClient.getDataModel('hotels');
-      assert.equal(createHotelSpy.callCount, 1);
     });
 
     it('should throw on unknown segment', () => {
@@ -87,13 +83,13 @@ describe('WTLibs.on-chain-data.OnChainDataClient', () => {
     it('should return airline datamodel', () => {
       const model = OnChainDataClient.getDataModel('airlines');
       assert.isDefined(OnChainDataClient.dataModels.airlines);
-      assert.instanceOf(model, AirlineDataModel);
+      assert.instanceOf(model, Directory);
     });
 
     it('should return hotel datamodel', () => {
       const model = OnChainDataClient.getDataModel('hotels');
       assert.isDefined(OnChainDataClient.dataModels.hotels);
-      assert.instanceOf(model, HotelDataModel);
+      assert.instanceOf(model, Directory);
     });
   });
 });

@@ -49,6 +49,7 @@ export class OnChainDataClient {
    * @param segment - allowed values are hotels and airlines
    */
   static getDataModel (segment) {
+    // TODO refactor and cache instances
     segment = segment && segment.toLowerCase();
     if (OnChainDataClient.dataModels[segment]) {
       return OnChainDataClient.dataModels[segment];

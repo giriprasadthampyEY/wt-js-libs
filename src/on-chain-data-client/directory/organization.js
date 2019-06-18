@@ -4,23 +4,28 @@ import StoragePointer from '../storage-pointer';
 import { SmartContractInstantiationError } from '../errors';
 
 /**
- * Wrapper class for a <record> backed by a smart contract on
+ * Wrapper class for a an organization backed by a smart contract on
  * Ethereum that's holding `orgJsonUri` pointer to its data.
+ *
+ * This is meant as a read only wrapper.
  *
  * It provides an accessor to such data in a form of
  * `StoragePointer` instance under `dataIndex` property.
  * Every schema-specific implementation details
  * are dealt with in StoragePointer.
  *
- * This should be extended by particular data types, such as hotels,
- * airlines, OTAs etc.
  */
 class OnChainOrganization {
-  constructor (web3Utils, web3Contracts, directoryContract, address) {
+  constructor (web3Utils, web3Contracts, address) {
     this.address = address;
     this.web3Utils = web3Utils;
     this.web3Contracts = web3Contracts;
-    this.directoryContract = directoryContract;
+  }
+
+  static createInstance (web3Utils, web3Contracts, directoryContract, address) {
+    const org = new OnChainOrganization(web3Utils, web3Contracts, directoryContract, address);
+    org.initialize();
+    return org;
   }
 
   /**
@@ -73,7 +78,8 @@ class OnChainOrganization {
   } */
 
   _getStoragePointerLayoutFactory () {
-    throw new Error('Cannot call _getStoragePointerLayoutFactory on class');
+    // TODO
+    return {};
   }
 
   _getRecordContractFactory () {
@@ -122,23 +128,6 @@ class OnChainOrganization {
       const associatedKeys = await this._associatedKeys;
       return associatedKeys;
     })();
-  }
-
-  /**
-   * Update owner and orgJsonUri properties. orgJsonUri can never be nulled. Owner
-   * can never be nulled. Manager can be changed only for an un-deployed
-   * contract (without address).
-   * @param {BaseOnChainRecordInterface} newData
-   */
-  async setLocalData (newData) {
-    const newOwner = await newData.owner;
-    if (newOwner) {
-      this.owner = newOwner;
-    }
-    const newOrgJsonUri = await newData.orgJsonUri;
-    if (newOrgJsonUri) {
-      this.orgJsonUri = newOrgJsonUri;
-    }
   }
 
   /**

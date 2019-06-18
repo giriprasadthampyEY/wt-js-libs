@@ -1,298 +1,226 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import AbstractDirectory from '../../../src/on-chain-data-client/directory';
+import SegmentDirectory from '../../../src/on-chain-data-client/directory';
+import OnChainOrganization from '../../../src/on-chain-data-client/directory/organization';
 import helpers from '../../utils/helpers';
-import { HotelDataModel } from '../../../src/on-chain-data-client/hotels/data-model';
-import testedDataModel from '../../utils/data-hotel-model-definition';
 import { WTLibsError } from '../../../src/errors';
-import { RecordNotFoundError, RecordNotInstantiableError,
-  InputDataError } from '../../../src/on-chain-data-client/errors';
+import { RecordNotFoundError, RecordNotInstantiableError, InputDataError } from '../../../src/on-chain-data-client/errors';
 
-describe('WTLibs.on-chain-data.AbstractDirectory', () => {
-  let dataModel;
+describe('WTLibs.on-chain-data.Directory', () => {
+  let contractsStub, utilsStub, ownerStub, addStub, removeStub;
+  let directory;
 
-  beforeAll(function () {
-    dataModel = HotelDataModel.createInstance(testedDataModel.withDataSource().onChainDataOptions, {
+  beforeEach(() => {
+    utilsStub = {
+      getCurrentWeb3Provider: sinon.stub().returns('current-provider'),
+      applyGasModifier: sinon.stub().returns(12),
+      determineCurrentAddressNonce: sinon.stub().resolves(3),
       isZeroAddress: sinon.stub().callsFake((addr) => {
-        return addr === '0x0000000000000000000000000000000000000000' || !addr.startsWith('0x');
+        return addr === '0x0000000000000000000000000000000000000000';
       }),
-    }, {
-      getHotelDirectoryInstance: sinon.stub().resolves({
+    };
+    ownerStub = helpers.stubContractMethodResult('some-remote-owner');
+    addStub = helpers.stubContractMethodResult('remote-add-result');
+    removeStub = helpers.stubContractMethodResult('remote-remove-result');
+    contractsStub = {
+      getSegmentDirectoryInstance: sinon.stub().resolves({
         methods: {
-          getOrganizations: helpers.stubContractMethodResult([]),
-          organizationsIndex: helpers.stubContractMethodResult(1),
+          owner: ownerStub,
+          add: addStub,
+          remove: removeStub,
+          getLifToken: helpers.stubContractMethodResult('0xAd84405aeF5d241E1BB264f0a58E238e221d70dE'),
+          getSegment: helpers.stubContractMethodResult('organizations'),
+          organizationsIndex: helpers.stubContractMethodResult('1'),
         },
       }),
-    });
+    };
+    directory = SegmentDirectory.createInstance('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', utilsStub, contractsStub);
   });
 
-  describe('abstraction', () => {
-    it('should throw when _getDeployedDirectoryFactory is called on an abstract class', async () => {
+  describe('add', () => {
+    it('should prepare transaction data', async () => {
+      const tx = await directory.add({ owner: 'b', address: 'a' });
+      assert.isDefined(tx.directory);
+      assert.isDefined(tx.directory.address, directory.address);
+      assert.isDefined(tx.transactionData.nonce);
+      assert.isDefined(tx.transactionData.data);
+      assert.equal(tx.transactionData.from, 'b');
+      assert.equal(tx.transactionData.to, directory.address);
+    });
+
+    it('should throw generic error when something does not work during tx data preparation', async () => {
       try {
-        const directory = new AbstractDirectory('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', dataModel.web3Utils, dataModel.web3Contracts);
-        await directory._getDeployedDirectory();
+        sinon.stub(directory, '_getDeployedDirectory').resolves({
+          methods: {
+            add: {
+              encodeABI: sinon.stub().rejects(new Error('something went wrong')),
+            },
+          },
+        });
+        await directory.add({ owner: 'b', address: 'aaa' });
         assert(false);
       } catch (e) {
-        assert.match(e.message, /Cannot call _getDeployedDirectoryFactory/i);
+        assert.match(e.message, /cannot add organization/i);
+        assert.instanceOf(e, WTLibsError);
+      } finally {
+        directory._getDeployedDirectory.restore();
       }
     });
 
-    it('should throw when _createRecordInstanceFactory is called on an abstract class', async () => {
+    it('should throw when address is not provided', async () => {
       try {
-        const directory = new AbstractDirectory('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', dataModel.web3Utils, dataModel.web3Contracts);
-        await directory._createRecord({
-          orgJsonUri: '1234',
-          owner: '1234',
+        await directory.add({ owner: 'b' });
+        assert(false);
+      } catch (e) {
+        assert.match(e.message, /cannot add organization/i);
+        assert.instanceOf(e, InputDataError);
+      }
+    });
+
+    it('should throw when owner is not provided', async () => {
+      try {
+        await directory.add({ address: 'b' });
+        assert(false);
+      } catch (e) {
+        assert.match(e.message, /cannot add organization/i);
+        assert.instanceOf(e, InputDataError);
+      }
+    });
+  });
+
+  describe('remove', () => {
+    it('should prepare transaction data', async () => {
+      const tx = await directory.remove({ owner: 'b', address: 'a' });
+      assert.isDefined(tx.directory);
+      assert.isDefined(tx.directory.address, directory.address);
+      assert.isDefined(tx.transactionData.nonce);
+      assert.isDefined(tx.transactionData.data);
+      assert.equal(tx.transactionData.from, 'b');
+      assert.equal(tx.transactionData.to, directory.address);
+    });
+
+    it('should throw generic error when something does not work during tx data preparation', async () => {
+      try {
+        sinon.stub(directory, '_getDeployedDirectory').resolves({
+          methods: {
+            remove: {
+              encodeABI: sinon.stub().rejects(new Error('something went worng')),
+            },
+          },
+        });
+        await directory.remove({
+          owner: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
+          address: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
         });
         assert(false);
       } catch (e) {
-        assert.match(e.message, /Cannot call _createRecordInstanceFactory/i);
+        assert.match(e.message, /cannot remove organization/i);
+        assert.instanceOf(e, WTLibsError);
+      } finally {
+        directory._getDeployedDirectory.restore();
       }
     });
 
-    it('should throw when _getDirectoryRecordPositionFactory is called on an abstract class', async () => {
+    it('should throw error when trying to remove a organization without owner', async () => {
       try {
-        const directory = new AbstractDirectory('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', dataModel.web3Utils, dataModel.web3Contracts);
-        await directory._getRecord();
+        await directory.remove({
+          address: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
+        });
         assert(false);
       } catch (e) {
-        assert.match(e.message, /Cannot call _getDirectoryRecordPositionFactory/i);
+        assert.match(e.message, /cannot remove organization/i);
+        assert.instanceOf(e, WTLibsError);
       }
     });
 
-    it('should throw when _getRecordsAddressListFactory is called on an abstract class', async () => {
+    it('should throw error when trying to remove a organization without address', async () => {
       try {
-        const directory = new AbstractDirectory('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', dataModel.web3Utils, dataModel.web3Contracts);
-        await directory._getRecords();
+        await directory.remove({
+          owner: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
+        });
         assert(false);
       } catch (e) {
-        assert.match(e.message, /Cannot call _getRecordsAddressListFactory/i);
+        assert.match(e.message, /cannot remove organization/i);
+        assert.instanceOf(e, WTLibsError);
       }
     });
   });
 
-  describe('mocked data provider', () => {
-    let directoryProvider;
+  describe('getSegment', () => {
+    it('should return segment', async () => {
+      const segment = await directory.getSegment();
+      assert.equal(segment, 'organizations');
+    });
+  });
 
-    beforeEach(async function () {
-      class ImplClass extends AbstractDirectory {
-        async _getDeployedDirectoryFactory () {
-          return Promise.resolve({
-            methods: {
-              LifToken: sinon.stub().returns({
-                call: sinon.stub().resolves('0xAd84405aeF5d241E1BB264f0a58E238e221d70dE'),
-              }),
-            },
-          });
-        }
+  describe('getLifTokenAddress', () => {
+    it('should return LifToken address', async () => {
+      const tokenAddress = await directory.getLifTokenAddress();
+      assert.equal(tokenAddress, '0xAd84405aeF5d241E1BB264f0a58E238e221d70dE');
+    });
+  });
 
-        async _createRecordInstanceFactory (address) {
-          return Promise.resolve({
-            setLocalData: sinon.stub().resolves(true),
-            createOnChainData: sinon.stub().resolves(true),
-            updateOnChainData: sinon.stub().resolves(true),
-          });
-        }
-
-        async _getDirectoryRecordPositionFactory (address) {
-          return Promise.resolve(1);
-        }
-
-        async _getRecordsAddressListFactory () {
-          return Promise.resolve([
-            '0x0000000000000000000000000000000000000000',
-            '0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8',
-          ]);
-        }
-      };
-      directoryProvider = new ImplClass('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', dataModel.web3Utils, dataModel.web3Contracts);
-      directoryProvider.RECORD_TYPE = 'dragon';
+  describe('_getOrganization', () => {
+    it('should throw if address is malformed', async () => {
+      try {
+        // we can fake it by emulating bad argument type
+        sinon.stub(directory, 'getOrganizationIndex').rejects();
+        await directory._getOrganization('random-address');
+        assert(false);
+      } catch (e) {
+        assert.match(e.message, /cannot find organization/i);
+        assert.instanceOf(e, WTLibsError);
+      }
     });
 
-    describe('getRecord', () => {
-      it('should throw if address is malformed', async () => {
-        try {
-          sinon.stub(directoryProvider, '_getDirectoryRecordPositionFactory').rejects();
-          await directoryProvider._getRecord('random-address');
-          assert(false);
-        } catch (e) {
-          assert.match(e.message, /cannot find dragon/i);
-          assert.instanceOf(e, WTLibsError);
-        }
-      });
-
-      it('should throw if no record exists on that address', async () => {
-        try {
-          sinon.stub(directoryProvider, '_getDirectoryRecordPositionFactory').resolves(0);
-          await directoryProvider._getRecord('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA');
-          assert(false);
-        } catch (e) {
-          assert.match(e.message, /cannot find dragon/i);
-          assert.instanceOf(e, RecordNotFoundError);
-        }
-      });
+    it('should throw if no record exists on that address', async () => {
+      try {
+        sinon.stub(directory, 'getOrganizationIndex').resolves(0);
+        await directory._getOrganization('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA');
+        assert(false);
+      } catch (e) {
+        assert.match(e.message, /cannot find organization/i);
+        assert.instanceOf(e, RecordNotFoundError);
+      }
     });
 
-    describe('_createRecord', () => {
-      it('should throw if record contract cannot be instantiated', async () => {
-        try {
-          sinon.stub(directoryProvider, '_createRecordInstanceFactory').rejects();
-          await directoryProvider._createRecord({
-            orgJsonUri: 'http://some-uri/',
-            owner: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
-          });
-          assert(false);
-        } catch (e) {
-          assert.match(e.message, /cannot create dragon/i);
-          assert.instanceOf(e, RecordNotInstantiableError);
-        } finally {
-          directoryProvider._createRecordInstanceFactory.restore();
-        }
-      });
+    it('should throw if organization contract cannot be instantiated', async () => {
+      try {
+        sinon.stub(OnChainOrganization, 'createInstance').throws(new Error());
+        await directory._getOrganization('0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
+        assert(false);
+      } catch (e) {
+        assert.match(e.message, /cannot instantiate organization/i);
+        assert.instanceOf(e, RecordNotInstantiableError);
+      } finally {
+        OnChainOrganization.createInstance.restore();
+      }
     });
+  });
 
-    describe('_addRecord', () => {
-      it('should throw generic error when something does not work during tx data preparation', async () => {
-        try {
-          sinon.stub(directoryProvider, '_createRecordInstanceFactory').resolves({
-            setLocalData: sinon.stub().resolves(),
-            createOnChainData: sinon.stub().rejects(),
+  describe('getOrganizations', () => {
+    it('should not panic when one of many records is missing on-chain', async () => {
+      sinon.stub(directory, '_getDeployedDirectory').resolves({
+        methods: {
+          getOrganizations: helpers.stubContractMethodResult([
+            '0x0000000000000000000000000000000000000000', // This is an empty address
+            '0xBF18B616aC81830dd0C5D4b771F22FD8144fe769',
+            '0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', // This is not an address of a organization
+          ]),
+        },
+      });
+      directory._getOrganization = sinon.stub()
+        .callsFake((addr) => {
+          return addr === '0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA' ? Promise.reject(new Error()) : Promise.resolve({
+            addr,
           });
-          await directoryProvider._addRecord({ owner: 'b', orgJsonUri: 'aaa' });
-          assert(false);
-        } catch (e) {
-          assert.match(e.message, /cannot add dragon/i);
-          assert.instanceOf(e, WTLibsError);
-        } finally {
-          directoryProvider._createRecordInstanceFactory.restore();
-        }
-      });
-
-      it('should throw when orgJsonUri is not provided', async () => {
-        try {
-          await directoryProvider._addRecord({ owner: 'b' });
-          assert(false);
-        } catch (e) {
-          assert.match(e.message, /cannot add dragon/i);
-          assert.instanceOf(e, InputDataError);
-        }
-      });
-
-      it('should throw when owner is not provided', async () => {
-        try {
-          await directoryProvider._addRecord({ orgJsonUri: 'b' });
-          assert(false);
-        } catch (e) {
-          assert.match(e.message, /cannot add dragon/i);
-          assert.instanceOf(e, InputDataError);
-        }
-      });
-    });
-
-    describe('_updateRecord', () => {
-      it('should throw generic error when something does not work during tx data preparation', async () => {
-        try {
-          await directoryProvider._updateRecord({
-            owner: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
-            address: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
-            updateOnChainData: sinon.stub().rejects('some original error'),
-          });
-          assert(false);
-        } catch (e) {
-          assert.match(e.message, /cannot update dragon/i);
-          assert.instanceOf(e, WTLibsError);
-          assert.isDefined(e.originalError);
-          assert.equal(e.originalError.name, 'some original error');
-        }
-      });
-
-      it('should throw when owner is not provided', async () => {
-        try {
-          await directoryProvider._updateRecord({ address: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769', orgJsonUri: 'b' });
-          assert(false);
-        } catch (e) {
-          assert.match(e.message, /cannot update dragon/i);
-          assert.instanceOf(e, InputDataError);
-        }
-      });
-
-      it('should throw when address is not provided', async () => {
-        try {
-          await directoryProvider._updateRecord({ orgJsonUri: 'b', owner: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769' });
-          assert(false);
-        } catch (e) {
-          assert.match(e.message, /cannot update dragon/i);
-          assert.instanceOf(e, InputDataError);
-        }
-      });
-    });
-
-    describe('_removeRecord', () => {
-      it('should throw generic error when something does not work during tx data preparation', async () => {
-        try {
-          await directoryProvider._removeRecord({
-            removeOnChainData: sinon.stub().rejects(),
-            owner: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
-            address: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
-          });
-          assert(false);
-        } catch (e) {
-          assert.match(e.message, /cannot remove dragon/i);
-          assert.instanceOf(e, WTLibsError);
-        }
-      });
-
-      it('should throw error when trying to remove a hotel without owner', async () => {
-        try {
-          await directoryProvider._removeRecord({
-            address: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
-          });
-          assert(false);
-        } catch (e) {
-          assert.match(e.message, /cannot remove dragon/i);
-          assert.instanceOf(e, WTLibsError);
-        }
-      });
-
-      it('should throw error when trying to remove a hotel without address', async () => {
-        try {
-          await directoryProvider._removeRecord({
-            owner: '0xbf18b616ac81830dd0c5d4b771f22fd8144fe769',
-          });
-          assert(false);
-        } catch (e) {
-          assert.match(e.message, /cannot remove dragon/i);
-          assert.instanceOf(e, WTLibsError);
-        }
-      });
-    });
-
-    describe('getOrganizations', () => {
-      it('should not panic when one of many records is missing on-chain', async () => {
-        directoryProvider._createRecordInstanceFactory = sinon.stub()
-          .callsFake((addr) => {
-            return addr === '0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA' ? Promise.reject(new Error()) : Promise.resolve({
-              addr,
-            });
-          });
-        directoryProvider._getRecordsAddressListFactory = sinon.stub().resolves([
-          '0x0000000000000000000000000000000000000000', // This is an empty address
-          '0xBF18B616aC81830dd0C5D4b771F22FD8144fe769',
-          '0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', // This is not an address of a hotel
-        ]);
-        const records = await directoryProvider._getRecords();
-        // Attempting to get two hotels for two valid addresses
-        assert.equal(directoryProvider._createRecordInstanceFactory.callCount, 2);
-        // But we know there's only one actual hotel
-        assert.equal(records.length, 1);
-      });
-    });
-
-    describe('getLifTokenAddress', () => {
-      it('should return LifToken address', async () => {
-        const tokenAddress = await directoryProvider.getLifTokenAddress();
-        assert.equal(tokenAddress, '0xAd84405aeF5d241E1BB264f0a58E238e221d70dE');
-      });
+        });
+      const records = await directory.getOrganizations();
+      // Attempting to get two organizations for two valid addresses
+      assert.equal(directory._getOrganization.callCount, 2);
+      // But we know there's only one actual organization
+      assert.equal(records.length, 1);
+      directory._getDeployedDirectory.restore();
     });
   });
 });
