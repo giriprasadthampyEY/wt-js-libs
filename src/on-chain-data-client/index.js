@@ -48,23 +48,20 @@ export class OnChainDataClient {
    * @throws OnChainDataRuntimeError when an unknown segment is encountered.
    * @param segment - allowed values are hotels and airlines
    */
-  static getDataModel (segment) {
-    // TODO refactor and cache instances
+  static getDirectory (segment, address) {
     segment = segment && segment.toLowerCase();
-    if (OnChainDataClient.dataModels[segment]) {
-      return OnChainDataClient.dataModels[segment];
+    if (OnChainDataClient.dataModels[`${segment}:${address}`]) {
+      return OnChainDataClient.dataModels[`${segment}:${address}`];
     }
     switch (segment) {
     case HOTEL_SEGMENT_ID:
-      OnChainDataClient.dataModels[segment] = SegmentDirectory.createInstance(OnChainDataClient.options, OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts);
-      break;
     case AIRLINE_SEGMENT_ID:
-      OnChainDataClient.dataModels[segment] = SegmentDirectory.createInstance(OnChainDataClient.options, OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts);
+      OnChainDataClient.dataModels[`${segment}:${address}`] = SegmentDirectory.createInstance(address, OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts);
       break;
     default:
       throw new OnChainDataRuntimeError(`Unknown segment: ${segment}`);
     }
-    return OnChainDataClient.dataModels[segment];
+    return OnChainDataClient.dataModels[`${segment}:${address}`];
   }
 
   /**

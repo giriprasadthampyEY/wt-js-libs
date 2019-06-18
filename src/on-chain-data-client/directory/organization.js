@@ -22,8 +22,8 @@ class OnChainOrganization {
     this.web3Contracts = web3Contracts;
   }
 
-  static createInstance (web3Utils, web3Contracts, directoryContract, address) {
-    const org = new OnChainOrganization(web3Utils, web3Contracts, directoryContract, address);
+  static createInstance (web3Utils, web3Contracts, address) {
+    const org = new OnChainOrganization(web3Utils, web3Contracts, address);
     org.initialize();
     return org;
   }

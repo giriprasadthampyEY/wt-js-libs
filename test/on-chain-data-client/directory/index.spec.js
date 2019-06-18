@@ -160,12 +160,12 @@ describe('WTLibs.on-chain-data.Directory', () => {
     });
   });
 
-  describe('_getOrganization', () => {
+  describe('getOrganization', () => {
     it('should throw if address is malformed', async () => {
       try {
         // we can fake it by emulating bad argument type
         sinon.stub(directory, 'getOrganizationIndex').rejects();
-        await directory._getOrganization('random-address');
+        await directory.getOrganization('random-address');
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot find organization/i);
@@ -176,7 +176,7 @@ describe('WTLibs.on-chain-data.Directory', () => {
     it('should throw if no record exists on that address', async () => {
       try {
         sinon.stub(directory, 'getOrganizationIndex').resolves(0);
-        await directory._getOrganization('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA');
+        await directory.getOrganization('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA');
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot find organization/i);
@@ -187,7 +187,7 @@ describe('WTLibs.on-chain-data.Directory', () => {
     it('should throw if organization contract cannot be instantiated', async () => {
       try {
         sinon.stub(OnChainOrganization, 'createInstance').throws(new Error());
-        await directory._getOrganization('0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
+        await directory.getOrganization('0xbf18b616ac81830dd0c5d4b771f22fd8144fe769');
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot instantiate organization/i);
@@ -209,7 +209,7 @@ describe('WTLibs.on-chain-data.Directory', () => {
           ]),
         },
       });
-      directory._getOrganization = sinon.stub()
+      directory.getOrganization = sinon.stub()
         .callsFake((addr) => {
           return addr === '0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA' ? Promise.reject(new Error()) : Promise.resolve({
             addr,
@@ -217,7 +217,7 @@ describe('WTLibs.on-chain-data.Directory', () => {
         });
       const records = await directory.getOrganizations();
       // Attempting to get two organizations for two valid addresses
-      assert.equal(directory._getOrganization.callCount, 2);
+      assert.equal(directory.getOrganization.callCount, 2);
       // But we know there's only one actual organization
       assert.equal(records.length, 1);
       directory._getDeployedDirectory.restore();

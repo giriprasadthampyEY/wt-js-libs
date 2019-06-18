@@ -69,8 +69,7 @@ export class WtJsLibs {
    * @param address of the Winding Tree index
    */
   getDirectory (segment, address) {
-    const dataModel = OnChainDataClient.getDataModel(segment);
-    return dataModel.getDirectory(address);
+    return OnChainDataClient.getDirectory(segment, address);
   }
 
   /**

@@ -42,54 +42,46 @@ describe('WTLibs.on-chain-data.OnChainDataClient', () => {
   describe('_reset', () => {
     it('should reset options and dataModels', () => {
       OnChainDataClient.setup({ opt1: 'value', provider: 'http://localhost:8545' });
-      OnChainDataClient.getDataModel('hotels');
-      assert.isDefined(OnChainDataClient.dataModels.hotels);
+      OnChainDataClient.getDirectory('hotels', '123');
+      assert.isDefined(OnChainDataClient.dataModels['hotels:123']);
       assert.isDefined(OnChainDataClient.options.opt1);
       OnChainDataClient._reset();
-      assert.isUndefined(OnChainDataClient.dataModels.hotels);
+      assert.isUndefined(OnChainDataClient.dataModels['hotels:123']);
       assert.isUndefined(OnChainDataClient.options.opt1);
     });
   });
 
-  describe('getDataModel', () => {
-    let createDataModelSpy;
+  describe('getDirectory', () => {
+    let createDirectorySpy;
 
     beforeAll(() => {
       OnChainDataClient.setup({ provider: 'http://localhost:8545' });
-      createDataModelSpy = sinon.spy(Directory, 'createInstance');
+      createDirectorySpy = sinon.spy(Directory, 'createInstance');
     });
 
     afterEach(() => {
-      createDataModelSpy.resetHistory();
+      createDirectorySpy.resetHistory();
     });
 
     it('should cache datamodel instances', () => {
-      OnChainDataClient.getDataModel('hotels');
-      assert.equal(createDataModelSpy.callCount, 1);
-      assert.isDefined(OnChainDataClient.dataModels.hotels);
-      OnChainDataClient.getDataModel('hotels');
+      OnChainDataClient.getDirectory('hotels', '123');
+      assert.equal(createDirectorySpy.callCount, 1);
+      assert.isDefined(OnChainDataClient.dataModels['hotels:123']);
+      OnChainDataClient.getDirectory('hotels', '123');
+      assert.equal(createDirectorySpy.callCount, 1);
+      const model = OnChainDataClient.getDirectory('hotels', '456');
+      assert.equal(createDirectorySpy.callCount, 2);
+      assert.instanceOf(model, Directory);
     });
 
     it('should throw on unknown segment', () => {
       try {
-        OnChainDataClient.getDataModel('random-segment');
+        OnChainDataClient.getDirectory('random-segment', '123');
         assert(false);
       } catch (e) {
         assert.match(e.message, /unknown segment/i);
         assert.instanceOf(e, OnChainDataRuntimeError);
       }
-    });
-    
-    it('should return airline datamodel', () => {
-      const model = OnChainDataClient.getDataModel('airlines');
-      assert.isDefined(OnChainDataClient.dataModels.airlines);
-      assert.instanceOf(model, Directory);
-    });
-
-    it('should return hotel datamodel', () => {
-      const model = OnChainDataClient.getDataModel('hotels');
-      assert.isDefined(OnChainDataClient.dataModels.hotels);
-      assert.instanceOf(model, Directory);
     });
   });
 });

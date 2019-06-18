@@ -103,7 +103,7 @@ export class SegmentDirectory {
    * @throws {RecordNotInstantiableError} When the organization class cannot be constructed.
    * @throws {WTLibsError} When something breaks in the network communication.
    */
-  async _getOrganization (address) {
+  async getOrganization (address) {
     let recordIndex;
     try {
       // This returns strings
@@ -116,7 +116,7 @@ export class SegmentDirectory {
       throw new RecordNotFoundError(`Cannot find Organization at ${address}: Not found in Organization list`);
     } else {
       try {
-        return OnChainOrganization.createInstance(this.web3Utils, this.web3Contracts, await this._getDeployedDirectory(), address);
+        return OnChainOrganization.createInstance(this.web3Utils, this.web3Contracts, address);
       } catch (err) {
         throw new RecordNotInstantiableError(`Cannot instantiate Organization at ${address}: ${err.message}`, err);
       }
@@ -131,7 +131,7 @@ export class SegmentDirectory {
   async getOrganizationByIndex (recordIndex) {
     const directory = await this._getDeployedDirectory();
     const address = await directory.methods.organizations(recordIndex).call();
-    return this._getOrganization(address);
+    return this.getOrganization(address);
   }
 
   /**
@@ -148,7 +148,7 @@ export class SegmentDirectory {
       // Filtering null addresses beforehand improves efficiency
       .filter((addr) => !this.web3Utils.isZeroAddress(addr))
       .map((addr) => {
-        return this._getOrganization(addr) // eslint-disable-line promise/no-nesting
+        return this.getOrganization(addr) // eslint-disable-line promise/no-nesting
           // We don't really care why the organization is inaccessible
           // and we need to catch exceptions here on each individual organization
           .catch((err) => { // eslint-disable-line

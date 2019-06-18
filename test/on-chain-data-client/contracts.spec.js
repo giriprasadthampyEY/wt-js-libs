@@ -35,37 +35,20 @@ describe('WTLibs.Contracts', () => {
     }
   });
 
-  it('should get hotel directory instance', async () => {
-    await contracts.getHotelDirectoryInstance('0x0C4c734F0Ecb92270D1ebE7b04aEC4440EB05CAa');
+  it('should get organization directory instance', async () => {
+    await contracts.getSegmentDirectoryInstance('0x0C4c734F0Ecb92270D1ebE7b04aEC4440EB05CAa');
     assert.equal(ContractStub.calledWithNew(), true);
   });
 
-  it('should get airline directory instance', async () => {
-    await contracts.getAirlineDirectoryInstance('0x0C4c734F0Ecb92270D1ebE7b04aEC4440EB05CAa');
+  it('should reuse existing organization contract instances', async () => {
+    await contracts.getSegmentDirectoryInstance('0x0C4c734F0Ecb92270D1ebE7b04aEC4440EB05CAa');
     assert.equal(ContractStub.calledWithNew(), true);
-  });
-
-  it('should reuse existing hotel contract instances', async () => {
-    await contracts.getHotelDirectoryInstance('0x0C4c734F0Ecb92270D1ebE7b04aEC4440EB05CAa');
-    assert.equal(ContractStub.calledWithNew(), true);
-    await contracts.getHotelDirectoryInstance('0x0C4c734F0Ecb92270D1ebE7b04aEC4440EB05CAa');
+    await contracts.getSegmentDirectoryInstance('0x0C4c734F0Ecb92270D1ebE7b04aEC4440EB05CAa');
     assert.equal(ContractStub.callCount, 1);
   });
 
-  it('should reuse existing airline contract instances', async () => {
-    await contracts.getAirlineDirectoryInstance('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
-    assert.equal(ContractStub.calledWithNew(), true);
-    await contracts.getAirlineDirectoryInstance('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
-    assert.equal(ContractStub.callCount, 1);
-  });
-
-  it('should get hotel instance', async () => {
+  it('should get organization instance', async () => {
     await contracts.getOrganizationInstance('0x8C2373842D5EA4Ce4Baf53f4175e5e42a364c59C');
-    assert.equal(ContractStub.calledWithNew(), true);
-  });
-
-  it('should get airline instance', async () => {
-    await contracts.getOrganizationInstance('0x820410b0E5c06147f1a894247C46Ea936D8A4Eb8');
     assert.equal(ContractStub.calledWithNew(), true);
   });
 
