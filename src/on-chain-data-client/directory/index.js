@@ -1,15 +1,8 @@
 import { WTLibsError } from '../../errors';
 import { InputDataError, RecordNotFoundError, RecordNotInstantiableError } from '../errors';
+import OnChainOrganization from './organization';
 
-/**
- * Ethereum smart contract backed implementation of Winding Tree
- * index wrapper. It provides methods for working with <record>
- * contracts.
- *
- * This should be extended by particular data types, such as hotels,
- * airlines, OTAs etc.
- */
-class AbstractDirectory {
+class SegmentDirectory {
   constructor (indexAddress, web3Utils, web3Contracts) {
     this.address = indexAddress;
     this.web3Utils = web3Utils;
@@ -17,27 +10,31 @@ class AbstractDirectory {
   }
 
   async _getDeployedDirectoryFactory () {
-    throw new Error('Cannot call _getDeployedDirectoryFactory on the class');
+    return this.web3Contracts.getSegmentDirectoryInstance(this.address);
   }
 
   async _createRecordInstanceFactory (address) {
-    throw new Error('Cannot call _createRecordInstanceFactory on the class');
+    return OnChainOrganization.createInstance(this.web3Utils, this.web3Contracts, await this._getDeployedDirectory(), address);
   }
 
   async _getDirectoryRecordPositionFactory (address) {
-    throw new Error('Cannot call _getDirectoryRecordPositionFactory on the class');
+    const directory = await this._getDeployedDirectory();
+    return parseInt(await directory.methods.organizationsIndex(address).call(), 10);
   }
 
   async _getDirectoryRecordByPositionFactory (idx) {
-    throw new Error('Cannot call _getDirectoryRecordByPositionFactory on the class');
+    const directory = await this._getDeployedDirectory();
+    return directory.methods.organizations(idx).call();
   }
 
   async _getRecordsAddressListFactory () {
-    throw new Error('Cannot call _getRecordsAddressListFactory on the class');
+    const directory = await this._getDeployedDirectory();
+    return directory.methods.getOrganizations().call();
   }
 
   async _getSegmentFactory (transactionOptions) {
-    throw new Error('Cannot call _getSegmentFactory on the class');
+    const directory = await this._getDeployedDirectory();
+    return directory.methods.getSegment().call(transactionOptions);
   }
 
   async _getDeployedDirectory () {
@@ -47,7 +44,7 @@ class AbstractDirectory {
     return this.deployedDirectory;
   }
 
-  async _getSegment (transactionOptions) {
+  async getSegment (transactionOptions) {
     return this._getSegmentFactory(transactionOptions);
   }
 
@@ -60,13 +57,13 @@ class AbstractDirectory {
    * @throws {InputDataError} When recordData does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
-  async _addRecord (recordData) {
+  async add (recordData) {
     if (!recordData.address) {
-      throw new InputDataError(`Cannot add ${this.RECORD_TYPE} without address.`);
+      throw new InputDataError('Cannot add Organization without address.');
     }
     const owner = await recordData.owner;
     if (!owner) {
-      throw new InputDataError(`Cannot add ${this.RECORD_TYPE} without owner.`);
+      throw new InputDataError('Cannot add Organization without owner.');
     }
     const directory = await this._getDeployedDirectory();
     const data = directory.methods.add(recordData.address).encodeABI();
@@ -93,20 +90,20 @@ class AbstractDirectory {
    * @throws {InputDataError} When <record> does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
-  async _removeRecord (record) {
+  async remove (record) {
     if (!record.address) {
-      throw new InputDataError(`Cannot remove ${this.RECORD_TYPE} without address.`);
+      throw new InputDataError('Cannot remove Organization without address.');
     }
     const recordOwner = await record.owner;
     if (!recordOwner) {
-      throw new InputDataError(`Cannot remove ${this.RECORD_TYPE} without owner.`);
+      throw new InputDataError('Cannot remove Organization without owner.');
     }
     return record.removeOnChainData({
       from: recordOwner,
     }).catch((err) => {
       // invalid opcode -> non-existent record
       // invalid opcode -> failed check for owner
-      throw new WTLibsError(`Cannot remove ${this.RECORD_TYPE}: ${err.message}`, err);
+      throw new WTLibsError(`Cannot remove Organization: ${err.message}`, err);
     });
   }
 
@@ -125,23 +122,23 @@ class AbstractDirectory {
       // This returns strings
       recordIndex = await this._getDirectoryRecordPositionFactory(address);
     } catch (err) {
-      throw new WTLibsError(`Cannot find ${this.RECORD_TYPE} at ${address}: ${err.message}`, err);
+      throw new WTLibsError(`Cannot find Organization at ${address}: ${err.message}`, err);
     }
     // Zeroeth position is reserved as empty during index deployment
     if (!recordIndex) {
-      throw new RecordNotFoundError(`Cannot find ${this.RECORD_TYPE} at ${address}: Not found in ${this.RECORD_TYPE} list`);
+      throw new RecordNotFoundError(`Cannot find Organization at ${address}: Not found in Organization list`);
     } else {
       return this._createRecordInstanceFactory(address).catch((err) => {
-        throw new RecordNotInstantiableError(`Cannot find ${this.RECORD_TYPE} at ${address}: ${err.message}`, err);
+        throw new RecordNotInstantiableError(`Cannot find Organization at ${address}: ${err.message}`, err);
       });
     }
   }
 
-  async _getRecordIndex (address) {
+  async getRecordIndex (address) {
     return this._getDirectoryRecordPositionFactory(address);
   }
 
-  async _getRecordByIndex (recordIndex) {
+  async getRecordByIndex (recordIndex) {
     const address = await this._getDirectoryRecordByPositionFactory(recordIndex);
     return this._getRecord(address);
   }
@@ -153,7 +150,7 @@ class AbstractDirectory {
    * Currently any inaccessible <record> is silently ignored.
    * Subject to change.
    */
-  async _getRecords () {
+  async getRecords () {
     const recordsAddressList = await this._getRecordsAddressListFactory();
     let getRecordDetails = recordsAddressList
       // Filtering null addresses beforehand improves efficiency
@@ -177,4 +174,4 @@ class AbstractDirectory {
   }
 }
 
-export default AbstractDirectory;
+export default SegmentDirectory;

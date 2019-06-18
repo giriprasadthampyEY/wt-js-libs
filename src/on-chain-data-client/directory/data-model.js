@@ -1,10 +1,14 @@
+import Directory from './index';
+
+// TODO drop this?
+
 /**
  * An entry-point abstraction for interacting with <record>s.
  *
  * This should be extended by particular data types, such as hotels,
  * airlines, OTAs etc.
  */
-export class AbstractDataModel {
+export class DataModel {
   /**
    * Returns new and configured instance
    */
@@ -19,7 +23,7 @@ export class AbstractDataModel {
    * Returns an Ethereum backed Winding Tree directory.
    */
   _directoryContractFactory (address) {
-    throw Error('Not implemented. Should be called on a subclass instance.');
+    return Directory.createInstance(address, this.web3Utils, this.web3Contracts);
   }
 
   /**
@@ -34,4 +38,4 @@ export class AbstractDataModel {
   }
 }
 
-export default AbstractDataModel;
+export default DataModel;

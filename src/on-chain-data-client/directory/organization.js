@@ -1,7 +1,7 @@
 import RemotelyBackedDataset from '../remotely-backed-dataset';
 import StoragePointer from '../storage-pointer';
 
-import { InputDataError, SmartContractInstantiationError } from '../errors';
+import { SmartContractInstantiationError } from '../errors';
 
 /**
  * Wrapper class for a <record> backed by a smart contract on
@@ -15,7 +15,7 @@ import { InputDataError, SmartContractInstantiationError } from '../errors';
  * This should be extended by particular data types, such as hotels,
  * airlines, OTAs etc.
  */
-class OnChainRecord {
+class OnChainOrganization {
   constructor (web3Utils, web3Contracts, directoryContract, address) {
     this.address = address;
     this.web3Utils = web3Utils;
@@ -56,12 +56,28 @@ class OnChainRecord {
     }
   }
 
+  /* hotel
+  _getStoragePointerLayoutFactory () {
+    return {
+      descriptionUri: { required: true },
+      ratePlansUri: { required: false },
+      availabilityUri: { required: false },
+    };
+  }
+
+  _getStoragePointerLayoutFactory () {
+    return {
+      descriptionUri: { required: true },
+      flightsUri: { required: false, children: { items: { children: { flightInstancesUri: { required: false } } } } },
+    };
+  } */
+
   _getStoragePointerLayoutFactory () {
     throw new Error('Cannot call _getStoragePointerLayoutFactory on class');
   }
 
   _getRecordContractFactory () {
-    throw new Error('Cannot call _getRecordContractFactory on class');
+    return this.web3Contracts.getOrganizationInstance(this.address);
   }
 
   /**
@@ -164,7 +180,7 @@ class OnChainRecord {
 
   async _getContractInstance () {
     if (!this.address) {
-      throw new SmartContractInstantiationError(`Cannot get ${this.RECORD_TYPE} instance without address`);
+      throw new SmartContractInstantiationError('Cannot get Organization instance without address');
     }
     if (!this.contractInstance) {
       this.contractInstance = await this._getRecordContractFactory();
@@ -172,11 +188,10 @@ class OnChainRecord {
     return this.contractInstance;
   }
 
-  async _hasAssociatedKey (associatedAddress, transactionOptions = {}) {
+  async hasAssociatedKey (associatedAddress, transactionOptions = {}) {
     const contract = await this._getContractInstance();
     return contract.methods.hasAssociatedKey(associatedAddress).call(transactionOptions);
   }
-
 }
 
-export default OnChainRecord;
+export default OnChainOrganization;

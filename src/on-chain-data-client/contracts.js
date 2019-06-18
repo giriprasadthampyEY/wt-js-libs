@@ -1,7 +1,6 @@
-// TODO inspect if we cannot use abstract/interface JSON files
-import SegmentDirectoryMetadata from '@windingtree/wt-contracts/build/contracts/SegmentDirectory.json';
-import OrganizationMetadata from '@windingtree/wt-contracts/build/contracts/Organization.json';
-import OrganizationFactoryMetadata from '@windingtree/wt-contracts/build/contracts/OrganizationFactory.json';
+import SegmentDirectoryMetadata from '@windingtree/wt-contracts/build/contracts/AbstractSegmentDirectory.json';
+import OrganizationInterfaceMetadata from '@windingtree/wt-contracts/build/contracts/OrganizationInterface.json';
+import OrganizationFactoryMetadata from '@windingtree/wt-contracts/build/contracts/AbstractOrganizationFactory.json';
 import { SmartContractInstantiationError } from './errors';
 
 import Web3Utils from 'web3-utils';
@@ -54,34 +53,12 @@ class Contracts {
     return this.contractsCache[`${name}:${address}`];
   }
 
-  /**
-   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.3.0/contracts/WTHotelDirectory.sol">WTHotelDirectory.sol</a>.
-   *
-   * @param  {string} address
-   * @return {web3.eth.Contract} Instance of an Directory
-   */
-  async getHotelDirectoryInstance (address) {
-    return this._getInstance('hotelDirectory', SegmentDirectoryMetadata.abi, address);
+  async getSegmentDirectoryInstance (address) {
+    return this._getInstance('segmentDirectory', SegmentDirectoryMetadata.abi, address);
   }
 
-  /**
-   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.3.0/contracts/WTAirlineDirectory.sol">WTAirlineDirectory.sol</a>.
-   *
-   * @param  {string} address
-   * @return {web3.eth.Contract} Instance of an Directory
-   */
-  async getAirlineDirectoryInstance (address) {
-    return this._getInstance('airlineDirectory', SegmentDirectoryMetadata.abi, address);
-  }
-
-  /**
-   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.3.0/contracts/hotel/Hotel.sol">Hotel.sol</a>.
-   *
-   * @param  {string} address
-   * @return {web3.eth.Contract} Instance of a Hotel
-   */
   async getOrganizationInstance (address) {
-    return this._getInstance('organization', OrganizationMetadata.abi, address);
+    return this._getInstance('organization', OrganizationInterfaceMetadata.abi, address);
   }
 
   async getOrganizationFactoryInstance (address) {
@@ -102,7 +79,7 @@ class Contracts {
     if (!this.eventRegistry) {
       this.eventRegistry = Object.assign(
         {},
-        generateEventSignatures(OrganizationMetadata.abi),
+        generateEventSignatures(OrganizationInterfaceMetadata.abi),
         generateEventSignatures(OrganizationFactoryMetadata.abi),
         generateEventSignatures(SegmentDirectoryMetadata.abi),
       );

@@ -1,8 +1,7 @@
 import { AIRLINE_SEGMENT_ID, HOTEL_SEGMENT_ID } from './constants';
 import Utils from './utils';
 import Contracts from './contracts';
-import HotelDataModel from './hotels/data-model';
-import AirlineDataModel from './airlines/data-model';
+import SegmentDirectory from './directory';
 import { OnChainDataRuntimeError } from './errors';
 
 /**
@@ -56,10 +55,10 @@ export class OnChainDataClient {
     }
     switch (segment) {
     case HOTEL_SEGMENT_ID:
-      OnChainDataClient.dataModels[segment] = HotelDataModel.createInstance(OnChainDataClient.options, OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts);
+      OnChainDataClient.dataModels[segment] = SegmentDirectory.createInstance(OnChainDataClient.options, OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts);
       break;
     case AIRLINE_SEGMENT_ID:
-      OnChainDataClient.dataModels[segment] = AirlineDataModel.createInstance(OnChainDataClient.options, OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts);
+      OnChainDataClient.dataModels[segment] = SegmentDirectory.createInstance(OnChainDataClient.options, OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts);
       break;
     default:
       throw new OnChainDataRuntimeError(`Unknown segment: ${segment}`);

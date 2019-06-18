@@ -1,3 +1,5 @@
+import { InputDataError, RecordNotInstantiableError, WTLibsError } from '/errors';
+
 class OrganizationFactory {
   static createInstance (factoryAddress, web3Utils, web3Contracts) {
     return new OrganizationFactory(factoryAddress, web3Utils, web3Contracts);
@@ -32,3 +34,5 @@ class OrganizationFactory {
     });
   }
 }
+
+export default OrganizationFactory;
