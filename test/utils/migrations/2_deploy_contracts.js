@@ -32,12 +32,12 @@ module.exports = async function (deployer, network, accounts) {
       from: accounts[4],
     });
     // create some 0xORGs
-    const firstHotelEvent = await factory.methods.create('in-memory://hotel-url-one').send({ from: accounts[2] });
-    const secondHotelEvent = await factory.methods.create('in-memory://hotel-url-two').send({ from: accounts[1] });
+    const firstHotelEvent = await factory.methods.create('in-memory://hotel-one').send({ from: accounts[2] });
+    const secondHotelEvent = await factory.methods.create('in-memory://hotel-two').send({ from: accounts[1] });
     const firstHotel = await Organization.at(firstHotelEvent.events.OrganizationCreated.returnValues.organization);
     const secondHotel = await Organization.at(secondHotelEvent.events.OrganizationCreated.returnValues.organization);
-    const firstAirlineEvent = await factory.methods.create('in-memory://airline-url-one').send({ from: accounts[3] });
-    const secondAirlineEvent = await factory.methods.create('in-memory://airline-url-two').send({ from: accounts[4] });
+    const firstAirlineEvent = await factory.methods.create('in-memory://airline-one').send({ from: accounts[3] });
+    const secondAirlineEvent = await factory.methods.create('in-memory://airline-two').send({ from: accounts[4] });
     const firstAirline = await Organization.at(firstAirlineEvent.events.OrganizationCreated.returnValues.organization);
     const secondAirline = await Organization.at(secondAirlineEvent.events.OrganizationCreated.returnValues.organization);
 

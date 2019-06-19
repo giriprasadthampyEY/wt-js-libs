@@ -9,7 +9,7 @@ import { SmartContractInstantiationError } from './errors';
  * This is meant as a read only wrapper.
  *
  * It provides an accessor to such data in a form of
- * `StoragePointer` instance under `dataIndex` property.
+ * `StoragePointer` instance under `orgJson` property.
  * Every schema-specific implementation details
  * are dealt with in StoragePointer.
  *
@@ -60,6 +60,7 @@ class OnChainOrganization {
     }
   }
 
+  // Move this to specific subclasses - it is specifid to windingtree api format
   /* hotel
   _getStoragePointerLayoutFactory () {
     return {
@@ -76,26 +77,19 @@ class OnChainOrganization {
     };
   } */
 
-  _getStoragePointerLayoutFactory () {
-    // TODO
-    return {};
-  }
-
-  _getOrganizationContractFactory () {
-    return this.web3Contracts.getOrganizationInstance(this.address);
-  }
-
   /**
    * Async getter for `StoragePointer` instance.
    * Since it has to eventually access the `orgJsonUri`
    * field stored on-chain, it is lazy loaded.
    */
-  get dataIndex () {
+  get orgJson () {
     return (async () => {
-      if (!this._dataIndex) {
-        this._dataIndex = StoragePointer.createInstance(await this.orgJsonUri, this._getStoragePointerLayoutFactory());
+      if (!this._orgJson) {
+        // we leverage StoragePointer to make this work with various off-chain storages
+        // no direct linked subdocuments though for now
+        this._orgJson = StoragePointer.createInstance(await this.orgJsonUri, {});
       }
-      return this._dataIndex;
+      return this._orgJson;
     })();
   }
 
@@ -156,10 +150,11 @@ class OnChainOrganization {
    * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
    */
   async toPlainObject (resolvedFields, depth) {
-    const dataIndex = await this.dataIndex;
-    const offChainData = await dataIndex.toPlainObject(resolvedFields, depth);
+    const orgJson = await this.orgJson;
+    const offChainData = await orgJson.toPlainObject(resolvedFields, depth);
     let result = {
       owner: await this.owner,
+      associatedKeys: await this.associatedKeys,
       address: this.address,
       orgJsonUri: offChainData,
     };
@@ -171,7 +166,7 @@ class OnChainOrganization {
       throw new SmartContractInstantiationError('Cannot get Organization instance without address');
     }
     if (!this.contractInstance) {
-      this.contractInstance = await this._getOrganizationContractFactory();
+      this.contractInstance = await this.web3Contracts.getOrganizationInstance(this.address);
     }
     return this.contractInstance;
   }

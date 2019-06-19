@@ -48,13 +48,12 @@ describe('WtJsLibs usage - airlines', () => {
       const orgJsonUri = await jsonClient.upload({
         descriptionUri: descUrl,
       });
-      const createAirline = await factory.createOrganization({
+      const createAirline = await factory.createOrganization({ // TODO replace with createAndAdd
         owner: airlineOwner,
         orgJsonUri: orgJsonUri,
       });
       const airline = createAirline.airline;
       const result = await wallet.signAndSendTransaction(createAirline.transactionData, createAirline.eventCallbacks);
-      console.log(result);
 
       assert.isDefined(result);
       assert.isDefined(airline.address);
@@ -63,9 +62,8 @@ describe('WtJsLibs usage - airlines', () => {
       // Don't bother with checksummed address format
       assert.equal((await airline.owner), airlineOwner);
       assert.equal((await airline.orgJsonUri).toLowerCase(), orgJsonUri);
-      assert.isDefined(await airline.created);
-      const dataIndex = await airline.dataIndex;
-      const description = (await dataIndex.contents).descriptionUri;
+      const orgJson = await airline.orgJson; // TODO this won't work at first
+      const description = (await orgJson.contents).descriptionUri;
       assert.equal((await description.contents).name, 'Premium airline');
 
       // We're removing the airline to ensure clean slate after this test is run.
@@ -89,7 +87,7 @@ describe('WtJsLibs usage - airlines', () => {
       const orgJsonUri = await jsonClient.upload({
         descriptionUri: descUrl,
       });
-      const createAirline = await directory.create({
+      const createAirline = await factory.createOrganization({
         owner: airlineOwner,
         orgJsonUri: orgJsonUri,
       });
@@ -119,7 +117,7 @@ describe('WtJsLibs usage - airlines', () => {
   xdescribe('remove', () => {
     it('should remove airline', async () => {
       const owner = airlineOwner;
-      const createAirline = await directory.createAndAdd({
+      const createAirline = await factory.createAndAdd({ // TODO
         orgJsonUri: 'in-memory://some-data-hash',
         owner: owner,
       });
@@ -147,7 +145,7 @@ describe('WtJsLibs usage - airlines', () => {
     it('should get airline by address', async () => {
       const airline = await directory.getOrganization(airlineAddress);
       assert.isNotNull(airline);
-      assert.equal(await airline.orgJsonUri, 'in-memory://airline-url-one');
+      assert.equal(await airline.orgJsonUri, 'in-memory://airline-one');
       assert.equal(await airline.address, airlineAddress);
     });
 
@@ -159,11 +157,11 @@ describe('WtJsLibs usage - airlines', () => {
     it('should get airline by index', async () => {
       const firstAirline = await directory.getOrganizationByIndex(1);
       assert.isNotNull(firstAirline);
-      assert.equal(await firstAirline.orgJsonUri, 'in-memory://airline-url-one');
+      assert.equal(await firstAirline.orgJsonUri, 'in-memory://airline-one');
       assert.equal(await firstAirline.address, airlineAddress);
       const secondAirline = await directory.getOrganizationByIndex(2);
       assert.isNotNull(secondAirline);
-      assert.equal(await secondAirline.orgJsonUri, 'in-memory://airline-url-two');
+      assert.equal(await secondAirline.orgJsonUri, 'in-memory://airline-two');
       assert.equal(await secondAirline.address, '0x714D6eB9B497b383afbB8204cfD948061920DA43');
     });
   });
@@ -174,7 +172,7 @@ describe('WtJsLibs usage - airlines', () => {
       assert.equal(airlines.length, 2);
       for (let airline of airlines) {
         assert.isDefined(airline.toPlainObject);
-        assert.isDefined((await airline.dataIndex).ref);
+        assert.isDefined((await airline.orgJson).ref);
         const plainAirline = await airline.toPlainObject();
         assert.equal(plainAirline.address, await airline.address);
         assert.equal(plainAirline.owner, await airline.owner);

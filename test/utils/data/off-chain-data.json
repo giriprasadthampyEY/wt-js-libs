@@ -1,4 +1,64 @@
 {
+  "hotel-one": {
+    "dataFormatVersion": "0.0.0",
+    "name": "organization-one",
+    "hotel": {
+      "name": "hotel one",
+      "apis": [
+        {
+          "entrypoint": "in-memory://hotel-url-one",
+          "format": "windingtree"
+        },
+        {
+          "entrypoint": "http://dummy.restapiexample.com/api/v1/employees",
+          "format": "coolapi"
+        }
+      ]
+    }
+  },
+  "hotel-two": {
+    "dataFormatVersion": "0.0.0",
+    "name": "organization-two",
+    "hotel": {
+      "name": "hotel two",
+      "apis": [
+        {
+          "entrypoint": "in-memory://hotel-url-two",
+          "format": "windingtree"
+        }
+      ]
+    }
+  },
+  "airline-two": {
+    "dataFormatVersion": "0.0.0",
+    "name": "airline-one",
+    "hotel": {
+      "name": "airline one",
+      "apis": [
+        {
+          "entrypoint": "in-memory://airline-url-one",
+          "format": "windingtree"
+        }
+      ]
+    }
+  },
+  "airline-two": {
+    "dataFormatVersion": "0.0.0",
+    "name": "airline-two",
+    "hotel": {
+      "name": "airline two",
+      "apis": [
+        {
+          "entrypoint": "in-memory://airline-url-two",
+          "format": "windingtree"
+        },
+        {
+          "entrypoint": "http://dummy.restapiexample.com/api/v1/employees",
+          "format": "coolapi"
+        }
+      ]
+    }
+  },
   "hotel-url-one": {
     "descriptionUri": "in-memory://hotel-description-one",
     "ratePlansUri": "in-memory://hotel-rateplans-one"

@@ -5,7 +5,7 @@ import testedDataModel from '../utils/data-hotel-model-definition';
 import OffChainDataClient from '../../src/off-chain-data-client';
 
 describe('WtJsLibs usage - hotels', () => {
-  let libs, wallet, directory, emptyDirectory;
+  let libs, wallet, directory, emptyDirectory, factory;
   const hotelOwner = '0xD39Ca7d186a37bb6Bf48AE8abFeB4c687dc8F906';
   const hotelAddress = '0xBF18B616aC81830dd0C5D4b771F22FD8144fe769';
 
@@ -14,6 +14,7 @@ describe('WtJsLibs usage - hotels', () => {
     directory = libs.getDirectory('hotels', testedDataModel.directoryAddress);
     wallet = libs.createWallet(jsonWallet);
     emptyDirectory = libs.getDirectory('hotels', testedDataModel.emptyDirectoryAddress);
+    factory = libs.getFactory(testedDataModel.factoryAddress);
     wallet.unlock('test123');
   });
 
@@ -47,7 +48,7 @@ describe('WtJsLibs usage - hotels', () => {
       const orgJsonUri = await jsonClient.upload({
         descriptionUri: descUrl,
       });
-      const createHotel = await directory.createAndAdd({
+      const createHotel = await factory.createAndAdd({ // TODO
         owner: hotelOwner,
         orgJsonUri: orgJsonUri,
       });
@@ -61,9 +62,8 @@ describe('WtJsLibs usage - hotels', () => {
       // Don't bother with checksummed address format
       assert.equal((await hotel.owner), hotelOwner);
       assert.equal((await hotel.orgJsonUri).toLowerCase(), orgJsonUri);
-      assert.isDefined(await hotel.created);
-      const dataIndex = await hotel.dataIndex;
-      const description = (await dataIndex.contents).descriptionUri;
+      const orgJson = await hotel.orgJson;
+      const description = (await orgJson.contents).descriptionUri;
       assert.equal((await description.contents).name, 'Premium hotel');
 
       // We're removing the hotel to ensure clean slate after this test is run.
@@ -87,7 +87,7 @@ describe('WtJsLibs usage - hotels', () => {
       const orgJsonUri = await jsonClient.upload({
         descriptionUri: descUrl,
       });
-      const createHotel = await directory.create({
+      const createHotel = await factory.createOrganization({
         owner: hotelOwner,
         orgJsonUri: orgJsonUri,
       });
@@ -117,7 +117,7 @@ describe('WtJsLibs usage - hotels', () => {
   xdescribe('remove', () => {
     it('should remove hotel', async () => {
       const owner = hotelOwner;
-      const createHotel = await directory.createAndAdd({
+      const createHotel = await factory.createAndAdd({ // TODO
         orgJsonUri: 'in-memory://some-data-hash',
         owner: owner,
       });
@@ -145,7 +145,7 @@ describe('WtJsLibs usage - hotels', () => {
     it('should get hotel by address', async () => {
       const hotel = await directory.getOrganization(hotelAddress);
       assert.isNotNull(hotel);
-      assert.equal(await hotel.orgJsonUri, 'in-memory://hotel-url-one');
+      assert.equal(await hotel.orgJsonUri, 'in-memory://hotel-one');
       assert.equal(await hotel.address, hotelAddress);
     });
 
@@ -157,11 +157,11 @@ describe('WtJsLibs usage - hotels', () => {
     it('should get hotel by index', async () => {
       const firstHotel = await directory.getOrganizationByIndex(1);
       assert.isNotNull(firstHotel);
-      assert.equal(await firstHotel.orgJsonUri, 'in-memory://hotel-url-one');
+      assert.equal(await firstHotel.orgJsonUri, 'in-memory://hotel-one');
       assert.equal(await firstHotel.address, hotelAddress);
       const secondHotel = await directory.getOrganizationByIndex(2);
       assert.isNotNull(secondHotel);
-      assert.equal(await secondHotel.orgJsonUri, 'in-memory://hotel-url-two');
+      assert.equal(await secondHotel.orgJsonUri, 'in-memory://hotel-two');
       assert.equal(await secondHotel.address, '0x4A763F50DFe5cF4468B4171539E021A26FCee0cC');
     });
   });
@@ -172,7 +172,7 @@ describe('WtJsLibs usage - hotels', () => {
       assert.equal(hotels.length, 2);
       for (let hotel of hotels) {
         assert.isDefined(hotel.toPlainObject);
-        assert.isDefined((await hotel.dataIndex).ref);
+        assert.isDefined((await hotel.orgJson).ref);
         const plainHotel = await hotel.toPlainObject();
         assert.equal(plainHotel.address, await hotel.address);
         assert.equal(plainHotel.owner, await hotel.owner);

@@ -1,7 +1,9 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
 import helpers from '../utils/helpers';
+import testedDataModel from '../utils/data-hotel-model-definition';
 import OnChainOrganization from '../../src/on-chain-data-client/organization';
+import { WtJsLibs } from '../../src/index';
 
 describe.only('WTLibs.on-chain-data.Organization', () => {
   let contractsStub, utilsStub, urlStub, ownerStub, associatedKeysStub, hasAssociatedKeyStub;
@@ -66,8 +68,8 @@ describe.only('WTLibs.on-chain-data.Organization', () => {
       assert.equal(associatedKeysStub().call.callCount, 1);
     });
 
-    it('should return dataIndex with a setup StoragePointer', async () => {
-      const index = await organization.dataIndex;
+    it('should return orgJson with a setup StoragePointer', async () => {
+      const index = await organization.orgJson;
       assert.equal(index.ref, 'some-remote-url');
     });
   });
@@ -79,30 +81,19 @@ describe.only('WTLibs.on-chain-data.Organization', () => {
     });
   });
 
-  xdescribe('toPlainObject', () => {
-    // TODO
+  describe('toPlainObject', () => {
     it('should return a plain JS object', async () => {
-      /* provider = new MockedProvider(utilsStub, contractsStub, directoryContractStub);
-        provider.initialize();
-        await provider.setLocalData({ orgJsonUri: validUri, owner: validOwner });
-        // initialize dataIndex so we're able to mock it later
-        await provider.dataIndex;
-        sinon.stub(provider._dataIndex, 'toPlainObject').resolves({
-          ref: validUri,
-          contents: {
-            descriptionUri: {
-              ref: validUri,
-              contents: {},
-            },
-          },
-        });
-        const plainHotel = await provider.toPlainObject();
-        assert.equal(plainHotel.owner, validOwner);
-        assert.isUndefined(plainHotel.toPlainObject);
-        assert.equal(plainHotel.orgJsonUri.ref, validUri);
-        assert.isDefined(plainHotel.orgJsonUri.contents);
-        assert.isDefined(plainHotel.orgJsonUri.contents.descriptionUri);
-        */
+      const libs = WtJsLibs.createInstance(testedDataModel.withDataSource());
+      const directory = libs.getDirectory('hotels', testedDataModel.directoryAddress);
+      organization = await directory.getOrganizationByIndex(1);
+      const plainOrg = await organization.toPlainObject();
+      assert.equal(plainOrg.owner, '0xD39Ca7d186a37bb6Bf48AE8abFeB4c687dc8F906');
+      assert.isUndefined(plainOrg.toPlainObject);
+      assert.isDefined(plainOrg.associatedKeys);
+      assert.isDefined(plainOrg.address);
+      assert.equal(plainOrg.orgJsonUri.ref, 'in-memory://hotel-one');
+      assert.isDefined(plainOrg.orgJsonUri.contents);
+      assert.equal(plainOrg.orgJsonUri.contents.name, 'organization-one');
     });
   });
 });

@@ -40,6 +40,7 @@ class OrganizationFactory {
         gas: this.web3Utils.applyGasModifier(await estimate),
       };
       return {
+        // TODO return Organization instance in organization
         factory: this,
         transactionData: transactionData,
       };
