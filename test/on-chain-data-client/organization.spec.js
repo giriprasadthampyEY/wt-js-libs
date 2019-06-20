@@ -5,7 +5,7 @@ import testedDataModel from '../utils/data-hotel-model-definition';
 import OnChainOrganization from '../../src/on-chain-data-client/organization';
 import { WtJsLibs } from '../../src/index';
 
-describe.only('WTLibs.on-chain-data.Organization', () => {
+describe('WTLibs.on-chain-data.Organization', () => {
   let contractsStub, utilsStub, urlStub, ownerStub, associatedKeysStub, hasAssociatedKeyStub;
   let organization;
 

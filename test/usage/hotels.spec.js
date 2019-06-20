@@ -120,15 +120,15 @@ describe('WtJsLibs usage - hotels', () => {
     });
   });
 
-  xdescribe('remove', () => {
+  describe('remove', () => {
     it('should remove hotel', async () => {
       const owner = hotelOwner;
-      const createHotel = await factory.createAndAdd({ // TODO
+      const createHotel = await factory.createAndAddOrganization({
         orgJsonUri: 'in-memory://some-data-hash',
         owner: owner,
-      });
-      const origHotel = createHotel.hotel;
+      }, directory.address);
       await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
+      const origHotel = await createHotel.organization;
       assert.isDefined(origHotel.address);
 
       // Verify that it has been added

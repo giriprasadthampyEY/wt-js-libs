@@ -120,15 +120,15 @@ describe('WtJsLibs usage - airlines', () => {
     });
   });
 
-  xdescribe('remove', () => {
+  describe('remove', () => {
     it('should remove airline', async () => {
       const owner = airlineOwner;
-      const createAirline = await factory.createAndAdd({ // TODO
+      const createAirline = await factory.createAndAddOrganization({
         orgJsonUri: 'in-memory://some-data-hash',
         owner: owner,
-      });
-      const origAirline = createAirline.airline;
+      }, directory.address);
       await wallet.signAndSendTransaction(createAirline.transactionData, createAirline.eventCallbacks);
+      const origAirline = await createAirline.organization;
       assert.isDefined(origAirline.address);
 
       // Verify that it has been added
