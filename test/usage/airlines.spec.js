@@ -48,21 +48,20 @@ describe('WtJsLibs usage - airlines', () => {
       const orgJsonUri = await jsonClient.upload({
         descriptionUri: descUrl,
       });
-      const createAirline = await factory.createOrganization({ // TODO replace with createAndAdd
+      const createAirline = await factory.createAndAddOrganization({
         owner: airlineOwner,
         orgJsonUri: orgJsonUri,
-      });
+      }, directory.address);
       const result = await wallet.signAndSendTransaction(createAirline.transactionData, createAirline.eventCallbacks);
       const airline = await createAirline.organization;
-
-      const addAirline = await directory.add(airline);
-      const addingResult = await wallet.signAndSendTransaction(addAirline.transactionData, addAirline.eventCallbacks);
-      const addingTxResults = await libs.getTransactionsStatus([addingResult.transactionHash]);
-      assert.equal(addingTxResults.meta.allPassed, true);
 
       assert.isDefined(result);
       assert.isDefined(airline.address);
       assert.isDefined(result.transactionHash);
+
+      // verify
+      let list = (await directory.getOrganizations());
+      assert.equal(list.length, 3);
 
       // Don't bother with checksummed address format
       assert.equal((await airline.owner), airlineOwner);

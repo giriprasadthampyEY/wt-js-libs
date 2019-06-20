@@ -21,7 +21,15 @@ class OrganizationFactory {
     return this.deployedFactory;
   }
 
+  async createAndAddOrganization (orgData, directoryAddress) {
+    return this._createOrganization(orgData, true, directoryAddress);
+  }
+
   async createOrganization (orgData) {
+    return this._createOrganization(orgData, false);
+  }
+
+  async _createOrganization (orgData, alsoAdd = false, directoryAddress) {
     const orgJsonUri = await orgData.orgJsonUri;
     if (!orgJsonUri) {
       throw new InputDataError('Cannot create Organization: Missing orgJsonUri');
@@ -32,8 +40,11 @@ class OrganizationFactory {
     }
     try {
       const directory = await this._getDeployedFactory();
-      const data = directory.methods.create(orgData.orgJsonUri).encodeABI();
-      const estimate = directory.methods.create(orgData.orgJsonUri).estimateGas({ from: orgOwner });
+      const fn = alsoAdd
+        ? directory.methods.createAndAddToDirectory(orgData.orgJsonUri, directoryAddress)
+        : directory.methods.create(orgData.orgJsonUri);
+      const data = fn.encodeABI();
+      const estimate = fn.estimateGas({ from: orgOwner });
       const transactionData = {
         nonce: await this.web3Utils.determineCurrentAddressNonce(orgOwner),
         data: data,
@@ -55,7 +66,6 @@ class OrganizationFactory {
               const orgAddress = decodedLogs[1].attributes[0].value;
               const organization = OnChainOrganization.createInstance(this.web3Utils, this.web3Contracts, orgAddress);
               resolveOrgPromise(organization);
-              return
             } catch (err) {
               rejectOrgPromise(err);
             }
@@ -64,7 +74,7 @@ class OrganizationFactory {
         organization: orgPromise,
       };
     } catch (err) {
-      throw new WTLibsError(`Cannot create Organization: ${err.message}`, err);
+      throw new WTLibsError(`Cannot ${alsoAdd ? 'create and add' : 'create'} Organization: ${err.message}`, err);
     }
   }
 }
