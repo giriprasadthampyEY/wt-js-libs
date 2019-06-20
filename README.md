@@ -108,7 +108,7 @@ const libs = WtJsLibs.createInstance({
 
 
 const directory = libs.getDirectory('hotels', '0x...');
-const hotel = await directory.getRecord('0x...');
+const hotel = await directory.getOrganization('0x...');
 
 // You can get all the off-chain data at once
 // This approach might be a little slow as all off-chain data gets downloaded
@@ -132,13 +132,15 @@ const hotelName = hotelDescriptionDocument.name;
 wallet = libs.createWallet({/*...Your wallet in a JSON format..*/});
 wallet.unlock('with-password');
 try {
-  const { hotel, transactionData, eventCallbacks } = await directory.create({
+  const factory = libs.getFactory('0x...');
+  const createHotel = await factory.createAndAddOrganization({
     orgJsonUri: 'https://example.com/my-hotel-data.json',
     owner: '0x...',
-  }, true);
-  const result = await wallet.signAndSendTransaction(transactionData, eventCallbacks);
+  }, directory.address);
+  const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
   // After the transaction is confirmed, one of the callbacks
-  // will set the address of the hotel.
+  // will set the object of the hotel.
+  const hotel = await createHotel.organization;
   const newHotelAddress = hotel.address;
 } finally {
   wallet.lock();
@@ -146,16 +148,18 @@ try {
 
 // Working with airline data is very similar. Just change the segment and a few method names:
 const directory = libs.getDirectory('airlines', '0x...');
-const airline = await directory.getRecord('0x...');
+const airline = await directory.getOrganization('0x...');
 
 try {
-  const { airline, transactionData, eventCallbacks } = await directory.createAndAdd({
+  const factory = libs.getFactory('0x...');
+  const createAirline = await factory.createAndAddOrganization({
     orgJsonUri: 'https://example.com/my-airline-data.json',
     owner: '0x...',
-  });
+  }, directory.address);
   const result = await wallet.signAndSendTransaction(transactionData, eventCallbacks);
   // After the transaction is confirmed, one of the callbacks
-  // will set the address of the airline.
+  // will set the object of the airline.
+  const airline = await createAirline.organization;
   const newAirlineAddress = airline.address;
 } finally {
   wallet.lock();
@@ -165,12 +169,12 @@ try {
 If you want, you can create the airline contract first and add it later:
 ```
 // create with `false` argument
-const createHotel = await directory.create({
+const createHotel = await factory.createOrganization({
   owner: hotelOwner,
   orgJsonUri: orgJsonUri,
 });
-const hotel = createHotel.hotel;
 const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
+const hotel = await createHotel.hotel;
 
 // and add later
 const addHotel = await directory.add(hotel);
