@@ -168,7 +168,6 @@ try {
 
 If you want, you can create the airline contract first and add it later:
 ```
-// create with `false` argument
 const createHotel = await factory.createOrganization({
   owner: hotelOwner,
   orgJsonUri: orgJsonUri,
