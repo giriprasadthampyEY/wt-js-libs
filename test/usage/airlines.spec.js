@@ -33,7 +33,7 @@ describe('WtJsLibs usage - airlines', () => {
   });
 
   describe('create and add', () => {
-    it.only('should create and add airline', async () => {
+    it('should create and add airline', async () => {
       const jsonClient = libs.getOffChainDataClient('in-memory');
       // airline description
       const descUrl = await jsonClient.upload({
@@ -52,8 +52,8 @@ describe('WtJsLibs usage - airlines', () => {
         owner: airlineOwner,
         orgJsonUri: orgJsonUri,
       });
-      const airline = createAirline.airline;
       const result = await wallet.signAndSendTransaction(createAirline.transactionData, createAirline.eventCallbacks);
+      const airline = await createAirline.organization;
 
       assert.isDefined(result);
       assert.isDefined(airline.address);
@@ -91,15 +91,17 @@ describe('WtJsLibs usage - airlines', () => {
         owner: airlineOwner,
         orgJsonUri: orgJsonUri,
       });
-      const airline = createAirline.airline;
       const result = await wallet.signAndSendTransaction(createAirline.transactionData, createAirline.eventCallbacks);
+      const airline = await createAirline.organization;
 
       assert.isDefined(result);
       assert.isDefined(airline.address);
       assert.isDefined(result.transactionHash);
 
       const addAirline = await directory.add(airline);
-      await wallet.signAndSendTransaction(addAirline.transactionData, addAirline.eventCallbacks);
+      const addingResult = await wallet.signAndSendTransaction(addAirline.transactionData, addAirline.eventCallbacks);
+      const addingTxResults = await libs.getTransactionsStatus([addingResult.transactionHash]);
+      assert.equal(addingTxResults.meta.allPassed, true);
 
       // verify
       let list = (await directory.getOrganizations());

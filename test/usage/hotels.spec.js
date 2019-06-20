@@ -32,7 +32,7 @@ describe('WtJsLibs usage - hotels', () => {
     });
   });
 
-  xdescribe('create and add', () => {
+  describe('create and add', () => {
     it('should create and add hotel', async () => {
       const jsonClient = libs.getOffChainDataClient('in-memory');
       // hotel description
@@ -48,12 +48,12 @@ describe('WtJsLibs usage - hotels', () => {
       const orgJsonUri = await jsonClient.upload({
         descriptionUri: descUrl,
       });
-      const createHotel = await factory.createAndAdd({ // TODO
+      const createHotel = await factory.createOrganization({ // TODO replace with createAndAdd
         owner: hotelOwner,
         orgJsonUri: orgJsonUri,
       });
-      const hotel = createHotel.hotel;
       const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
+      const hotel = await createHotel.organization;
 
       assert.isDefined(result);
       assert.isDefined(hotel.address);
@@ -91,15 +91,17 @@ describe('WtJsLibs usage - hotels', () => {
         owner: hotelOwner,
         orgJsonUri: orgJsonUri,
       });
-      const hotel = createHotel.hotel;
       const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
+      const hotel = await createHotel.organization;
 
       assert.isDefined(result);
       assert.isDefined(hotel.address);
       assert.isDefined(result.transactionHash);
 
       const addHotel = await directory.add(hotel);
-      await wallet.signAndSendTransaction(addHotel.transactionData, addHotel.eventCallbacks);
+      const addingResult = await wallet.signAndSendTransaction(addHotel.transactionData, addHotel.eventCallbacks);
+      const addingTxResults = await libs.getTransactionsStatus([addingResult.transactionHash]);
+      assert.equal(addingTxResults.meta.allPassed, true);
 
       // verify
       let list = (await directory.getOrganizations());

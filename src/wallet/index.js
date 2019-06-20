@@ -147,7 +147,7 @@ class Wallet {
               eventCallbacks.onTransactionHash(hash);
             }
             if (!eventCallbacks || !eventCallbacks.onReceipt) {
-              resolve(hash);
+              resolve({ transactionHash: hash });
             }
           }).on('receipt', (receipt) => {
             if (eventCallbacks && eventCallbacks.onReceipt) {

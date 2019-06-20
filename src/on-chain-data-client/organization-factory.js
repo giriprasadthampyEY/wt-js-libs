@@ -1,5 +1,7 @@
 import { WTLibsError } from '../errors';
 import { InputDataError } from './errors';
+import OnChainOrganization from './organization';
+import OnChainDataClient from './index';
 
 class OrganizationFactory {
   static createInstance (factoryAddress, web3Utils, web3Contracts) {
@@ -39,10 +41,27 @@ class OrganizationFactory {
         to: this.address,
         gas: this.web3Utils.applyGasModifier(await estimate),
       };
+      let resolveOrgPromise, rejectOrgPromise;
+      const orgPromise = new Promise(async (resolve, reject) => {
+        resolveOrgPromise = resolve;
+        rejectOrgPromise = reject;
+      });
       return {
-        // TODO return Organization instance in organization
-        factory: this,
         transactionData: transactionData,
+        eventCallbacks: {
+          onReceipt: (receipt) => {
+            try {
+              let decodedLogs = OnChainDataClient.web3Contracts.decodeLogs(receipt.logs);
+              const orgAddress = decodedLogs[1].attributes[0].value;
+              const organization = OnChainOrganization.createInstance(this.web3Utils, this.web3Contracts, orgAddress);
+              resolveOrgPromise(organization);
+              return
+            } catch (err) {
+              rejectOrgPromise(err);
+            }
+          },
+        },
+        organization: orgPromise,
       };
     } catch (err) {
       throw new WTLibsError(`Cannot create Organization: ${err.message}`, err);

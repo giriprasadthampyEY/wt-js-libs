@@ -49,8 +49,10 @@ export class SegmentDirectory {
         gas: this.web3Utils.applyGasModifier(await estimate),
       };
       return {
-        directory: this,
         transactionData: transactionData,
+        eventCallbacks: {
+          onReceipt: () => {}, // use empty callback to ensure consistent behaviour of all tx methods
+        },
       };
     } catch (err) {
       throw new WTLibsError(`Cannot add Organization: ${err.message}`, err);
@@ -86,8 +88,10 @@ export class SegmentDirectory {
         gas: this.web3Utils.applyGasModifier(await estimate),
       };
       return {
-        directory: this,
         transactionData: transactionData,
+        eventCallbacks: {
+          onReceipt: () => {}, // use empty callback to ensure consistent behaviour of all tx methods
+        },
       };
     } catch (err) {
       throw new WTLibsError(`Cannot remove Organization: ${err.message}`, err);
