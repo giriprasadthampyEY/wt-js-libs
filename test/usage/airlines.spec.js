@@ -55,6 +55,11 @@ describe('WtJsLibs usage - airlines', () => {
       const result = await wallet.signAndSendTransaction(createAirline.transactionData, createAirline.eventCallbacks);
       const airline = await createAirline.organization;
 
+      const addAirline = await directory.add(airline);
+      const addingResult = await wallet.signAndSendTransaction(addAirline.transactionData, addAirline.eventCallbacks);
+      const addingTxResults = await libs.getTransactionsStatus([addingResult.transactionHash]);
+      assert.equal(addingTxResults.meta.allPassed, true);
+
       assert.isDefined(result);
       assert.isDefined(airline.address);
       assert.isDefined(result.transactionHash);
@@ -62,7 +67,7 @@ describe('WtJsLibs usage - airlines', () => {
       // Don't bother with checksummed address format
       assert.equal((await airline.owner), airlineOwner);
       assert.equal((await airline.orgJsonUri).toLowerCase(), orgJsonUri);
-      const orgJson = await airline.orgJson; // TODO this won't work at first
+      const orgJson = await airline.orgJson;
       const description = (await orgJson.contents).descriptionUri;
       assert.equal((await description.contents).name, 'Premium airline');
 

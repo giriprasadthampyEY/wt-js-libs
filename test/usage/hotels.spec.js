@@ -55,6 +55,11 @@ describe('WtJsLibs usage - hotels', () => {
       const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
       const hotel = await createHotel.organization;
 
+      const addHotel = await directory.add(hotel);
+      const addingResult = await wallet.signAndSendTransaction(addHotel.transactionData, addHotel.eventCallbacks);
+      const addingTxResults = await libs.getTransactionsStatus([addingResult.transactionHash]);
+      assert.equal(addingTxResults.meta.allPassed, true);
+
       assert.isDefined(result);
       assert.isDefined(hotel.address);
       assert.isDefined(result.transactionHash);

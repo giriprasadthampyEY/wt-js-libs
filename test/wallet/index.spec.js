@@ -286,7 +286,7 @@ describe('WTLibs.Wallet', () => {
         data: 'data',
         gas: 1234,
       });
-      assert.equal(result, 'tx-hash');
+      assert.equal(result.transactionHash, 'tx-hash');
     });
 
     it('should call onReceipt callback and resolve with receipt', async () => {
@@ -318,7 +318,7 @@ describe('WTLibs.Wallet', () => {
       }, {
         onTransactionHash: txHashCallback,
       });
-      assert.equal(result, 'tx-hash');
+      assert.equal(result.transactionHash, 'tx-hash');
       assert.equal(txHashCallback.callCount, 1);
     });
 

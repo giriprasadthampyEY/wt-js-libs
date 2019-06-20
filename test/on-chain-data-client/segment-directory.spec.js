@@ -40,8 +40,6 @@ describe('WTLibs.on-chain-data.SegmentDirectory', () => {
   describe('add', () => {
     it('should prepare transaction data', async () => {
       const tx = await directory.add({ owner: 'b', address: 'a' });
-      assert.isDefined(tx.directory);
-      assert.isDefined(tx.directory.address, directory.address);
       assert.isDefined(tx.transactionData.nonce);
       assert.isDefined(tx.transactionData.data);
       assert.equal(tx.transactionData.from, 'b');
@@ -91,8 +89,6 @@ describe('WTLibs.on-chain-data.SegmentDirectory', () => {
   describe('remove', () => {
     it('should prepare transaction data', async () => {
       const tx = await directory.remove({ owner: 'b', address: 'a' });
-      assert.isDefined(tx.directory);
-      assert.isDefined(tx.directory.address, directory.address);
       assert.isDefined(tx.transactionData.nonce);
       assert.isDefined(tx.transactionData.data);
       assert.equal(tx.transactionData.from, 'b');

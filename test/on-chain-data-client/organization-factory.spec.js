@@ -32,8 +32,6 @@ describe('WTLibs.on-chain-data.OrganizationFactory', () => {
   describe('create', () => {
     it('should prepare transaction data', async () => {
       const tx = await factory.createOrganization({ owner: 'b', orgJsonUri: 'a' });
-      assert.isDefined(tx.factory);
-      assert.isDefined(tx.factory.address, factory.address);
       assert.isDefined(tx.transactionData.nonce);
       assert.isDefined(tx.transactionData.data);
       assert.equal(tx.transactionData.from, 'b');

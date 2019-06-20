@@ -87,7 +87,7 @@ class OnChainOrganization {
       if (!this._orgJson) {
         // we leverage StoragePointer to make this work with various off-chain storages
         // no direct linked subdocuments though for now
-        this._orgJson = StoragePointer.createInstance(await this.orgJsonUri, {});
+        this._orgJson = StoragePointer.createInstance(await this.orgJsonUri, { descriptionUri: { required: false } });
       }
       return this._orgJson;
     })();
