@@ -8,7 +8,7 @@ describe('WtJsLibs usage', () => {
   let libs,
     // this depends on the migrations and might not work
     minedTxHashes = [
-      '0x3d53f41f2fca764d317ad033f5fd570857f8621eaf39993ab776babee035f6c2',
+      '0x829e5f6dbafc36ad33712b08600ecaa2495f1a550040bc94b8fbefbe825ea46b',
       '0x5c3c1ed9271398db1d12c911ef53ba458f24342436a0c0067645121f57998048',
     ];
 
