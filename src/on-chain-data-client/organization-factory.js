@@ -22,14 +22,27 @@ class OrganizationFactory {
   }
 
   async createAndAddOrganization (orgData, directoryAddress) {
-    return this._createOrganization(orgData, true, directoryAddress);
+    const orgJsonUri = await orgData.orgJsonUri;
+    if (!orgJsonUri) {
+      throw new InputDataError('Cannot create and add Organization: Missing orgJsonUri');
+    }
+    const orgOwner = await orgData.owner;
+    if (!orgOwner) {
+      throw new InputDataError('Cannot create and add Organization: Missing owner');
+    }
+    if (!directoryAddress) {
+      throw new InputDataError('Cannot create and add Organization: Missing directory address');
+    }
+    try {
+      const directory = await this._getDeployedFactory();
+      const contractMethod = directory.methods.createAndAddToDirectory(orgData.orgJsonUri, directoryAddress);
+      return this._callContract(contractMethod, orgOwner);
+    } catch (err) {
+      throw new WTLibsError(`Cannot create and add Organization: ${err.message}`, err);
+    }
   }
 
   async createOrganization (orgData) {
-    return this._createOrganization(orgData, false);
-  }
-
-  async _createOrganization (orgData, alsoAdd = false, directoryAddress) {
     const orgJsonUri = await orgData.orgJsonUri;
     if (!orgJsonUri) {
       throw new InputDataError('Cannot create Organization: Missing orgJsonUri');
@@ -40,42 +53,44 @@ class OrganizationFactory {
     }
     try {
       const directory = await this._getDeployedFactory();
-      const fn = alsoAdd
-        ? directory.methods.createAndAddToDirectory(orgData.orgJsonUri, directoryAddress)
-        : directory.methods.create(orgData.orgJsonUri);
-      const data = fn.encodeABI();
-      const estimate = fn.estimateGas({ from: orgOwner });
-      const transactionData = {
-        nonce: await this.web3Utils.determineCurrentAddressNonce(orgOwner),
-        data: data,
-        from: orgOwner,
-        to: this.address,
-        gas: this.web3Utils.applyGasModifier(await estimate),
-      };
-      let resolveOrgPromise, rejectOrgPromise;
-      const orgPromise = new Promise(async (resolve, reject) => {
-        resolveOrgPromise = resolve;
-        rejectOrgPromise = reject;
-      });
-      return {
-        transactionData: transactionData,
-        eventCallbacks: {
-          onReceipt: (receipt) => {
-            try {
-              let decodedLogs = OnChainDataClient.web3Contracts.decodeLogs(receipt.logs);
-              const orgAddress = decodedLogs[1].attributes[0].value;
-              const organization = OnChainOrganization.createInstance(this.web3Utils, this.web3Contracts, orgAddress);
-              resolveOrgPromise(organization);
-            } catch (err) {
-              rejectOrgPromise(err);
-            }
-          },
-        },
-        organization: orgPromise,
-      };
+      const contractMethod = directory.methods.create(orgData.orgJsonUri);
+      return this._callContract(contractMethod, orgOwner);
     } catch (err) {
-      throw new WTLibsError(`Cannot ${alsoAdd ? 'create and add' : 'create'} Organization: ${err.message}`, err);
+      throw new WTLibsError(`Cannot create Organization: ${err.message}`, err);
     }
+  }
+
+  async _callContract (contractMethod, caller) {
+    const data = contractMethod.encodeABI();
+    const estimate = contractMethod.estimateGas({ from: caller });
+    const transactionData = {
+      nonce: await this.web3Utils.determineCurrentAddressNonce(caller),
+      data: data,
+      from: caller,
+      to: this.address,
+      gas: this.web3Utils.applyGasModifier(await estimate),
+    };
+    let resolveOrgPromise, rejectOrgPromise;
+    const orgPromise = new Promise(async (resolve, reject) => {
+      resolveOrgPromise = resolve;
+      rejectOrgPromise = reject;
+    });
+    return {
+      transactionData: transactionData,
+      organization: orgPromise,
+      eventCallbacks: {
+        onReceipt: (receipt) => {
+          try {
+            let decodedLogs = OnChainDataClient.web3Contracts.decodeLogs(receipt.logs);
+            const orgAddress = decodedLogs[1].attributes[0].value;
+            const organization = OnChainOrganization.createInstance(this.web3Utils, this.web3Contracts, orgAddress);
+            resolveOrgPromise(organization);
+          } catch (err) {
+            rejectOrgPromise(err);
+          }
+        },
+      },
+    };
   }
 }
 
