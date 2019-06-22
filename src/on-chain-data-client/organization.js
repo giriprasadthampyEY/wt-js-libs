@@ -60,23 +60,6 @@ class OnChainOrganization {
     }
   }
 
-  // Move this to specific subclasses - it is specifid to windingtree api format
-  /* hotel
-  _getStoragePointerLayoutFactory () {
-    return {
-      descriptionUri: { required: true },
-      ratePlansUri: { required: false },
-      availabilityUri: { required: false },
-    };
-  }
-
-  _getStoragePointerLayoutFactory () {
-    return {
-      descriptionUri: { required: true },
-      flightsUri: { required: false, children: { items: { children: { flightInstancesUri: { required: false } } } } },
-    };
-  } */
-
   /**
    * Async getter for `StoragePointer` instance.
    * Since it has to eventually access the `orgJsonUri`
@@ -87,7 +70,7 @@ class OnChainOrganization {
       if (!this._orgJson) {
         // we leverage StoragePointer to make this work with various off-chain storages
         // no direct linked subdocuments though for now
-        this._orgJson = StoragePointer.createInstance(await this.orgJsonUri, { descriptionUri: { required: false } });
+        this._orgJson = StoragePointer.createInstance(await this.orgJsonUri, {});
       }
       return this._orgJson;
     })();
@@ -159,6 +142,35 @@ class OnChainOrganization {
       orgJsonUri: offChainData,
     };
     return result;
+  }
+
+  async getWindingTreeApi () {
+    const ret = {
+      hotel: [],
+      airline: [],
+    };
+    for (let segment of ['hotel', 'airline']) {
+      const data = (await this.toPlainObject([`orgJsonUri.${segment}`])).orgJsonUri.contents[segment];
+      if (data && data.apis) {
+        data.apis
+          .filter((a) => a.format === 'windingtree')
+          .map((a) => {
+            if (segment === 'hotel') {
+              ret.hotel.push(StoragePointer.createInstance(a.entrypoint, {
+                descriptionUri: { required: true },
+                ratePlansUri: { required: false },
+                availabilityUri: { required: false },
+              }));
+            } else if (segment === 'airline') {
+              ret.airline.push(StoragePointer.createInstance(a.entrypoint, {
+                descriptionUri: { required: true },
+                flightsUri: { required: false, children: { items: { children: { flightInstancesUri: { required: false } } } } },
+              }));
+            }
+          });
+      }
+    }
+    return ret;
   }
 
   async _getContractInstance () {

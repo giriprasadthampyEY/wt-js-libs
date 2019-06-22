@@ -96,4 +96,19 @@ describe('WTLibs.on-chain-data.Organization', () => {
       assert.equal(plainOrg.orgJsonUri.contents.name, 'organization-one');
     });
   });
+
+  describe('getWindingTreeApi', () => {
+    it('should return any wt api it finds wrapped into storagepointer', async () => {
+      const libs = WtJsLibs.createInstance(testedDataModel.withDataSource());
+      const directory = libs.getDirectory('hotels', testedDataModel.directoryAddress);
+      organization = await directory.getOrganizationByIndex(1);
+      const apiPointers = await organization.getWindingTreeApi();
+      assert.isDefined(apiPointers.hotel);
+      assert.equal(apiPointers.hotel.length, 1);
+      assert.isDefined(apiPointers.airline);
+      assert.equal(apiPointers.airline.length, 0);
+      const hotelApi = await apiPointers.hotel[0].toPlainObject();
+      assert.equal(hotelApi.contents.descriptionUri.contents.name, 'First hotel');
+    });
+  });
 });

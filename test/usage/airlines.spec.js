@@ -36,7 +36,7 @@ describe('WtJsLibs usage - airlines', () => {
     it('should create and add airline', async () => {
       const jsonClient = libs.getOffChainDataClient('in-memory');
       // airline description
-      const descUrl = await jsonClient.upload({
+      const descUri = await jsonClient.upload({
         name: 'Premium airline',
         description: 'Great airline',
         location: {
@@ -44,9 +44,26 @@ describe('WtJsLibs usage - airlines', () => {
           longitude: 'long',
         },
       });
+      const dataUri = await jsonClient.upload({
+        descriptionUri: descUri,
+      });
       // ORG.ID json
       const orgJsonUri = await jsonClient.upload({
-        descriptionUri: descUrl,
+        'dataFormatVersion': '0.0.0',
+        'name': 'Premium airline',
+        'airline': {
+          'name': 'Premium airline',
+          'apis': [
+            {
+              'entrypoint': dataUri,
+              'format': 'windingtree',
+            },
+            {
+              'entrypoint': 'http://dummy.restapiexample.com/api/v1/employees',
+              'format': 'coolapi',
+            },
+          ],
+        },
       });
       const createAirline = await factory.createAndAddOrganization({
         owner: airlineOwner,
@@ -66,9 +83,9 @@ describe('WtJsLibs usage - airlines', () => {
       // Don't bother with checksummed address format
       assert.equal((await airline.owner), airlineOwner);
       assert.equal((await airline.orgJsonUri).toLowerCase(), orgJsonUri);
-      const orgJson = await airline.orgJson;
-      const description = (await orgJson.contents).descriptionUri;
-      assert.equal((await description.contents).name, 'Premium airline');
+      const apiPointer = (await airline.getWindingTreeApi()).airline[0];
+      assert.isDefined(apiPointer);
+      assert.equal((await apiPointer.toPlainObject()).contents.descriptionUri.contents.name, 'Premium airline');
 
       // We're removing the airline to ensure clean slate after this test is run.
       // It is too possibly expensive to re-set on-chain directory after each test.
@@ -80,7 +97,8 @@ describe('WtJsLibs usage - airlines', () => {
 
     it('should create then add airline', async () => {
       const jsonClient = libs.getOffChainDataClient('in-memory');
-      const descUrl = await jsonClient.upload({
+      // airline description
+      const descUri = await jsonClient.upload({
         name: 'Premium airline',
         description: 'Great airline',
         location: {
@@ -88,8 +106,26 @@ describe('WtJsLibs usage - airlines', () => {
           longitude: 'long',
         },
       });
+      const dataUri = await jsonClient.upload({
+        descriptionUri: descUri,
+      });
+      // ORG.ID json
       const orgJsonUri = await jsonClient.upload({
-        descriptionUri: descUrl,
+        'dataFormatVersion': '0.0.0',
+        'name': 'Premium airline',
+        'airline': {
+          'name': 'Premium airline',
+          'apis': [
+            {
+              'entrypoint': dataUri,
+              'format': 'windingtree',
+            },
+            {
+              'entrypoint': 'http://dummy.restapiexample.com/api/v1/employees',
+              'format': 'coolapi',
+            },
+          ],
+        },
       });
       const createAirline = await factory.createOrganization({
         owner: airlineOwner,
@@ -106,6 +142,9 @@ describe('WtJsLibs usage - airlines', () => {
       const addingResult = await wallet.signAndSendTransaction(addAirline.transactionData, addAirline.eventCallbacks);
       const addingTxResults = await libs.getTransactionsStatus([addingResult.transactionHash]);
       assert.equal(addingTxResults.meta.allPassed, true);
+      const apiPointer = (await airline.getWindingTreeApi()).airline[0];
+      assert.isDefined(apiPointer);
+      assert.equal((await apiPointer.toPlainObject()).contents.descriptionUri.contents.name, 'Premium airline');
 
       // verify
       let list = (await directory.getOrganizations());

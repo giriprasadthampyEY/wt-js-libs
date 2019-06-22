@@ -114,18 +114,20 @@ const hotel = await directory.getOrganization('0x...');
 // This approach might be a little slow as all off-chain data gets downloaded
 const plainHotel = await hotel.toPlainObject();
 // You get a synced plain javascript object you can traverse in any way you want
-const hotelName2 = plainHotel.dataUri.contents.descriptionUri.contents.name;
+const hotelName2 = plainHotel.orgJson.contents.name;
+// If an ORG.ID is using an API that conform to Winding Tree data model, you can wrap
+// them into a storage pointer as well
+const hotelApis = await hotel.getWindingTreeApi();
+const apiContents = (await hotelApis.hotel[0].toPlainObject()).contents;
+const hotelDescriptionDocument = await apiContents.descriptionUri.contents;
 
-// OR you can be picky but faster
+// OR you can do it like this
 
 // Accessing off-chain data - the entry point url is actually stored on chain
-const dataIndex = await hotel.dataIndex;
-const hotelDataIndexUrl = dataIndex.ref;
+const orgJson = await hotel.orgJson;
+const hotelOrgJsonUrl = orgJson.ref;
 // This data is fetched from some off-chain storage
-const dataIndexContents = await dataIndex.contents;
-const hotelDescriptionDocument = await dataIndexContents.descriptionUri.contents;
-// This data is fetched from another off-chain document
-const hotelName = hotelDescriptionDocument.name;
+const orgJsonContents = await orgJson.contents;
 
 
 // How about creating a hotel and adding it to a directory?
@@ -167,7 +169,7 @@ try {
 ```
 
 If you want, you can create the airline contract first and add it later:
-```
+```js
 const createHotel = await factory.createOrganization({
   owner: hotelOwner,
   orgJsonUri: orgJsonUri,
