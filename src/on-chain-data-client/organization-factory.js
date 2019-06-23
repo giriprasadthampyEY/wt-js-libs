@@ -1,6 +1,6 @@
 import { WTLibsError } from '../errors';
 import { InputDataError } from './errors';
-import OnChainOrganization from './organization';
+import UpdateableOnChainOrganization from './updateable-organization';
 import OnChainDataClient from './index';
 
 class OrganizationFactory {
@@ -83,7 +83,7 @@ class OrganizationFactory {
           try {
             let decodedLogs = OnChainDataClient.web3Contracts.decodeLogs(receipt.logs);
             const orgAddress = decodedLogs[1].attributes[0].value;
-            const organization = OnChainOrganization.createInstance(this.web3Utils, this.web3Contracts, orgAddress);
+            const organization = UpdateableOnChainOrganization.createInstance(this.web3Utils, this.web3Contracts, orgAddress);
             resolveOrgPromise(organization);
           } catch (err) {
             rejectOrgPromise(err);

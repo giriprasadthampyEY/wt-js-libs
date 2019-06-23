@@ -1,5 +1,6 @@
 import SegmentDirectoryMetadata from '@windingtree/wt-contracts/build/contracts/AbstractSegmentDirectory.json';
 import OrganizationInterfaceMetadata from '@windingtree/wt-contracts/build/contracts/OrganizationInterface.json';
+import OrganizationMetadata from '@windingtree/wt-contracts/build/contracts/Organization.json';
 import OrganizationFactoryMetadata from '@windingtree/wt-contracts/build/contracts/AbstractOrganizationFactory.json';
 import { SmartContractInstantiationError } from './errors';
 
@@ -59,6 +60,10 @@ class Contracts {
 
   async getOrganizationInstance (address) {
     return this._getInstance('organization', OrganizationInterfaceMetadata.abi, address);
+  }
+
+  async getUpdateableOrganizationInstance (address) {
+    return this._getInstance('organization', OrganizationMetadata.abi, address);
   }
 
   async getOrganizationFactoryInstance (address) {
