@@ -3,6 +3,8 @@ import Utils from './utils';
 import Contracts from './contracts';
 import SegmentDirectory from './segment-directory';
 import OrganizationFactory from './organization-factory';
+import UpdateableOrganization from './updateable-organization';
+import Organization from './organization';
 import { OnChainDataRuntimeError } from './errors';
 
 /**
@@ -72,6 +74,14 @@ export class OnChainDataClient {
       OnChainDataClient.factories[address] = OrganizationFactory.createInstance(address, OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts);
     }
     return OnChainDataClient.factories[address];
+  }
+
+  static getUpdateableOrganization (address) {
+    return UpdateableOrganization.createInstance(OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts, address);
+  }
+
+  static getOrganization (address) {
+    return Organization.createInstance(OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts, address);
   }
 
   /**

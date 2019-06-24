@@ -63,7 +63,7 @@ export class WtJsLibs {
   }
 
   /**
-   * Get an instance of Winding Tree index from the OnChainDataClient.
+   * Get an instance of Winding Tree directory from the OnChainDataClient.
    *
    * @param segment - allowed are `hotels` and `airlines`
    * @param address of the Winding Tree index
@@ -74,6 +74,14 @@ export class WtJsLibs {
 
   getFactory (address) {
     return OnChainDataClient.getFactory(address);
+  }
+
+  getUpdateableOrganization (address) {
+    return OnChainDataClient.getUpdateableOrganization(address);
+  }
+
+  getOrganization (address) {
+    return OnChainDataClient.getOrganization(address);
   }
 
   /**

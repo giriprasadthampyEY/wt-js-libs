@@ -86,7 +86,8 @@ describe('WtJsLibs usage - hotels', () => {
       assert.isDefined(updateResult);
       assert.isDefined(updateResult.transactionHash);
     }
-    assert.equal((await hotel.orgJsonUri).toLowerCase(), 'https://example.com');
+    const standaloneHotel = libs.getUpdateableOrganization(hotel.address);
+    assert.equal((await standaloneHotel.orgJsonUri).toLowerCase(), 'https://example.com');
 
     // We're removing the hotel to ensure clean slate after this test is run.
     // It is too possibly expensive to re-set on-chain directory after each test.
@@ -159,7 +160,8 @@ describe('WtJsLibs usage - hotels', () => {
       assert.isDefined(updateResult);
       assert.isDefined(updateResult.transactionHash);
     }
-    assert.equal((await hotel.orgJsonUri).toLowerCase(), 'https://example.com');
+    const standaloneHotel = libs.getOrganization(hotel.address);
+    assert.equal((await standaloneHotel.orgJsonUri).toLowerCase(), 'https://example.com');
 
     // verify
     let list = (await directory.getOrganizations());
