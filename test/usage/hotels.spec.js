@@ -5,7 +5,7 @@ import testedDataModel from '../utils/data-hotel-model-definition';
 import OffChainDataClient from '../../src/off-chain-data-client';
 
 describe('WtJsLibs usage - hotels', () => {
-  let libs, wallet, directory, emptyDirectory, factory;
+  let libs, wallet, directory, factory;
   const hotelOwner = '0xD39Ca7d186a37bb6Bf48AE8abFeB4c687dc8F906';
   const hotelAddress = '0xBF18B616aC81830dd0C5D4b771F22FD8144fe769';
 
@@ -13,7 +13,6 @@ describe('WtJsLibs usage - hotels', () => {
     libs = WtJsLibs.createInstance(testedDataModel.withDataSource());
     directory = libs.getDirectory('hotels', testedDataModel.directoryAddress);
     wallet = libs.createWallet(jsonWallet);
-    emptyDirectory = libs.getDirectory('hotels', testedDataModel.emptyDirectoryAddress);
     factory = libs.getFactory(testedDataModel.factoryAddress);
     wallet.unlock('test123');
   });
@@ -23,221 +22,131 @@ describe('WtJsLibs usage - hotels', () => {
     OffChainDataClient._reset();
   });
 
-  describe('segment', () => {
-    it('should get correct segment', async () => {
-      const segment = await directory.getSegment({
-        from: hotelOwner,
-      });
-      assert.equal(segment, 'hotels');
+  it('create and add, update and remove a hotel', async () => {
+    const jsonClient = libs.getOffChainDataClient('in-memory');
+    // hotel description
+    const descUri = await jsonClient.upload({
+      name: 'Premium hotel',
+      description: 'Great hotel',
+      location: {
+        latitude: 'lat',
+        longitude: 'long',
+      },
     });
-  });
-
-  describe('create and add', () => {
-    it('should create and add hotel', async () => {
-      const jsonClient = libs.getOffChainDataClient('in-memory');
-      // hotel description
-      const descUri = await jsonClient.upload({
-        name: 'Premium hotel',
-        description: 'Great hotel',
-        location: {
-          latitude: 'lat',
-          longitude: 'long',
-        },
-      });
-      const dataUri = await jsonClient.upload({
-        descriptionUri: descUri,
-      });
+    const dataUri = await jsonClient.upload({
+      descriptionUri: descUri,
+    });
       // ORG.ID json
-      const orgJsonUri = await jsonClient.upload({
-        'dataFormatVersion': '0.0.0',
+    const orgJsonUri = await jsonClient.upload({
+      'dataFormatVersion': '0.0.0',
+      'name': 'Premium hotel',
+      'hotel': {
         'name': 'Premium hotel',
-        'hotel': {
-          'name': 'Premium hotel',
-          'apis': [
-            {
-              'entrypoint': dataUri,
-              'format': 'windingtree',
-            },
-            {
-              'entrypoint': 'http://dummy.restapiexample.com/api/v1/employees',
-              'format': 'coolapi',
-            },
-          ],
-        },
-      });
-      const createHotel = await factory.createAndAddOrganization({
-        owner: hotelOwner,
-        orgJsonUri: orgJsonUri,
-      }, directory.address);
-      const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
-      const hotel = await createHotel.organization;
-
-      assert.isDefined(result);
-      assert.isDefined(hotel.address);
-      assert.isDefined(result.transactionHash);
-
-      // verify
-      let list = (await directory.getOrganizations());
-      assert.equal(list.length, 3);
-
-      // Don't bother with checksummed address format
-      assert.equal((await hotel.owner), hotelOwner);
-      assert.equal((await hotel.orgJsonUri).toLowerCase(), orgJsonUri);
-      const apiPointer = (await hotel.getWindingTreeApi()).hotel[0];
-      assert.isDefined(apiPointer);
-      assert.equal((await apiPointer.toPlainObject()).contents.descriptionUri.contents.name, 'Premium hotel');
-
-      // We're removing the hotel to ensure clean slate after this test is run.
-      // It is too possibly expensive to re-set on-chain directory after each test.
-      const removeHotel = await directory.remove(hotel);
-      const removalResult = await wallet.signAndSendTransaction(removeHotel.transactionData, removeHotel.eventCallbacks);
-      const removalTxResults = await libs.getTransactionsStatus([removalResult.transactionHash]);
-      assert.equal(removalTxResults.meta.allPassed, true);
+        'apis': [
+          {
+            'entrypoint': dataUri,
+            'format': 'windingtree',
+          },
+          {
+            'entrypoint': 'http://dummy.restapiexample.com/api/v1/employees',
+            'format': 'coolapi',
+          },
+        ],
+      },
     });
+    const createHotel = await factory.createAndAddOrganization({
+      owner: hotelOwner,
+      orgJsonUri: orgJsonUri,
+    }, directory.address);
+    const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
+    const hotel = await createHotel.organization;
 
-    it('should create then add hotel', async () => {
-      const jsonClient = libs.getOffChainDataClient('in-memory');
-      // hotel description
-      const descUri = await jsonClient.upload({
-        name: 'Premium hotel',
-        description: 'Great hotel',
-        location: {
-          latitude: 'lat',
-          longitude: 'long',
-        },
-      });
-      const dataUri = await jsonClient.upload({
-        descriptionUri: descUri,
-      });
+    assert.isDefined(result);
+    assert.isDefined(hotel.address);
+    assert.isDefined(result.transactionHash);
+
+    // verify
+    let list = (await directory.getOrganizations());
+    assert.equal(list.length, 3);
+
+    // Don't bother with checksummed address format
+    assert.equal((await hotel.owner), hotelOwner);
+    assert.equal((await hotel.orgJsonUri).toLowerCase(), orgJsonUri);
+    const apiPointer = (await hotel.getWindingTreeApi()).hotel[0];
+    assert.isDefined(apiPointer);
+    assert.equal((await apiPointer.toPlainObject()).contents.descriptionUri.contents.name, 'Premium hotel');
+
+    // We're removing the hotel to ensure clean slate after this test is run.
+    // It is too possibly expensive to re-set on-chain directory after each test.
+    const removeHotel = await directory.remove(hotel);
+    const removalResult = await wallet.signAndSendTransaction(removeHotel.transactionData, removeHotel.eventCallbacks);
+    const removalTxResults = await libs.getTransactionsStatus([removalResult.transactionHash]);
+    assert.equal(removalTxResults.meta.allPassed, true);
+    list = await directory.getOrganizations();
+    assert.equal(list.length, 2);
+    assert.notInclude(list.map(async (a) => a.address), await hotel.address);
+  });
+  it('should create, add, update and remove a hotel', async () => {
+    const jsonClient = libs.getOffChainDataClient('in-memory');
+    // hotel description
+    const descUri = await jsonClient.upload({
+      name: 'Premium hotel',
+      description: 'Great hotel',
+      location: {
+        latitude: 'lat',
+        longitude: 'long',
+      },
+    });
+    const dataUri = await jsonClient.upload({
+      descriptionUri: descUri,
+    });
       // ORG.ID json
-      const orgJsonUri = await jsonClient.upload({
-        'dataFormatVersion': '0.0.0',
+    const orgJsonUri = await jsonClient.upload({
+      'dataFormatVersion': '0.0.0',
+      'name': 'Premium hotel',
+      'hotel': {
         'name': 'Premium hotel',
-        'hotel': {
-          'name': 'Premium hotel',
-          'apis': [
-            {
-              'entrypoint': dataUri,
-              'format': 'windingtree',
-            },
-            {
-              'entrypoint': 'http://dummy.restapiexample.com/api/v1/employees',
-              'format': 'coolapi',
-            },
-          ],
-        },
-      });
-      const createHotel = await factory.createOrganization({
-        owner: hotelOwner,
-        orgJsonUri: orgJsonUri,
-      });
-      const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
-      const hotel = await createHotel.organization;
-
-      assert.isDefined(result);
-      assert.isDefined(hotel.address);
-      assert.isDefined(result.transactionHash);
-
-      const addHotel = await directory.add(hotel);
-      const addingResult = await wallet.signAndSendTransaction(addHotel.transactionData, addHotel.eventCallbacks);
-      const addingTxResults = await libs.getTransactionsStatus([addingResult.transactionHash]);
-      assert.equal(addingTxResults.meta.allPassed, true);
-      const apiPointer = (await hotel.getWindingTreeApi()).hotel[0];
-      assert.isDefined(apiPointer);
-      assert.equal((await apiPointer.toPlainObject()).contents.descriptionUri.contents.name, 'Premium hotel');
-
-      // verify
-      let list = (await directory.getOrganizations());
-      assert.equal(list.length, 3);
-
-      // We're removing the hotel to ensure clean slate after this test is run.
-      // It is too possibly expensive to re-set on-chain directory after each test.
-      const removeHotel = await directory.remove(hotel);
-      const removalResult = await wallet.signAndSendTransaction(removeHotel.transactionData, removeHotel.eventCallbacks);
-      const removalTxResults = await libs.getTransactionsStatus([removalResult.transactionHash]);
-      assert.equal(removalTxResults.meta.allPassed, true);
+        'apis': [
+          {
+            'entrypoint': dataUri,
+            'format': 'windingtree',
+          },
+          {
+            'entrypoint': 'http://dummy.restapiexample.com/api/v1/employees',
+            'format': 'coolapi',
+          },
+        ],
+      },
     });
-  });
-
-  describe('remove', () => {
-    it('should remove hotel', async () => {
-      const owner = hotelOwner;
-      const createHotel = await factory.createAndAddOrganization({
-        orgJsonUri: 'in-memory://some-data-hash',
-        owner: owner,
-      }, directory.address);
-      await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
-      const origHotel = await createHotel.organization;
-      assert.isDefined(origHotel.address);
-
-      // Verify that it has been added
-      let list = (await directory.getOrganizations());
-      assert.equal(list.length, 3);
-      assert.include(await Promise.all(list.map(async (a) => a.address)), origHotel.address);
-      const hotel = await directory.getOrganization(origHotel.address);
-      // Remove
-      const removeHotel = await directory.remove(hotel);
-      const removalResult = await wallet.signAndSendTransaction(removeHotel.transactionData, removeHotel.eventCallbacks);
-      assert.isDefined(removalResult);
-      // Verify that it has been removed
-      list = await directory.getOrganizations();
-      assert.equal(list.length, 2);
-      assert.notInclude(list.map(async (a) => a.address), await hotel.address);
+    const createHotel = await factory.createOrganization({
+      owner: hotelOwner,
+      orgJsonUri: orgJsonUri,
     });
-  });
+    const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
+    const hotel = await createHotel.organization;
 
-  describe('getOrganization', () => {
-    it('should get hotel by address', async () => {
-      const hotel = await directory.getOrganization(hotelAddress);
-      assert.isNotNull(hotel);
-      assert.equal(await hotel.orgJsonUri, 'in-memory://hotel-one');
-      assert.equal(await hotel.address, hotelAddress);
-    });
+    assert.isDefined(result);
+    assert.isDefined(hotel.address);
+    assert.isDefined(result.transactionHash);
 
-    it('should get hotel index by address', async () => {
-      const idx = await directory.getOrganizationIndex(hotelAddress);
-      assert.equal(idx, 1);
-    });
+    const addHotel = await directory.add(hotel);
+    const addingResult = await wallet.signAndSendTransaction(addHotel.transactionData, addHotel.eventCallbacks);
+    const addingTxResults = await libs.getTransactionsStatus([addingResult.transactionHash]);
+    assert.equal(addingTxResults.meta.allPassed, true);
+    const apiPointer = (await hotel.getWindingTreeApi()).hotel[0];
+    assert.isDefined(apiPointer);
+    assert.equal((await apiPointer.toPlainObject()).contents.descriptionUri.contents.name, 'Premium hotel');
 
-    it('should get hotel by index', async () => {
-      const firstHotel = await directory.getOrganizationByIndex(1);
-      assert.isNotNull(firstHotel);
-      assert.equal(await firstHotel.orgJsonUri, 'in-memory://hotel-one');
-      assert.equal(await firstHotel.address, hotelAddress);
-      const secondHotel = await directory.getOrganizationByIndex(2);
-      assert.isNotNull(secondHotel);
-      assert.equal(await secondHotel.orgJsonUri, 'in-memory://hotel-two');
-      assert.equal(await secondHotel.address, '0x4A763F50DFe5cF4468B4171539E021A26FCee0cC');
-    });
-  });
+    // verify
+    let list = (await directory.getOrganizations());
+    assert.equal(list.length, 3);
 
-  describe('getOrganizations', () => {
-    it('should get all hotels', async () => {
-      const hotels = await directory.getOrganizations();
-      assert.equal(hotels.length, 2);
-      for (let hotel of hotels) {
-        assert.isDefined(hotel.toPlainObject);
-        assert.isDefined((await hotel.orgJson).ref);
-        const plainHotel = await hotel.toPlainObject();
-        assert.equal(plainHotel.address, await hotel.address);
-        assert.equal(plainHotel.owner, await hotel.owner);
-        assert.isDefined(plainHotel.orgJsonUri.ref);
-        assert.isDefined(plainHotel.orgJsonUri.contents);
-      }
-    });
-
-    it('should get empty list if no hotels are set', async () => {
-      const hotels = await emptyDirectory.getOrganizations();
-      assert.equal(hotels.length, 0);
-    });
-  });
-
-  describe('owner', () => {
-    it('should get owner', async () => {
-      const hotel = await directory.getOrganization(hotelAddress);
-      assert.isNotNull(hotel);
-      assert.equal(await hotel.owner, hotelOwner);
-    });
+    // We're removing the hotel to ensure clean slate after this test is run.
+    // It is too possibly expensive to re-set on-chain directory after each test.
+    const removeHotel = await directory.remove(hotel);
+    const removalResult = await wallet.signAndSendTransaction(removeHotel.transactionData, removeHotel.eventCallbacks);
+    const removalTxResults = await libs.getTransactionsStatus([removalResult.transactionHash]);
+    assert.equal(removalTxResults.meta.allPassed, true);
   });
 
   describe('hasAssociatedKey', () => {
