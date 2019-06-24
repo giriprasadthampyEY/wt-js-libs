@@ -76,6 +76,18 @@ describe('WtJsLibs usage - hotels', () => {
     assert.isDefined(apiPointer);
     assert.equal((await apiPointer.toPlainObject()).contents.descriptionUri.contents.name, 'Premium hotel');
 
+    // update
+    hotel.orgJsonUri = 'https://example.com';
+    const updateHotel = await hotel.updateOnChainData({
+      from: hotelOwner,
+    });
+    for (let i = 0; i < updateHotel.length; i++) {
+      const updateResult = await wallet.signAndSendTransaction(updateHotel[i].transactionData, updateHotel[i].eventCallbacks);
+      assert.isDefined(updateResult);
+      assert.isDefined(updateResult.transactionHash);
+    }
+    assert.equal((await hotel.orgJsonUri).toLowerCase(), 'https://example.com');
+
     // We're removing the hotel to ensure clean slate after this test is run.
     // It is too possibly expensive to re-set on-chain directory after each test.
     const removeHotel = await directory.remove(hotel);
@@ -86,6 +98,7 @@ describe('WtJsLibs usage - hotels', () => {
     assert.equal(list.length, 2);
     assert.notInclude(list.map(async (a) => a.address), await hotel.address);
   });
+
   it('should create, add, update and remove a hotel', async () => {
     const jsonClient = libs.getOffChainDataClient('in-memory');
     // hotel description
@@ -136,6 +149,17 @@ describe('WtJsLibs usage - hotels', () => {
     const apiPointer = (await hotel.getWindingTreeApi()).hotel[0];
     assert.isDefined(apiPointer);
     assert.equal((await apiPointer.toPlainObject()).contents.descriptionUri.contents.name, 'Premium hotel');
+
+    hotel.orgJsonUri = 'https://example.com';
+    const updateHotel = await hotel.updateOnChainData({
+      from: hotelOwner,
+    });
+    for (let i = 0; i < updateHotel.length; i++) {
+      const updateResult = await wallet.signAndSendTransaction(updateHotel[i].transactionData, updateHotel[i].eventCallbacks);
+      assert.isDefined(updateResult);
+      assert.isDefined(updateResult.transactionHash);
+    }
+    assert.equal((await hotel.orgJsonUri).toLowerCase(), 'https://example.com');
 
     // verify
     let list = (await directory.getOrganizations());
