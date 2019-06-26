@@ -33,31 +33,11 @@ export class RemoteDataAccessError extends RemotelyBackedDatasetError {}
 export class RemoteDataReadError extends RemotelyBackedDatasetError {}
 
 /**
- * Record is not found in WTIndex for some reason.
+ * Organization is not found in WTIndex for some reason.
  */
-export class RecordNotFoundError extends WTLibsError {}
+export class OrganizationNotFoundError extends WTLibsError {}
 
 /**
- * Record abstraction instance cannot be created for some reason.
+ * Organization abstraction instance cannot be created for some reason.
  */
-export class RecordNotInstantiableError extends WTLibsError {}
-
-/**
- * Hotel is not found in WTIndex for some reason.
- */
-export class HotelNotFoundError extends WTLibsError {}
-
-/**
- * Hotel abstraction instance cannot be created for some reason.
- */
-export class HotelNotInstantiableError extends WTLibsError {}
-
-/**
- * Airline is not found in WTIndex for some reason.
- */
-export class AirlineNotFoundError extends WTLibsError {}
-
-/**
- * Airline abstraction instance cannot be created for some reason.
- */
-export class AirlineNotInstantiableError extends WTLibsError {}
+export class OrganizationNotInstantiableError extends WTLibsError {}

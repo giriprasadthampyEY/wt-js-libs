@@ -1,26 +1,8 @@
-// @flow
 import cloneDeep from 'lodash.clonedeep';
-import type { OffChainDataAdapterInterface } from '../interfaces/base-interfaces';
 // TODO replace this with a runtime passed implementation of an interface
 import OffChainDataClient from '../off-chain-data-client';
 
 import { StoragePointerError } from './errors';
-
-/**
- * Definition of a data field that is stored off-chain.
- * This may be recursive.
- */
-type ChildType = {
-  required?: boolean,
-  // If `nested` is true, we assume the child is actually an object whose keys are field names and values are uris.
-  nested?: boolean,
-  children?: ChildrenType
-};
-
-/**
- * Structure definition of `ChildType`.
- */
-type ChildrenType = {[string]: ChildType};
 
 /**
  * `StoragePointer` serves as a representation of an
@@ -90,14 +72,6 @@ type ChildrenType = {[string]: ChildType};
  * Note that arrays are not supported for `nested` children types.
  */
 class StoragePointer {
-  ref: string;
-  contents: Promise<Object>;
-  _downloaded: boolean;
-  _data: {[string]: Object};
-  _children: ?ChildrenType;
-  _adapter: OffChainDataAdapterInterface;
-  _downloading: ?Promise<void>;
-
   /**
    * Returns a new instance of StoragePointer.
    *
@@ -108,7 +82,7 @@ class StoragePointer {
    * @param {ChildrenType} children subordinate storage pointers
    * @throw {StoragePointerError} if uri is not defined
    */
-  static createInstance (uri: ?string, children: ?ChildrenType): StoragePointer {
+  static createInstance (uri, children) {
     if (!uri) {
       throw new StoragePointerError('Cannot instantiate StoragePointer without uri');
     }
@@ -135,14 +109,14 @@ class StoragePointer {
    * @param {string} uri where to look for the data
    * @param {ChildrenType} children subordinate storage pointers
    */
-  constructor (uri: string, children: ChildrenType) {
+  constructor (uri, children) {
     this.ref = uri;
     this._downloaded = false;
     this._data = {};
     this._children = children || [];
   }
 
-  get contents (): {[string]: Object} {
+  get contents () {
     return (async () => {
       if (!this._downloaded) {
         await this._downloadFromStorage();
@@ -171,7 +145,7 @@ class StoragePointer {
    * Detects schema from an uri, i. e.
    * from `schema://some-data`, detects `schema`.
    */
-  _detectSchema (uri: string): ?string {
+  _detectSchema (uri) {
     const matchResult = uri.match(/([a-zA-Z-]+):\/\//i);
     return matchResult ? matchResult[1] : null;
   }
@@ -180,7 +154,7 @@ class StoragePointer {
    * Returns appropriate implementation of `OffChainDataAdapterInterface`
    * based on schema. Uses `OffChainDataClient.getAdapter` factory method.
    */
-  _getOffChainDataClient (): OffChainDataAdapterInterface {
+  _getOffChainDataClient () {
     if (!this._adapter) {
       this._adapter = OffChainDataClient.getAdapter(this._detectSchema(this.ref));
     }
@@ -191,7 +165,7 @@ class StoragePointer {
    * Sets the internal _data property based on the data retrieved from
    * the storage.
    */
-  _initFromStorage (data: Object) {
+  _initFromStorage (data) {
     this._data = cloneDeep(data); // Copy data to avoid issues with mutability.
     for (let fieldName in this._children) {
       const fieldData = this._data[fieldName],
@@ -242,7 +216,7 @@ class StoragePointer {
    * Gets the data document via `OffChainDataAdapterInterface`
    * and uses it to initialize the internal state.
    */
-  async _downloadFromStorage (): Promise<void> {
+  async _downloadFromStorage () {
     if (!this._downloading) {
       this._downloading = (async () => {
         const adapter = this._getOffChainDataClient();
@@ -315,7 +289,7 @@ class StoragePointer {
    *  (e.g. when calling `toPlainObject(['a.b'])` all fields in data.a.b will be resolved - unless limited by depth).
    * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
    */
-  async toPlainObject (resolvedFields: ?Array<string>, depth?: number = 9999): Promise<{ref: string, contents: Object}> {
+  async toPlainObject (resolvedFields, depth = 9999) {
     // Download data
     await this._downloadFromStorage();
     let result = {};

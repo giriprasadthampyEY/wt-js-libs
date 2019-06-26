@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import AirlineDataModel from '../../src/on-chain-data-client/airlines/data-model';
-import HotelDataModel from '../../src/on-chain-data-client/hotels/data-model';
+import Directory from '../../src/on-chain-data-client/segment-directory';
+import OrganizationFactory from '../../src/on-chain-data-client/organization-factory';
 
 import OnChainDataClient from '../../src/on-chain-data-client';
 import { OnChainDataRuntimeError } from '../../src/on-chain-data-client/errors';
@@ -43,57 +43,70 @@ describe('WTLibs.on-chain-data.OnChainDataClient', () => {
   describe('_reset', () => {
     it('should reset options and dataModels', () => {
       OnChainDataClient.setup({ opt1: 'value', provider: 'http://localhost:8545' });
-      OnChainDataClient.getDataModel('hotels');
-      assert.isDefined(OnChainDataClient.dataModels.hotels);
+      OnChainDataClient.getDirectory('hotels', '123');
+      assert.isDefined(OnChainDataClient.dataModels['hotels:123']);
       assert.isDefined(OnChainDataClient.options.opt1);
       OnChainDataClient._reset();
-      assert.isUndefined(OnChainDataClient.dataModels.hotels);
+      assert.isUndefined(OnChainDataClient.dataModels['hotels:123']);
       assert.isUndefined(OnChainDataClient.options.opt1);
     });
   });
 
-  describe('getDataModel', () => {
-    let createHotelSpy, createAirlineSpy;
+  describe('getDirectory', () => {
+    let createDirectorySpy;
 
     beforeAll(() => {
       OnChainDataClient.setup({ provider: 'http://localhost:8545' });
-      createHotelSpy = sinon.spy(HotelDataModel, 'createInstance');
-      createAirlineSpy = sinon.spy(AirlineDataModel, 'createInstance');
+      createDirectorySpy = sinon.spy(Directory, 'createInstance');
     });
 
     afterEach(() => {
-      createHotelSpy.resetHistory();
-      createAirlineSpy.resetHistory();
+      createDirectorySpy.resetHistory();
     });
 
     it('should cache datamodel instances', () => {
-      OnChainDataClient.getDataModel('hotels');
-      assert.isDefined(OnChainDataClient.dataModels.hotels);
-      assert.equal(createHotelSpy.callCount, 1);
-      OnChainDataClient.getDataModel('hotels');
-      assert.equal(createHotelSpy.callCount, 1);
+      OnChainDataClient.getDirectory('hotels', '123');
+      assert.equal(createDirectorySpy.callCount, 1);
+      assert.isDefined(OnChainDataClient.dataModels['hotels:123']);
+      OnChainDataClient.getDirectory('hotels', '123');
+      assert.equal(createDirectorySpy.callCount, 1);
+      const model = OnChainDataClient.getDirectory('hotels', '456');
+      assert.equal(createDirectorySpy.callCount, 2);
+      assert.instanceOf(model, Directory);
     });
 
     it('should throw on unknown segment', () => {
       try {
-        OnChainDataClient.getDataModel('random-segment');
+        OnChainDataClient.getDirectory('random-segment', '123');
         assert(false);
       } catch (e) {
         assert.match(e.message, /unknown segment/i);
         assert.instanceOf(e, OnChainDataRuntimeError);
       }
     });
-    
-    it('should return airline datamodel', () => {
-      const model = OnChainDataClient.getDataModel('airlines');
-      assert.isDefined(OnChainDataClient.dataModels.airlines);
-      assert.instanceOf(model, AirlineDataModel);
+  });
+
+  describe('getFactory', () => {
+    let createFactorySpy;
+
+    beforeAll(() => {
+      OnChainDataClient.setup({ provider: 'http://localhost:8545' });
+      createFactorySpy = sinon.spy(OrganizationFactory, 'createInstance');
     });
 
-    it('should return hotel datamodel', () => {
-      const model = OnChainDataClient.getDataModel('hotels');
-      assert.isDefined(OnChainDataClient.dataModels.hotels);
-      assert.instanceOf(model, HotelDataModel);
+    afterEach(() => {
+      createFactorySpy.resetHistory();
+    });
+
+    it('should cache datamodel instances', () => {
+      OnChainDataClient.getFactory('123');
+      assert.equal(createFactorySpy.callCount, 1);
+      assert.isDefined(OnChainDataClient.factories['123']);
+      OnChainDataClient.getFactory('123');
+      assert.equal(createFactorySpy.callCount, 1);
+      const model = OnChainDataClient.getFactory('456');
+      assert.equal(createFactorySpy.callCount, 2);
+      assert.instanceOf(model, OrganizationFactory);
     });
   });
 });

@@ -1,9 +1,6 @@
-// @flow
 import Web3Utils from 'web3-utils';
 import Web3Eth from 'web3-eth';
 
-import type { WalletInterface, KeystoreV3Interface, TransactionDataInterface,
-  TransactionCallbacksInterface, TxReceiptInterface } from '../interfaces/base-interfaces';
 import {
   WalletError,
   MalformedWalletError,
@@ -22,20 +19,15 @@ import {
 /**
  * web3-eth based wallet implementation
  */
-class Wallet implements WalletInterface {
-  _destroyedFlag: boolean;
-  _jsonWallet: ?KeystoreV3Interface;
-  _account: ?Object;
-  web3Eth: Web3Eth;
-
+class Wallet {
   /**
    * Creates an initialized instance
    */
-  static createInstance (keystoreJsonV3: KeystoreV3Interface): Wallet {
+  static createInstance (keystoreJsonV3) {
     return new Wallet(keystoreJsonV3);
   }
 
-  constructor (keystoreJsonV3: KeystoreV3Interface) {
+  constructor (keystoreJsonV3) {
     this._jsonWallet = keystoreJsonV3;
     this._destroyedFlag = false;
   }
@@ -43,7 +35,7 @@ class Wallet implements WalletInterface {
   /**
    * Sets up an initialized web3-eth instance for later use
    */
-  setupWeb3Eth (provider: string | Object) {
+  setupWeb3Eth (provider) {
     this.web3Eth = new Web3Eth(provider);
   }
 
@@ -51,7 +43,7 @@ class Wallet implements WalletInterface {
    * It is not possible to do any operations on a destroyed
    * wallet. Wallet is destroyed by calling the `destroy()` method.
    */
-  isDestroyed (): boolean {
+  isDestroyed () {
     return this._destroyedFlag;
   }
 
@@ -65,7 +57,7 @@ class Wallet implements WalletInterface {
    * @throws {WalletStateError} When wallet is not unlocked.
    * @throws {WalletStateError} When there's no keystore.
    */
-  getAddress (): string {
+  getAddress () {
     if (this.isDestroyed()) {
       throw new WalletStateError('Cannot get address of a destroyed wallet.');
     }
@@ -89,7 +81,7 @@ class Wallet implements WalletInterface {
    * @throws {WalletError} When anything else breaks down during decryption. But
    * that should actually never happen unless the web3-eth implementation is changed.
    */
-  unlock (password: string) {
+  unlock (password) {
     if (this.isDestroyed()) {
       throw new WalletStateError('Cannot unlock destroyed wallet.');
     }
@@ -132,7 +124,7 @@ class Wallet implements WalletInterface {
    * @param  {TransactionCallbacksInterface} optional callbacks called when events come back from the network
    * @return {Promise<string|TxReceiptInterface>} transaction hash
    */
-  async signAndSendTransaction (transactionData: TransactionDataInterface, eventCallbacks: ?TransactionCallbacksInterface): Promise<string | TxReceiptInterface> {
+  async signAndSendTransaction (transactionData, eventCallbacks) {
     if (this.isDestroyed()) {
       throw new WalletStateError('Cannot use destroyed wallet.');
     }
@@ -155,7 +147,7 @@ class Wallet implements WalletInterface {
               eventCallbacks.onTransactionHash(hash);
             }
             if (!eventCallbacks || !eventCallbacks.onReceipt) {
-              resolve(hash);
+              resolve({ transactionHash: hash });
             }
           }).on('receipt', (receipt) => {
             if (eventCallbacks && eventCallbacks.onReceipt) {
@@ -173,7 +165,7 @@ class Wallet implements WalletInterface {
     }
   }
 
-  _repackageWeb3Error (originalError: Error): WalletError {
+  _repackageWeb3Error (originalError) {
     // This heavily depends on web3.js and EVM implementation
     // Reference of some errors on https://github.com/ethereum/go-ethereum/blob/master/core/tx_pool.go#L43
     if (originalError.message) {
@@ -207,7 +199,7 @@ class Wallet implements WalletInterface {
    * @throws {WalletSigningError} When something does not work during the actual signing
    * @return {Promise<string>} Hex encoded signature
    */
-  async signData (claim: string): Promise<string> {
+  async signData (claim) {
     if (this.isDestroyed()) {
       throw new WalletStateError('Cannot sign with a destroyed wallet.');
     }
@@ -216,7 +208,7 @@ class Wallet implements WalletInterface {
     }
 
     try {
-      const signed = await (this._account: Object).sign(claim);
+      const signed = await (this._account).sign(claim);
       return signed.signature;
     } catch (e) {
       throw new WalletSigningError(`Cannot sign the claim: ${e.message}`, e);

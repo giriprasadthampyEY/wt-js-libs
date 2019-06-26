@@ -1,57 +1,34 @@
-// @flow
-
-import type { AdaptedTxResultInterface, AdaptedTxResultsInterface } from '../interfaces/base-interfaces';
-
 import { AIRLINE_SEGMENT_ID, HOTEL_SEGMENT_ID } from './constants';
 import Utils from './utils';
 import Contracts from './contracts';
-import HotelDataModel from './hotels/data-model';
-import AirlineDataModel from './airlines/data-model';
+import SegmentDirectory from './segment-directory';
+import OrganizationFactory from './organization-factory';
+import UpdateableOrganization from './updateable-organization';
+import Organization from './organization';
 import { OnChainDataRuntimeError } from './errors';
-import { AbstractDataModel } from './wt-index/data-model';
-
-/**
- * OnChainDataClientOptionsType options. May look like this:
- *
- * ```
- * {
- *   "provider": 'http://localhost:8545',// or another Web3 provider
- *   "gasCoefficient": 2 // Optional, defaults to 2
- * }
- * ```
- */
-export type OnChainDataClientOptionsType = {
-  // URL of currently used RPC provider for Web3.
-  provider: string | Object,
-  // Gas coefficient that is used as a multiplier when setting
-  // a transaction gas.
-  gasCoefficient?: number,
-  // Gas margin that is added to a computed gas amount when
-  // setting a transaction gas.
-  gasMargin?: number
-};
 
 /**
  * A factory class used to access various on-chain data
  * represented by Winding Tree index.
  */
 export class OnChainDataClient {
-  static dataModels: {[key: string]: AbstractDataModel};
-  static options: OnChainDataClientOptionsType;
-  static web3Utils: Utils;
-  static web3Contracts: Contracts;
+  static dataModels;
+  static options;
+  static web3Utils;
+  static web3Contracts;
 
   /**
    * Sets up Utils and Contracts with given web3 provider.
    * Sets up gasCoefficient or gasMargin. If neither is provided,
    * sets gasCoefficient to a default of 2.
    */
-  static setup (options: OnChainDataClientOptionsType) {
+  static setup (options) {
     options = options || {};
     if (!options.gasMargin && !options.gasCoefficient) {
       options.gasCoefficient = 2;
     }
     OnChainDataClient.dataModels = {};
+    OnChainDataClient.factories = {};
     OnChainDataClient.options = options;
     OnChainDataClient.web3Utils = Utils.createInstance({
       gasCoefficient: OnChainDataClient.options.gasCoefficient,
@@ -66,6 +43,7 @@ export class OnChainDataClient {
   static _reset () {
     OnChainDataClient.options = {};
     OnChainDataClient.dataModels = {};
+    OnChainDataClient.factories = {};
   }
 
   /**
@@ -75,32 +53,45 @@ export class OnChainDataClient {
    * @throws OnChainDataRuntimeError when an unknown segment is encountered.
    * @param segment - allowed values are hotels and airlines
    */
-  static getDataModel (segment: string): AbstractDataModel {
+  static getDirectory (segment, address) {
     segment = segment && segment.toLowerCase();
-    if (OnChainDataClient.dataModels[segment]) {
-      return OnChainDataClient.dataModels[segment];
+    if (OnChainDataClient.dataModels[`${segment}:${address}`]) {
+      return OnChainDataClient.dataModels[`${segment}:${address}`];
     }
     switch (segment) {
     case HOTEL_SEGMENT_ID:
-      OnChainDataClient.dataModels[segment] = HotelDataModel.createInstance(OnChainDataClient.options, OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts);
-      break;
     case AIRLINE_SEGMENT_ID:
-      OnChainDataClient.dataModels[segment] = AirlineDataModel.createInstance(OnChainDataClient.options, OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts);
+      OnChainDataClient.dataModels[`${segment}:${address}`] = SegmentDirectory.createInstance(address, OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts);
       break;
     default:
       throw new OnChainDataRuntimeError(`Unknown segment: ${segment}`);
     }
-    return OnChainDataClient.dataModels[segment];
+    return OnChainDataClient.dataModels[`${segment}:${address}`];
+  }
+
+  static getFactory (address) {
+    if (!OnChainDataClient.factories[address]) {
+      OnChainDataClient.factories[address] = OrganizationFactory.createInstance(address, OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts);
+    }
+    return OnChainDataClient.factories[address];
+  }
+
+  static getUpdateableOrganization (address) {
+    return UpdateableOrganization.createInstance(OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts, address);
+  }
+
+  static getOrganization (address) {
+    return Organization.createInstance(OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts, address);
   }
 
   /**
    * Finds out in what state are Ethereum transactions. All logs
    * are decoded along the way and some metrics such as min/max blockAge
    * are computed. If you pass all transactions related to a single
-   * operation (such as updateHotel), you may benefit from the computed
+   * operation (such as update), you may benefit from the computed
    * metrics.
    */
-  static async getTransactionsStatus (txHashes: Array<string>): Promise<AdaptedTxResultsInterface> {
+  static async getTransactionsStatus (txHashes) {
     let receiptsPromises = [];
     let txDataPromises = [];
     for (let hash of txHashes) {
@@ -125,7 +116,7 @@ export class OnChainDataClient {
         raw: receipt,
       };
     }
-    const resultsValues: Array<AdaptedTxResultInterface> = (Object.values(results): Array<any>); // eslint-disable-line flowtype/no-weak-types
+    const resultsValues = Object.values(results);
     return {
       meta: {
         total: txHashes.length,
