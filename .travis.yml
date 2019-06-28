@@ -17,7 +17,7 @@ jobs:
   - stage: NPM release
     if: tag IS present
     script: echo 'Deploying to NPM...'
-    before_deploy: npm run build
+    before_deploy: npm run clean && npm run build
     deploy:
       provider: npm
       email: devops@windingtree.com
