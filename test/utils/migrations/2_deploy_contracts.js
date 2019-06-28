@@ -1,33 +1,62 @@
+const lib = require('zos-lib');
+
 const LifTokenTest = artifacts.require('@windingtree/lif-token/LifTokenTest');
-const WTHotelIndex = artifacts.require('@windingtree/wt-contracts/WTHotelIndex');
 
 module.exports = async function (deployer, network, accounts) {
   if (network === 'development') {
-    let firstIndex, secondIndex;
-
     // First, we need the token contract with a faucet
     await deployer.deploy(LifTokenTest, { from: accounts[0], gas: 60000000 });
-    // And then we setup the WTHotelIndex
-    
-    await deployer.deploy(WTHotelIndex, { from: accounts[0], gas: 60000000 });
-    firstIndex = await WTHotelIndex.deployed();
-    await firstIndex.initialize(accounts[0], LifTokenTest.address, { from: accounts[0], gas: 60000000 });
-    
-    await deployer.deploy(WTHotelIndex, { from: accounts[0], gas: 60000000 });
-    secondIndex = await WTHotelIndex.deployed();
-    await secondIndex.initialize(accounts[0], LifTokenTest.address, { from: accounts[0], gas: 60000000 });
-    
-    await firstIndex.registerHotel('in-memory://hotel-url-one', { from: accounts[2], gas: 60000000 });
-    await firstIndex.registerHotel('in-memory://hotel-url-two', { from: accounts[1], gas: 60000000 });
 
-    const hotels = await firstIndex.getHotels();
+    // Setup a local copy of zos package for wt-contracts
+    const ZWeb3 = lib.ZWeb3;
+    ZWeb3.initialize(web3.currentProvider);
+    const Contracts = lib.Contracts;
+    Contracts.setArtifactsDefaults({
+      gas: 6721975,
+      gasPrice: 100000000000,
+    });
+
+    // setup the project with all the proxies
+    const project = await lib.AppProject.fetchOrDeploy('wt-contracts', '0.0.1');
+    const Organization = Contracts.getFromNodeModules('@windingtree/wt-contracts', 'Organization');
+    const OrganizationFactory = Contracts.getFromNodeModules('@windingtree/wt-contracts', 'OrganizationFactory');
+    const SegmentDirectory = Contracts.getFromNodeModules('@windingtree/wt-contracts', 'SegmentDirectory');
+    await project.setImplementation(Organization, 'Organization');
+    await project.setImplementation(OrganizationFactory, 'OrganizationFactory');
+    await project.setImplementation(SegmentDirectory, 'SegmentDirectory');
+
+    // setup the factory proxy
+    const factory = await project.createProxy(OrganizationFactory, {
+      initFunction: 'initialize',
+      initArgs: [accounts[4], project.getApp().address],
+      from: accounts[4],
+    });
+    // create some 0xORGs
+    const firstHotelEvent = await factory.methods.create('in-memory://hotel-one').send({ from: accounts[2] });
+    const secondHotelEvent = await factory.methods.create('in-memory://hotel-two').send({ from: accounts[1] });
+    const firstHotel = await Organization.at(firstHotelEvent.events.OrganizationCreated.returnValues.organization);
+    const secondHotel = await Organization.at(secondHotelEvent.events.OrganizationCreated.returnValues.organization);
+
+    // setup directories
+    const firstHotelDirectory = await project.createProxy(SegmentDirectory, {
+      initFunction: 'initialize',
+      initArgs: [accounts[4], 'hotels', LifTokenTest.address],
+      from: accounts[4],
+    });
+
+    await firstHotelDirectory.methods.add(firstHotel.address).send({ from: accounts[2], gas: 60000000 });
+    await firstHotelDirectory.methods.add(secondHotel.address).send({ from: accounts[1], gas: 60000000 });
+    // Add associateed key
+    await firstHotel.methods.addAssociatedKey(accounts[3]).send({ from: accounts[2], gas: 60000000 });
+
     console.log('========================================');
-    console.log('    Index and token owner:', accounts[0]);
+    console.log('    Proxy owner:', accounts[4]);
+    console.log('    Factory, Directory and Token owner:', accounts[0]);
+    console.log('    Factory address:', factory.address);
     console.log('    Wallet account:', accounts[1]);
     console.log('    LifToken with faucet:', LifTokenTest.address);
-    console.log('    WTHotelIndex:', firstIndex.address);
-    console.log('    Second WTHotelIndex:', secondIndex.address);
-    console.log('    First hotel', hotels[1]);
-    console.log('    Second hotel', hotels[2]);
+    console.log('    HotelDirectory:', firstHotelDirectory.address);
+    console.log('    First hotel', firstHotel.address);
+    console.log('    Second hotel', secondHotel.address);
   }
 };

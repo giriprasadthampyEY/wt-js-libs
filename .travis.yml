@@ -11,14 +11,13 @@ jobs:
   - stage: test
     script:
     - set -e
-    - npm run flow
     - npm run lint
     - npm run test
     - npm run coverage
   - stage: NPM release
     if: tag IS present
     script: echo 'Deploying to NPM...'
-    before_deploy: npm run build
+    before_deploy: npm run clean && npm run build
     deploy:
       provider: npm
       email: devops@windingtree.com

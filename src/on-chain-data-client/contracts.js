@@ -1,7 +1,7 @@
-import WTHotelIndexContractMetadata from '@windingtree/wt-contracts/build/contracts/AbstractWTHotelIndex.json';
-import HotelContractMetadata from '@windingtree/wt-contracts/build/contracts/AbstractHotel.json';
-import WTAirlineIndexContractMetadata from '@windingtree/wt-contracts/build/contracts/AbstractWTAirlineIndex.json';
-import AirlineContractMetadata from '@windingtree/wt-contracts/build/contracts/AbstractAirline.json';
+import SegmentDirectoryMetadata from '@windingtree/wt-contracts/build/contracts/AbstractSegmentDirectory.json';
+import OrganizationInterfaceMetadata from '@windingtree/wt-contracts/build/contracts/OrganizationInterface.json';
+import OrganizationMetadata from '@windingtree/wt-contracts/build/contracts/Organization.json';
+import OrganizationFactoryMetadata from '@windingtree/wt-contracts/build/contracts/AbstractOrganizationFactory.json';
 import { SmartContractInstantiationError } from './errors';
 
 import Web3Utils from 'web3-utils';
@@ -54,44 +54,20 @@ class Contracts {
     return this.contractsCache[`${name}:${address}`];
   }
 
-  /**
-   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.3.0/contracts/WTHotelIndex.sol">WTHotelIndex.sol</a>.
-   *
-   * @param  {string} address
-   * @return {web3.eth.Contract} Instance of an Index
-   */
-  async getHotelIndexInstance (address) {
-    return this._getInstance('hotelIndex', WTHotelIndexContractMetadata.abi, address);
+  async getSegmentDirectoryInstance (address) {
+    return this._getInstance('segmentDirectory', SegmentDirectoryMetadata.abi, address);
   }
 
-  /**
-   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.3.0/contracts/WTAirlineIndex.sol">WTAirlineIndex.sol</a>.
-   *
-   * @param  {string} address
-   * @return {web3.eth.Contract} Instance of an Index
-   */
-  async getAirlineIndexInstance (address) {
-    return this._getInstance('airlineIndex', WTAirlineIndexContractMetadata.abi, address);
+  async getOrganizationInstance (address) {
+    return this._getInstance('organization', OrganizationInterfaceMetadata.abi, address);
   }
 
-  /**
-   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.3.0/contracts/hotel/Hotel.sol">Hotel.sol</a>.
-   *
-   * @param  {string} address
-   * @return {web3.eth.Contract} Instance of a Hotel
-   */
-  async getHotelInstance (address) {
-    return this._getInstance('hotel', HotelContractMetadata.abi, address);
+  async getUpdateableOrganizationInstance (address) {
+    return this._getInstance('organization', OrganizationMetadata.abi, address);
   }
 
-  /**
-   * Returns a representation of <a href="https://github.com/windingtree/wt-contracts/blob/v0.3.0/contracts/hotel/Airline.sol">Airline.sol</a>.
-   *
-   * @param  {string} address
-   * @return {web3.eth.Contract} Instance of an Airline
-   */
-  async getAirlineInstance (address) {
-    return this._getInstance('airline', AirlineContractMetadata.abi, address);
+  async getOrganizationFactoryInstance (address) {
+    return this._getInstance('organizationFactory', OrganizationFactoryMetadata.abi, address);
   }
 
   _initEventRegistry () {
@@ -108,10 +84,9 @@ class Contracts {
     if (!this.eventRegistry) {
       this.eventRegistry = Object.assign(
         {},
-        generateEventSignatures(WTHotelIndexContractMetadata.abi),
-        generateEventSignatures(WTAirlineIndexContractMetadata.abi),
-        generateEventSignatures(HotelContractMetadata.abi),
-        generateEventSignatures(AirlineContractMetadata.abi),
+        generateEventSignatures(OrganizationInterfaceMetadata.abi),
+        generateEventSignatures(OrganizationFactoryMetadata.abi),
+        generateEventSignatures(SegmentDirectoryMetadata.abi),
       );
     }
     return this.eventRegistry;
@@ -119,7 +94,7 @@ class Contracts {
 
   /**
    * Decodes ethereum transaction log values. Currently supports
-   * events from Index and Hotel smart contracts.
+   * events from Directory and Hotel smart contracts.
    *
    * @param  {Array<RawLogRecordInterface>} logs in a raw format
    * @return {Array<DecodedLogRecordInterface>} Decoded logs

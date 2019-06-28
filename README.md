@@ -18,7 +18,7 @@ const libs = WtJsLibs.createInstance({
   offChainDataOptions: { ... },
   trustClueOptions: { ... },
 });
-const hotelIndex = libs.getWTIndex('hotels', '0x...');
+const hotelDirectory = libs.getDirectory('hotels', '0x...');
 ```
 
 ```html
@@ -54,7 +54,7 @@ const libs = window.WtJsLibs.createInstance({
     }
   },
 });
-const index = libs.getWTIndex('hotels', '0x...');
+const hotelDirectory = libs.getDirectory('hotels', '0x...');
 </script>
 ```
 
@@ -82,7 +82,7 @@ const libs = WtJsLibs.createInstance({
       'in-memory': {
         options: {
           // some: options
-        }
+        },
         create: (options) => {
           return new InMemoryAdapter(options);
         },
@@ -107,59 +107,79 @@ const libs = WtJsLibs.createInstance({
 });
 
 
-const index = libs.getWTIndex('hotels', '0x...');
-const hotel = await index.getHotel('0x...');
+const directory = libs.getDirectory('hotels', '0x...');
+const hotel = await directory.getOrganization('0x...');
 
 // You can get all the off-chain data at once
 // This approach might be a little slow as all off-chain data gets downloaded
 const plainHotel = await hotel.toPlainObject();
 // You get a synced plain javascript object you can traverse in any way you want
-const hotelName2 = plainHotel.dataUri.contents.descriptionUri.contents.name;
+const hotelName2 = plainHotel.orgJson.contents.name;
+// If an ORG.ID is using an API that conform to Winding Tree data model, you can wrap
+// them into a storage pointer as well
+const hotelApis = await hotel.getWindingTreeApi();
+const apiContents = (await hotelApis.hotel[0].toPlainObject()).contents;
+const hotelDescriptionDocument = await apiContents.descriptionUri.contents;
 
-// OR you can be picky but faster
+// OR you can do it like this
 
 // Accessing off-chain data - the entry point url is actually stored on chain
-const dataIndex = await hotel.dataIndex;
-const hotelDataIndexUrl = dataIndex.ref;
+const orgJson = await hotel.orgJson;
+const hotelOrgJsonUrl = orgJson.ref;
 // This data is fetched from some off-chain storage
-const dataIndexContents = await dataIndex.contents;
-const hotelDescriptionDocument = await dataIndexContents.descriptionUri.contents;
-// This data is fetched from another off-chain document
-const hotelName = hotelDescriptionDocument.name;
+const orgJsonContents = await orgJson.contents;
 
 
-// How about creating a hotel?
+// How about creating a hotel and adding it to a directory?
 wallet = libs.createWallet({/*...Your wallet in a JSON format..*/});
 wallet.unlock('with-password');
 try {
-  const { hotel, transactionData, eventCallbacks } = await index.addHotel({
-    manager: wallet.getAddress(),
-    dataUri: 'https://example.com/my-hotel-data.json',
-  });
-  const result = await wallet.signAndSendTransaction(transactionData, eventCallbacks);
+  const factory = libs.getFactory('0x...');
+  const createHotel = await factory.createAndAddOrganization({
+    orgJsonUri: 'https://example.com/my-hotel-data.json',
+    owner: '0x...',
+  }, directory.address);
+  const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
   // After the transaction is confirmed, one of the callbacks
-  // will set the address of the hotel.
+  // will set the object of the hotel.
+  const hotel = await createHotel.organization;
   const newHotelAddress = hotel.address;
 } finally {
   wallet.lock();
 }
 
 // Working with airline data is very similar. Just change the segment and a few method names:
-const index = libs.getWTIndex('hotels', '0x...');
-const airline = await index.getAirline('0x...');
+const directory = libs.getDirectory('airlines', '0x...');
+const airline = await directory.getOrganization('0x...');
 
 try {
-  const { airline, transactionData, eventCallbacks } = await index.addAirline({
-    manager: wallet.getAddress(),
-    dataUri: 'https://example.com/my-airline-data.json',
-  });
+  const factory = libs.getFactory('0x...');
+  const createAirline = await factory.createAndAddOrganization({
+    orgJsonUri: 'https://example.com/my-airline-data.json',
+    owner: '0x...',
+  }, directory.address);
   const result = await wallet.signAndSendTransaction(transactionData, eventCallbacks);
   // After the transaction is confirmed, one of the callbacks
-  // will set the address of the airline.
+  // will set the object of the airline.
+  const airline = await createAirline.organization;
   const newAirlineAddress = airline.address;
 } finally {
   wallet.lock();
 }
+```
+
+If you want, you can create the airline contract first and add it later:
+```js
+const createHotel = await factory.createOrganization({
+  owner: hotelOwner,
+  orgJsonUri: orgJsonUri,
+});
+const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
+const hotel = await createHotel.hotel;
+
+// and add later
+const addHotel = await directory.add(hotel);
+await wallet.signAndSendTransaction(addHotel.transactionData, addHotel.eventCallbacks);
 ```
 
 ## Documentation

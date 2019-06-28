@@ -20,4 +20,3 @@ truffle-config.js
 .github
 .nyc_output
 .nvmrc
-.flowconfig
