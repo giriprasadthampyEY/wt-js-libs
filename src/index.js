@@ -72,14 +72,25 @@ export class WtJsLibs {
     return OnChainDataClient.getDirectory(segment, address);
   }
 
+  /**
+   * Get an instance of Organization Factory on given address
+   */
   getFactory (address) {
     return OnChainDataClient.getFactory(address);
   }
 
+  /**
+   * Get a wrapper instance of updateable organizations, useful for changing on chain data
+   * @param  {[type]} address [description]
+   * @return {[type]}         [description]
+   */
   getUpdateableOrganization (address) {
     return OnChainDataClient.getUpdateableOrganization(address);
   }
 
+  /**
+   * Get an instance of read-only organization wrapper
+   */
   getOrganization (address) {
     return OnChainDataClient.getOrganization(address);
   }
