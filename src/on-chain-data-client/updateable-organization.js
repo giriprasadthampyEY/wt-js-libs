@@ -116,8 +116,12 @@ class UpdateableOnChainOrganization extends Organization {
 
   async _editInfoOnChain (transactionOptions) {
     const contract = await this._getContractInstance();
-    const estimate = contract.methods.changeOrgJsonUri(await this.orgJsonUri).estimateGas();
-    const txData = contract.methods.changeOrgJsonUri(await this.orgJsonUri).encodeABI();
+    const estimate = contract.methods.changeOrgJsonUri(await this.orgJsonUri).estimateGas({
+      from: transactionOptions.from,
+    });
+    const txData = contract.methods.changeOrgJsonUri(await this.orgJsonUri).encodeABI({
+      from: transactionOptions.from,
+    });
     const transactionData = {
       nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
       data: txData,
