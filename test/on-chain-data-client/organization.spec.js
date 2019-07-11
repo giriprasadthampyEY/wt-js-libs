@@ -108,9 +108,11 @@ describe('WTLibs.on-chain-data.Organization', () => {
       assert.isDefined(apiPointers.hotel);
       assert.equal(apiPointers.hotel.length, 1);
       assert.isDefined(apiPointers.airline);
-      assert.equal(apiPointers.airline.length, 0);
+      assert.equal(apiPointers.airline.length, 1);
       const hotelApi = await apiPointers.hotel[0].toPlainObject();
       assert.equal(hotelApi.contents.descriptionUri.contents.name, 'First hotel');
+      const airlineApi = await apiPointers.airline[0].toPlainObject();
+      assert.equal(airlineApi.contents.descriptionUri.contents.name, 'First airline');
     });
   });
 });

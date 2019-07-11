@@ -1,102 +1,106 @@
 import { assert } from 'chai';
 import sinon from 'sinon';
-import Directory from '../../src/on-chain-data-client/segment-directory';
+import helpers from '../utils/helpers';
+import Entrypoint from '../../src/on-chain-data-client/entrypoint';
+import SegmentDirectory from '../../src/on-chain-data-client/segment-directory';
 import OrganizationFactory from '../../src/on-chain-data-client/organization-factory';
-
-import OnChainDataClient from '../../src/on-chain-data-client';
 import { OnChainDataRuntimeError } from '../../src/on-chain-data-client/errors';
 
-xdescribe('WTLibs.on-chain-data.Entrypoint', () => {
-  describe('setup', () => {
-    //   let entrypoint;
-    beforeEach(() => {
-      // entrypoint =
-    });
+describe('WTLibs.on-chain-data.Entrypoint', () => {
+  let contractsStub, utilsStub, orgFactoryStub;
+  let entrypoint;
 
-    it('should save options and dataModels', () => {
-      OnChainDataClient.setup({ opt1: 'value', gasMargin: 4 });
-      assert.equal(OnChainDataClient.options.opt1, 'value');
-      assert.equal(OnChainDataClient.options.gasMargin, 4);
-      assert.isUndefined(OnChainDataClient.options.gasCoefficient);
-      assert.isDefined(OnChainDataClient._cache);
-      assert.isDefined(OnChainDataClient._segmentAddresses);
-    });
+  beforeEach(() => {
+    utilsStub = {
+      getCurrentWeb3Provider: sinon.stub().returns('current-provider'),
+      applyGasModifier: sinon.stub().returns(12),
+      determineCurrentAddressNonce: sinon.stub().resolves(3),
+      isZeroAddress: sinon.stub().callsFake((addr) => {
+        return addr === '0x0000000000000000000000000000000000000000';
+      }),
+    };
+    orgFactoryStub = helpers.stubContractMethodResult('0x5678');
+    contractsStub = {
+      getEntrypointInstance: sinon.stub().resolves({
+        methods: {
+          getSegment: helpers.stubContractMethodResult('0x1234'),
+          getOrganizationFactory: orgFactoryStub,
+        },
+      }),
+    };
+    entrypoint = Entrypoint.createInstance('0x96eA4BbF71FEa3c9411C1Cefc555E9d7189695fA', utilsStub, contractsStub);
+  });
 
-    it('should setup default gasCoefficient', () => {
-      OnChainDataClient.setup({ opt1: 'value' });
-      assert.isDefined(OnChainDataClient.options.gasCoefficient, 2);
-    });
-
-    it('should setup web3Utils', () => {
-      OnChainDataClient.setup({ opt1: 'value', provider: 'http://localhost:8545' });
-      assert.isDefined(OnChainDataClient.web3Utils);
-      assert.equal(OnChainDataClient.web3Utils.gasModifiers.gasCoefficient, 2);
-      assert.isUndefined(OnChainDataClient.web3Utils.gasModifiers.gasMargin);
-      assert.equal(OnChainDataClient.web3Utils.provider, 'http://localhost:8545');
-    });
-
-    it('should setup web3Contracts', () => {
-      OnChainDataClient.setup({ opt1: 'value', provider: 'http://localhost:8545' });
-      assert.isDefined(OnChainDataClient.web3Contracts);
-      assert.equal(OnChainDataClient.web3Contracts.provider, 'http://localhost:8545');
+  describe('getSegmentAddress', () => {
+    it('should return a segment address', async () => {
+      const addr = await entrypoint.getSegmentAddress('hotels');
+      assert.equal(addr, '0x1234');
     });
   });
 
-  describe('getDirectory', () => {
-    let createDirectorySpy;
-
-    beforeAll(() => {
-      OnChainDataClient.setup({ provider: 'http://localhost:8545' });
-      createDirectorySpy = sinon.spy(Directory, 'createInstance');
+  describe('getSegmentDirectory', () => {
+    it('should return SegmentDirectory instance', async () => {
+      const segmentAddressSpy = sinon.spy(entrypoint, 'getSegmentAddress');
+      const directory = await entrypoint.getSegmentDirectory('hotels');
+      assert.equal(segmentAddressSpy.callCount, 1);
+      assert.instanceOf(directory, SegmentDirectory);
+      assert.equal(directory.address, '0x1234');
+      segmentAddressSpy.restore();
     });
 
-    afterEach(() => {
-      createDirectorySpy.resetHistory();
+    it('should cache SegmentDirectory instance', async () => {
+      const segmentAddressSpy = sinon.spy(entrypoint, 'getSegmentAddress');
+      const directory = await entrypoint.getSegmentDirectory('hotels');
+      assert.equal(segmentAddressSpy.callCount, 1);
+      assert.instanceOf(directory, SegmentDirectory);
+      assert.equal(directory.address, '0x1234');
+      await entrypoint.getSegmentDirectory('hotels');
+      await entrypoint.getSegmentDirectory('hotels');
+      assert.equal(segmentAddressSpy.callCount, 1);
+      segmentAddressSpy.restore();
     });
 
-    it('should cache datamodel instances', () => {
-      OnChainDataClient.getDirectory('hotels', '123');
-      assert.equal(createDirectorySpy.callCount, 1);
-      assert.isDefined(OnChainDataClient.dataModels['hotels:123']);
-      OnChainDataClient.getDirectory('hotels', '123');
-      assert.equal(createDirectorySpy.callCount, 1);
-      const model = OnChainDataClient.getDirectory('hotels', '456');
-      assert.equal(createDirectorySpy.callCount, 2);
-      assert.instanceOf(model, Directory);
-    });
-
-    it('should throw on unknown segment', () => {
+    it('should throw if user asks for a non-existent directory', async () => {
+      const segmentAddressStub = sinon.stub(entrypoint, 'getSegmentAddress').resolves('0x0000000000000000000000000000000000000000');
       try {
-        OnChainDataClient.getDirectory('random-segment', '123');
+        await entrypoint.getSegmentDirectory('airlines');
         assert(false);
       } catch (e) {
-        assert.match(e.message, /unknown segment/i);
+        assert.match(e.message, /cannot find segment/i);
         assert.instanceOf(e, OnChainDataRuntimeError);
+      } finally {
+        segmentAddressStub.restore();
       }
     });
   });
 
-  describe('getFactory', () => {
-    let createFactorySpy;
-
-    beforeAll(() => {
-      OnChainDataClient.setup({ provider: 'http://localhost:8545' });
-      createFactorySpy = sinon.spy(OrganizationFactory, 'createInstance');
+  describe('getOrganizationFactory', () => {
+    it('should return OrganizationFactory instance', async () => {
+      const factory = await entrypoint.getOrganizationFactory();
+      assert.equal(orgFactoryStub().call.callCount, 1);
+      assert.instanceOf(factory, OrganizationFactory);
+      assert.equal(factory.address, '0x5678');
     });
 
-    afterEach(() => {
-      createFactorySpy.resetHistory();
+    it('should cache OrganizationFactory instance', async () => {
+      const factory = await entrypoint.getOrganizationFactory();
+      assert.equal(orgFactoryStub().call.callCount, 1);
+      await entrypoint.getOrganizationFactory();
+      await entrypoint.getOrganizationFactory();
+      assert.equal(orgFactoryStub().call.callCount, 1);
+      assert.instanceOf(factory, OrganizationFactory);
+      assert.equal(factory.address, '0x5678');
     });
 
-    it('should cache datamodel instances', () => {
-      OnChainDataClient.getFactory('123');
-      assert.equal(createFactorySpy.callCount, 1);
-      assert.isDefined(OnChainDataClient.factories['123']);
-      OnChainDataClient.getFactory('123');
-      assert.equal(createFactorySpy.callCount, 1);
-      const model = OnChainDataClient.getFactory('456');
-      assert.equal(createFactorySpy.callCount, 2);
-      assert.instanceOf(model, OrganizationFactory);
+    it('should throw if user asks for a non-existent directory', async () => {
+      orgFactoryStub().call.resolves('0x0000000000000000000000000000000000000000');
+      try {
+        await entrypoint.getOrganizationFactory();
+        assert(false);
+      } catch (e) {
+        assert.match(e.message, /cannot find organization factory/i);
+        assert.instanceOf(e, OnChainDataRuntimeError);
+      }
     });
   });
 });

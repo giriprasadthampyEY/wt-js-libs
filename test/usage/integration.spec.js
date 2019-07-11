@@ -4,7 +4,7 @@ import jsonWallet from '../utils/test-wallet';
 import testedDataModel from '../utils/data-hotel-model-definition';
 import OffChainDataClient from '../../src/off-chain-data-client';
 
-describe.only('WtJsLibs usage - hotels', () => {
+describe('WtJsLibs usage - hotels', () => {
   let libs, wallet, directory, factory;
   const hotelOwner = '0xD39Ca7d186a37bb6Bf48AE8abFeB4c687dc8F906';
   const hotelAddress = '0xBF18B616aC81830dd0C5D4b771F22FD8144fe769';

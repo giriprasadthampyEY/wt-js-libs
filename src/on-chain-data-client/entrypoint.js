@@ -35,11 +35,6 @@ export class Entrypoint {
 
   }
 
-  async getSegmentAddress (segment) {
-    const contract = await this._getDeployedEntrypoint();
-    return contract.methods.getSegment(segment).call();
-  }
-
   getOwner () {
 
   }
@@ -48,10 +43,15 @@ export class Entrypoint {
 
   }
 
+  async getSegmentAddress (segment) {
+    const contract = await this._getDeployedEntrypoint();
+    return contract.methods.getSegment(segment).call();
+  }
+
   async getSegmentDirectory (segment) {
     if (!this._segmentAddresses[segment]) {
       const address = await this.getSegmentAddress(segment);
-      if (!address) { // TODO test for zero address
+      if (this.web3Utils.isZeroAddress(address)) {
         throw new OnChainDataRuntimeError(`Cannot find segment ${segment} in entrypoint at ${this.address}`);
       }
       this._segmentAddresses[segment] = address;
@@ -63,7 +63,7 @@ export class Entrypoint {
     if (!this._factoryAddress) {
       const contract = await this._getDeployedEntrypoint();
       const address = await contract.methods.getOrganizationFactory().call();
-      if (!address) { // TODO test for zero address
+      if (this.web3Utils.isZeroAddress(address)) {
         throw new OnChainDataRuntimeError(`Cannot find organization factory in entrypoint at ${this.address}`);
       }
       this._factoryAddress = address;
