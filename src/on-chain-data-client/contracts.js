@@ -12,7 +12,7 @@ import Web3Eth from 'web3-eth';
  * Wrapper class for work with Winding Tree's Ethereum
  * smart contracts.
  */
-class Contracts {
+export class Contracts {
   /**
    * Returns an initialized instance
    *

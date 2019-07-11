@@ -14,7 +14,7 @@ import { SmartContractInstantiationError } from './errors';
  * are dealt with in StoragePointer.
  *
  */
-class OnChainOrganization {
+export class OnChainOrganization {
   constructor (web3Utils, web3Contracts, address) {
     this.address = address;
     this.web3Utils = web3Utils;

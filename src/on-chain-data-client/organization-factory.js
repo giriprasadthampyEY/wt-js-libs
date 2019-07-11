@@ -3,7 +3,7 @@ import { InputDataError } from './errors';
 import UpdateableOnChainOrganization from './updateable-organization';
 import OnChainDataClient from './index';
 
-class OrganizationFactory {
+export class OrganizationFactory {
   static createInstance (factoryAddress, web3Utils, web3Contracts) {
     return new OrganizationFactory(factoryAddress, web3Utils, web3Contracts);
   }

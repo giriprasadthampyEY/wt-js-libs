@@ -19,7 +19,7 @@ import {
 /**
  * web3-eth based wallet implementation
  */
-class Wallet {
+export class Wallet {
   /**
    * Creates an initialized instance
    */

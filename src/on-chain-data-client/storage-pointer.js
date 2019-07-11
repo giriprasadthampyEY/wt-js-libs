@@ -71,7 +71,7 @@ import { StoragePointerError } from './errors';
  * StoragePointers in arrays are also supported, see [an example](https://github.com/windingtree/wt-js-libs/blob/8fdfe3aed7248fd327b60f1a56f0d3a3b1d3e93b/test/wt-libs/storage-pointer.spec.js#L427).
  * Note that arrays are not supported for `nested` children types.
  */
-class StoragePointer {
+export class StoragePointer {
   /**
    * Returns a new instance of StoragePointer.
    *

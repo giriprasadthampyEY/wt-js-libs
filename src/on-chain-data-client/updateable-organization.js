@@ -3,7 +3,7 @@ import Organization from './organization';
 import StoragePointer from './storage-pointer';
 import { InputDataError, SmartContractInstantiationError } from './errors';
 
-class UpdateableOnChainOrganization extends Organization {
+export class UpdateableOnChainOrganization extends Organization {
   static createInstance (web3Utils, web3Contracts, address) {
     const org = new UpdateableOnChainOrganization(web3Utils, web3Contracts, address);
     org.initialize();

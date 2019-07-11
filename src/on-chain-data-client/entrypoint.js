@@ -32,15 +32,15 @@ export class Entrypoint {
   }
 
   getSegments () {
-
+    // TODO
   }
 
   getOwner () {
-
+    // TODO
   }
 
   getLifTokenAddress () {
-
+    // TODO
   }
 
   async getSegmentAddress (segment) {
