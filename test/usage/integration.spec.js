@@ -4,16 +4,17 @@ import jsonWallet from '../utils/test-wallet';
 import testedDataModel from '../utils/data-hotel-model-definition';
 import OffChainDataClient from '../../src/off-chain-data-client';
 
-describe('WtJsLibs usage - hotels', () => {
+describe.only('WtJsLibs usage - hotels', () => {
   let libs, wallet, directory, factory;
   const hotelOwner = '0xD39Ca7d186a37bb6Bf48AE8abFeB4c687dc8F906';
   const hotelAddress = '0xBF18B616aC81830dd0C5D4b771F22FD8144fe769';
 
-  beforeEach(() => {
+  beforeEach(async () => {
     libs = WtJsLibs.createInstance(testedDataModel.withDataSource());
-    directory = libs.getDirectory('hotels', testedDataModel.directoryAddress);
     wallet = libs.createWallet(jsonWallet);
-    factory = libs.getFactory(testedDataModel.factoryAddress);
+    let entrypoint = libs.getEntrypoint(testedDataModel.entrypointAddress);
+    factory = await entrypoint.getOrganizationFactory();
+    directory = await entrypoint.getSegmentDirectory('hotels');
     wallet.unlock('test123');
   });
 
@@ -179,7 +180,7 @@ describe('WtJsLibs usage - hotels', () => {
     const associatedKeyAddress = '0x04e46F24307E4961157B986a0b653a0D88F9dBd6';
 
     it('should return true if is associatedKey', async () => {
-      const hotel = await directory.getOrganization(hotelAddress);
+      const hotel = await libs.getOrganization(hotelAddress);
       const hasAssociatedKey = await hotel.hasAssociatedKey(associatedKeyAddress, {
         from: hotelOwner,
       });
@@ -187,7 +188,7 @@ describe('WtJsLibs usage - hotels', () => {
     });
 
     it('should return true if is associatedKey whoever asks', async () => {
-      const hotel = await directory.getOrganization(hotelAddress);
+      const hotel = await libs.getOrganization(hotelAddress);
       const hasAssociatedKey = await hotel.hasAssociatedKey(associatedKeyAddress, {
         from: '0xB309875d8b24D522Ea0Ac57903c8A0b0C93C414A',
       });
@@ -195,7 +196,7 @@ describe('WtJsLibs usage - hotels', () => {
     });
 
     it('should return false if is not associatedKey', async () => {
-      const hotel = await directory.getOrganization(hotelAddress);
+      const hotel = await libs.getOrganization(hotelAddress);
       const hasAssociatedKey = await hotel.hasAssociatedKey(hotelOwner, {
         from: hotelOwner,
       });
@@ -203,7 +204,7 @@ describe('WtJsLibs usage - hotels', () => {
     });
 
     it('should return false if is not associatedKey whoever asks', async () => {
-      const hotel = await directory.getOrganization(hotelAddress);
+      const hotel = await libs.getOrganization(hotelAddress);
       const hasAssociatedKey = await hotel.hasAssociatedKey(hotelOwner, {
         from: '0xB309875d8b24D522Ea0Ac57903c8A0b0C93C414A',
       });
