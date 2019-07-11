@@ -34,16 +34,31 @@ export class Entrypoint {
     return this._cache[address];
   }
 
-  getSegments () {
-    // TODO
+  /**
+   * Returns list of all registered segments. Does not return empty records.
+   */
+  async getSegments () {
+    const contract = await this._getDeployedEntrypoint();
+    const length = await contract.methods.getSegmentsLength().call();
+    const segments = [];
+    // intentionally skipping the first null record
+    for (let i = 1; i < length; i++) {
+      segments.push(contract.methods.getSegmentName(i).call());
+    }
+    return Promise.all(segments).then((results) => {
+      // filter out empty spots
+      return results.filter(s => !!s);
+    });
   }
 
-  getOwner () {
-    // TODO
+  async getOwner () {
+    const contract = await this._getDeployedEntrypoint();
+    return contract.methods.owner().call();
   }
 
-  getLifTokenAddress () {
-    // TODO
+  async getLifTokenAddress () {
+    const contract = await this._getDeployedEntrypoint();
+    return contract.methods.LifToken().call();
   }
 
   /**

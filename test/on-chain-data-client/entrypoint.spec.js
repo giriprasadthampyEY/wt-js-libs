@@ -23,6 +23,8 @@ describe('WTLibs.on-chain-data.Entrypoint', () => {
     contractsStub = {
       getEntrypointInstance: sinon.stub().resolves({
         methods: {
+          LifToken: helpers.stubContractMethodResult('0xLLLL'),
+          owner: helpers.stubContractMethodResult('0x8888'),
           getSegment: helpers.stubContractMethodResult('0x1234'),
           getOrganizationFactory: orgFactoryStub,
         },
@@ -35,6 +37,24 @@ describe('WTLibs.on-chain-data.Entrypoint', () => {
     it('should return a segment address', async () => {
       const addr = await entrypoint.getSegmentAddress('hotels');
       assert.equal(addr, '0x1234');
+    });
+  });
+
+  describe('getOwner', () => {
+    it('should return owner address', async () => {
+      const addr = await entrypoint.getOwner();
+      assert.equal(addr, '0x8888');
+    });
+  });
+
+  describe('getSegments', () => {
+    // This is tested in the integration suite for now
+  });
+
+  describe('getLifTokenAddress', () => {
+    it('should return owner address', async () => {
+      const addr = await entrypoint.getLifTokenAddress();
+      assert.equal(addr, '0xLLLL');
     });
   });
 

@@ -66,7 +66,10 @@ module.exports = async function (deployer, network, accounts) {
 
     // Set entrypoint directories
     await entrypoint.methods.setSegment('airlines', airlineDirectory.address).send({ from: accounts[4], gas: 60000000 });
+    await entrypoint.methods.setSegment('otas', airlineDirectory.address).send({ from: accounts[4], gas: 60000000 });
     await entrypoint.methods.setSegment('hotels', hotelDirectory.address).send({ from: accounts[4], gas: 60000000 });
+    // gap testing in segment list
+    await entrypoint.methods.removeSegment('otas').send({ from: accounts[4], gas: 60000000 });
 
     console.log('========================================');
     console.log('    Proxy owner:', accounts[4]);
