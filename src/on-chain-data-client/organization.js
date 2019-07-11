@@ -3,7 +3,7 @@ import StoragePointer from './storage-pointer';
 import { SmartContractInstantiationError } from './errors';
 
 /**
- * Wrapper class for a an organization backed by a smart contract on
+ * Wrapper class for an organization backed by a smart contract on
  * Ethereum that's holding `orgJsonUri` pointer to its data.
  *
  * This is meant as a read only wrapper.

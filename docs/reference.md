@@ -6,173 +6,184 @@
     -   [Parameters][2]
 -   [WtJsLibs][3]
     -   [Parameters][4]
-    -   [getDirectory][5]
+    -   [getUpdateableOrganization][5]
         -   [Parameters][6]
-    -   [getFactory][7]
+    -   [getOrganization][7]
         -   [Parameters][8]
-    -   [getUpdateableOrganization][9]
+    -   [getTransactionsStatus][9]
         -   [Parameters][10]
-    -   [getOrganization][11]
+    -   [createWallet][11]
         -   [Parameters][12]
-    -   [getTransactionsStatus][13]
+    -   [getOffChainDataClient][13]
         -   [Parameters][14]
-    -   [createWallet][15]
-        -   [Parameters][16]
-    -   [getOffChainDataClient][17]
-        -   [Parameters][18]
-    -   [getTrustClueClient][19]
-    -   [createInstance][20]
+    -   [getTrustClueClient][15]
+    -   [createInstance][16]
+        -   [Parameters][17]
+-   [errors][18]
+-   [Wallet][19]
+    -   [setupWeb3Eth][20]
         -   [Parameters][21]
--   [errors][22]
--   [Wallet][23]
-    -   [setupWeb3Eth][24]
+    -   [isDestroyed][22]
+    -   [getAddress][23]
+    -   [unlock][24]
         -   [Parameters][25]
-    -   [isDestroyed][26]
-    -   [getAddress][27]
-    -   [unlock][28]
+    -   [signAndSendTransaction][26]
+        -   [Parameters][27]
+    -   [signData][28]
         -   [Parameters][29]
-    -   [signAndSendTransaction][30]
-        -   [Parameters][31]
-    -   [signData][32]
+    -   [lock][30]
+    -   [destroy][31]
+    -   [createInstance][32]
         -   [Parameters][33]
-    -   [lock][34]
-    -   [destroy][35]
-    -   [createInstance][36]
+-   [Wallet][34]
+    -   [Parameters][35]
+    -   [setupWeb3Eth][36]
         -   [Parameters][37]
--   [Wallet][38]
-    -   [Parameters][39]
-    -   [setupWeb3Eth][40]
+    -   [isDestroyed][38]
+    -   [getAddress][39]
+    -   [unlock][40]
         -   [Parameters][41]
-    -   [isDestroyed][42]
-    -   [getAddress][43]
-    -   [unlock][44]
+    -   [signAndSendTransaction][42]
+        -   [Parameters][43]
+    -   [signData][44]
         -   [Parameters][45]
-    -   [signAndSendTransaction][46]
-        -   [Parameters][47]
-    -   [signData][48]
+    -   [lock][46]
+    -   [destroy][47]
+    -   [createInstance][48]
         -   [Parameters][49]
-    -   [lock][50]
-    -   [destroy][51]
-    -   [createInstance][52]
-        -   [Parameters][53]
--   [OffChainDataError][54]
--   [OffChainDataConfigurationError][55]
--   [OffChainDataRuntimeError][56]
--   [OffChainDataClient][57]
-    -   [setup][58]
-        -   [Parameters][59]
-    -   [\_reset][60]
-    -   [getAdapter][61]
+-   [OffChainDataError][50]
+-   [OffChainDataConfigurationError][51]
+-   [OffChainDataRuntimeError][52]
+-   [OffChainDataClient][53]
+    -   [setup][54]
+        -   [Parameters][55]
+    -   [\_reset][56]
+    -   [getAdapter][57]
+        -   [Parameters][58]
+-   [Contracts][59]
+    -   [Parameters][60]
+    -   [\_getInstance][61]
         -   [Parameters][62]
--   [Contracts][63]
-    -   [Parameters][64]
-    -   [\_getInstance][65]
+    -   [decodeLogs][63]
+        -   [Parameters][64]
+    -   [createInstance][65]
         -   [Parameters][66]
-    -   [decodeLogs][67]
-        -   [Parameters][68]
-    -   [createInstance][69]
+-   [Entrypoint][67]
+    -   [Parameters][68]
+    -   [getSegmentAddress][69]
         -   [Parameters][70]
--   [SmartContractInstantiationError][71]
--   [InputDataError][72]
--   [StoragePointerError][73]
--   [RemotelyBackedDatasetError][74]
--   [RemoteDataAccessError][75]
--   [RemoteDataReadError][76]
--   [OrganizationNotFoundError][77]
--   [OrganizationNotInstantiableError][78]
--   [OnChainDataClient][79]
-    -   [setup][80]
-        -   [Parameters][81]
-    -   [\_reset][82]
-    -   [getDirectory][83]
-        -   [Parameters][84]
-    -   [getTransactionsStatus][85]
-        -   [Parameters][86]
--   [OnChainOrganization][87]
-    -   [Parameters][88]
-    -   [initialize][89]
-    -   [orgJson][90]
-    -   [toPlainObject][91]
+    -   [getSegmentDirectory][71]
+        -   [Parameters][72]
+    -   [getOrganizationFactory][73]
+        -   [Parameters][74]
+-   [SmartContractInstantiationError][75]
+-   [InputDataError][76]
+-   [StoragePointerError][77]
+-   [RemotelyBackedDatasetError][78]
+-   [RemoteDataAccessError][79]
+-   [RemoteDataReadError][80]
+-   [OrganizationNotFoundError][81]
+-   [OrganizationNotInstantiableError][82]
+-   [OnChainDataClient][83]
+    -   [setup][84]
+        -   [Parameters][85]
+    -   [\_reset][86]
+    -   [getTransactionsStatus][87]
+        -   [Parameters][88]
+-   [OrganizationFactory][89]
+    -   [Parameters][90]
+    -   [createAndAddOrganization][91]
         -   [Parameters][92]
--   [RemotelyBackedDataset][93]
-    -   [bindProperties][94]
-        -   [Parameters][95]
-    -   [isObsolete][96]
-    -   [markObsolete][97]
-    -   [isDeployed][98]
-    -   [markDeployed][99]
-    -   [\_genericGetter][100]
-        -   [Parameters][101]
-    -   [\_genericSetter][102]
+    -   [createOrganization][93]
+        -   [Parameters][94]
+-   [OnChainOrganization][95]
+    -   [Parameters][96]
+    -   [initialize][97]
+    -   [orgJson][98]
+    -   [toPlainObject][99]
+        -   [Parameters][100]
+-   [RemotelyBackedDataset][101]
+    -   [bindProperties][102]
         -   [Parameters][103]
-    -   [updateRemoteData][104]
-        -   [Parameters][105]
-    -   [createInstance][106]
--   [add][107]
-    -   [Parameters][108]
--   [remove][109]
-    -   [Parameters][110]
--   [getOrganization][111]
-    -   [Parameters][112]
--   [getOrganizations][113]
--   [StoragePointer][114]
-    -   [Parameters][115]
-    -   [reset][116]
-    -   [\_detectSchema][117]
+    -   [isObsolete][104]
+    -   [markObsolete][105]
+    -   [isDeployed][106]
+    -   [markDeployed][107]
+    -   [\_genericGetter][108]
+        -   [Parameters][109]
+    -   [\_genericSetter][110]
+        -   [Parameters][111]
+    -   [updateRemoteData][112]
+        -   [Parameters][113]
+    -   [createInstance][114]
+-   [SegmentDirectory][115]
+    -   [Parameters][116]
+    -   [add][117]
         -   [Parameters][118]
-    -   [\_getOffChainDataClient][119]
-    -   [\_initFromStorage][120]
-        -   [Parameters][121]
-    -   [\_downloadFromStorage][122]
-    -   [toPlainObject][123]
-        -   [Parameters][124]
-    -   [createInstance][125]
-        -   [Parameters][126]
--   [Utils][127]
-    -   [Parameters][128]
-    -   [isZeroAddress][129]
-        -   [Parameters][130]
-    -   [applyGasModifier][131]
-        -   [Parameters][132]
-    -   [getCurrentBlockNumber][133]
-    -   [checkAddressChecksum][134]
-        -   [Parameters][135]
-    -   [determineCurrentAddressNonce][136]
-        -   [Parameters][137]
-    -   [getTransactionReceipt][138]
-        -   [Parameters][139]
-    -   [getTransaction][140]
+    -   [remove][119]
+        -   [Parameters][120]
+    -   [getOrganization][121]
+        -   [Parameters][122]
+    -   [getOrganizations][123]
+-   [StoragePointer][124]
+    -   [Parameters][125]
+    -   [reset][126]
+    -   [\_detectSchema][127]
+        -   [Parameters][128]
+    -   [\_getOffChainDataClient][129]
+    -   [\_initFromStorage][130]
+        -   [Parameters][131]
+    -   [\_downloadFromStorage][132]
+    -   [toPlainObject][133]
+        -   [Parameters][134]
+    -   [createInstance][135]
+        -   [Parameters][136]
+-   [UpdateableOnChainOrganization][137]
+-   [Utils][138]
+    -   [Parameters][139]
+    -   [isZeroAddress][140]
         -   [Parameters][141]
-    -   [createInstance][142]
+    -   [applyGasModifier][142]
         -   [Parameters][143]
--   [TrustClueError][144]
--   [TrustClueConfigurationError][145]
--   [TrustClueRuntimeError][146]
--   [TrustClueClient][147]
-    -   [Parameters][148]
-    -   [getClue][149]
+    -   [getCurrentBlockNumber][144]
+    -   [checkAddressChecksum][145]
+        -   [Parameters][146]
+    -   [determineCurrentAddressNonce][147]
+        -   [Parameters][148]
+    -   [getTransactionReceipt][149]
         -   [Parameters][150]
-    -   [getMetadataForAllClues][151]
-    -   [getAllValues][152]
-        -   [Parameters][153]
-    -   [interpretAllValues][154]
-        -   [Parameters][155]
-    -   [verifySignedData][156]
-        -   [Parameters][157]
-    -   [createInstance][158]
-        -   [Parameters][159]
--   [WalletError][160]
--   [MalformedWalletError][161]
--   [WalletStateError][162]
--   [WalletPasswordError][163]
--   [WalletSigningError][164]
--   [TransactionMiningError][165]
--   [OutOfGasError][166]
--   [InsufficientFundsError][167]
--   [TransactionRevertedError][168]
--   [TransactionDidNotComeThroughError][169]
--   [NoReceiptError][170]
--   [InaccessibleEthereumNodeError][171]
+    -   [getTransaction][151]
+        -   [Parameters][152]
+    -   [createInstance][153]
+        -   [Parameters][154]
+-   [TrustClueError][155]
+-   [TrustClueConfigurationError][156]
+-   [TrustClueRuntimeError][157]
+-   [TrustClueClient][158]
+    -   [Parameters][159]
+    -   [getClue][160]
+        -   [Parameters][161]
+    -   [getMetadataForAllClues][162]
+    -   [getAllValues][163]
+        -   [Parameters][164]
+    -   [interpretAllValues][165]
+        -   [Parameters][166]
+    -   [verifySignedData][167]
+        -   [Parameters][168]
+    -   [createInstance][169]
+        -   [Parameters][170]
+-   [WalletError][171]
+-   [MalformedWalletError][172]
+-   [WalletStateError][173]
+-   [WalletPasswordError][174]
+-   [WalletSigningError][175]
+-   [TransactionMiningError][176]
+-   [OutOfGasError][177]
+-   [InsufficientFundsError][178]
+-   [TransactionRevertedError][179]
+-   [TransactionDidNotComeThroughError][180]
+-   [NoReceiptError][181]
+-   [InaccessibleEthereumNodeError][182]
 
 ## WTLibsError
 
@@ -192,23 +203,6 @@ Main public interface of wt-libs-js.
 ### Parameters
 
 -   `options`  
-
-### getDirectory
-
-Get an instance of Winding Tree directory from the OnChainDataClient.
-
-#### Parameters
-
--   `segment`  allowed are `hotels` and `airlines`
--   `address`  of the Winding Tree index
-
-### getFactory
-
-Get an instance of Organization Factory on given address
-
-#### Parameters
-
--   `address`  
 
 ### getUpdateableOrganization
 
@@ -298,9 +292,9 @@ in a checksummed format, e.g. prefixed with 0x
 and case-sensitive. Works only in an unlocked state,
 because all other methods are unreliable.
 
--   Throws **[WalletStateError][172]** When wallet was destroyed.
--   Throws **[WalletStateError][172]** When wallet is not unlocked.
--   Throws **[WalletStateError][172]** When there's no keystore.
+-   Throws **[WalletStateError][183]** When wallet was destroyed.
+-   Throws **[WalletStateError][183]** When wallet is not unlocked.
+-   Throws **[WalletStateError][183]** When there's no keystore.
 
 ### unlock
 
@@ -312,11 +306,11 @@ there is a readable privateKey stored in memory!</strong>
 -   `password`  
 
 
--   Throws **[WalletStateError][172]** When wallet was destroyed.
--   Throws **[WalletStateError][172]** When there is no web3-eth instance configured.
--   Throws **[WalletPasswordError][173]** When wallet cannot be decrypted.
--   Throws **[MalformedWalletError][174]** When wallet format is not recognized by web3-eth.
--   Throws **[WalletError][175]** When anything else breaks down during decryption. But
+-   Throws **[WalletStateError][183]** When wallet was destroyed.
+-   Throws **[WalletStateError][183]** When there is no web3-eth instance configured.
+-   Throws **[WalletPasswordError][184]** When wallet cannot be decrypted.
+-   Throws **[MalformedWalletError][185]** When wallet format is not recognized by web3-eth.
+-   Throws **[WalletError][186]** When anything else breaks down during decryption. But
     that should actually never happen unless the web3-eth implementation is changed.
 
 ### signAndSendTransaction
@@ -333,18 +327,18 @@ When onReceipt callback is present, Promise is resolved after `receipt` event
 -   `optional` **TransactionCallbacksInterface** callbacks called when events come back from the network
 
 
--   Throws **[WalletStateError][172]** When wallet was destroyed.
--   Throws **[WalletStateError][172]** When there is no web3-eth instance configured.
--   Throws **[WalletStateError][172]** When wallet is not unlocked.
--   Throws **[WalletSigningError][176]** When transaction.from does not match the wallet account.
--   Throws **[NoReceiptError][177]** When there are issues with getting a transaction receipt.
--   Throws **[OutOfGasError][178]** When it seems transaction ran out of gas
--   Throws **[TransactionRevertedError][179]** When it seems transaction was reverted in EVM
--   Throws **[InsufficientFundsError][180]** When it seems there is not enough ETH in this wallet
--   Throws **[InaccessibleEthereumNodeError][181]** When it seems the network is unreachable
--   Throws **[TransactionMiningError][182]** When there's another error during the signing and mining process
+-   Throws **[WalletStateError][183]** When wallet was destroyed.
+-   Throws **[WalletStateError][183]** When there is no web3-eth instance configured.
+-   Throws **[WalletStateError][183]** When wallet is not unlocked.
+-   Throws **[WalletSigningError][187]** When transaction.from does not match the wallet account.
+-   Throws **[NoReceiptError][188]** When there are issues with getting a transaction receipt.
+-   Throws **[OutOfGasError][189]** When it seems transaction ran out of gas
+-   Throws **[TransactionRevertedError][190]** When it seems transaction was reverted in EVM
+-   Throws **[InsufficientFundsError][191]** When it seems there is not enough ETH in this wallet
+-   Throws **[InaccessibleEthereumNodeError][192]** When it seems the network is unreachable
+-   Throws **[TransactionMiningError][193]** When there's another error during the signing and mining process
 
-Returns **[Promise][183]&lt;([string][184] | TxReceiptInterface)>** transaction hash
+Returns **[Promise][194]&lt;([string][195] | TxReceiptInterface)>** transaction hash
 
 ### signData
 
@@ -355,11 +349,11 @@ Signs a claim with a private key associated with this wallet.
 -   `claim`  
 
 
--   Throws **[WalletStateError][172]** When wallet was destroyed.
--   Throws **[WalletStateError][172]** When wallet is not unlocked.
--   Throws **[WalletSigningError][176]** When something does not work during the actual signing
+-   Throws **[WalletStateError][183]** When wallet was destroyed.
+-   Throws **[WalletStateError][183]** When wallet is not unlocked.
+-   Throws **[WalletSigningError][187]** When something does not work during the actual signing
 
-Returns **[Promise][183]&lt;[string][184]>** Hex encoded signature
+Returns **[Promise][194]&lt;[string][195]>** Hex encoded signature
 
 ### lock
 
@@ -370,7 +364,7 @@ be unlocked again if necessary.
 This relies on the JS garbage collector, so please do not reference
 the internal variables of this class elsewhere.
 
--   Throws **[WalletStateError][172]** When wallet was destroyed.
+-   Throws **[WalletStateError][183]** When wallet was destroyed.
 
 ### destroy
 
@@ -381,7 +375,7 @@ memory the JSON file.
 This relies on the JS garbage collector, so please do not reference
 the internal variables of this class elsewhere.
 
--   Throws **[WalletStateError][172]** When wallet was destroyed.
+-   Throws **[WalletStateError][183]** When wallet was destroyed.
 
 ### createInstance
 
@@ -419,9 +413,9 @@ in a checksummed format, e.g. prefixed with 0x
 and case-sensitive. Works only in an unlocked state,
 because all other methods are unreliable.
 
--   Throws **[WalletStateError][172]** When wallet was destroyed.
--   Throws **[WalletStateError][172]** When wallet is not unlocked.
--   Throws **[WalletStateError][172]** When there's no keystore.
+-   Throws **[WalletStateError][183]** When wallet was destroyed.
+-   Throws **[WalletStateError][183]** When wallet is not unlocked.
+-   Throws **[WalletStateError][183]** When there's no keystore.
 
 ### unlock
 
@@ -433,11 +427,11 @@ there is a readable privateKey stored in memory!</strong>
 -   `password`  
 
 
--   Throws **[WalletStateError][172]** When wallet was destroyed.
--   Throws **[WalletStateError][172]** When there is no web3-eth instance configured.
--   Throws **[WalletPasswordError][173]** When wallet cannot be decrypted.
--   Throws **[MalformedWalletError][174]** When wallet format is not recognized by web3-eth.
--   Throws **[WalletError][175]** When anything else breaks down during decryption. But
+-   Throws **[WalletStateError][183]** When wallet was destroyed.
+-   Throws **[WalletStateError][183]** When there is no web3-eth instance configured.
+-   Throws **[WalletPasswordError][184]** When wallet cannot be decrypted.
+-   Throws **[MalformedWalletError][185]** When wallet format is not recognized by web3-eth.
+-   Throws **[WalletError][186]** When anything else breaks down during decryption. But
     that should actually never happen unless the web3-eth implementation is changed.
 
 ### signAndSendTransaction
@@ -454,18 +448,18 @@ When onReceipt callback is present, Promise is resolved after `receipt` event
 -   `optional` **TransactionCallbacksInterface** callbacks called when events come back from the network
 
 
--   Throws **[WalletStateError][172]** When wallet was destroyed.
--   Throws **[WalletStateError][172]** When there is no web3-eth instance configured.
--   Throws **[WalletStateError][172]** When wallet is not unlocked.
--   Throws **[WalletSigningError][176]** When transaction.from does not match the wallet account.
--   Throws **[NoReceiptError][177]** When there are issues with getting a transaction receipt.
--   Throws **[OutOfGasError][178]** When it seems transaction ran out of gas
--   Throws **[TransactionRevertedError][179]** When it seems transaction was reverted in EVM
--   Throws **[InsufficientFundsError][180]** When it seems there is not enough ETH in this wallet
--   Throws **[InaccessibleEthereumNodeError][181]** When it seems the network is unreachable
--   Throws **[TransactionMiningError][182]** When there's another error during the signing and mining process
+-   Throws **[WalletStateError][183]** When wallet was destroyed.
+-   Throws **[WalletStateError][183]** When there is no web3-eth instance configured.
+-   Throws **[WalletStateError][183]** When wallet is not unlocked.
+-   Throws **[WalletSigningError][187]** When transaction.from does not match the wallet account.
+-   Throws **[NoReceiptError][188]** When there are issues with getting a transaction receipt.
+-   Throws **[OutOfGasError][189]** When it seems transaction ran out of gas
+-   Throws **[TransactionRevertedError][190]** When it seems transaction was reverted in EVM
+-   Throws **[InsufficientFundsError][191]** When it seems there is not enough ETH in this wallet
+-   Throws **[InaccessibleEthereumNodeError][192]** When it seems the network is unreachable
+-   Throws **[TransactionMiningError][193]** When there's another error during the signing and mining process
 
-Returns **[Promise][183]&lt;([string][184] | TxReceiptInterface)>** transaction hash
+Returns **[Promise][194]&lt;([string][195] | TxReceiptInterface)>** transaction hash
 
 ### signData
 
@@ -476,11 +470,11 @@ Signs a claim with a private key associated with this wallet.
 -   `claim`  
 
 
--   Throws **[WalletStateError][172]** When wallet was destroyed.
--   Throws **[WalletStateError][172]** When wallet is not unlocked.
--   Throws **[WalletSigningError][176]** When something does not work during the actual signing
+-   Throws **[WalletStateError][183]** When wallet was destroyed.
+-   Throws **[WalletStateError][183]** When wallet is not unlocked.
+-   Throws **[WalletSigningError][187]** When something does not work during the actual signing
 
-Returns **[Promise][183]&lt;[string][184]>** Hex encoded signature
+Returns **[Promise][194]&lt;[string][195]>** Hex encoded signature
 
 ### lock
 
@@ -491,7 +485,7 @@ be unlocked again if necessary.
 This relies on the JS garbage collector, so please do not reference
 the internal variables of this class elsewhere.
 
--   Throws **[WalletStateError][172]** When wallet was destroyed.
+-   Throws **[WalletStateError][183]** When wallet was destroyed.
 
 ### destroy
 
@@ -502,7 +496,7 @@ memory the JSON file.
 This relies on the JS garbage collector, so please do not reference
 the internal variables of this class elsewhere.
 
--   Throws **[WalletStateError][172]** When wallet was destroyed.
+-   Throws **[WalletStateError][183]** When wallet was destroyed.
 
 ### createInstance
 
@@ -549,7 +543,7 @@ Initializes the map of OffChainDataAdapters.
 -   `OffChainDataClientOptionsType`  
 
 
--   Throws **[OffChainDataConfigurationError][185]** when there are multiple adapters with the same name
+-   Throws **[OffChainDataConfigurationError][196]** when there are multiple adapters with the same name
 
 ### \_reset
 
@@ -565,7 +559,7 @@ calling the `create` function from the adapter's configuration.
 -   `schema`  
 
 
--   Throws **[OffChainDataRuntimeError][186]** when schema is not defined or adapter for this schema does not exist
+-   Throws **[OffChainDataRuntimeError][197]** when schema is not defined or adapter for this schema does not exist
 
 ## Contracts
 
@@ -584,13 +578,13 @@ and address.
 
 #### Parameters
 
--   `name` **[string][184]** of contract, used in errors
--   `abi` **[Object][187]** specification of contract
--   `address` **[string][184]** on which we should look for the contract
+-   `name` **[string][195]** of contract, used in errors
+-   `abi` **[Object][198]** specification of contract
+-   `address` **[string][195]** on which we should look for the contract
 
 
--   Throws **[SmartContractInstantiationError][188]** When address is invalid
--   Throws **[SmartContractInstantiationError][188]** When no code is deployed on given address
+-   Throws **[SmartContractInstantiationError][199]** When address is invalid
+-   Throws **[SmartContractInstantiationError][199]** When no code is deployed on given address
 
 Returns **web3.eth.Contract** Resulting wrapper contract
 
@@ -601,9 +595,9 @@ events from Directory and Hotel smart contracts.
 
 #### Parameters
 
--   `logs` **[Array][189]&lt;RawLogRecordInterface>** in a raw format
+-   `logs` **[Array][200]&lt;RawLogRecordInterface>** in a raw format
 
-Returns **[Array][189]&lt;DecodedLogRecordInterface>** Decoded logs
+Returns **[Array][200]&lt;DecodedLogRecordInterface>** Decoded logs
 
 ### createInstance
 
@@ -612,9 +606,48 @@ Returns an initialized instance
 #### Parameters
 
 -   `provider`  
--   `web3` **([string][184] \| [Object][187])** provider used to initialize web3-eth
+-   `web3` **([string][195] \| [Object][198])** provider used to initialize web3-eth
 
-Returns **[Contracts][190]** 
+Returns **[Contracts][201]** 
+
+## Entrypoint
+
+A wrapper class for Winding Tree entrypoint.
+
+### Parameters
+
+-   `entrypointAddress`  
+-   `web3Utils`  
+-   `web3Contracts`  
+
+### getSegmentAddress
+
+Fetches an address of a segment. Does not cache, always calls
+a smart contract!
+
+#### Parameters
+
+-   `segment` **[string][195]** 
+
+Returns **[string][195]** address
+
+### getSegmentDirectory
+
+Gets address of a segment from the entrypoint
+and returns SegmentDirectory abstraction.
+
+#### Parameters
+
+-   `segment`  
+
+### getOrganizationFactory
+
+Gets address of organization factory from the entrypoint
+and returns OrganizationFactory abstraction.
+
+#### Parameters
+
+-   `address`  
 
 ## SmartContractInstantiationError
 
@@ -681,20 +714,7 @@ sets gasCoefficient to a default of 2.
 
 ### \_reset
 
-Deletes options and dataModels. Useful for testing.
-
-### getDirectory
-
-Returns a cached instance of `AbstractDataModel`
-for given segment
-
-#### Parameters
-
--   `segment`  allowed values are hotels and airlines
--   `address`  
-
-
--   Throws **any** OnChainDataRuntimeError when an unknown segment is encountered.
+Deletes options and entrypoints. Useful for testing.
 
 ### getTransactionsStatus
 
@@ -708,9 +728,46 @@ metrics.
 
 -   `txHashes`  
 
+## OrganizationFactory
+
+Wrapper for an Organization Factory smart contract. Allows you to
+call `create` or `createAndAddOrganization`.
+
+### Parameters
+
+-   `factoryAddress`  
+-   `web3Utils`  
+-   `web3Contracts`  
+
+### createAndAddOrganization
+
+Prepares transaction data that creates and adds the organization
+to the selected directory.
+
+#### Parameters
+
+-   `orgData` **[Object][198]** 
+-   `directoryAddress` **[string][195]** 
+
+Returns **[Object][198]** Contains `transactionData`, `eventCAllbacks` useful
+in the wallet abstraction and `organization` Promise that gets fullfilled
+once the `onReceipt` event occurs.
+
+### createOrganization
+
+Prepares transaction data that creates a new organization smart contract.
+
+#### Parameters
+
+-   `orgData` **[Object][198]** 
+
+Returns **[Object][198]** Contains `transactionData`, `eventCAllbacks` useful
+in the wallet abstraction and `organization` Promise that gets fullfilled
+once the `onReceipt` event occurs.
+
 ## OnChainOrganization
 
-Wrapper class for a an organization backed by a smart contract on
+Wrapper class for an organization backed by a smart contract on
 Ethereum that's holding `orgJsonUri` pointer to its data.
 
 This is meant as a read only wrapper.
@@ -761,12 +818,12 @@ Properties that represent an actual separate document have a format of
 
 #### Parameters
 
--   `resolvedFields` **[Array][189]&lt;[string][184]>** List of fields to be resolved from off chain data, in dot notation.
+-   `resolvedFields` **[Array][200]&lt;[string][195]>** List of fields to be resolved from off chain data, in dot notation.
     If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
--   `depth` **[number][191]** Number of levels to resolve. See `StoragePointer` jsDocs for more info.
+-   `depth` **[number][202]** Number of levels to resolve. See `StoragePointer` jsDocs for more info.
 
 
--   Throws **[StoragePointerError][192]** when an adapter encounters an error while accessing the data
+-   Throws **[StoragePointerError][203]** when an adapter encounters an error while accessing the data
 
 ## RemotelyBackedDataset
 
@@ -819,15 +876,15 @@ be synced from the remote storage (if the dataset is marked as deployed).
 
 #### Parameters
 
--   `options` **[Object][187]** `{fields: {[field]: fieldOptions}}`
--   `bindTo` **[Object][187]** Object to which the properties will be bound.
+-   `options` **[Object][198]** `{fields: {[field]: fieldOptions}}`
+-   `bindTo` **[Object][198]** Object to which the properties will be bound.
     Typically the initiator of this operation.
 
 ### isObsolete
 
 Is dataset marked as obsolete?
 
-Returns **[Boolean][193]** 
+Returns **[Boolean][204]** 
 
 ### markObsolete
 
@@ -839,7 +896,7 @@ but merely serves as a flag to prevent further interaction with this object.
 
 Is dataset deployed to the remote storage?
 
-Returns **[Boolean][193]** 
+Returns **[Boolean][204]** 
 
 ### markDeployed
 
@@ -854,10 +911,10 @@ was modified locally before, the modified value will be returned.
 
 #### Parameters
 
--   `property` **[string][184]** 
+-   `property` **[string][195]** 
 
 
--   Throws **[RemoteDataAccessError][194]** When dataset is marked as obsolete
+-   Throws **[RemoteDataAccessError][205]** When dataset is marked as obsolete
 
 Returns **any** property's current value
 
@@ -869,7 +926,7 @@ serve the locally modified value.
 
 #### Parameters
 
--   `property` **[string][184]** 
+-   `property` **[string][195]** 
 -   `newValue` **any** 
 
 ### updateRemoteData
@@ -880,61 +937,72 @@ to update multiple fields, it is called only once.
 
 #### Parameters
 
--   `transactionOptions` **[Object][187]** passed to every remoteSetter, typically something like `{from: address, to: address}`
+-   `transactionOptions` **[Object][198]** passed to every remoteSetter, typically something like `{from: address, to: address}`
 
-Returns **[Array][189]&lt;any>** Results of remoteSetters, it would typically contain transaction metadata. In any case, an eventCallbacks
+Returns **[Array][200]&lt;any>** Results of remoteSetters, it would typically contain transaction metadata. In any case, an eventCallbacks
 object is appended to every result and onReceipt callback is added to ensure that data fields would eventually be properly marked as 'synced'.
 
 ### createInstance
 
 Generic factory method.
 
-## add
+## SegmentDirectory
+
+Wrapper class for a SegmentDirectory smart contract. Allows you to
+add and remove organizations from this directory.
+
+### Parameters
+
+-   `address`  
+-   `web3Utils`  
+-   `web3Contracts`  
+
+### add
 
 Generates transaction data required for adding an organization
 and more metadata required for sucessful mining of that transaction.
 Does not sign or send the transaction.
 
-### Parameters
+#### Parameters
 
 -   `orgData`  
 
 
--   Throws **[InputDataError][195]** When orgData does not contain orgJsonUri property.
--   Throws **[InputDataError][195]** When orgData does not contain a owner property.
--   Throws **[WTLibsError][196]** When anything goes wrong during data preparation phase.
+-   Throws **[InputDataError][206]** When orgData does not contain orgJsonUri property.
+-   Throws **[InputDataError][206]** When orgData does not contain a owner property.
+-   Throws **[WTLibsError][207]** When anything goes wrong during data preparation phase.
 
-## remove
+### remove
 
 Generates transaction data required for removing an organization
 and more metadata required for successful mining of that transaction.
 Does not sign or send the transaction.
 
-### Parameters
+#### Parameters
 
 -   `orgData`  
 
 
--   Throws **[InputDataError][195]** When organization does not contain orgJsonUri property.
--   Throws **[InputDataError][195]** When organization does not contain a owner property.
--   Throws **[WTLibsError][196]** When anything goes wrong during data preparation phase.
+-   Throws **[InputDataError][206]** When organization does not contain orgJsonUri property.
+-   Throws **[InputDataError][206]** When organization does not contain a owner property.
+-   Throws **[WTLibsError][207]** When anything goes wrong during data preparation phase.
 
-## getOrganization
+### getOrganization
 
 Gets organization representation of a organization on a given address. If organization
 on such address is not registered through this Winding Tree index
 instance, the method throws immediately.
 
-### Parameters
+#### Parameters
 
 -   `address`  
 
 
--   Throws **[OrganizationNotFoundError][197]** When organization does not exist.
--   Throws **[OrganizationNotInstantiableError][198]** When the organization class cannot be constructed.
--   Throws **[WTLibsError][196]** When something breaks in the network communication.
+-   Throws **[OrganizationNotFoundError][208]** When organization does not exist.
+-   Throws **[OrganizationNotInstantiableError][209]** When the organization class cannot be constructed.
+-   Throws **[WTLibsError][207]** When something breaks in the network communication.
 
-## getOrganizations
+### getOrganizations
 
 Returns a list of all organizations. It will filter out
 every organization that is inaccessible for any reason.
@@ -983,7 +1051,7 @@ Only subordinate storage pointers (`children`) have to be defined beforehand, so
 field above may contain a complex JSON object.
 
 Recursion is supported, if described in `children` definition.
-See [test][199] for a working example.
+See [test][210] for a working example.
 
     const innerUri = InMemoryAdapter.storageInstance.create({
       data: 'wt',
@@ -1003,12 +1071,12 @@ See [test][199] for a working example.
     contents.detail.ref; // contains innerUri
     (await contents.detail.contents).data; // contains 'wt'. See `toPlainObject` if you want to avoid multiple `await` clauses.
 
-StoragePointers in arrays are also supported, see [an example][200].
+StoragePointers in arrays are also supported, see [an example][211].
 Note that arrays are not supported for `nested` children types.
 
 ### Parameters
 
--   `uri` **[string][184]** where to look for the data
+-   `uri` **[string][195]** where to look for the data
 -   `children` **ChildrenType** subordinate storage pointers
 
 ### reset
@@ -1093,7 +1161,7 @@ The resulting structure mimicks the original `StoragePointer` data structure:
 
 #### Parameters
 
--   `resolvedFields` **[Array][189]&lt;[string][184]>** List of fields that limit the resulting dataset in dot notation (`father.child.son`).
+-   `resolvedFields` **[Array][200]&lt;[string][195]>** List of fields that limit the resulting dataset in dot notation (`father.child.son`).
      If an empty array is provided, no resolving is done. If the argument is missing, all fields are resolved.
      You don't need to specify path to a field in any special way when it is in an array (e.g. storagePointers.0.field or similar).
      Array items are resolved as if they're on the array level (i.e. storagePointers.field).
@@ -1102,7 +1170,7 @@ The resulting structure mimicks the original `StoragePointer` data structure:
      (e.g. when calling `toPlainObject(['a.b'])` all fields in data.a.b will be resolved - unless limited by depth). (optional, default `9999`)
 
 
--   Throws **[StoragePointerError][192]** when an adapter encounters an error while accessing the data
+-   Throws **[StoragePointerError][203]** when an adapter encounters an error while accessing the data
 
 ### createInstance
 
@@ -1113,8 +1181,19 @@ instance
 
 #### Parameters
 
--   `uri` **[string][184]** where to look for data document. It has to include schema, i. e. `https://example.com/data`
+-   `uri` **[string][195]** where to look for data document. It has to include schema, i. e. `https://example.com/data`
 -   `children` **ChildrenType** subordinate storage pointers
+
+## UpdateableOnChainOrganization
+
+**Extends Organization**
+
+Wrapper class for an organization backed by a smart contract on
+Ethereum that's holding `orgJsonUri` pointer to its data.
+
+This is meant as a read/write wrapper. If you want to change some field,
+just use its setter and call `updateOnChainData` when ready. This will produce
+as many transactions as necessary for you to execute on chain.
 
 ## Utils
 
@@ -1135,7 +1214,7 @@ Returns true also for strings that are not a valid address.
 
 -   `address`  
 
-Returns **[boolean][193]** 
+Returns **[boolean][204]** 
 
 ### applyGasModifier
 
@@ -1144,9 +1223,9 @@ or `gasMargin`.
 
 #### Parameters
 
--   `gas` **[number][191]** 
+-   `gas` **[number][202]** 
 
-Returns **[number][191]** modified gas
+Returns **[number][202]** modified gas
 
 ### getCurrentBlockNumber
 
@@ -1167,7 +1246,7 @@ Ethereum address
 
 #### Parameters
 
--   `address` **[string][184]** 
+-   `address` **[string][195]** 
 
 Returns **any** number
 
@@ -1177,7 +1256,7 @@ Proxy method for `web3.eth.getTransactionReceipt`
 
 #### Parameters
 
--   `txHash` **[string][184]** 
+-   `txHash` **[string][195]** 
 
 Returns **TxReceiptInterface** 
 
@@ -1199,9 +1278,9 @@ Returns an initialized instance
 -   `provider`  
 -   `gasCoefficient` **GasModifiersType** or gasMargin that can be applied
     to outgoing transactions.
--   `web3` **([string][184] \| [Object][187])** instance provider used to create web3-eth
+-   `web3` **([string][195] \| [Object][198])** instance provider used to create web3-eth
 
-Returns **[Utils][201]** 
+Returns **[Utils][212]** 
 
 ## TrustClueError
 
@@ -1244,7 +1323,7 @@ calling the `create` function from the clue's configuration.
 -   `name`  
 
 
--   Throws **[TrustClueRuntimeError][202]** when name is not defined or a clue with such name does not exist
+-   Throws **[TrustClueRuntimeError][213]** when name is not defined or a clue with such name does not exist
 
 ### getMetadataForAllClues
 
@@ -1256,7 +1335,7 @@ Walks over all clues and collects their values.
 
 #### Parameters
 
--   `address` **[string][184]** Ethereum address for which the values should
+-   `address` **[string][195]** Ethereum address for which the values should
     be collected.
 
 Returns **any** A list of objects with either value or error:
@@ -1268,7 +1347,7 @@ Walks over all clues and collects their interpreted values.
 
 #### Parameters
 
--   `address` **[string][184]** Ethereum address for which the values should
+-   `address` **[string][195]** Ethereum address for which the values should
     be collected.
 
 Returns **any** A list of objects with either value or error:
@@ -1280,16 +1359,16 @@ Verifies the signature and actual signer.
 
 #### Parameters
 
--   `serializedData` **[string][184]** String data to be signed.
--   `signature` **[string][184]** Strictly hex encoded (starting with 0x) signature of `serializedData`.
--   `verificationFn` **[function][203]** Optional verification function. Is called with the actual
+-   `serializedData` **[string][195]** String data to be signed.
+-   `signature` **[string][195]** Strictly hex encoded (starting with 0x) signature of `serializedData`.
+-   `verificationFn` **[function][214]** Optional verification function. Is called with the actual
     signer and should throw when verification fails. The return value is ignored.
     Default: Parse `serializedData` as JSON and compare the actual signer to checksum
     address of the `signer` field.Default verification fn expects the `serializedData` is string containing JSON with `signer` field
     Provide custom `verificationFn` if needed.
 
 
--   Throws **[TrustClueRuntimeError][202]** When any of arguments is missing, or the signature recovery
+-   Throws **[TrustClueRuntimeError][213]** When any of arguments is missing, or the signature recovery
     fails or the signature verification fails or any other error occurs.
 
 ### createInstance
@@ -1302,7 +1381,7 @@ Initializes the map of `TrustClue`s.
 -   `TrustClueClientOptionsType`  
 
 
--   Throws **[TrustClueConfigurationError][204]** when there are multiple clues with the same name
+-   Throws **[TrustClueConfigurationError][215]** when there are multiple clues with the same name
 
 ## WalletError
 
@@ -1404,402 +1483,424 @@ transaction.
 
 [4]: #parameters-1
 
-[5]: #getdirectory
+[5]: #getupdateableorganization
 
 [6]: #parameters-2
 
-[7]: #getfactory
+[7]: #getorganization
 
 [8]: #parameters-3
 
-[9]: #getupdateableorganization
+[9]: #gettransactionsstatus
 
 [10]: #parameters-4
 
-[11]: #getorganization
+[11]: #createwallet
 
 [12]: #parameters-5
 
-[13]: #gettransactionsstatus
+[13]: #getoffchaindataclient
 
 [14]: #parameters-6
 
-[15]: #createwallet
+[15]: #gettrustclueclient
 
-[16]: #parameters-7
+[16]: #createinstance
 
-[17]: #getoffchaindataclient
+[17]: #parameters-7
 
-[18]: #parameters-8
+[18]: #errors
 
-[19]: #gettrustclueclient
+[19]: #wallet
 
-[20]: #createinstance
+[20]: #setupweb3eth
 
-[21]: #parameters-9
+[21]: #parameters-8
 
-[22]: #errors
+[22]: #isdestroyed
 
-[23]: #wallet
+[23]: #getaddress
 
-[24]: #setupweb3eth
+[24]: #unlock
 
-[25]: #parameters-10
+[25]: #parameters-9
 
-[26]: #isdestroyed
+[26]: #signandsendtransaction
 
-[27]: #getaddress
+[27]: #parameters-10
 
-[28]: #unlock
+[28]: #signdata
 
 [29]: #parameters-11
 
-[30]: #signandsendtransaction
+[30]: #lock
 
-[31]: #parameters-12
+[31]: #destroy
 
-[32]: #signdata
+[32]: #createinstance-1
 
-[33]: #parameters-13
+[33]: #parameters-12
 
-[34]: #lock
+[34]: #wallet-1
 
-[35]: #destroy
+[35]: #parameters-13
 
-[36]: #createinstance-1
+[36]: #setupweb3eth-1
 
 [37]: #parameters-14
 
-[38]: #wallet-1
+[38]: #isdestroyed-1
 
-[39]: #parameters-15
+[39]: #getaddress-1
 
-[40]: #setupweb3eth-1
+[40]: #unlock-1
 
-[41]: #parameters-16
+[41]: #parameters-15
 
-[42]: #isdestroyed-1
+[42]: #signandsendtransaction-1
 
-[43]: #getaddress-1
+[43]: #parameters-16
 
-[44]: #unlock-1
+[44]: #signdata-1
 
 [45]: #parameters-17
 
-[46]: #signandsendtransaction-1
+[46]: #lock-1
 
-[47]: #parameters-18
+[47]: #destroy-1
 
-[48]: #signdata-1
+[48]: #createinstance-2
 
-[49]: #parameters-19
+[49]: #parameters-18
 
-[50]: #lock-1
+[50]: #offchaindataerror
 
-[51]: #destroy-1
+[51]: #offchaindataconfigurationerror
 
-[52]: #createinstance-2
+[52]: #offchaindataruntimeerror
 
-[53]: #parameters-20
+[53]: #offchaindataclient
 
-[54]: #offchaindataerror
+[54]: #setup
 
-[55]: #offchaindataconfigurationerror
+[55]: #parameters-19
 
-[56]: #offchaindataruntimeerror
+[56]: #_reset
 
-[57]: #offchaindataclient
+[57]: #getadapter
 
-[58]: #setup
+[58]: #parameters-20
 
-[59]: #parameters-21
+[59]: #contracts
 
-[60]: #_reset
+[60]: #parameters-21
 
-[61]: #getadapter
+[61]: #_getinstance
 
 [62]: #parameters-22
 
-[63]: #contracts
+[63]: #decodelogs
 
 [64]: #parameters-23
 
-[65]: #_getinstance
+[65]: #createinstance-3
 
 [66]: #parameters-24
 
-[67]: #decodelogs
+[67]: #entrypoint
 
 [68]: #parameters-25
 
-[69]: #createinstance-3
+[69]: #getsegmentaddress
 
 [70]: #parameters-26
 
-[71]: #smartcontractinstantiationerror
+[71]: #getsegmentdirectory
 
-[72]: #inputdataerror
+[72]: #parameters-27
 
-[73]: #storagepointererror
+[73]: #getorganizationfactory
 
-[74]: #remotelybackeddataseterror
+[74]: #parameters-28
 
-[75]: #remotedataaccesserror
+[75]: #smartcontractinstantiationerror
 
-[76]: #remotedatareaderror
+[76]: #inputdataerror
 
-[77]: #organizationnotfounderror
+[77]: #storagepointererror
 
-[78]: #organizationnotinstantiableerror
+[78]: #remotelybackeddataseterror
 
-[79]: #onchaindataclient
+[79]: #remotedataaccesserror
 
-[80]: #setup-1
+[80]: #remotedatareaderror
 
-[81]: #parameters-27
+[81]: #organizationnotfounderror
 
-[82]: #_reset-1
+[82]: #organizationnotinstantiableerror
 
-[83]: #getdirectory-1
+[83]: #onchaindataclient
 
-[84]: #parameters-28
+[84]: #setup-1
 
-[85]: #gettransactionsstatus-1
+[85]: #parameters-29
 
-[86]: #parameters-29
+[86]: #_reset-1
 
-[87]: #onchainorganization
+[87]: #gettransactionsstatus-1
 
 [88]: #parameters-30
 
-[89]: #initialize
+[89]: #organizationfactory
 
-[90]: #orgjson
+[90]: #parameters-31
 
-[91]: #toplainobject
+[91]: #createandaddorganization
 
-[92]: #parameters-31
+[92]: #parameters-32
 
-[93]: #remotelybackeddataset
+[93]: #createorganization
 
-[94]: #bindproperties
+[94]: #parameters-33
 
-[95]: #parameters-32
+[95]: #onchainorganization
 
-[96]: #isobsolete
+[96]: #parameters-34
 
-[97]: #markobsolete
+[97]: #initialize
 
-[98]: #isdeployed
+[98]: #orgjson
 
-[99]: #markdeployed
+[99]: #toplainobject
 
-[100]: #_genericgetter
+[100]: #parameters-35
 
-[101]: #parameters-33
+[101]: #remotelybackeddataset
 
-[102]: #_genericsetter
+[102]: #bindproperties
 
-[103]: #parameters-34
+[103]: #parameters-36
 
-[104]: #updateremotedata
+[104]: #isobsolete
 
-[105]: #parameters-35
+[105]: #markobsolete
 
-[106]: #createinstance-4
+[106]: #isdeployed
 
-[107]: #add
+[107]: #markdeployed
 
-[108]: #parameters-36
+[108]: #_genericgetter
 
-[109]: #remove
+[109]: #parameters-37
 
-[110]: #parameters-37
+[110]: #_genericsetter
 
-[111]: #getorganization-1
+[111]: #parameters-38
 
-[112]: #parameters-38
+[112]: #updateremotedata
 
-[113]: #getorganizations
+[113]: #parameters-39
 
-[114]: #storagepointer
+[114]: #createinstance-4
 
-[115]: #parameters-39
+[115]: #segmentdirectory
 
-[116]: #reset
+[116]: #parameters-40
 
-[117]: #_detectschema
+[117]: #add
 
-[118]: #parameters-40
+[118]: #parameters-41
 
-[119]: #_getoffchaindataclient
+[119]: #remove
 
-[120]: #_initfromstorage
+[120]: #parameters-42
 
-[121]: #parameters-41
+[121]: #getorganization-1
 
-[122]: #_downloadfromstorage
+[122]: #parameters-43
 
-[123]: #toplainobject-1
+[123]: #getorganizations
 
-[124]: #parameters-42
+[124]: #storagepointer
 
-[125]: #createinstance-5
+[125]: #parameters-44
 
-[126]: #parameters-43
+[126]: #reset
 
-[127]: #utils
+[127]: #_detectschema
 
-[128]: #parameters-44
+[128]: #parameters-45
 
-[129]: #iszeroaddress
+[129]: #_getoffchaindataclient
 
-[130]: #parameters-45
+[130]: #_initfromstorage
 
-[131]: #applygasmodifier
+[131]: #parameters-46
 
-[132]: #parameters-46
+[132]: #_downloadfromstorage
 
-[133]: #getcurrentblocknumber
+[133]: #toplainobject-1
 
-[134]: #checkaddresschecksum
+[134]: #parameters-47
 
-[135]: #parameters-47
+[135]: #createinstance-5
 
-[136]: #determinecurrentaddressnonce
+[136]: #parameters-48
 
-[137]: #parameters-48
+[137]: #updateableonchainorganization
 
-[138]: #gettransactionreceipt
+[138]: #utils
 
 [139]: #parameters-49
 
-[140]: #gettransaction
+[140]: #iszeroaddress
 
 [141]: #parameters-50
 
-[142]: #createinstance-6
+[142]: #applygasmodifier
 
 [143]: #parameters-51
 
-[144]: #trustclueerror
+[144]: #getcurrentblocknumber
 
-[145]: #trustclueconfigurationerror
+[145]: #checkaddresschecksum
 
-[146]: #trustclueruntimeerror
+[146]: #parameters-52
 
-[147]: #trustclueclient
+[147]: #determinecurrentaddressnonce
 
-[148]: #parameters-52
+[148]: #parameters-53
 
-[149]: #getclue
+[149]: #gettransactionreceipt
 
-[150]: #parameters-53
+[150]: #parameters-54
 
-[151]: #getmetadataforallclues
+[151]: #gettransaction
 
-[152]: #getallvalues
+[152]: #parameters-55
 
-[153]: #parameters-54
+[153]: #createinstance-6
 
-[154]: #interpretallvalues
+[154]: #parameters-56
 
-[155]: #parameters-55
+[155]: #trustclueerror
 
-[156]: #verifysigneddata
+[156]: #trustclueconfigurationerror
 
-[157]: #parameters-56
+[157]: #trustclueruntimeerror
 
-[158]: #createinstance-7
+[158]: #trustclueclient
 
 [159]: #parameters-57
 
-[160]: #walleterror
+[160]: #getclue
 
-[161]: #malformedwalleterror
+[161]: #parameters-58
 
-[162]: #walletstateerror
+[162]: #getmetadataforallclues
 
-[163]: #walletpassworderror
+[163]: #getallvalues
 
-[164]: #walletsigningerror
+[164]: #parameters-59
 
-[165]: #transactionminingerror
+[165]: #interpretallvalues
 
-[166]: #outofgaserror
+[166]: #parameters-60
 
-[167]: #insufficientfundserror
+[167]: #verifysigneddata
 
-[168]: #transactionrevertederror
+[168]: #parameters-61
 
-[169]: #transactiondidnotcomethrougherror
+[169]: #createinstance-7
 
-[170]: #noreceipterror
+[170]: #parameters-62
 
-[171]: #inaccessibleethereumnodeerror
+[171]: #walleterror
 
-[172]: #walletstateerror
+[172]: #malformedwalleterror
 
-[173]: #walletpassworderror
+[173]: #walletstateerror
 
-[174]: #malformedwalleterror
+[174]: #walletpassworderror
 
-[175]: #walleterror
+[175]: #walletsigningerror
 
-[176]: #walletsigningerror
+[176]: #transactionminingerror
 
-[177]: #noreceipterror
+[177]: #outofgaserror
 
-[178]: #outofgaserror
+[178]: #insufficientfundserror
 
 [179]: #transactionrevertederror
 
-[180]: #insufficientfundserror
+[180]: #transactiondidnotcomethrougherror
 
-[181]: #inaccessibleethereumnodeerror
+[181]: #noreceipterror
 
-[182]: #transactionminingerror
+[182]: #inaccessibleethereumnodeerror
 
-[183]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
+[183]: #walletstateerror
 
-[184]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[184]: #walletpassworderror
 
-[185]: #offchaindataconfigurationerror
+[185]: #malformedwalleterror
 
-[186]: #offchaindataruntimeerror
+[186]: #walleterror
 
-[187]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[187]: #walletsigningerror
 
-[188]: #smartcontractinstantiationerror
+[188]: #noreceipterror
 
-[189]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[189]: #outofgaserror
 
-[190]: #contracts
+[190]: #transactionrevertederror
 
-[191]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[191]: #insufficientfundserror
 
-[192]: #storagepointererror
+[192]: #inaccessibleethereumnodeerror
 
-[193]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[193]: #transactionminingerror
 
-[194]: #remotedataaccesserror
+[194]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise
 
-[195]: #inputdataerror
+[195]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
 
-[196]: #wtlibserror
+[196]: #offchaindataconfigurationerror
 
-[197]: #organizationnotfounderror
+[197]: #offchaindataruntimeerror
 
-[198]: #organizationnotinstantiableerror
+[198]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
 
-[199]: https://github.com/windingtree/wt-js-libs/blob/8fdfe3aed7248fd327b60f1a56f0d3a3b1d3e93b/test/wt-libs/storage-pointer.spec.js#L448
+[199]: #smartcontractinstantiationerror
 
-[200]: https://github.com/windingtree/wt-js-libs/blob/8fdfe3aed7248fd327b60f1a56f0d3a3b1d3e93b/test/wt-libs/storage-pointer.spec.js#L427
+[200]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
 
-[201]: #utils
+[201]: #contracts
 
-[202]: #trustclueruntimeerror
+[202]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
 
-[203]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+[203]: #storagepointererror
 
-[204]: #trustclueconfigurationerror
+[204]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+
+[205]: #remotedataaccesserror
+
+[206]: #inputdataerror
+
+[207]: #wtlibserror
+
+[208]: #organizationnotfounderror
+
+[209]: #organizationnotinstantiableerror
+
+[210]: https://github.com/windingtree/wt-js-libs/blob/8fdfe3aed7248fd327b60f1a56f0d3a3b1d3e93b/test/wt-libs/storage-pointer.spec.js#L448
+
+[211]: https://github.com/windingtree/wt-js-libs/blob/8fdfe3aed7248fd327b60f1a56f0d3a3b1d3e93b/test/wt-libs/storage-pointer.spec.js#L427
+
+[212]: #utils
+
+[213]: #trustclueruntimeerror
+
+[214]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function
+
+[215]: #trustclueconfigurationerror

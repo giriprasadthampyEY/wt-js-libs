@@ -91,6 +91,7 @@ export class Contracts {
         generateEventSignatures(OrganizationInterfaceMetadata.abi),
         generateEventSignatures(OrganizationFactoryMetadata.abi),
         generateEventSignatures(SegmentDirectoryMetadata.abi),
+        generateEventSignatures(EntrypointMetadata.abi),
       );
     }
     return this.eventRegistry;

@@ -2,6 +2,9 @@ import SegmentDirectory from './segment-directory';
 import OrganizationFactory from './organization-factory';
 import { OnChainDataRuntimeError } from './errors';
 
+/**
+ * A wrapper class for Winding Tree entrypoint.
+ */
 export class Entrypoint {
   static createInstance (entrypointAddress, web3Utils, web3Contracts) {
     return new Entrypoint(entrypointAddress, web3Utils, web3Contracts);
@@ -43,11 +46,21 @@ export class Entrypoint {
     // TODO
   }
 
+  /**
+   * Fetches an address of a segment. Does not cache, always calls
+   * a smart contract!
+   * @param  {string} segment
+   * @return {string} address
+   */
   async getSegmentAddress (segment) {
     const contract = await this._getDeployedEntrypoint();
     return contract.methods.getSegment(segment).call();
   }
 
+  /**
+   * Gets address of a segment from the entrypoint
+   * and returns SegmentDirectory abstraction.
+   */
   async getSegmentDirectory (segment) {
     if (!this._segmentAddresses[segment]) {
       const address = await this.getSegmentAddress(segment);
@@ -59,6 +72,10 @@ export class Entrypoint {
     return this._getCachedInstance(this._segmentAddresses[segment], SegmentDirectory);
   }
 
+  /**
+   * Gets address of organization factory from the entrypoint
+   * and returns OrganizationFactory abstraction.
+   */
   async getOrganizationFactory (address) {
     if (!this._factoryAddress) {
       const contract = await this._getDeployedEntrypoint();

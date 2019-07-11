@@ -3,6 +3,15 @@ import Organization from './organization';
 import StoragePointer from './storage-pointer';
 import { InputDataError, SmartContractInstantiationError } from './errors';
 
+/**
+ * Wrapper class for an organization backed by a smart contract on
+ * Ethereum that's holding `orgJsonUri` pointer to its data.
+ *
+ * This is meant as a read/write wrapper. If you want to change some field,
+ * just use its setter and call `updateOnChainData` when ready. This will produce
+ * as many transactions as necessary for you to execute on chain.
+ *
+ */
 export class UpdateableOnChainOrganization extends Organization {
   static createInstance (web3Utils, web3Contracts, address) {
     const org = new UpdateableOnChainOrganization(web3Utils, web3Contracts, address);

@@ -3,6 +3,10 @@ import { InputDataError } from './errors';
 import UpdateableOnChainOrganization from './updateable-organization';
 import OnChainDataClient from './index';
 
+/**
+ * Wrapper for an Organization Factory smart contract. Allows you to
+ * call `create` or `createAndAddOrganization`.
+ */
 export class OrganizationFactory {
   static createInstance (factoryAddress, web3Utils, web3Contracts) {
     return new OrganizationFactory(factoryAddress, web3Utils, web3Contracts);
@@ -21,6 +25,16 @@ export class OrganizationFactory {
     return this.deployedFactory;
   }
 
+  /**
+   * Prepares transaction data that creates and adds the organization
+   * to the selected directory.
+   *
+   * @param  {Object} orgData
+   * @param  {string} directoryAddress
+   * @return {Object} Contains `transactionData`, `eventCAllbacks` useful
+   * in the wallet abstraction and `organization` Promise that gets fullfilled
+   * once the `onReceipt` event occurs.
+   */
   async createAndAddOrganization (orgData, directoryAddress) {
     const orgJsonUri = await orgData.orgJsonUri;
     if (!orgJsonUri) {
@@ -42,6 +56,14 @@ export class OrganizationFactory {
     }
   }
 
+  /**
+   * Prepares transaction data that creates a new organization smart contract.
+   *
+   * @param  {Object} orgData
+   * @return {Object} Contains `transactionData`, `eventCAllbacks` useful
+   * in the wallet abstraction and `organization` Promise that gets fullfilled
+   * once the `onReceipt` event occurs.
+   */
   async createOrganization (orgData) {
     const orgJsonUri = await orgData.orgJsonUri;
     if (!orgJsonUri) {
