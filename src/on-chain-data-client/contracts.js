@@ -2,6 +2,7 @@ import SegmentDirectoryMetadata from '@windingtree/wt-contracts/build/contracts/
 import OrganizationInterfaceMetadata from '@windingtree/wt-contracts/build/contracts/OrganizationInterface.json';
 import OrganizationMetadata from '@windingtree/wt-contracts/build/contracts/Organization.json';
 import OrganizationFactoryMetadata from '@windingtree/wt-contracts/build/contracts/AbstractOrganizationFactory.json';
+import EntrypointMetadata from '@windingtree/wt-contracts/build/contracts/WindingTreeEntrypoint.json';
 import { SmartContractInstantiationError } from './errors';
 
 import Web3Utils from 'web3-utils';
@@ -11,7 +12,7 @@ import Web3Eth from 'web3-eth';
  * Wrapper class for work with Winding Tree's Ethereum
  * smart contracts.
  */
-class Contracts {
+export class Contracts {
   /**
    * Returns an initialized instance
    *
@@ -69,6 +70,9 @@ class Contracts {
   async getOrganizationFactoryInstance (address) {
     return this._getInstance('organizationFactory', OrganizationFactoryMetadata.abi, address);
   }
+  async getEntrypointInstance (address) {
+    return this._getInstance('entrypoint', EntrypointMetadata.abi, address);
+  }
 
   _initEventRegistry () {
     function generateEventSignatures (abi) {
@@ -87,6 +91,7 @@ class Contracts {
         generateEventSignatures(OrganizationInterfaceMetadata.abi),
         generateEventSignatures(OrganizationFactoryMetadata.abi),
         generateEventSignatures(SegmentDirectoryMetadata.abi),
+        generateEventSignatures(EntrypointMetadata.abi),
       );
     }
     return this.eventRegistry;

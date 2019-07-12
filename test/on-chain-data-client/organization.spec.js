@@ -84,7 +84,8 @@ describe('WTLibs.on-chain-data.Organization', () => {
   describe('toPlainObject', () => {
     it('should return a plain JS object', async () => {
       const libs = WtJsLibs.createInstance(testedDataModel.withDataSource());
-      const directory = libs.getDirectory('hotels', testedDataModel.directoryAddress);
+      const entrypoint = libs.getEntrypoint(testedDataModel.entrypointAddress);
+      const directory = await entrypoint.getSegmentDirectory('hotels');
       organization = await directory.getOrganizationByIndex(1);
       const plainOrg = await organization.toPlainObject();
       assert.equal(plainOrg.owner, '0xD39Ca7d186a37bb6Bf48AE8abFeB4c687dc8F906');
@@ -100,15 +101,18 @@ describe('WTLibs.on-chain-data.Organization', () => {
   describe('getWindingTreeApi', () => {
     it('should return any wt api it finds wrapped into storagepointer', async () => {
       const libs = WtJsLibs.createInstance(testedDataModel.withDataSource());
-      const directory = libs.getDirectory('hotels', testedDataModel.directoryAddress);
+      const entrypoint = libs.getEntrypoint(testedDataModel.entrypointAddress);
+      const directory = await entrypoint.getSegmentDirectory('hotels');
       organization = await directory.getOrganizationByIndex(1);
       const apiPointers = await organization.getWindingTreeApi();
       assert.isDefined(apiPointers.hotel);
       assert.equal(apiPointers.hotel.length, 1);
       assert.isDefined(apiPointers.airline);
-      assert.equal(apiPointers.airline.length, 0);
+      assert.equal(apiPointers.airline.length, 1);
       const hotelApi = await apiPointers.hotel[0].toPlainObject();
       assert.equal(hotelApi.contents.descriptionUri.contents.name, 'First hotel');
+      const airlineApi = await apiPointers.airline[0].toPlainObject();
+      assert.equal(airlineApi.contents.descriptionUri.contents.name, 'First airline');
     });
   });
 });

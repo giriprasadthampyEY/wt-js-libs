@@ -3,7 +3,7 @@ import StoragePointer from './storage-pointer';
 import { SmartContractInstantiationError } from './errors';
 
 /**
- * Wrapper class for a an organization backed by a smart contract on
+ * Wrapper class for an organization backed by a smart contract on
  * Ethereum that's holding `orgJsonUri` pointer to its data.
  *
  * This is meant as a read only wrapper.
@@ -14,7 +14,7 @@ import { SmartContractInstantiationError } from './errors';
  * are dealt with in StoragePointer.
  *
  */
-class OnChainOrganization {
+export class OnChainOrganization {
   constructor (web3Utils, web3Contracts, address) {
     this.address = address;
     this.web3Utils = web3Utils;

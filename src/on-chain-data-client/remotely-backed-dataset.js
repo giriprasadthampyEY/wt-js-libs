@@ -26,7 +26,7 @@ import { RemoteDataAccessError, RemoteDataReadError } from './errors';
  * remote storage. These calls are deduplicated, so if a single call is used
  * to update multiple properties, only once call is done.
  */
-class RemotelyBackedDataset {
+export class RemotelyBackedDataset {
   /**
    * Generic factory method.
    */

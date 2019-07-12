@@ -2,6 +2,10 @@ import { WTLibsError } from '../errors';
 import { InputDataError, OrganizationNotFoundError, OrganizationNotInstantiableError } from './errors';
 import OnChainOrganization from './organization';
 
+/**
+ * Wrapper class for a SegmentDirectory smart contract. Allows you to
+ * add and remove organizations from this directory.
+ */
 export class SegmentDirectory {
   static createInstance (address, web3Utils, web3Contracts) {
     return new SegmentDirectory(address, web3Utils, web3Contracts);
