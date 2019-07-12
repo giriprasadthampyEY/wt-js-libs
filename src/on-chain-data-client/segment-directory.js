@@ -152,7 +152,7 @@ export class SegmentDirectory {
   async getOrganizations () {
     const directory = await this._getDeployedDirectory();
     const orgAddressList = await directory.methods.getOrganizations().call();
-    let getOrgDetails = orgAddressList
+    const getOrgDetails = orgAddressList
       // Filtering null addresses beforehand improves efficiency
       .filter((addr) => !this.web3Utils.isZeroAddress(addr))
       .map((addr) => {

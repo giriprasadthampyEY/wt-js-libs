@@ -89,7 +89,7 @@ export class StoragePointer {
     const uniqueFields = {};
     children = children || {};
 
-    for (let fieldName in children) {
+    for (const fieldName in children) {
       if (uniqueFields[fieldName.toLowerCase()]) {
         throw new StoragePointerError('Cannot create instance: Conflict in field names.');
       }
@@ -167,7 +167,7 @@ export class StoragePointer {
    */
   _initFromStorage (data) {
     this._data = cloneDeep(data); // Copy data to avoid issues with mutability.
-    for (let fieldName in this._children) {
+    for (const fieldName in this._children) {
       const fieldData = this._data[fieldName],
         fieldDef = this._children[fieldName],
         expectedType = fieldDef.nested ? 'object' : 'string';
@@ -186,7 +186,7 @@ export class StoragePointer {
           throw new StoragePointerError(`Cannot access field '${fieldName}'. Nested pointer cannot be an Array.`);
         } else {
           const pointers = {};
-          for (let key of Object.keys(fieldData)) {
+          for (const key of Object.keys(fieldData)) {
             if (typeof fieldData[key] !== 'string') {
               throw new StoragePointerError(`Cannot access field '${fieldName}.${key}' which does not appear to be of type string.`);
             }
@@ -199,7 +199,7 @@ export class StoragePointer {
           this._data[fieldName] = [];
           for (let i = 0; i < fieldData.length; i++) {
             this._data[fieldName].push(fieldData[i]);
-            for (let refName in fieldDef.children) {
+            for (const refName in fieldDef.children) {
               if (!fieldData[i][refName].ref || !fieldData[i][refName].contents) {
                 this._data[fieldName][i][refName] = StoragePointer.createInstance(fieldData[i][refName], fieldDef.children[refName].children);
               }
@@ -294,9 +294,9 @@ export class StoragePointer {
     await this._downloadFromStorage();
     let result = {};
     // Prepare subtrees that will possibly be resolved later by splitting the dot notation.
-    let currentFieldDef = {};
+    const currentFieldDef = {};
     if (resolvedFields) {
-      for (let field of resolvedFields) {
+      for (const field of resolvedFields) {
         let currentLevelName, remainingPath;
         if (field.indexOf('.') === -1) {
           currentLevelName = field;
@@ -316,13 +316,14 @@ export class StoragePointer {
     }
 
     // Put everything together
-    let contents = await this.contents;
+    const contents = await this.contents;
     if (Array.isArray(contents)) {
       result = contents;
     } else {
-      for (let fieldName in this._data) {
+      for (const fieldName in this._data) {
         if (!this._children || !this._children[fieldName]) {
           // Do not fabricate undefined fields if they are actually missing in the source data
+          // eslint-disable-next-line no-prototype-builtins
           if (this._data && this._data.hasOwnProperty(fieldName)) {
             result[fieldName] = contents[fieldName];
           }
@@ -330,12 +331,13 @@ export class StoragePointer {
         }
 
         // Check if the user wants to resolve the child StoragePointer;
+        // eslint-disable-next-line no-prototype-builtins
         const resolve = (!resolvedFields && depth > 0) || currentFieldDef.hasOwnProperty(fieldName),
           nested = this._children && this._children[fieldName].nested;
 
         if (nested) {
           result[fieldName] = {};
-          for (let key of Object.keys(contents[fieldName])) {
+          for (const key of Object.keys(contents[fieldName])) {
             if (resolve && depth > 1) {
               result[fieldName][key] = await contents[fieldName][key].toPlainObject(currentFieldDef[fieldName], depth - 2);
             } else {
@@ -348,7 +350,7 @@ export class StoragePointer {
               result[fieldName] = [];
               for (let i = 0; i < contents[fieldName].length; i++) {
                 result[fieldName].push(contents[fieldName][i]);
-                for (let key of Object.keys(contents[fieldName][i])) {
+                for (const key of Object.keys(contents[fieldName][i])) {
                   if (contents[fieldName][i][key].toPlainObject && depth > 1) {
                     result[fieldName][i][key] = await contents[fieldName][i][key].toPlainObject(currentFieldDef[fieldName], depth - 2);
                   }

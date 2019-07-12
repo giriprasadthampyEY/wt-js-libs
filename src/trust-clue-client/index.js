@@ -22,10 +22,10 @@ export class TrustClueClient {
    */
   static createInstance (options) {
     options = options || {};
-    let clues = {};
+    const clues = {};
     // Convert all trust clue names to lowercase.
-    for (let key of Object.keys(options.clues || {})) {
-      let normalizedKey = key.toLowerCase();
+    for (const key of Object.keys(options.clues || {})) {
+      const normalizedKey = key.toLowerCase();
       if (clues[normalizedKey]) {
         throw new TrustClueConfigurationError(`Clue declared twice: ${normalizedKey}`);
       }
@@ -85,7 +85,7 @@ export class TrustClueClient {
    * `{name: clue-name, value: value, error: error message}`
    */
   async getAllValues (address) {
-    let promises = [];
+    const promises = [];
     for (let i = 0; i < this.clueNameList.length; i++) {
       const getClueValue = this.getClue(this.clueNameList[i])
         .then((clue) => {
@@ -112,7 +112,7 @@ export class TrustClueClient {
    * `{name: clue-name, value: value, error: error message}`
    */
   async interpretAllValues (address) {
-    let promises = [];
+    const promises = [];
     for (let i = 0; i < this.clueNameList.length; i++) {
       const getClueValue = this.getClue(this.clueNameList[i])
         .then((clue) => {
@@ -157,8 +157,8 @@ export class TrustClueClient {
     }
     if (!verificationFn) {
       verificationFn = (_actualSigner) => {
-        let data = JSON.parse(serializedData);
-        let expectedSigner = data.signer;
+        const data = JSON.parse(serializedData);
+        const expectedSigner = data.signer;
         if (Web3Utils.toChecksumAddress(expectedSigner) !== _actualSigner) {
           throw new TrustClueRuntimeError(`Expected signer '${expectedSigner}' does not match the recovered one '${_actualSigner}'`);
         }

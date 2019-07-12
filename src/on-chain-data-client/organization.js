@@ -135,7 +135,7 @@ export class OnChainOrganization {
   async toPlainObject (resolvedFields, depth) {
     const orgJson = await this.orgJson;
     const offChainData = await orgJson.toPlainObject(resolvedFields, depth);
-    let result = {
+    const result = {
       owner: await this.owner,
       associatedKeys: await this.associatedKeys,
       address: this.address,
@@ -149,7 +149,7 @@ export class OnChainOrganization {
       hotel: [],
       airline: [],
     };
-    for (let segment of ['hotel', 'airline']) {
+    for (const segment of ['hotel', 'airline']) {
       const data = (await this.toPlainObject([`orgJsonUri.${segment}`])).orgJsonUri.contents[segment];
       if (data && data.apis) {
         data.apis

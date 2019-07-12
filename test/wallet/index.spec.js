@@ -434,7 +434,7 @@ describe('WTLibs.Wallet', () => {
     });
 
     it('should sign the data', async () => {
-      let serializedData = JSON.stringify({
+      const serializedData = JSON.stringify({
         city: 'Islamabad',
         country: 'Pakistan',
         signer: wallet.getAddress(),

@@ -10,8 +10,11 @@ import Organization from './organization';
  */
 export class OnChainDataClient {
   static entrypoints;
+
   static options;
+
   static web3Utils;
+
   static web3Contracts;
 
   /**
@@ -64,9 +67,9 @@ export class OnChainDataClient {
    * metrics.
    */
   static async getTransactionsStatus (txHashes) {
-    let receiptsPromises = [];
-    let txDataPromises = [];
-    for (let hash of txHashes) {
+    const receiptsPromises = [];
+    const txDataPromises = [];
+    for (const hash of txHashes) {
       receiptsPromises.push(OnChainDataClient.web3Utils.getTransactionReceipt(hash));
       txDataPromises.push(OnChainDataClient.web3Utils.getTransaction(hash));
     }
@@ -74,11 +77,11 @@ export class OnChainDataClient {
     const receipts = await Promise.all(receiptsPromises);
     const txData = await Promise.all(txDataPromises);
 
-    let results = {};
-    for (let receipt of receipts) {
+    const results = {};
+    for (const receipt of receipts) {
       if (!receipt) { continue; }
-      let decodedLogs = OnChainDataClient.web3Contracts.decodeLogs(receipt.logs);
-      let originalTxData = txData.find((tx) => tx.hash === receipt.transactionHash);
+      const decodedLogs = OnChainDataClient.web3Contracts.decodeLogs(receipt.logs);
+      const originalTxData = txData.find((tx) => tx.hash === receipt.transactionHash);
       results[receipt.transactionHash] = {
         transactionHash: receipt.transactionHash,
         blockAge: (await currentBlockNumber) - receipt.blockNumber,

@@ -93,7 +93,7 @@ export class OrganizationFactory {
       gas: this.web3Utils.applyGasModifier(await estimate),
     };
     let resolveOrgPromise, rejectOrgPromise;
-    const orgPromise = new Promise(async (resolve, reject) => {
+    const orgPromise = new Promise((resolve, reject) => {
       resolveOrgPromise = resolve;
       rejectOrgPromise = reject;
     });
@@ -103,7 +103,7 @@ export class OrganizationFactory {
       eventCallbacks: {
         onReceipt: (receipt) => {
           try {
-            let decodedLogs = OnChainDataClient.web3Contracts.decodeLogs(receipt.logs);
+            const decodedLogs = OnChainDataClient.web3Contracts.decodeLogs(receipt.logs);
             const orgAddress = decodedLogs[1].attributes[0].value;
             const organization = UpdateableOnChainOrganization.createInstance(this.web3Utils, this.web3Contracts, orgAddress);
             resolveOrgPromise(organization);

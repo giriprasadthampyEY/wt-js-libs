@@ -164,7 +164,7 @@ describe('WTLibs.StoragePointer', () => {
       const pointer = StoragePointer.createInstance('in-memory://url', { sp: {} });
       sinon.stub(pointer, '_getOffChainDataClient').returns({
         download: sinon.stub().returns({
-          'sp': 'in-memory://point',
+          sp: 'in-memory://point',
         }),
       });
       assert.equal(pointer.ref, 'in-memory://url');
@@ -178,7 +178,7 @@ describe('WTLibs.StoragePointer', () => {
       const pointer = StoragePointer.createInstance('in-memory://url', { sp: { nested: true } });
       sinon.stub(pointer, '_getOffChainDataClient').returns({
         download: sinon.stub().returns({
-          'sp': {
+          sp: {
             key1: 'in-memory://point1',
             key2: 'in-memory://point2',
           },
@@ -219,7 +219,7 @@ describe('WTLibs.StoragePointer', () => {
         const pointer = StoragePointer.createInstance('in-memory://url', { sp: {} });
         sinon.stub(pointer, '_getOffChainDataClient').returns({
           download: sinon.stub().returns({
-            'sp': { some: 'field' },
+            sp: { some: 'field' },
           }),
         });
         await pointer.contents;
@@ -234,7 +234,7 @@ describe('WTLibs.StoragePointer', () => {
         const pointer = StoragePointer.createInstance('in-memory://url', { sp: { nested: true } });
         sinon.stub(pointer, '_getOffChainDataClient').returns({
           download: sinon.stub().returns({
-            'sp': {
+            sp: {
               key1: { dummy: 'dummy' },
               key2: { dummy: 'dummy' },
             },
@@ -252,7 +252,7 @@ describe('WTLibs.StoragePointer', () => {
         const pointer = StoragePointer.createInstance('in-memory://url', { sp: {} });
         sinon.stub(pointer, '_getOffChainDataClient').returns({
           download: sinon.stub().returns({
-            'sp': 'random://point',
+            sp: 'random://point',
           }),
         });
         assert.equal(pointer.ref, 'in-memory://url');
@@ -497,7 +497,7 @@ describe('WTLibs.StoragePointer', () => {
       const ptr = StoragePointer.createInstance(`in-memory://${hash}`, {
         array: { children: { valueUri: { required: true } } },
       });
-      let data = await ptr.toPlainObject();
+      const data = await ptr.toPlainObject();
       assert.equal(data.contents.array[0].valueUri.contents.number, 23);
       assert.equal(data.contents.array[1].valueUri.contents.number, 42);
     });
@@ -517,13 +517,13 @@ describe('WTLibs.StoragePointer', () => {
       });
       // direct access
       assert.equal(pointer.ref, `in-memory://${outerUri}`);
-      let contents = await pointer.contents;
+      const contents = await pointer.contents;
       assert.equal(contents.bar, 'foo');
       assert.equal(contents.detail.ref, `in-memory://${innerUri}`);
       assert.equal((await contents.detail.contents).data, 'wt');
 
       // toPlainObject
-      let plainObject = await pointer.toPlainObject();
+      const plainObject = await pointer.toPlainObject();
       assert.equal(plainObject.contents.bar, 'foo');
       assert.equal(plainObject.contents.detail.contents.data, 'wt');
     });
@@ -585,7 +585,7 @@ describe('WTLibs.StoragePointer', () => {
       const ptr = StoragePointer.createInstance(`in-memory://${hash}`, {
         flightsUri: { required: false, children: { items: { children: { flightInstancesUri: { required: false } } } } },
       });
-      let data = await ptr.toPlainObject();
+      const data = await ptr.toPlainObject();
       assert.equal(data.contents.flightsUri.contents.items[0].id, 'IeKeix6G');
       assert.equal(data.contents.flightsUri.contents.items[0].origin, 'PRG');
       assert.equal(data.contents.flightsUri.contents.items[0].flightInstancesUri.contents[0].id, 'IeKeix6G-1');
@@ -603,7 +603,7 @@ describe('WTLibs.StoragePointer', () => {
     it('should throw for nested pointer that contains an array', async () => {
       const hash = InMemoryAdapter.storageInstance.create({
         ten:
-          { okey: [ 'dokey', 'foo' ] },
+          { okey: ['dokey', 'foo'] },
       });
       const ptr = StoragePointer.createInstance(`in-memory://${hash}`, {
         ten: { nested: true },

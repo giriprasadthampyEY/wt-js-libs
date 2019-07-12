@@ -78,7 +78,7 @@ export class RemotelyBackedDataset {
     this._fieldKeys = Object.keys(options.fields);
 
     for (let i = 0; i < this._fieldKeys.length; i++) {
-      let fieldName = this._fieldKeys[i];
+      const fieldName = this._fieldKeys[i];
       this._fieldStates[fieldName] = 'unsynced';
       Object.defineProperty(bindTo, fieldName, {
         configurable: false,
@@ -244,7 +244,7 @@ export class RemotelyBackedDataset {
       const remoteSetter = this._options.fields[this._fieldKeys[i]].remoteSetter;
       if (remoteSetter && this._fieldStates[this._fieldKeys[i]] === 'dirty') {
         // deduplicate equal calls
-        let setterHashCode = this._hashCode(remoteSetter.toString());
+        const setterHashCode = this._hashCode(remoteSetter.toString());
         if (!remoteSettersHashCodes[setterHashCode]) {
           remoteSettersHashCodes[setterHashCode] = true;
           remoteSetters.push(remoteSetter(cloneDeep(transactionOptions)).then((result) => {

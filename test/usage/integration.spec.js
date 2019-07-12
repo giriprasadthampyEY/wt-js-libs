@@ -39,18 +39,18 @@ describe('WtJsLibs usage - hotels', () => {
     });
       // ORG.ID json
     const orgJsonUri = await jsonClient.upload({
-      'dataFormatVersion': '0.0.0',
-      'name': 'Premium hotel',
-      'hotel': {
-        'name': 'Premium hotel',
-        'apis': [
+      dataFormatVersion: '0.0.0',
+      name: 'Premium hotel',
+      hotel: {
+        name: 'Premium hotel',
+        apis: [
           {
-            'entrypoint': dataUri,
-            'format': 'windingtree',
+            entrypoint: dataUri,
+            format: 'windingtree',
           },
           {
-            'entrypoint': 'http://dummy.restapiexample.com/api/v1/employees',
-            'format': 'coolapi',
+            entrypoint: 'http://dummy.restapiexample.com/api/v1/employees',
+            format: 'coolapi',
           },
         ],
       },
@@ -117,18 +117,18 @@ describe('WtJsLibs usage - hotels', () => {
     });
       // ORG.ID json
     const orgJsonUri = await jsonClient.upload({
-      'dataFormatVersion': '0.0.0',
-      'name': 'Premium hotel',
-      'hotel': {
-        'name': 'Premium hotel',
-        'apis': [
+      dataFormatVersion: '0.0.0',
+      name: 'Premium hotel',
+      hotel: {
+        name: 'Premium hotel',
+        apis: [
           {
-            'entrypoint': dataUri,
-            'format': 'windingtree',
+            entrypoint: dataUri,
+            format: 'windingtree',
           },
           {
-            'entrypoint': 'http://dummy.restapiexample.com/api/v1/employees',
-            'format': 'coolapi',
+            entrypoint: 'http://dummy.restapiexample.com/api/v1/employees',
+            format: 'coolapi',
           },
         ],
       },
@@ -165,7 +165,7 @@ describe('WtJsLibs usage - hotels', () => {
     assert.equal((await standaloneHotel.orgJsonUri).toLowerCase(), 'https://example.com');
 
     // verify
-    let list = (await directory.getOrganizations());
+    const list = (await directory.getOrganizations());
     assert.equal(list.length, 3);
 
     // We're removing the hotel to ensure clean slate after this test is run.

@@ -9,10 +9,12 @@ class TestList {
   getMetadata () {
     return { name: 'testList', description: 'description' };
   }
+
   getValueFor (addr) {
     if (addr === 42) { return Promise.reject(new Error('fish')); }
     return Promise.resolve(`123+${addr}`);
   }
+
   interpretValueFor (addr) {
     if (addr === 42) { return Promise.reject(new Error('fish')); }
     return Promise.resolve(addr % 2);
@@ -23,9 +25,11 @@ class MyList {
   getMetadata () {
     return { name: 'myList', description: 'description' };
   }
+
   getValueFor (addr) {
     return Promise.resolve(`456+${addr}`);
   }
+
   interpretValueFor (addr) {
     return Promise.resolve(addr % 2 > 0);
   }

@@ -70,6 +70,7 @@ export class Contracts {
   async getOrganizationFactoryInstance (address) {
     return this._getInstance('organizationFactory', OrganizationFactoryMetadata.abi, address);
   }
+
   async getEntrypointInstance (address) {
     return this._getInstance('entrypoint', EntrypointMetadata.abi, address);
   }
@@ -77,8 +78,8 @@ export class Contracts {
   _initEventRegistry () {
     function generateEventSignatures (abi) {
       const events = abi.filter((m) => m.type === 'event');
-      let indexedEvents = {};
-      for (let event of events) {
+      const indexedEvents = {};
+      for (const event of events) {
         // kudos https://github.com/ConsenSys/abi-decoder/blob/master/index.js#L19
         const signature = Web3Utils.sha3(event.name + '(' + event.inputs.map(function (input) { return input.type; }).join(',') + ')');
         indexedEvents[signature] = event;
@@ -107,7 +108,7 @@ export class Contracts {
   decodeLogs (logs) {
     const result = [];
     const eventRegistry = this._initEventRegistry();
-    for (let log of logs) {
+    for (const log of logs) {
       if (log.topics && log.topics[0] && eventRegistry[log.topics[0]]) {
         const eventAbi = eventRegistry[log.topics[0]];
         let topics = log.topics;
@@ -116,7 +117,7 @@ export class Contracts {
           topics = log.topics.slice(1);
         }
         const decoded = this.web3Eth.abi.decodeLog(eventAbi.inputs, log.data, topics);
-        let parsedAttributes = eventAbi.inputs.map((input) => {
+        const parsedAttributes = eventAbi.inputs.map((input) => {
           return {
             name: input.name,
             type: input.type,

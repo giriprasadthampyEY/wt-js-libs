@@ -20,7 +20,7 @@ export const Web3UriBackedDataModel = {
   entrypointAddress: '0x13a3381f7239909601b177e29739C442B8e858Fe',
 };
 
-for (let key in offChainData) {
+for (const key in offChainData) {
   InMemoryAdapter.storageInstance.update(key, offChainData[key]);
 }
 

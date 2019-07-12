@@ -140,7 +140,7 @@ export class Wallet {
     }
     try {
       const signedTx = await this._account.signTransaction(transactionData);
-      return new Promise(async (resolve, reject) => {
+      return new Promise((resolve, reject) => {
         return this.web3Eth.sendSignedTransaction(signedTx.rawTransaction)
           .on('transactionHash', (hash) => {
             if (eventCallbacks && eventCallbacks.onTransactionHash) {
