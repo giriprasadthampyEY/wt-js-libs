@@ -42,6 +42,11 @@ export class OnChainOrganization {
             return (await this._getContractInstance()).methods.getOrgJsonUri().call();
           },
         },
+        _orgJsonHash: {
+          remoteGetter: async () => {
+            return (await this._getContractInstance()).methods.getOrgJsonHash().call();
+          },
+        },
         _owner: {
           remoteGetter: async () => {
             return (await this._getContractInstance()).methods.owner().call();
@@ -83,6 +88,16 @@ export class OnChainOrganization {
     return (async () => {
       const orgJsonUri = await this._orgJsonUri;
       return orgJsonUri;
+    })();
+  }
+
+  get orgJsonHash () {
+    if (!this._initialized) {
+      return;
+    }
+    return (async () => {
+      const orgJsonHash = await this._orgJsonHash;
+      return orgJsonHash;
     })();
   }
 
@@ -134,12 +149,13 @@ export class OnChainOrganization {
    */
   async toPlainObject (resolvedFields, depth) {
     const orgJson = await this.orgJson;
-    const offChainData = await orgJson.toPlainObject(resolvedFields, depth);
+    const offChainData = orgJson.toPlainObject(resolvedFields, depth);
     const result = {
       owner: await this.owner,
       associatedKeys: await this.associatedKeys,
       address: this.address,
-      orgJsonUri: offChainData,
+      orgJsonUri: await offChainData,
+      orgJsonHash: await this.orgJsonHash,
     };
     return result;
   }

@@ -6,7 +6,7 @@ import OnChainOrganization from '../../src/on-chain-data-client/organization';
 import { WtJsLibs } from '../../src/index';
 
 describe('WTLibs.on-chain-data.Organization', () => {
-  let contractsStub, utilsStub, urlStub, ownerStub, associatedKeysStub, hasAssociatedKeyStub;
+  let contractsStub, utilsStub, urlStub, hashStub, ownerStub, associatedKeysStub, hasAssociatedKeyStub;
   let organization;
 
   beforeEach(() => {
@@ -16,6 +16,7 @@ describe('WTLibs.on-chain-data.Organization', () => {
       determineCurrentAddressNonce: sinon.stub().resolves(3),
     };
     urlStub = helpers.stubContractMethodResult('some-remote-url');
+    hashStub = helpers.stubContractMethodResult('hash');
     ownerStub = helpers.stubContractMethodResult('some-remote-owner');
     associatedKeysStub = helpers.stubContractMethodResult(['addr', 'addr2']);
     hasAssociatedKeyStub = helpers.stubContractMethodResult(true);
@@ -23,6 +24,7 @@ describe('WTLibs.on-chain-data.Organization', () => {
       getOrganizationInstance: sinon.stub().resolves({
         methods: {
           getOrgJsonUri: urlStub,
+          getOrgJsonHash: hashStub,
           owner: ownerStub,
           getAssociatedKeys: associatedKeysStub,
           hasAssociatedKey: hasAssociatedKeyStub,
@@ -33,13 +35,15 @@ describe('WTLibs.on-chain-data.Organization', () => {
   });
 
   describe('initialize', () => {
-    it('should setup orgJsonUri, owner and associatedKeys fields', () => {
+    it('should setup orgJsonUri, orgJsonHash, owner and associatedKeys fields', () => {
       const provider = new OnChainOrganization(utilsStub, contractsStub);
       assert.isUndefined(provider.orgJsonUri);
+      assert.isUndefined(provider.orgJsonHash);
       assert.isUndefined(provider.owner);
       assert.isUndefined(provider.associatedKeys);
       provider.initialize();
       assert.isDefined(provider.orgJsonUri);
+      assert.isDefined(provider.orgJsonHash);
       assert.isDefined(provider.owner);
       assert.isDefined(provider.associatedKeys);
       assert.isFalse(provider.onChainDataset.isDeployed());
@@ -56,6 +60,11 @@ describe('WTLibs.on-chain-data.Organization', () => {
     it('should return orgJsonUri', async () => {
       assert.equal(await organization.orgJsonUri, 'some-remote-url');
       assert.equal(urlStub().call.callCount, 1);
+    });
+
+    it('should return orgJsonHash', async () => {
+      assert.equal(await organization.orgJsonHash, 'hash');
+      assert.equal(hashStub().call.callCount, 1);
     });
 
     it('should return owner', async () => {
@@ -94,6 +103,7 @@ describe('WTLibs.on-chain-data.Organization', () => {
       assert.isDefined(plainOrg.address);
       assert.equal(plainOrg.orgJsonUri.ref, 'in-memory://hotel-one');
       assert.isDefined(plainOrg.orgJsonUri.contents);
+      assert.isDefined(plainOrg.orgJsonHash);
       assert.equal(plainOrg.orgJsonUri.contents.name, 'organization-one');
     });
   });

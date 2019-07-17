@@ -7,7 +7,8 @@ import { InputDataError, SmartContractInstantiationError } from '../../src/on-ch
 
 describe('WTLibs.on-chain-data.UpdateableOrganization', () => {
   const validUri = 'schema://new-url';
-  let contractsStub, utilsStub, urlStub, ownerStub, associatedKeysStub, hasAssociatedKeyStub,
+  const validHash = '0xd1e15bcea4bbf5fa55e36bb5aa9ad5183a4acdc1b06a0f21f3dba8868dee2c99';
+  let contractsStub, utilsStub, urlStub, hashStub, ownerStub, associatedKeysStub, hasAssociatedKeyStub,
     transferOwnershipStub, changeOrgJsonUriStub;
   let organization;
 
@@ -18,6 +19,7 @@ describe('WTLibs.on-chain-data.UpdateableOrganization', () => {
       determineCurrentAddressNonce: sinon.stub().resolves(3),
     };
     urlStub = helpers.stubContractMethodResult('some-remote-url');
+    hashStub = helpers.stubContractMethodResult('hash');
     ownerStub = helpers.stubContractMethodResult('some-remote-owner');
     associatedKeysStub = helpers.stubContractMethodResult(['addr', 'addr2']);
     hasAssociatedKeyStub = helpers.stubContractMethodResult(true);
@@ -27,6 +29,7 @@ describe('WTLibs.on-chain-data.UpdateableOrganization', () => {
       getUpdateableOrganizationInstance: sinon.stub().resolves({
         methods: {
           getOrgJsonUri: urlStub,
+          getOrgJsonHash: hashStub,
           owner: ownerStub,
           getAssociatedKeys: associatedKeysStub,
           hasAssociatedKey: hasAssociatedKeyStub,
@@ -39,13 +42,15 @@ describe('WTLibs.on-chain-data.UpdateableOrganization', () => {
   });
 
   describe('initialize', () => {
-    it('should setup orgJsonUri, owner and associatedKeys fields', () => {
+    it('should setup orgJsonUri, orgJsonHash, owner and associatedKeys fields', () => {
       organization = new UpdateableOnChainOrganization(utilsStub, contractsStub);
       assert.isUndefined(organization.orgJsonUri);
+      assert.isUndefined(organization.orgJsonHash);
       assert.isUndefined(organization.owner);
       assert.isUndefined(organization.associatedKeys);
       organization.initialize();
       assert.isDefined(organization.orgJsonUri);
+      assert.isDefined(organization.orgJsonHash);
       assert.isDefined(organization.owner);
       assert.isDefined(organization.associatedKeys);
       assert.isFalse(organization.onChainDataset.isDeployed());
@@ -62,6 +67,11 @@ describe('WTLibs.on-chain-data.UpdateableOrganization', () => {
     it('should return orgJsonUri', async () => {
       assert.equal(await organization.orgJsonUri, 'some-remote-url');
       assert.equal(urlStub().call.callCount, 1);
+    });
+
+    it('should return orgJsonHash', async () => {
+      assert.equal(await organization.orgJsonHash, 'hash');
+      assert.equal(hashStub().call.callCount, 1);
     });
 
     it('should return owner', async () => {
@@ -114,6 +124,33 @@ describe('WTLibs.on-chain-data.UpdateableOrganization', () => {
       await organization.setLocalData({ orgJsonUri: 'bzz-raw://valid-url' });
       assert.equal(await organization.orgJsonUri, 'bzz-raw://valid-url');
     });
+
+    it('should set orgJsonHash', async () => {
+      await organization.setLocalData({ orgJsonHash: validHash });
+      assert.equal(await organization.orgJsonHash, validHash);
+      await organization.setLocalData({ orgJsonHash: '0xd1e15bcea4bbf5fa55e36bb5aa9ad5183a4acdc1b06a0f21f3dba8868dee2c98' });
+      assert.equal(await organization.orgJsonHash, '0xd1e15bcea4bbf5fa55e36bb5aa9ad5183a4acdc1b06a0f21f3dba8868dee2c98');
+    });
+
+    it('should never null orgJsonHash', async () => {
+      await organization.setLocalData({ orgJsonHash: validHash });
+      assert.equal(await organization.orgJsonHash, validHash);
+      await organization.setLocalData({ orgJsonHash: null });
+      assert.equal(await organization.orgJsonHash, validHash);
+    });
+
+    it('should never set invalid orgJsonHash', async () => {
+      try {
+        await organization.setLocalData({ orgJsonHash: validHash });
+        assert.equal(await organization.orgJsonHash, validHash);
+        await organization.setLocalData({ orgJsonHash: 'invalid-hash' });
+        assert(false);
+      } catch (e) {
+        assert.match(e.message, /cannot update organization/i);
+        assert.match(e.message, /cannot set orgJsonHash with invalid format/i);
+        assert.instanceOf(e, InputDataError);
+      }
+    });
   });
 
   describe('setters', () => {
@@ -146,6 +183,26 @@ describe('WTLibs.on-chain-data.UpdateableOrganization', () => {
       await organization.setLocalData({ orgJsonUri: validUri });
       organization.orgJsonUri = await organization.orgJsonUri;
       assert.isNull(organization._orgJson);
+    });
+
+    it('should never null orgJsonHash', async () => {
+      try {
+        organization.orgJsonHash = null;
+        assert(false);
+      } catch (e) {
+        assert.match(e.message, /cannot set orgJsonHash when it is not provided/i);
+        assert.instanceOf(e, InputDataError);
+      }
+    });
+
+    it('should never set orgJsonHash in a bad format', async () => {
+      try {
+        organization.orgJsonHash = 'some-weird-hash that is not in prefixed hex';
+        assert(false);
+      } catch (e) {
+        assert.match(e.message, /cannot set orgJsonHash with invalid format/i);
+        assert.instanceOf(e, InputDataError);
+      }
     });
   });
 
@@ -213,6 +270,17 @@ describe('WTLibs.on-chain-data.UpdateableOrganization', () => {
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot set orgJsonUri when it is not provided/i);
+        assert.instanceOf(e, InputDataError);
+      }
+    });
+
+    it('should throw when updating hotel without orgJsonHash', async () => {
+      try {
+        organization.orgJsonHash = null;
+        await organization.updateOnChainData({});
+        assert(false);
+      } catch (e) {
+        assert.match(e.message, /cannot set orgJsonHash when it is not provided/i);
         assert.instanceOf(e, InputDataError);
       }
     });

@@ -58,6 +58,7 @@ describe('WtJsLibs usage - hotels', () => {
     const createHotel = await factory.createAndAddOrganization({
       owner: hotelOwner,
       orgJsonUri: orgJsonUri,
+      orgJsonHash: '0xd1e15bcea4bbf5fa55e36bb5aa9ad5183a4acdc1b06a0f21f3dba8868dee2c99', // TODO Fix
     }, directory.address);
     const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
     const hotel = await createHotel.organization;
@@ -136,6 +137,7 @@ describe('WtJsLibs usage - hotels', () => {
     const createHotel = await factory.createOrganization({
       owner: hotelOwner,
       orgJsonUri: orgJsonUri,
+      orgJsonHash: '0xd1e15bcea4bbf5fa55e36bb5aa9ad5183a4acdc1b06a0f21f3dba8868dee2c99', // TODO Fix
     });
     const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
     const hotel = await createHotel.organization;

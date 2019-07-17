@@ -40,6 +40,10 @@ export class OrganizationFactory {
     if (!orgJsonUri) {
       throw new InputDataError('Cannot create and add Organization: Missing orgJsonUri');
     }
+    const orgJsonHash = await orgData.orgJsonHash;
+    if (!orgJsonHash) {
+      throw new InputDataError('Cannot create and add Organization: Missing orgJsonHash');
+    }
     const orgOwner = await orgData.owner;
     if (!orgOwner) {
       throw new InputDataError('Cannot create and add Organization: Missing owner');
@@ -49,7 +53,7 @@ export class OrganizationFactory {
     }
     try {
       const directory = await this._getDeployedFactory();
-      const contractMethod = directory.methods.createAndAddToDirectory(orgData.orgJsonUri, directoryAddress);
+      const contractMethod = directory.methods.createAndAddToDirectory(orgJsonUri, orgJsonHash, directoryAddress);
       return this._callContract(contractMethod, orgOwner);
     } catch (err) {
       throw new WTLibsError(`Cannot create and add Organization: ${err.message}`, err);
@@ -60,7 +64,7 @@ export class OrganizationFactory {
    * Prepares transaction data that creates a new organization smart contract.
    *
    * @param  {Object} orgData
-   * @return {Object} Contains `transactionData`, `eventCAllbacks` useful
+   * @return {Object} Contains `transactionData`, `eventCallbacks` useful
    * in the wallet abstraction and `organization` Promise that gets fullfilled
    * once the `onReceipt` event occurs.
    */
@@ -69,13 +73,17 @@ export class OrganizationFactory {
     if (!orgJsonUri) {
       throw new InputDataError('Cannot create Organization: Missing orgJsonUri');
     }
+    const orgJsonHash = await orgData.orgJsonHash;
+    if (!orgJsonHash) {
+      throw new InputDataError('Cannot create Organization: Missing orgJsonHash');
+    }
     const orgOwner = await orgData.owner;
     if (!orgOwner) {
       throw new InputDataError('Cannot create Organization: Missing owner');
     }
     try {
       const directory = await this._getDeployedFactory();
-      const contractMethod = directory.methods.create(orgData.orgJsonUri);
+      const contractMethod = directory.methods.create(orgJsonUri, orgJsonHash);
       return this._callContract(contractMethod, orgOwner);
     } catch (err) {
       throw new WTLibsError(`Cannot create Organization: ${err.message}`, err);

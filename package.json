@@ -9,6 +9,7 @@
   },
   "scripts": {
     "lint": "eslint src test",
+    "lint:fix": "eslint src test --fix",
     "test": "rimraf coverage && ./test/utils/scripts/localtestnet.sh",
     "test:watch": "rimraf coverage && ./test/utils/scripts/localtestnet.sh --watch",
     "test-runner": "rimraf coverage && jest --coverage",

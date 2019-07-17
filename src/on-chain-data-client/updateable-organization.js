@@ -29,6 +29,12 @@ export class UpdateableOnChainOrganization extends Organization {
           },
           remoteSetter: this._editInfoOnChain.bind(this),
         },
+        _orgJsonHash: {
+          remoteGetter: async () => {
+            return (await this._getContractInstance()).methods.getOrgJsonHash().call();
+          },
+          remoteSetter: this._editInfoOnChain.bind(this),
+        },
         _owner: {
           remoteGetter: async () => {
             return (await this._getContractInstance()).methods.owner().call();
@@ -78,6 +84,16 @@ export class UpdateableOnChainOrganization extends Organization {
     })();
   }
 
+  get orgJsonHash () {
+    if (!this._initialized) {
+      return;
+    }
+    return (async () => {
+      const orgJsonHash = await this._orgJsonHash;
+      return orgJsonHash;
+    })();
+  }
+
   get owner () {
     if (!this._initialized) {
       return;
@@ -116,15 +132,34 @@ export class UpdateableOnChainOrganization extends Organization {
     this._orgJsonUri = newOrgJsonUri;
   }
 
+  set orgJsonHash (newOrgJsonHash) {
+    if (!newOrgJsonHash) {
+      throw new InputDataError(
+        'Cannot update Organization: Cannot set orgJsonHash when it is not provided'
+      );
+    }
+    if (typeof newOrgJsonHash === 'string' && !newOrgJsonHash.match(/^0x/)) {
+      throw new InputDataError(
+        'Cannot update Organization: Cannot set orgJsonHash with invalid format'
+      );
+    }
+    this._orgJsonHash = newOrgJsonHash;
+  }
+
   async setLocalData (newData) {
     const newOrgJsonUri = await newData.orgJsonUri;
     if (newOrgJsonUri) {
       this.orgJsonUri = newOrgJsonUri;
     }
+    const newOrgJsonHash = await newData.orgJsonHash;
+    if (newOrgJsonHash) {
+      this.orgJsonHash = newOrgJsonHash;
+    }
   }
 
   async _editInfoOnChain (transactionOptions) {
     const contract = await this._getContractInstance();
+    // TODO work in orgJsonHash and use the proper method based on which properties were changed
     const estimate = contract.methods.changeOrgJsonUri(await this.orgJsonUri).estimateGas({
       from: transactionOptions.from,
     });
