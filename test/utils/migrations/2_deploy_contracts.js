@@ -41,9 +41,8 @@ module.exports = async function (deployer, network, accounts) {
     });
 
     // create some 0xORGs
-    // TODO fix kecak256 content hashes
-    const firstHotelEvent = await factory.methods.create('in-memory://hotel-one', '0xd1e15bcea4bbf5fa55e36bb5aa9ad5183a4acdc1b06a0f21f3dba8868dee2c99').send({ from: accounts[2] });
-    const secondHotelEvent = await factory.methods.create('in-memory://hotel-two', '0xd1e15bcea4bbf5fa55e36bb5aa9ad5183a4acdc1b06a0f21f3dba8868dee2c99').send({ from: accounts[1] });
+    const firstHotelEvent = await factory.methods.create('in-memory://hotel-one', '0x5361c891ea9e26a0188d7d7dd05150a57fa201d51a1166aefd5c4e9cf5b63ded').send({ from: accounts[2] });
+    const secondHotelEvent = await factory.methods.create('in-memory://hotel-two', '0x2a901c3b85076981a62cefebd323271b4221c1f67675b4a097f6210ad8932489').send({ from: accounts[1] });
     const firstHotel = await Organization.at(firstHotelEvent.events.OrganizationCreated.returnValues.organization);
     const secondHotel = await Organization.at(secondHotelEvent.events.OrganizationCreated.returnValues.organization);
 
