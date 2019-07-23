@@ -122,6 +122,18 @@ export class OnChainOrganization {
   }
 
   /**
+   * Compares an actual soliditiSha3 hash of off-chain data with
+   * the hash provided in a smart contract.
+   * @return {boolean} False if hashes don't match
+   * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
+   */
+  async validateOrgJsonHash () {
+    const orgJson = await this.orgJson;
+    const hash = this.web3Utils.getSoliditySha3Hash(await orgJson.downloadRaw());
+    return hash === await this.orgJsonHash;
+  }
+
+  /**
    * Helper method that transforms the whole Organization into a sync simple
    * JavaScript object only with data properties.
    *

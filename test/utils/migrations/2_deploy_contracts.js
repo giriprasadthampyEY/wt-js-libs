@@ -41,8 +41,8 @@ module.exports = async function (deployer, network, accounts) {
     });
 
     // create some 0xORGs
-    const firstHotelEvent = await factory.methods.create('in-memory://hotel-one', '0x5361c891ea9e26a0188d7d7dd05150a57fa201d51a1166aefd5c4e9cf5b63ded').send({ from: accounts[2] });
-    const secondHotelEvent = await factory.methods.create('in-memory://hotel-two', '0x2a901c3b85076981a62cefebd323271b4221c1f67675b4a097f6210ad8932489').send({ from: accounts[1] });
+    const firstHotelEvent = await factory.methods.create('in-memory://hotel-one', '0x0ba74543cbe4a4d1178ca92702c6699de12da57ce4c9607cd1fcae6eaf28424d').send({ from: accounts[2] });
+    const secondHotelEvent = await factory.methods.create('in-memory://hotel-two', '0x558581e9d7e121d459ddb21b8c472fab22704a427d28c2d3f5304172024dc335').send({ from: accounts[1] });
     const firstHotel = await Organization.at(firstHotelEvent.events.OrganizationCreated.returnValues.organization);
     const secondHotel = await Organization.at(secondHotelEvent.events.OrganizationCreated.returnValues.organization);
 

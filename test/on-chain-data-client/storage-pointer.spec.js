@@ -159,6 +159,39 @@ describe('WTLibs.StoragePointer', () => {
     });
   });
 
+  describe('raw data downloading', () => {
+    it('should throw when the adapter throws on download', async () => {
+      const pointer = StoragePointer.createInstance('in-memory://url-1234');
+      sinon.stub(OffChainDataClient, 'getAdapter').returns({
+        downloadRaw: sinon.stub().rejects(),
+      });
+      try {
+        await pointer.downloadRaw();
+        throw new Error('should have never been called');
+      } catch (e) {
+        assert.match(e.message, /cannot download data/i);
+        assert.instanceOf(e, StoragePointerError);
+      } finally {
+        OffChainDataClient.getAdapter.restore();
+      }
+    });
+
+    it('should not cache', async () => {
+      const pointer = StoragePointer.createInstance('in-memory://url-1234');
+      const rawStub = sinon.stub().resolves('some data');
+      sinon.stub(OffChainDataClient, 'getAdapter').returns({
+        downloadRaw: rawStub,
+      });
+      let data = await pointer.downloadRaw();
+      assert.equal(data, 'some data');
+      assert.equal(rawStub.callCount, 1);
+      data = await pointer.downloadRaw();
+      assert.equal(data, 'some data');
+      assert.equal(rawStub.callCount, 2);
+      OffChainDataClient.getAdapter.restore();
+    });
+  });
+
   describe('recursion', () => {
     it('should recursively instantiate another StoragePointer', async () => {
       const pointer = StoragePointer.createInstance('in-memory://url', { sp: {} });
