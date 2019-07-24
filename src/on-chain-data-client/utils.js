@@ -68,6 +68,10 @@ export class Utils {
     return Web3Utils.checkAddressChecksum(address);
   }
 
+  getSoliditySha3Hash (data) {
+    return Web3Utils.soliditySha3(data);
+  }
+
   /**
    * Returns current number of transactions mined for given
    * Ethereum address

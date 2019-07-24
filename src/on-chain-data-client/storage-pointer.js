@@ -236,6 +236,23 @@ export class StoragePointer {
   }
 
   /**
+   * Gets the data document via `OffChainDataAdapterInterface.downloadRaw`.
+   * Does not interpret data, does not intialize internal state, does not cache.
+   * @return {string}
+   */
+  async downloadRaw () {
+    const adapter = this._getOffChainDataClient();
+    try {
+      return (await adapter.downloadRaw(this.ref)) || {};
+    } catch (err) {
+      if (err instanceof StoragePointerError) {
+        throw err;
+      }
+      throw new StoragePointerError('Cannot download data: ' + err.message, err);
+    }
+  }
+
+  /**
    * Recursively transforms the off chain stored document to a sync plain
    * javascript object. By default, traverses the whole document tree.
    *

@@ -21,7 +21,7 @@ export const Web3UriBackedDataModel = {
 };
 
 for (const key in offChainData) {
-  InMemoryAdapter.storageInstance.update(key, offChainData[key]);
+  InMemoryAdapter.storageInstance.update(key, JSON.stringify(offChainData[key]));
 }
 
 export default Web3UriBackedDataModel;

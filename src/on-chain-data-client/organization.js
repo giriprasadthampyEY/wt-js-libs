@@ -42,6 +42,11 @@ export class OnChainOrganization {
             return (await this._getContractInstance()).methods.getOrgJsonUri().call();
           },
         },
+        _orgJsonHash: {
+          remoteGetter: async () => {
+            return (await this._getContractInstance()).methods.getOrgJsonHash().call();
+          },
+        },
         _owner: {
           remoteGetter: async () => {
             return (await this._getContractInstance()).methods.owner().call();
@@ -86,6 +91,16 @@ export class OnChainOrganization {
     })();
   }
 
+  get orgJsonHash () {
+    if (!this._initialized) {
+      return;
+    }
+    return (async () => {
+      const orgJsonHash = await this._orgJsonHash;
+      return orgJsonHash;
+    })();
+  }
+
   get owner () {
     if (!this._initialized) {
       return;
@@ -104,6 +119,18 @@ export class OnChainOrganization {
       const associatedKeys = await this._associatedKeys;
       return associatedKeys;
     })();
+  }
+
+  /**
+   * Compares an actual soliditiSha3 hash of off-chain data with
+   * the hash provided in a smart contract.
+   * @return {boolean} False if hashes don't match
+   * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
+   */
+  async validateOrgJsonHash () {
+    const orgJson = await this.orgJson;
+    const hash = this.web3Utils.getSoliditySha3Hash(await orgJson.downloadRaw());
+    return hash === await this.orgJsonHash;
   }
 
   /**
@@ -134,12 +161,13 @@ export class OnChainOrganization {
    */
   async toPlainObject (resolvedFields, depth) {
     const orgJson = await this.orgJson;
-    const offChainData = await orgJson.toPlainObject(resolvedFields, depth);
+    const offChainData = orgJson.toPlainObject(resolvedFields, depth);
     const result = {
       owner: await this.owner,
       associatedKeys: await this.associatedKeys,
       address: this.address,
-      orgJsonUri: offChainData,
+      orgJsonUri: await offChainData,
+      orgJsonHash: await this.orgJsonHash,
     };
     return result;
   }

@@ -31,7 +31,7 @@ describe('WTLibs.on-chain-data.OrganizationFactory', () => {
 
   describe('create', () => {
     it('should prepare transaction data', async () => {
-      const tx = await factory.createOrganization({ owner: 'b', orgJsonUri: 'a' });
+      const tx = await factory.createOrganization({ owner: 'b', orgJsonUri: 'a', orgJsonHash: '0xd1e15bcea4bbf5fa55e36bb5aa9ad5183a4acdc1b06a0f21f3dba8868dee2c99' });
       assert.isDefined(tx.transactionData.nonce);
       assert.isDefined(tx.transactionData.data);
       assert.equal(tx.transactionData.from, 'b');
@@ -47,7 +47,7 @@ describe('WTLibs.on-chain-data.OrganizationFactory', () => {
             },
           },
         });
-        await factory.createOrganization({ owner: 'b', orgJsonUri: 'aaa' });
+        await factory.createOrganization({ owner: 'b', orgJsonUri: 'aaa', orgJsonHash: '0xd1e15bcea4bbf5fa55e36bb5aa9ad5183a4acdc1b06a0f21f3dba8868dee2c99' });
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot create organization/i);
@@ -57,9 +57,19 @@ describe('WTLibs.on-chain-data.OrganizationFactory', () => {
       }
     });
 
+    it('should throw when orgJsonHash is not provided', async () => {
+      try {
+        await factory.createOrganization({ owner: 'b', orgJsonUri: 'a' });
+        assert(false);
+      } catch (e) {
+        assert.match(e.message, /cannot create organization/i);
+        assert.instanceOf(e, InputDataError);
+      }
+    });
+
     it('should throw when orgJsonUri is not provided', async () => {
       try {
-        await factory.createOrganization({ owner: 'b' });
+        await factory.createOrganization({ owner: 'b', orgJsonHash: '0xd1e15bcea4bbf5fa55e36bb5aa9ad5183a4acdc1b06a0f21f3dba8868dee2c99' });
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot create organization/i);
@@ -69,7 +79,7 @@ describe('WTLibs.on-chain-data.OrganizationFactory', () => {
 
     it('should throw when owner is not provided', async () => {
       try {
-        await factory.createOrganization({ orgJsonUri: 'b' });
+        await factory.createOrganization({ orgJsonUri: 'b', orgJsonHash: '0xd1e15bcea4bbf5fa55e36bb5aa9ad5183a4acdc1b06a0f21f3dba8868dee2c99' });
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot create organization/i);
@@ -81,7 +91,7 @@ describe('WTLibs.on-chain-data.OrganizationFactory', () => {
   describe('createAndAdd', () => {
     it('should throw when adding org without orgJsonUri', async () => {
       try {
-        await factory.createAndAddOrganization({ owner: 'b' }, '0x8C51716A18CF4FBF12437EdC010fDBE2E51Fd934');
+        await factory.createAndAddOrganization({ owner: 'b', orgJsonHash: '0xd1e15bcea4bbf5fa55e36bb5aa9ad5183a4acdc1b06a0f21f3dba8868dee2c99' }, '0x8C51716A18CF4FBF12437EdC010fDBE2E51Fd934');
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot create and add organization/i);
@@ -89,9 +99,19 @@ describe('WTLibs.on-chain-data.OrganizationFactory', () => {
       }
     });
     
+    it('should throw when adding org without orgJsonHash', async () => {
+      try {
+        await factory.createAndAddOrganization({ owner: 'b', orgJsonUri: 'a' }, '0x8C51716A18CF4FBF12437EdC010fDBE2E51Fd934');
+        assert(false);
+      } catch (e) {
+        assert.match(e.message, /cannot create and add organization/i);
+        assert.instanceOf(e, InputDataError);
+      }
+    });
+
     it('should throw when adding org without owner', async () => {
       try {
-        await factory.createAndAddOrganization({ orgJsonUri: 'b' }, '0x8C51716A18CF4FBF12437EdC010fDBE2E51Fd934');
+        await factory.createAndAddOrganization({ orgJsonUri: 'b', orgJsonHash: '0xd1e15bcea4bbf5fa55e36bb5aa9ad5183a4acdc1b06a0f21f3dba8868dee2c99' }, '0x8C51716A18CF4FBF12437EdC010fDBE2E51Fd934');
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot create and add organization/i);
@@ -101,7 +121,7 @@ describe('WTLibs.on-chain-data.OrganizationFactory', () => {
 
     it('should throw when adding org without specifying directory address', async () => {
       try {
-        await factory.createAndAddOrganization({ owner: 'b', orgJsonUri: 'b' });
+        await factory.createAndAddOrganization({ owner: 'b', orgJsonUri: 'b', orgJsonHash: '0xd1e15bcea4bbf5fa55e36bb5aa9ad5183a4acdc1b06a0f21f3dba8868dee2c99' });
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot create and add organization/i);
@@ -118,7 +138,7 @@ describe('WTLibs.on-chain-data.OrganizationFactory', () => {
             },
           },
         });
-        await factory.createAndAddOrganization({ owner: 'b', orgJsonUri: 'aaa' }, '0x8C51716A18CF4FBF12437EdC010fDBE2E51Fd934');
+        await factory.createAndAddOrganization({ owner: 'b', orgJsonUri: 'aaa', orgJsonHash: '0xd1e15bcea4bbf5fa55e36bb5aa9ad5183a4acdc1b06a0f21f3dba8868dee2c99' }, '0x8C51716A18CF4FBF12437EdC010fDBE2E51Fd934');
         assert(false);
       } catch (e) {
         assert.match(e.message, /cannot create and add organization/i);

@@ -2,6 +2,7 @@ import { assert } from 'chai';
 import { WtJsLibs } from '../../src/index';
 import jsonWallet from '../utils/test-wallet';
 import testedDataModel from '../utils/data-hotel-model-definition';
+import web3utils from 'web3-utils';
 import OffChainDataClient from '../../src/off-chain-data-client';
 
 describe('WtJsLibs usage - hotels', () => {
@@ -38,7 +39,7 @@ describe('WtJsLibs usage - hotels', () => {
       descriptionUri: descUri,
     });
       // ORG.ID json
-    const orgJsonUri = await jsonClient.upload({
+    const orgJsonData = {
       dataFormatVersion: '0.0.0',
       name: 'Premium hotel',
       hotel: {
@@ -54,10 +55,12 @@ describe('WtJsLibs usage - hotels', () => {
           },
         ],
       },
-    });
+    };
+    const orgJsonUri = await jsonClient.upload(orgJsonData);
     const createHotel = await factory.createAndAddOrganization({
       owner: hotelOwner,
       orgJsonUri: orgJsonUri,
+      orgJsonHash: web3utils.soliditySha3(JSON.stringify(orgJsonData)),
     }, directory.address);
     const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
     const hotel = await createHotel.organization;
@@ -116,7 +119,7 @@ describe('WtJsLibs usage - hotels', () => {
       descriptionUri: descUri,
     });
       // ORG.ID json
-    const orgJsonUri = await jsonClient.upload({
+    const orgJsonData = {
       dataFormatVersion: '0.0.0',
       name: 'Premium hotel',
       hotel: {
@@ -132,10 +135,12 @@ describe('WtJsLibs usage - hotels', () => {
           },
         ],
       },
-    });
+    };
+    const orgJsonUri = await jsonClient.upload(orgJsonData);
     const createHotel = await factory.createOrganization({
       owner: hotelOwner,
       orgJsonUri: orgJsonUri,
+      orgJsonHash: web3utils.soliditySha3(JSON.stringify(orgJsonData)),
     });
     const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
     const hotel = await createHotel.organization;

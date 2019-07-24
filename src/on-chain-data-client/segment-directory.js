@@ -29,7 +29,7 @@ export class SegmentDirectory {
    * and more metadata required for sucessful mining of that transaction.
    * Does not sign or send the transaction.
    *
-   * @throws {InputDataError} When orgData does not contain orgJsonUri property.
+   * @throws {InputDataError} When orgData does not contain address property.
    * @throws {InputDataError} When orgData does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
@@ -68,7 +68,7 @@ export class SegmentDirectory {
    * and more metadata required for successful mining of that transaction.
    * Does not sign or send the transaction.
    *
-   * @throws {InputDataError} When organization does not contain orgJsonUri property.
+   * @throws {InputDataError} When organization does not contain address property.
    * @throws {InputDataError} When organization does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */

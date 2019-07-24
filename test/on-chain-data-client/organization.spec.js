@@ -6,23 +6,31 @@ import OnChainOrganization from '../../src/on-chain-data-client/organization';
 import { WtJsLibs } from '../../src/index';
 
 describe('WTLibs.on-chain-data.Organization', () => {
-  let contractsStub, utilsStub, urlStub, ownerStub, associatedKeysStub, hasAssociatedKeyStub;
+  let contractsStub, utilsStub, orgJsonStub, urlStub, hashStub, ownerStub, associatedKeysStub, hasAssociatedKeyStub;
   let organization;
 
   beforeEach(() => {
     utilsStub = {
+      getSoliditySha3Hash: sinon.stub().returns('sha3hash'),
       getCurrentWeb3Provider: sinon.stub().returns('current-provider'),
       applyGasModifier: sinon.stub().returns(12),
       determineCurrentAddressNonce: sinon.stub().resolves(3),
     };
-    urlStub = helpers.stubContractMethodResult('some-remote-url');
+    orgJsonStub = sinon.stub().resolves({
+      downloadRaw: sinon.stub().resolves(''),
+      toPlainObject: sinon.stub().resolves({}),
+    });
+    urlStub = helpers.stubContractMethodResult('in-memory://some-remote-url');
+    hashStub = helpers.stubContractMethodResult('hash');
     ownerStub = helpers.stubContractMethodResult('some-remote-owner');
     associatedKeysStub = helpers.stubContractMethodResult(['addr', 'addr2']);
     hasAssociatedKeyStub = helpers.stubContractMethodResult(true);
     contractsStub = {
       getOrganizationInstance: sinon.stub().resolves({
         methods: {
+          getOrgJson: orgJsonStub,
           getOrgJsonUri: urlStub,
+          getOrgJsonHash: hashStub,
           owner: ownerStub,
           getAssociatedKeys: associatedKeysStub,
           hasAssociatedKey: hasAssociatedKeyStub,
@@ -33,13 +41,15 @@ describe('WTLibs.on-chain-data.Organization', () => {
   });
 
   describe('initialize', () => {
-    it('should setup orgJsonUri, owner and associatedKeys fields', () => {
+    it('should setup orgJsonUri, orgJsonHash, owner and associatedKeys fields', () => {
       const provider = new OnChainOrganization(utilsStub, contractsStub);
       assert.isUndefined(provider.orgJsonUri);
+      assert.isUndefined(provider.orgJsonHash);
       assert.isUndefined(provider.owner);
       assert.isUndefined(provider.associatedKeys);
       provider.initialize();
       assert.isDefined(provider.orgJsonUri);
+      assert.isDefined(provider.orgJsonHash);
       assert.isDefined(provider.owner);
       assert.isDefined(provider.associatedKeys);
       assert.isFalse(provider.onChainDataset.isDeployed());
@@ -54,8 +64,13 @@ describe('WTLibs.on-chain-data.Organization', () => {
 
   describe('data getters', () => {
     it('should return orgJsonUri', async () => {
-      assert.equal(await organization.orgJsonUri, 'some-remote-url');
+      assert.equal(await organization.orgJsonUri, 'in-memory://some-remote-url');
       assert.equal(urlStub().call.callCount, 1);
+    });
+
+    it('should return orgJsonHash', async () => {
+      assert.equal(await organization.orgJsonHash, 'hash');
+      assert.equal(hashStub().call.callCount, 1);
     });
 
     it('should return owner', async () => {
@@ -70,7 +85,7 @@ describe('WTLibs.on-chain-data.Organization', () => {
 
     it('should return orgJson with a setup StoragePointer', async () => {
       const index = await organization.orgJson;
-      assert.equal(index.ref, 'some-remote-url');
+      assert.equal(index.ref, 'in-memory://some-remote-url');
     });
   });
 
@@ -94,6 +109,7 @@ describe('WTLibs.on-chain-data.Organization', () => {
       assert.isDefined(plainOrg.address);
       assert.equal(plainOrg.orgJsonUri.ref, 'in-memory://hotel-one');
       assert.isDefined(plainOrg.orgJsonUri.contents);
+      assert.isDefined(plainOrg.orgJsonHash);
       assert.equal(plainOrg.orgJsonUri.contents.name, 'organization-one');
     });
   });
@@ -113,6 +129,20 @@ describe('WTLibs.on-chain-data.Organization', () => {
       assert.equal(hotelApi.contents.descriptionUri.contents.name, 'First hotel');
       const airlineApi = await apiPointers.airline[0].toPlainObject();
       assert.equal(airlineApi.contents.descriptionUri.contents.name, 'First airline');
+    });
+  });
+
+  describe('validateOrgJsonHash', () => {
+    it('should return true if the published hash matches the ORG.JSON contents', async () => {
+      const libs = WtJsLibs.createInstance(testedDataModel.withDataSource());
+      const entrypoint = libs.getEntrypoint(testedDataModel.entrypointAddress);
+      const directory = await entrypoint.getSegmentDirectory('hotels');
+      organization = await directory.getOrganizationByIndex(1);
+      assert.equal(await organization.validateOrgJsonHash(), true);
+    });
+
+    it('should return false if the published hash does not match the ORG.JSON contents', async () => {
+      assert.equal(await organization.validateOrgJsonHash(), false);
     });
   });
 });

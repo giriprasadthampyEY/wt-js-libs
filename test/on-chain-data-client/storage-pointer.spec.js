@@ -159,6 +159,39 @@ describe('WTLibs.StoragePointer', () => {
     });
   });
 
+  describe('raw data downloading', () => {
+    it('should throw when the adapter throws on download', async () => {
+      const pointer = StoragePointer.createInstance('in-memory://url-1234');
+      sinon.stub(OffChainDataClient, 'getAdapter').returns({
+        downloadRaw: sinon.stub().rejects(),
+      });
+      try {
+        await pointer.downloadRaw();
+        throw new Error('should have never been called');
+      } catch (e) {
+        assert.match(e.message, /cannot download data/i);
+        assert.instanceOf(e, StoragePointerError);
+      } finally {
+        OffChainDataClient.getAdapter.restore();
+      }
+    });
+
+    it('should not cache', async () => {
+      const pointer = StoragePointer.createInstance('in-memory://url-1234');
+      const rawStub = sinon.stub().resolves('some data');
+      sinon.stub(OffChainDataClient, 'getAdapter').returns({
+        downloadRaw: rawStub,
+      });
+      let data = await pointer.downloadRaw();
+      assert.equal(data, 'some data');
+      assert.equal(rawStub.callCount, 1);
+      data = await pointer.downloadRaw();
+      assert.equal(data, 'some data');
+      assert.equal(rawStub.callCount, 2);
+      OffChainDataClient.getAdapter.restore();
+    });
+  });
+
   describe('recursion', () => {
     it('should recursively instantiate another StoragePointer', async () => {
       const pointer = StoragePointer.createInstance('in-memory://url', { sp: {} });
@@ -299,26 +332,26 @@ describe('WTLibs.StoragePointer', () => {
     let pointer, hashKey1, hashKey2, hashLevelZero, hashLevelOne, hashLevelTwo, hashLevelThree,
       topLevelArrayHash, arrayInsideHash;
     beforeAll(() => {
-      topLevelArrayHash = InMemoryAdapter.storageInstance.create([
+      topLevelArrayHash = InMemoryAdapter.storageInstance.create(JSON.stringify([
         { type: 'cat', name: 'Garfield' },
         { type: 'dog', name: 'Odie' },
         { type: 'human', name: 'Jon' },
-      ]);
-      arrayInsideHash = InMemoryAdapter.storageInstance.create({
+      ]));
+      arrayInsideHash = InMemoryAdapter.storageInstance.create(JSON.stringify({
         publisher: 'Random House',
         members: [
           { type: 'cat', name: 'Garfield' },
           { type: 'dog', name: 'Odie' },
           { type: 'human', name: 'Jon' },
         ],
-      });
-      hashKey1 = InMemoryAdapter.storageInstance.create({ value: 'value1' });
-      hashKey2 = InMemoryAdapter.storageInstance.create({ value: 'value2' });
-      hashLevelThree = InMemoryAdapter.storageInstance.create({ below: 'cows', above: 'sheep' });
-      hashLevelTwo = InMemoryAdapter.storageInstance.create({ one: 'bunny', two: 'frogs', below: `in-memory://${hashLevelThree}` });
-      hashLevelOne = InMemoryAdapter.storageInstance.create({ three: 'dogs', four: 'donkeys', five: `in-memory://${hashLevelTwo}` });
+      }));
+      hashKey1 = InMemoryAdapter.storageInstance.create(JSON.stringify({ value: 'value1' }));
+      hashKey2 = InMemoryAdapter.storageInstance.create(JSON.stringify({ value: 'value2' }));
+      hashLevelThree = InMemoryAdapter.storageInstance.create(JSON.stringify({ below: 'cows', above: 'sheep' }));
+      hashLevelTwo = InMemoryAdapter.storageInstance.create(JSON.stringify({ one: 'bunny', two: 'frogs', below: `in-memory://${hashLevelThree}` }));
+      hashLevelOne = InMemoryAdapter.storageInstance.create(JSON.stringify({ three: 'dogs', four: 'donkeys', five: `in-memory://${hashLevelTwo}` }));
 
-      hashLevelZero = InMemoryAdapter.storageInstance.create({
+      hashLevelZero = InMemoryAdapter.storageInstance.create(JSON.stringify({
         six: 'horses',
         seven: 'cats',
         eight: `in-memory://${hashLevelOne}`,
@@ -331,7 +364,7 @@ describe('WTLibs.StoragePointer', () => {
         },
         eleven: `in-memory://${topLevelArrayHash}`,
         twelve: `in-memory://${arrayInsideHash}`,
-      });
+      }));
       pointer = StoragePointer.createInstance(`in-memory://${hashLevelZero}`, {
         eight: {
           children: {
@@ -465,11 +498,11 @@ describe('WTLibs.StoragePointer', () => {
     });
 
     it('should throw for nested pointer that actually contains array', async () => {
-      const hash = InMemoryAdapter.storageInstance.create({
+      const hash = InMemoryAdapter.storageInstance.create(JSON.stringify({
         ten: [
           { okey: 'dokey' },
         ],
-      });
+      }));
       const ptr = StoragePointer.createInstance(`in-memory://${hash}`, {
         ten: { nested: true },
       });
@@ -482,18 +515,18 @@ describe('WTLibs.StoragePointer', () => {
     });
 
     it('should accept an array of objects that contain pointers', async () => {
-      const childHash1 = InMemoryAdapter.storageInstance.create({
+      const childHash1 = InMemoryAdapter.storageInstance.create(JSON.stringify({
         number: 23,
-      });
-      const childHash2 = InMemoryAdapter.storageInstance.create({
+      }));
+      const childHash2 = InMemoryAdapter.storageInstance.create(JSON.stringify({
         number: 42,
-      });
-      const hash = InMemoryAdapter.storageInstance.create({
+      }));
+      const hash = InMemoryAdapter.storageInstance.create(JSON.stringify({
         array: [
           { valueUri: `in-memory://${childHash1}` },
           { valueUri: `in-memory://${childHash2}` },
         ],
-      });
+      }));
       const ptr = StoragePointer.createInstance(`in-memory://${hash}`, {
         array: { children: { valueUri: { required: true } } },
       });
@@ -503,13 +536,13 @@ describe('WTLibs.StoragePointer', () => {
     });
 
     it('should accept recursive references, both with/without toPlainObject', async () => {
-      const innerUri = InMemoryAdapter.storageInstance.create({
+      const innerUri = InMemoryAdapter.storageInstance.create(JSON.stringify({
         data: 'wt',
-      });
-      const outerUri = InMemoryAdapter.storageInstance.create({
+      }));
+      const outerUri = InMemoryAdapter.storageInstance.create(JSON.stringify({
         detail: `in-memory://${innerUri}`,
         bar: 'foo',
-      });
+      }));
       const pointer = StoragePointer.createInstance(`in-memory://${outerUri}`, {
         detail: {
           children: {},
@@ -529,7 +562,7 @@ describe('WTLibs.StoragePointer', () => {
     });
 
     it('should work with flights and instances', async () => {
-      const flightInstancesHash = InMemoryAdapter.storageInstance.create([{
+      const flightInstancesHash = InMemoryAdapter.storageInstance.create(JSON.stringify([{
         id: 'IeKeix6G-1',
         departureDateTime: '2018-12-10 12:00:00',
         bookingClasses: [
@@ -542,8 +575,8 @@ describe('WTLibs.StoragePointer', () => {
         bookingClasses: [
           { id: 'economy', availabilityCount: 150 },
         ],
-      }]);
-      const flightsHash = InMemoryAdapter.storageInstance.create({
+      }]));
+      const flightsHash = InMemoryAdapter.storageInstance.create(JSON.stringify({
         updatedAt: '2019-01-01 12:00:00',
         items: [
           {
@@ -578,10 +611,10 @@ describe('WTLibs.StoragePointer', () => {
             flightInstancesUri: `in-memory://${flightInstancesHash}`,
           },
         ],
-      });
-      const hash = InMemoryAdapter.storageInstance.create({
+      }));
+      const hash = InMemoryAdapter.storageInstance.create(JSON.stringify({
         flightsUri: `in-memory://${flightsHash}`,
-      });
+      }));
       const ptr = StoragePointer.createInstance(`in-memory://${hash}`, {
         flightsUri: { required: false, children: { items: { children: { flightInstancesUri: { required: false } } } } },
       });
@@ -601,10 +634,10 @@ describe('WTLibs.StoragePointer', () => {
     });
 
     it('should throw for nested pointer that contains an array', async () => {
-      const hash = InMemoryAdapter.storageInstance.create({
+      const hash = InMemoryAdapter.storageInstance.create(JSON.stringify({
         ten:
           { okey: ['dokey', 'foo'] },
-      });
+      }));
       const ptr = StoragePointer.createInstance(`in-memory://${hash}`, {
         ten: { nested: true },
       });
@@ -682,14 +715,14 @@ describe('WTLibs.StoragePointer', () => {
     });
 
     it('should not report undefined for missing fields', async () => {
-      const hash = InMemoryAdapter.storageInstance.create({ six: 'horses', seven: 'cats', nine: undefined });
+      const hash = InMemoryAdapter.storageInstance.create(JSON.stringify({ six: 'horses', seven: 'cats', nine: null }));
       const pointer = StoragePointer.createInstance(`in-memory://${hash}`);
       const pojo = await pointer.toPlainObject();
       assert.property(pojo.contents, 'six');
       assert.property(pojo.contents, 'seven');
       assert.notProperty(pojo.contents, 'eight');
       assert.property(pojo.contents, 'nine');
-      assert.isUndefined(pojo.contents.nine);
+      assert.isNull(pojo.contents.nine);
     });
   });
 });
