@@ -216,6 +216,16 @@ export class RemotelyBackedDataset {
     return this._syncing;
   }
 
+  /**
+   * Returns field's current state.
+   *
+   * @param  {string} fieldName
+   * @return {string|undefined} Can be 'dirty', 'synced', 'unsynced'
+   */
+  getFieldState (fieldName) {
+    return this._fieldStates[fieldName];
+  }
+
   // https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript-jquery
   _hashCode (text) {
     var hash = 0, i, chr;

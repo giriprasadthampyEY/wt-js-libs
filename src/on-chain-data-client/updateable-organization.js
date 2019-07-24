@@ -27,13 +27,13 @@ export class UpdateableOnChainOrganization extends Organization {
           remoteGetter: async () => {
             return (await this._getContractInstance()).methods.getOrgJsonUri().call();
           },
-          remoteSetter: this._editInfoOnChain.bind(this),
+          remoteSetter: this._editOrgJsonDataOnChain('orgJsonUri', 'changeOrgJsonUri').bind(this),
         },
         _orgJsonHash: {
           remoteGetter: async () => {
             return (await this._getContractInstance()).methods.getOrgJsonHash().call();
           },
-          remoteSetter: this._editInfoOnChain.bind(this),
+          remoteSetter: this._editOrgJsonDataOnChain('orgJsonHash', 'changeOrgJsonHash').bind(this),
         },
         _owner: {
           remoteGetter: async () => {
@@ -157,25 +157,47 @@ export class UpdateableOnChainOrganization extends Organization {
     }
   }
 
-  async _editInfoOnChain (transactionOptions) {
-    const contract = await this._getContractInstance();
-    // TODO work in orgJsonHash and use the proper method based on which properties were changed
-    const estimate = contract.methods.changeOrgJsonUri(await this.orgJsonUri).estimateGas({
-      from: transactionOptions.from,
-    });
-    const txData = contract.methods.changeOrgJsonUri(await this.orgJsonUri).encodeABI({
-      from: transactionOptions.from,
-    });
-    const transactionData = {
-      nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
-      data: txData,
-      from: transactionOptions.from,
-      to: this.address,
-      gas: this.web3Utils.applyGasModifier(await estimate),
+  /**
+   * Factory for update on chain data, handles orgJsonUri and orgJsonHash.
+   * It can decide by checking onChainDataset internal's state if to use
+   * a single-field update contract method or be efficient and use only one
+   * to update both fields in a single transaction.
+   *
+   * @param  {string} field name to be updated
+   * @param  {string} base contract method name that updates that single field
+   * @return {function} function that can prepare tx data
+   */
+  _editOrgJsonDataOnChain (field, baseMethod) {
+    const update = async (contract, fieldName, baseMethodName) => {
+      if (
+        this.onChainDataset.getFieldState('_orgJsonUri') === 'dirty' &&
+        this.onChainDataset.getFieldState('_orgJsonHash') === 'dirty'
+      ) {
+        return contract.methods.changeOrgJsonUriAndHash(await this.orgJsonUri, await this.orgJsonHash);
+      }
+      return contract.methods[baseMethodName](await this[fieldName]);
     };
-    return {
-      organization: this,
-      transactionData: transactionData,
+
+    return async function (transactionOptions) {
+      const contract = await this._getContractInstance();
+      const updateMethod = await update(contract, field, baseMethod);
+      const estimate = updateMethod.estimateGas({
+        from: transactionOptions.from,
+      });
+      const txData = updateMethod.encodeABI({
+        from: transactionOptions.from,
+      });
+      const transactionData = {
+        nonce: await this.web3Utils.determineCurrentAddressNonce(transactionOptions.from),
+        data: txData,
+        from: transactionOptions.from,
+        to: this.address,
+        gas: this.web3Utils.applyGasModifier(await estimate),
+      };
+      return {
+        organization: this,
+        transactionData: transactionData,
+      };
     };
   }
 

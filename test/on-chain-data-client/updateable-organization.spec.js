@@ -9,7 +9,7 @@ describe('WTLibs.on-chain-data.UpdateableOrganization', () => {
   const validUri = 'schema://new-url';
   const validHash = '0xd1e15bcea4bbf5fa55e36bb5aa9ad5183a4acdc1b06a0f21f3dba8868dee2c99';
   let contractsStub, utilsStub, urlStub, hashStub, ownerStub, associatedKeysStub, hasAssociatedKeyStub,
-    transferOwnershipStub, changeOrgJsonUriStub;
+    transferOwnershipStub, changeOrgJsonUriStub, changeOrgJsonHashStub, changeOrgJsonUriAndHashStub;
   let organization;
 
   beforeEach(() => {
@@ -25,6 +25,8 @@ describe('WTLibs.on-chain-data.UpdateableOrganization', () => {
     hasAssociatedKeyStub = helpers.stubContractMethodResult(true);
     transferOwnershipStub = helpers.stubContractMethodResult(null);
     changeOrgJsonUriStub = helpers.stubContractMethodResult(null);
+    changeOrgJsonHashStub = helpers.stubContractMethodResult(null);
+    changeOrgJsonUriAndHashStub = helpers.stubContractMethodResult(null);
     contractsStub = {
       getUpdateableOrganizationInstance: sinon.stub().resolves({
         methods: {
@@ -35,6 +37,8 @@ describe('WTLibs.on-chain-data.UpdateableOrganization', () => {
           hasAssociatedKey: hasAssociatedKeyStub,
           transferOwnership: transferOwnershipStub,
           changeOrgJsonUri: changeOrgJsonUriStub,
+          changeOrgJsonHash: changeOrgJsonHashStub,
+          changeOrgJsonUriAndHash: changeOrgJsonUriAndHashStub,
         },
       }),
     };
@@ -263,7 +267,7 @@ describe('WTLibs.on-chain-data.UpdateableOrganization', () => {
       }
     });
 
-    it('should throw when updating hotel without orgJsonUri', async () => {
+    it('should throw when updating hotel without any data', async () => {
       try {
         organization.orgJsonUri = null;
         await organization.updateOnChainData({});
@@ -274,20 +278,38 @@ describe('WTLibs.on-chain-data.UpdateableOrganization', () => {
       }
     });
 
-    it('should throw when updating hotel without orgJsonHash', async () => {
-      try {
-        organization.orgJsonHash = null;
-        await organization.updateOnChainData({});
-        assert(false);
-      } catch (e) {
-        assert.match(e.message, /cannot set orgJsonHash when it is not provided/i);
-        assert.instanceOf(e, InputDataError);
-      }
-    });
-
-    it('should return transactions metadata', async () => {
+    it('should return single transaction metadata for orgJsonUri update', async () => {
       await organization.setLocalData({ orgJsonUri: validUri });
       const result = await organization.updateOnChainData({ from: 'xx' });
+      assert.equal(changeOrgJsonUriStub().encodeABI.callCount, 1);
+      assert.equal(changeOrgJsonHashStub().encodeABI.callCount, 0);
+      assert.equal(changeOrgJsonUriAndHashStub().encodeABI.callCount, 0);
+      assert.equal(result.length, 1);
+      assert.isDefined(result[0].transactionData);
+      assert.isDefined(result[0].organization);
+      assert.isDefined(result[0].eventCallbacks);
+      assert.isDefined(result[0].eventCallbacks.onReceipt);
+    });
+
+    it('should return single transaction metadata for orgJsonHash update', async () => {
+      await organization.setLocalData({ orgJsonHash: validHash });
+      const result = await organization.updateOnChainData({ from: 'xx' });
+      assert.equal(changeOrgJsonUriStub().encodeABI.callCount, 0);
+      assert.equal(changeOrgJsonHashStub().encodeABI.callCount, 1);
+      assert.equal(changeOrgJsonUriAndHashStub().encodeABI.callCount, 0);
+      assert.equal(result.length, 1);
+      assert.isDefined(result[0].transactionData);
+      assert.isDefined(result[0].organization);
+      assert.isDefined(result[0].eventCallbacks);
+      assert.isDefined(result[0].eventCallbacks.onReceipt);
+    });
+
+    it('should return single transaction metadata for orgJsonHash and orgJsonUri update', async () => {
+      await organization.setLocalData({ orgJsonUri: validUri, orgJsonHash: validHash });
+      const result = await organization.updateOnChainData({ from: 'xx' });
+      assert.equal(changeOrgJsonUriStub().encodeABI.callCount, 0);
+      assert.equal(changeOrgJsonHashStub().encodeABI.callCount, 0);
+      assert.equal(changeOrgJsonUriAndHashStub().encodeABI.callCount, 1);
       assert.equal(result.length, 1);
       assert.isDefined(result[0].transactionData);
       assert.isDefined(result[0].organization);
