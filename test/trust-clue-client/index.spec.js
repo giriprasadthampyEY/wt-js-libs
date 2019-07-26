@@ -186,11 +186,11 @@ describe('WTLibs.TrustClueClient', () => {
       signature = signingResult.signature;
     });
 
-    it('should not throw if everything goes well with default verificationFn', () => {
-      client.verifySignedData(serializedData, signature);
+    it('should not throw if everything goes well with default verificationFn', async () => {
+      return client.verifySignedData(serializedData, signature);
     });
 
-    it('should not fail when address in signer field is not checksummed and no custom verificationFn is used', () => {
+    it('should not fail when address in signer field is not checksummed and no custom verificationFn is used', async () => {
       const myData = {
         signer: '0xd39ca7d186A37BB6bf48ae8abfeb4c687dc8f906',
         data: {
@@ -200,10 +200,10 @@ describe('WTLibs.TrustClueClient', () => {
       };
       const serializedData = JSON.stringify(myData);
       const signingResult = decryptedWallet.sign(serializedData);
-      client.verifySignedData(serializedData, signingResult.signature);
+      return client.verifySignedData(serializedData, signingResult.signature);
     });
 
-    it('should throw when signer field does not contain address', () => {
+    it('should throw when signer field does not contain address', async () => {
       const myData = {
         signer: 'aaaaaaaaaaaaaa',
         data: {
@@ -214,20 +214,20 @@ describe('WTLibs.TrustClueClient', () => {
       const mySerializedData = JSON.stringify(myData);
       const signingResult = decryptedWallet.sign(mySerializedData);
       try {
-        client.verifySignedData(mySerializedData, signingResult.signature);
+        await client.verifySignedData(mySerializedData, signingResult.signature);
       } catch (e) {
         assert.match(e.message, /ethereum address/i);
         assert.instanceOf(e, TrustClueRuntimeError);
       }
     });
 
-    it('should call custom verificationFn', () => {
+    it('should call custom verificationFn', async () => {
       const verificationFn = sinon.stub().returns(true);
-      client.verifySignedData(serializedData, signature, verificationFn);
+      await client.verifySignedData(serializedData, signature, verificationFn);
       assert.equal(verificationFn.callCount, 1);
       const throwingVerificationFn = sinon.stub().throws(new Error('random error'));
       try {
-        client.verifySignedData(serializedData, signature, throwingVerificationFn);
+        await client.verifySignedData(serializedData, signature, throwingVerificationFn);
         assert(false);
       } catch (e) {
         assert.equal(throwingVerificationFn.callCount, 1);
@@ -235,9 +235,23 @@ describe('WTLibs.TrustClueClient', () => {
       }
     });
 
-    it('should throw when any of the required arguments is missing', () => {
+    it('should work with async custom verificationFn', async () => {
+      const verificationFn = sinon.stub().resolves(true);
+      await client.verifySignedData(serializedData, signature, verificationFn);
+      assert.equal(verificationFn.callCount, 1);
+      const throwingVerificationFn = sinon.stub().throws(new Error('random error'));
       try {
-        client.verifySignedData(undefined, signature);
+        await client.verifySignedData(serializedData, signature, throwingVerificationFn);
+        assert(false);
+      } catch (e) {
+        assert.equal(throwingVerificationFn.callCount, 1);
+        assert.match(e.message, /random error/i);
+      }
+    });
+
+    it('should throw when any of the required arguments is missing', async () => {
+      try {
+        await client.verifySignedData(undefined, signature);
         assert(false);
       } catch (e) {
         assert.match(e.message, /serializedData/i);
@@ -245,7 +259,7 @@ describe('WTLibs.TrustClueClient', () => {
       }
 
       try {
-        client.verifySignedData(serializedData, undefined);
+        await client.verifySignedData(serializedData, undefined);
         assert(false);
       } catch (e) {
         assert.match(e.message, /signature/i);
@@ -253,34 +267,34 @@ describe('WTLibs.TrustClueClient', () => {
       }
     });
 
-    it('should not accept not-hex encoded signature', () => {
+    it('should not accept not-hex encoded signature', async () => {
       try {
-        client.verifySignedData(serializedData, 'random string');
+        await client.verifySignedData(serializedData, 'random string');
       } catch (e) {
         assert.match(e.message, /signature/i);
         assert.instanceOf(e, TrustClueRuntimeError);
       }
     });
 
-    it('should fail verification when serializedData is not a valid JSON with default verification function', () => {
+    it('should fail verification when serializedData is not a valid JSON with default verification function', async () => {
       const mySerializedData = '0xd39ca7d186A37BB6bf48ae8abfeb4c687dc8f906';
       const signingResult = decryptedWallet.sign(mySerializedData);
       const mySignature = signingResult.signature;
       try {
-        client.verifySignedData(mySerializedData, mySignature);
+        await client.verifySignedData(mySerializedData, mySignature);
         assert(false);
       } catch (e) {
         assert.match(e.message, /verification function failed/i);
         assert.instanceOf(e, TrustClueRuntimeError);
       }
       try {
-        client.verifySignedData(mySerializedData, mySignature, () => {});
+        await client.verifySignedData(mySerializedData, mySignature, () => {});
       } catch (e) {
         assert(false);
       }
     });
 
-    it('should fail verification when signer field is not present with default validation function', () => {
+    it('should fail verification when signer field is not present with default validation function', async () => {
       const myData = {
         data: {
           random: 'thing',
@@ -290,7 +304,7 @@ describe('WTLibs.TrustClueClient', () => {
       const mySerializedData = JSON.stringify(myData);
       const signingResult = decryptedWallet.sign(mySerializedData);
       try {
-        client.verifySignedData(mySerializedData, signingResult.signature);
+        await client.verifySignedData(mySerializedData, signingResult.signature);
         assert(false);
       } catch (e) {
         assert.match(e.message, /verification function failed/i);
@@ -298,9 +312,9 @@ describe('WTLibs.TrustClueClient', () => {
       }
     });
 
-    it('should throw when address recovery fails', () => {
+    it('should throw when address recovery fails', async () => {
       try {
-        client.verifySignedData(serializedData, '0x');
+        await client.verifySignedData(serializedData, '0x');
         assert(false);
       } catch (e) {
         assert.match(e.message, /recovery/i);

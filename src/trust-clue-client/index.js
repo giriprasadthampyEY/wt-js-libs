@@ -147,7 +147,7 @@ export class TrustClueClient {
    * @throws {TrustClueRuntimeError} When any of arguments is missing, or the signature recovery
    * fails or the signature verification fails or any other error occurs.
    */
-  verifySignedData (serializedData, signature, verificationFn) {
+  async verifySignedData (serializedData, signature, verificationFn) {
     if (!serializedData) {
       throw new TrustClueRuntimeError('serializedData is missing.');
     }
@@ -156,7 +156,7 @@ export class TrustClueClient {
       throw new TrustClueRuntimeError('signature is either missing or not hex encoded with 0x prefix.');
     }
     if (!verificationFn) {
-      verificationFn = (_actualSigner) => {
+      verificationFn = async (_actualSigner) => {
         const data = JSON.parse(serializedData);
         const expectedSigner = data.signer;
         if (Web3Utils.toChecksumAddress(expectedSigner) !== _actualSigner) {
@@ -168,7 +168,7 @@ export class TrustClueClient {
     try {
       const actualSigner = this.web3Eth.accounts.recover(serializedData, signature);
       try {
-        verificationFn(actualSigner);
+        await verificationFn(actualSigner);
       } catch (e) {
         throw new TrustClueRuntimeError(`Verification function failed: ${e.toString()}`, e);
       }
