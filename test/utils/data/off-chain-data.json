@@ -14,6 +14,15 @@
           "format": "coolapi"
         }
       ]
+    },
+    "airline": {
+      "name": "airline one",
+      "apis": [
+        {
+          "entrypoint": "in-memory://airline-url-one",
+          "format": "windingtree"
+        }
+      ]
     }
   },
   "hotel-two": {

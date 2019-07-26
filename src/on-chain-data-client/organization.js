@@ -3,7 +3,7 @@ import StoragePointer from './storage-pointer';
 import { SmartContractInstantiationError } from './errors';
 
 /**
- * Wrapper class for a an organization backed by a smart contract on
+ * Wrapper class for an organization backed by a smart contract on
  * Ethereum that's holding `orgJsonUri` pointer to its data.
  *
  * This is meant as a read only wrapper.
@@ -14,7 +14,7 @@ import { SmartContractInstantiationError } from './errors';
  * are dealt with in StoragePointer.
  *
  */
-class OnChainOrganization {
+export class OnChainOrganization {
   constructor (web3Utils, web3Contracts, address) {
     this.address = address;
     this.web3Utils = web3Utils;
@@ -40,6 +40,11 @@ class OnChainOrganization {
         _orgJsonUri: {
           remoteGetter: async () => {
             return (await this._getContractInstance()).methods.getOrgJsonUri().call();
+          },
+        },
+        _orgJsonHash: {
+          remoteGetter: async () => {
+            return (await this._getContractInstance()).methods.getOrgJsonHash().call();
           },
         },
         _owner: {
@@ -86,6 +91,16 @@ class OnChainOrganization {
     })();
   }
 
+  get orgJsonHash () {
+    if (!this._initialized) {
+      return;
+    }
+    return (async () => {
+      const orgJsonHash = await this._orgJsonHash;
+      return orgJsonHash;
+    })();
+  }
+
   get owner () {
     if (!this._initialized) {
       return;
@@ -104,6 +119,18 @@ class OnChainOrganization {
       const associatedKeys = await this._associatedKeys;
       return associatedKeys;
     })();
+  }
+
+  /**
+   * Compares an actual soliditiSha3 hash of off-chain data with
+   * the hash provided in a smart contract.
+   * @return {boolean} False if hashes don't match
+   * @throws {StoragePointerError} when an adapter encounters an error while accessing the data
+   */
+  async validateOrgJsonHash () {
+    const orgJson = await this.orgJson;
+    const hash = this.web3Utils.getSoliditySha3Hash(await orgJson.downloadRaw());
+    return hash === await this.orgJsonHash;
   }
 
   /**
@@ -134,12 +161,13 @@ class OnChainOrganization {
    */
   async toPlainObject (resolvedFields, depth) {
     const orgJson = await this.orgJson;
-    const offChainData = await orgJson.toPlainObject(resolvedFields, depth);
-    let result = {
+    const offChainData = orgJson.toPlainObject(resolvedFields, depth);
+    const result = {
       owner: await this.owner,
       associatedKeys: await this.associatedKeys,
       address: this.address,
-      orgJsonUri: offChainData,
+      orgJsonUri: await offChainData,
+      orgJsonHash: await this.orgJsonHash,
     };
     return result;
   }
@@ -149,7 +177,7 @@ class OnChainOrganization {
       hotel: [],
       airline: [],
     };
-    for (let segment of ['hotel', 'airline']) {
+    for (const segment of ['hotel', 'airline']) {
       const data = (await this.toPlainObject([`orgJsonUri.${segment}`])).orgJsonUri.contents[segment];
       if (data && data.apis) {
         data.apis

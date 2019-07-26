@@ -2,6 +2,7 @@ import SegmentDirectoryMetadata from '@windingtree/wt-contracts/build/contracts/
 import OrganizationInterfaceMetadata from '@windingtree/wt-contracts/build/contracts/OrganizationInterface.json';
 import OrganizationMetadata from '@windingtree/wt-contracts/build/contracts/Organization.json';
 import OrganizationFactoryMetadata from '@windingtree/wt-contracts/build/contracts/AbstractOrganizationFactory.json';
+import EntrypointMetadata from '@windingtree/wt-contracts/build/contracts/WindingTreeEntrypoint.json';
 import { SmartContractInstantiationError } from './errors';
 
 import Web3Utils from 'web3-utils';
@@ -11,7 +12,7 @@ import Web3Eth from 'web3-eth';
  * Wrapper class for work with Winding Tree's Ethereum
  * smart contracts.
  */
-class Contracts {
+export class Contracts {
   /**
    * Returns an initialized instance
    *
@@ -70,11 +71,15 @@ class Contracts {
     return this._getInstance('organizationFactory', OrganizationFactoryMetadata.abi, address);
   }
 
+  async getEntrypointInstance (address) {
+    return this._getInstance('entrypoint', EntrypointMetadata.abi, address);
+  }
+
   _initEventRegistry () {
     function generateEventSignatures (abi) {
       const events = abi.filter((m) => m.type === 'event');
-      let indexedEvents = {};
-      for (let event of events) {
+      const indexedEvents = {};
+      for (const event of events) {
         // kudos https://github.com/ConsenSys/abi-decoder/blob/master/index.js#L19
         const signature = Web3Utils.sha3(event.name + '(' + event.inputs.map(function (input) { return input.type; }).join(',') + ')');
         indexedEvents[signature] = event;
@@ -87,6 +92,7 @@ class Contracts {
         generateEventSignatures(OrganizationInterfaceMetadata.abi),
         generateEventSignatures(OrganizationFactoryMetadata.abi),
         generateEventSignatures(SegmentDirectoryMetadata.abi),
+        generateEventSignatures(EntrypointMetadata.abi),
       );
     }
     return this.eventRegistry;
@@ -102,7 +108,7 @@ class Contracts {
   decodeLogs (logs) {
     const result = [];
     const eventRegistry = this._initEventRegistry();
-    for (let log of logs) {
+    for (const log of logs) {
       if (log.topics && log.topics[0] && eventRegistry[log.topics[0]]) {
         const eventAbi = eventRegistry[log.topics[0]];
         let topics = log.topics;
@@ -111,7 +117,7 @@ class Contracts {
           topics = log.topics.slice(1);
         }
         const decoded = this.web3Eth.abi.decodeLog(eventAbi.inputs, log.data, topics);
-        let parsedAttributes = eventAbi.inputs.map((input) => {
+        const parsedAttributes = eventAbi.inputs.map((input) => {
           return {
             name: input.name,
             type: input.type,

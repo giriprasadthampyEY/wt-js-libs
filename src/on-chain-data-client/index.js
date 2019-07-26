@@ -1,20 +1,20 @@
-import { AIRLINE_SEGMENT_ID, HOTEL_SEGMENT_ID } from './constants';
 import Utils from './utils';
 import Contracts from './contracts';
-import SegmentDirectory from './segment-directory';
-import OrganizationFactory from './organization-factory';
+import Entrypoint from './entrypoint';
 import UpdateableOrganization from './updateable-organization';
 import Organization from './organization';
-import { OnChainDataRuntimeError } from './errors';
 
 /**
  * A factory class used to access various on-chain data
  * represented by Winding Tree index.
  */
 export class OnChainDataClient {
-  static dataModels;
+  static entrypoints;
+
   static options;
+
   static web3Utils;
+
   static web3Contracts;
 
   /**
@@ -27,8 +27,7 @@ export class OnChainDataClient {
     if (!options.gasMargin && !options.gasCoefficient) {
       options.gasCoefficient = 2;
     }
-    OnChainDataClient.dataModels = {};
-    OnChainDataClient.factories = {};
+    OnChainDataClient.entrypoints = {};
     OnChainDataClient.options = options;
     OnChainDataClient.web3Utils = Utils.createInstance({
       gasCoefficient: OnChainDataClient.options.gasCoefficient,
@@ -38,42 +37,18 @@ export class OnChainDataClient {
   }
 
   /**
-   * Deletes options and dataModels. Useful for testing.
+   * Deletes options and entrypoints. Useful for testing.
    */
   static _reset () {
     OnChainDataClient.options = {};
-    OnChainDataClient.dataModels = {};
-    OnChainDataClient.factories = {};
+    OnChainDataClient.entrypoints = {};
   }
 
-  /**
-   * Returns a cached instance of `AbstractDataModel`
-   * for given segment
-   *
-   * @throws OnChainDataRuntimeError when an unknown segment is encountered.
-   * @param segment - allowed values are hotels and airlines
-   */
-  static getDirectory (segment, address) {
-    segment = segment && segment.toLowerCase();
-    if (OnChainDataClient.dataModels[`${segment}:${address}`]) {
-      return OnChainDataClient.dataModels[`${segment}:${address}`];
+  static getEntrypoint (address) {
+    if (!OnChainDataClient.entrypoints[address]) {
+      OnChainDataClient.entrypoints[address] = Entrypoint.createInstance(address, OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts);
     }
-    switch (segment) {
-    case HOTEL_SEGMENT_ID:
-    case AIRLINE_SEGMENT_ID:
-      OnChainDataClient.dataModels[`${segment}:${address}`] = SegmentDirectory.createInstance(address, OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts);
-      break;
-    default:
-      throw new OnChainDataRuntimeError(`Unknown segment: ${segment}`);
-    }
-    return OnChainDataClient.dataModels[`${segment}:${address}`];
-  }
-
-  static getFactory (address) {
-    if (!OnChainDataClient.factories[address]) {
-      OnChainDataClient.factories[address] = OrganizationFactory.createInstance(address, OnChainDataClient.web3Utils, OnChainDataClient.web3Contracts);
-    }
-    return OnChainDataClient.factories[address];
+    return OnChainDataClient.entrypoints[address];
   }
 
   static getUpdateableOrganization (address) {
@@ -92,9 +67,9 @@ export class OnChainDataClient {
    * metrics.
    */
   static async getTransactionsStatus (txHashes) {
-    let receiptsPromises = [];
-    let txDataPromises = [];
-    for (let hash of txHashes) {
+    const receiptsPromises = [];
+    const txDataPromises = [];
+    for (const hash of txHashes) {
       receiptsPromises.push(OnChainDataClient.web3Utils.getTransactionReceipt(hash));
       txDataPromises.push(OnChainDataClient.web3Utils.getTransaction(hash));
     }
@@ -102,11 +77,11 @@ export class OnChainDataClient {
     const receipts = await Promise.all(receiptsPromises);
     const txData = await Promise.all(txDataPromises);
 
-    let results = {};
-    for (let receipt of receipts) {
+    const results = {};
+    for (const receipt of receipts) {
       if (!receipt) { continue; }
-      let decodedLogs = OnChainDataClient.web3Contracts.decodeLogs(receipt.logs);
-      let originalTxData = txData.find((tx) => tx.hash === receipt.transactionHash);
+      const decodedLogs = OnChainDataClient.web3Contracts.decodeLogs(receipt.logs);
+      const originalTxData = txData.find((tx) => tx.hash === receipt.transactionHash);
       results[receipt.transactionHash] = {
         transactionHash: receipt.transactionHash,
         blockAge: (await currentBlockNumber) - receipt.blockNumber,

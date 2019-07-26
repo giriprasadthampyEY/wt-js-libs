@@ -5,12 +5,12 @@ import { TrustClueClient } from '../../src/trust-clue-client';
 import testedDataModel from '../utils/data-hotel-model-definition';
 
 describe('WtJsLibs usage', () => {
-  let libs,
-    // this depends on the migrations and might not work
-    minedTxHashes = [
-      '0x829e5f6dbafc36ad33712b08600ecaa2495f1a550040bc94b8fbefbe825ea46b',
-      '0x5c3c1ed9271398db1d12c911ef53ba458f24342436a0c0067645121f57998048',
-    ];
+  let libs;
+  // this depends on the migrations and might not work
+  const minedTxHashes = [
+    '0x829e5f6dbafc36ad33712b08600ecaa2495f1a550040bc94b8fbefbe825ea46b',
+    '0x5c3c1ed9271398db1d12c911ef53ba458f24342436a0c0067645121f57998048',
+  ];
 
   beforeEach(() => {
     libs = WtJsLibs.createInstance(testedDataModel.withDataSource());
@@ -18,12 +18,12 @@ describe('WtJsLibs usage', () => {
 
   describe('getTransactionsStatus', () => {
     it('should return transaction status', async () => {
-      let result = await libs.getTransactionsStatus(minedTxHashes);
+      const result = await libs.getTransactionsStatus(minedTxHashes);
       assert.isDefined(result.meta);
       assert.equal(result.meta.total, minedTxHashes.length);
       assert.equal(result.meta.processed, minedTxHashes.length);
       assert.equal(result.meta.allPassed, true);
-      for (let hash of minedTxHashes) {
+      for (const hash of minedTxHashes) {
         assert.isDefined(result.results[hash]);
         assert.isDefined(result.results[hash].transactionHash);
         assert.isDefined(result.results[hash].from);
@@ -35,7 +35,7 @@ describe('WtJsLibs usage', () => {
     });
 
     it('should return nothing if transactions do not exist', async () => {
-      let result = await libs.getTransactionsStatus(['random-tx', 'another-random-tx']);
+      const result = await libs.getTransactionsStatus(['random-tx', 'another-random-tx']);
       assert.isDefined(result.meta);
       assert.equal(result.meta.total, 2);
       assert.equal(result.meta.processed, 0);

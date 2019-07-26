@@ -3,7 +3,11 @@ import { InputDataError } from './errors';
 import UpdateableOnChainOrganization from './updateable-organization';
 import OnChainDataClient from './index';
 
-class OrganizationFactory {
+/**
+ * Wrapper for an Organization Factory smart contract. Allows you to
+ * call `create` or `createAndAddOrganization`.
+ */
+export class OrganizationFactory {
   static createInstance (factoryAddress, web3Utils, web3Contracts) {
     return new OrganizationFactory(factoryAddress, web3Utils, web3Contracts);
   }
@@ -21,10 +25,24 @@ class OrganizationFactory {
     return this.deployedFactory;
   }
 
+  /**
+   * Prepares transaction data that creates and adds the organization
+   * to the selected directory.
+   *
+   * @param  {Object} orgData
+   * @param  {string} directoryAddress
+   * @return {Object} Contains `transactionData`, `eventCAllbacks` useful
+   * in the wallet abstraction and `organization` Promise that gets fullfilled
+   * once the `onReceipt` event occurs.
+   */
   async createAndAddOrganization (orgData, directoryAddress) {
     const orgJsonUri = await orgData.orgJsonUri;
     if (!orgJsonUri) {
       throw new InputDataError('Cannot create and add Organization: Missing orgJsonUri');
+    }
+    const orgJsonHash = await orgData.orgJsonHash;
+    if (!orgJsonHash) {
+      throw new InputDataError('Cannot create and add Organization: Missing orgJsonHash');
     }
     const orgOwner = await orgData.owner;
     if (!orgOwner) {
@@ -35,17 +53,29 @@ class OrganizationFactory {
     }
     try {
       const directory = await this._getDeployedFactory();
-      const contractMethod = directory.methods.createAndAddToDirectory(orgData.orgJsonUri, directoryAddress);
+      const contractMethod = directory.methods.createAndAddToDirectory(orgJsonUri, orgJsonHash, directoryAddress);
       return this._callContract(contractMethod, orgOwner);
     } catch (err) {
       throw new WTLibsError(`Cannot create and add Organization: ${err.message}`, err);
     }
   }
 
+  /**
+   * Prepares transaction data that creates a new organization smart contract.
+   *
+   * @param  {Object} orgData
+   * @return {Object} Contains `transactionData`, `eventCallbacks` useful
+   * in the wallet abstraction and `organization` Promise that gets fullfilled
+   * once the `onReceipt` event occurs.
+   */
   async createOrganization (orgData) {
     const orgJsonUri = await orgData.orgJsonUri;
     if (!orgJsonUri) {
       throw new InputDataError('Cannot create Organization: Missing orgJsonUri');
+    }
+    const orgJsonHash = await orgData.orgJsonHash;
+    if (!orgJsonHash) {
+      throw new InputDataError('Cannot create Organization: Missing orgJsonHash');
     }
     const orgOwner = await orgData.owner;
     if (!orgOwner) {
@@ -53,7 +83,7 @@ class OrganizationFactory {
     }
     try {
       const directory = await this._getDeployedFactory();
-      const contractMethod = directory.methods.create(orgData.orgJsonUri);
+      const contractMethod = directory.methods.create(orgJsonUri, orgJsonHash);
       return this._callContract(contractMethod, orgOwner);
     } catch (err) {
       throw new WTLibsError(`Cannot create Organization: ${err.message}`, err);
@@ -71,7 +101,7 @@ class OrganizationFactory {
       gas: this.web3Utils.applyGasModifier(await estimate),
     };
     let resolveOrgPromise, rejectOrgPromise;
-    const orgPromise = new Promise(async (resolve, reject) => {
+    const orgPromise = new Promise((resolve, reject) => {
       resolveOrgPromise = resolve;
       rejectOrgPromise = reject;
     });
@@ -81,7 +111,7 @@ class OrganizationFactory {
       eventCallbacks: {
         onReceipt: (receipt) => {
           try {
-            let decodedLogs = OnChainDataClient.web3Contracts.decodeLogs(receipt.logs);
+            const decodedLogs = OnChainDataClient.web3Contracts.decodeLogs(receipt.logs);
             const orgAddress = decodedLogs[1].attributes[0].value;
             const organization = UpdateableOnChainOrganization.createInstance(this.web3Utils, this.web3Contracts, orgAddress);
             resolveOrgPromise(organization);

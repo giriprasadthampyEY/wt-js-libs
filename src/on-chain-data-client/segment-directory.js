@@ -2,6 +2,10 @@ import { WTLibsError } from '../errors';
 import { InputDataError, OrganizationNotFoundError, OrganizationNotInstantiableError } from './errors';
 import OnChainOrganization from './organization';
 
+/**
+ * Wrapper class for a SegmentDirectory smart contract. Allows you to
+ * add and remove organizations from this directory.
+ */
 export class SegmentDirectory {
   static createInstance (address, web3Utils, web3Contracts) {
     return new SegmentDirectory(address, web3Utils, web3Contracts);
@@ -25,7 +29,7 @@ export class SegmentDirectory {
    * and more metadata required for sucessful mining of that transaction.
    * Does not sign or send the transaction.
    *
-   * @throws {InputDataError} When orgData does not contain orgJsonUri property.
+   * @throws {InputDataError} When orgData does not contain address property.
    * @throws {InputDataError} When orgData does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
@@ -64,7 +68,7 @@ export class SegmentDirectory {
    * and more metadata required for successful mining of that transaction.
    * Does not sign or send the transaction.
    *
-   * @throws {InputDataError} When organization does not contain orgJsonUri property.
+   * @throws {InputDataError} When organization does not contain address property.
    * @throws {InputDataError} When organization does not contain a owner property.
    * @throws {WTLibsError} When anything goes wrong during data preparation phase.
    */
@@ -148,7 +152,7 @@ export class SegmentDirectory {
   async getOrganizations () {
     const directory = await this._getDeployedDirectory();
     const orgAddressList = await directory.methods.getOrganizations().call();
-    let getOrgDetails = orgAddressList
+    const getOrgDetails = orgAddressList
       // Filtering null addresses beforehand improves efficiency
       .filter((addr) => !this.web3Utils.isZeroAddress(addr))
       .map((addr) => {

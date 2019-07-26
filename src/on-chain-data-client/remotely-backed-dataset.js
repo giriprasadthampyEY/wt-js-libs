@@ -26,7 +26,7 @@ import { RemoteDataAccessError, RemoteDataReadError } from './errors';
  * remote storage. These calls are deduplicated, so if a single call is used
  * to update multiple properties, only once call is done.
  */
-class RemotelyBackedDataset {
+export class RemotelyBackedDataset {
   /**
    * Generic factory method.
    */
@@ -78,7 +78,7 @@ class RemotelyBackedDataset {
     this._fieldKeys = Object.keys(options.fields);
 
     for (let i = 0; i < this._fieldKeys.length; i++) {
-      let fieldName = this._fieldKeys[i];
+      const fieldName = this._fieldKeys[i];
       this._fieldStates[fieldName] = 'unsynced';
       Object.defineProperty(bindTo, fieldName, {
         configurable: false,
@@ -216,6 +216,16 @@ class RemotelyBackedDataset {
     return this._syncing;
   }
 
+  /**
+   * Returns field's current state.
+   *
+   * @param  {string} fieldName
+   * @return {string|undefined} Can be 'dirty', 'synced', 'unsynced'
+   */
+  getFieldState (fieldName) {
+    return this._fieldStates[fieldName];
+  }
+
   // https://stackoverflow.com/questions/7616461/generate-a-hash-from-string-in-javascript-jquery
   _hashCode (text) {
     var hash = 0, i, chr;
@@ -244,7 +254,7 @@ class RemotelyBackedDataset {
       const remoteSetter = this._options.fields[this._fieldKeys[i]].remoteSetter;
       if (remoteSetter && this._fieldStates[this._fieldKeys[i]] === 'dirty') {
         // deduplicate equal calls
-        let setterHashCode = this._hashCode(remoteSetter.toString());
+        const setterHashCode = this._hashCode(remoteSetter.toString());
         if (!remoteSettersHashCodes[setterHashCode]) {
           remoteSettersHashCodes[setterHashCode] = true;
           remoteSetters.push(remoteSetter(cloneDeep(transactionOptions)).then((result) => {

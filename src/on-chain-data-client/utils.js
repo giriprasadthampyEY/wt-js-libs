@@ -5,7 +5,7 @@ import Web3Utils from 'web3-utils';
  * Collection of utility methods useful during
  * communication with Ethereum network.
  */
-class Utils {
+export class Utils {
   /**
    * Returns an initialized instance
    *
@@ -66,6 +66,10 @@ class Utils {
    */
   checkAddressChecksum (address) {
     return Web3Utils.checkAddressChecksum(address);
+  }
+
+  getSoliditySha3Hash (data) {
+    return Web3Utils.soliditySha3(data);
   }
 
   /**

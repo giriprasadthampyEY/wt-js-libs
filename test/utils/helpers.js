@@ -11,20 +11,20 @@ function stubPromiEvent (sendSetup = { txHash: true, receipt: true, error: false
         callback({ some: 'receipt' }); // eslint-disable-line standard/no-callback-literal
       }
       if (evt === 'error' && sendSetup.error) {
-        let message = typeof sendSetup.error === 'string' ? sendSetup.error : 'on error handler fired';
+        const message = typeof sendSetup.error === 'string' ? sendSetup.error : 'on error handler fired';
         callback({ message: message }); // eslint-disable-line standard/no-callback-literal
       }
       return this;
     },
     catch: function (callback) {
-      let message = typeof sendSetup.catch === 'string' ? sendSetup.catch : 'send catch fired';
+      const message = typeof sendSetup.catch === 'string' ? sendSetup.catch : 'send catch fired';
       callback({ message: message }); // eslint-disable-line standard/no-callback-literal
     },
   };
 }
 
 function stubContractMethodResult (callResult, sendSetup = { txHash: true, receipt: true, error: false, catch: false }, estimatedGas = 33) {
-  let methodParams = arguments;
+  const methodParams = arguments;
   let finalCallResult = callResult;
   if (isFunction(callResult)) {
     finalCallResult = callResult({

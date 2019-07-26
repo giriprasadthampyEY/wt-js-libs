@@ -22,8 +22,8 @@ export class OffChainDataClient {
     OffChainDataClient.adapters = {};
     OffChainDataClient.options = options || {};
     // Convert all adapter keys (i.e. URL schemes) to lowercase.
-    for (let key of Object.keys(OffChainDataClient.options.adapters || {})) {
-      let normalizedKey = key.toLowerCase();
+    for (const key of Object.keys(OffChainDataClient.options.adapters || {})) {
+      const normalizedKey = key.toLowerCase();
       if (OffChainDataClient.adapters[normalizedKey]) {
         throw new OffChainDataConfigurationError(`Adapter declared twice: ${normalizedKey}`);
       }

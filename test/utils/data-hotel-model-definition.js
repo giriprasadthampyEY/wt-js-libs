@@ -17,12 +17,11 @@ export const Web3UriBackedDataModel = {
       },
     },
   }),
-  directoryAddress: '0x3f77813140ee53a99889D7E71c03D80f9F690eD4',
-  factoryAddress: '0xC0FF9Ef6071BEEBeADf5Cb40fFf84Cf40A5C3CCB',
+  entrypointAddress: '0x13a3381f7239909601b177e29739C442B8e858Fe',
 };
 
-for (let key in offChainData) {
-  InMemoryAdapter.storageInstance.update(key, offChainData[key]);
+for (const key in offChainData) {
+  InMemoryAdapter.storageInstance.update(key, JSON.stringify(offChainData[key]));
 }
 
 export default Web3UriBackedDataModel;

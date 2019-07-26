@@ -2,18 +2,20 @@ import { assert } from 'chai';
 import { WtJsLibs } from '../../src/index';
 import jsonWallet from '../utils/test-wallet';
 import testedDataModel from '../utils/data-hotel-model-definition';
+import web3utils from 'web3-utils';
 import OffChainDataClient from '../../src/off-chain-data-client';
 
 describe('WtJsLibs usage - hotels', () => {
-  let libs, wallet, directory, factory;
+  let libs, wallet, entrypoint, directory, factory;
   const hotelOwner = '0xD39Ca7d186a37bb6Bf48AE8abFeB4c687dc8F906';
   const hotelAddress = '0xBF18B616aC81830dd0C5D4b771F22FD8144fe769';
 
-  beforeEach(() => {
+  beforeEach(async () => {
     libs = WtJsLibs.createInstance(testedDataModel.withDataSource());
-    directory = libs.getDirectory('hotels', testedDataModel.directoryAddress);
     wallet = libs.createWallet(jsonWallet);
-    factory = libs.getFactory(testedDataModel.factoryAddress);
+    entrypoint = libs.getEntrypoint(testedDataModel.entrypointAddress);
+    factory = await entrypoint.getOrganizationFactory();
+    directory = await entrypoint.getSegmentDirectory('hotels');
     wallet.unlock('test123');
   });
 
@@ -37,26 +39,28 @@ describe('WtJsLibs usage - hotels', () => {
       descriptionUri: descUri,
     });
       // ORG.ID json
-    const orgJsonUri = await jsonClient.upload({
-      'dataFormatVersion': '0.0.0',
-      'name': 'Premium hotel',
-      'hotel': {
-        'name': 'Premium hotel',
-        'apis': [
+    const orgJsonData = {
+      dataFormatVersion: '0.0.0',
+      name: 'Premium hotel',
+      hotel: {
+        name: 'Premium hotel',
+        apis: [
           {
-            'entrypoint': dataUri,
-            'format': 'windingtree',
+            entrypoint: dataUri,
+            format: 'windingtree',
           },
           {
-            'entrypoint': 'http://dummy.restapiexample.com/api/v1/employees',
-            'format': 'coolapi',
+            entrypoint: 'http://dummy.restapiexample.com/api/v1/employees',
+            format: 'coolapi',
           },
         ],
       },
-    });
+    };
+    const orgJsonUri = await jsonClient.upload(orgJsonData);
     const createHotel = await factory.createAndAddOrganization({
       owner: hotelOwner,
       orgJsonUri: orgJsonUri,
+      orgJsonHash: web3utils.soliditySha3(JSON.stringify(orgJsonData)),
     }, directory.address);
     const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
     const hotel = await createHotel.organization;
@@ -115,26 +119,28 @@ describe('WtJsLibs usage - hotels', () => {
       descriptionUri: descUri,
     });
       // ORG.ID json
-    const orgJsonUri = await jsonClient.upload({
-      'dataFormatVersion': '0.0.0',
-      'name': 'Premium hotel',
-      'hotel': {
-        'name': 'Premium hotel',
-        'apis': [
+    const orgJsonData = {
+      dataFormatVersion: '0.0.0',
+      name: 'Premium hotel',
+      hotel: {
+        name: 'Premium hotel',
+        apis: [
           {
-            'entrypoint': dataUri,
-            'format': 'windingtree',
+            entrypoint: dataUri,
+            format: 'windingtree',
           },
           {
-            'entrypoint': 'http://dummy.restapiexample.com/api/v1/employees',
-            'format': 'coolapi',
+            entrypoint: 'http://dummy.restapiexample.com/api/v1/employees',
+            format: 'coolapi',
           },
         ],
       },
-    });
+    };
+    const orgJsonUri = await jsonClient.upload(orgJsonData);
     const createHotel = await factory.createOrganization({
       owner: hotelOwner,
       orgJsonUri: orgJsonUri,
+      orgJsonHash: web3utils.soliditySha3(JSON.stringify(orgJsonData)),
     });
     const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
     const hotel = await createHotel.organization;
@@ -164,7 +170,7 @@ describe('WtJsLibs usage - hotels', () => {
     assert.equal((await standaloneHotel.orgJsonUri).toLowerCase(), 'https://example.com');
 
     // verify
-    let list = (await directory.getOrganizations());
+    const list = (await directory.getOrganizations());
     assert.equal(list.length, 3);
 
     // We're removing the hotel to ensure clean slate after this test is run.
@@ -179,7 +185,7 @@ describe('WtJsLibs usage - hotels', () => {
     const associatedKeyAddress = '0x04e46F24307E4961157B986a0b653a0D88F9dBd6';
 
     it('should return true if is associatedKey', async () => {
-      const hotel = await directory.getOrganization(hotelAddress);
+      const hotel = await libs.getOrganization(hotelAddress);
       const hasAssociatedKey = await hotel.hasAssociatedKey(associatedKeyAddress, {
         from: hotelOwner,
       });
@@ -187,7 +193,7 @@ describe('WtJsLibs usage - hotels', () => {
     });
 
     it('should return true if is associatedKey whoever asks', async () => {
-      const hotel = await directory.getOrganization(hotelAddress);
+      const hotel = await libs.getOrganization(hotelAddress);
       const hasAssociatedKey = await hotel.hasAssociatedKey(associatedKeyAddress, {
         from: '0xB309875d8b24D522Ea0Ac57903c8A0b0C93C414A',
       });
@@ -195,7 +201,7 @@ describe('WtJsLibs usage - hotels', () => {
     });
 
     it('should return false if is not associatedKey', async () => {
-      const hotel = await directory.getOrganization(hotelAddress);
+      const hotel = await libs.getOrganization(hotelAddress);
       const hasAssociatedKey = await hotel.hasAssociatedKey(hotelOwner, {
         from: hotelOwner,
       });
@@ -203,11 +209,23 @@ describe('WtJsLibs usage - hotels', () => {
     });
 
     it('should return false if is not associatedKey whoever asks', async () => {
-      const hotel = await directory.getOrganization(hotelAddress);
+      const hotel = await libs.getOrganization(hotelAddress);
       const hasAssociatedKey = await hotel.hasAssociatedKey(hotelOwner, {
         from: '0xB309875d8b24D522Ea0Ac57903c8A0b0C93C414A',
       });
       assert.equal(hasAssociatedKey, false);
+    });
+  });
+
+  describe('hasAssociatedKey', () => {
+  });
+
+  describe('getSegments', () => {
+    it('should return a list of segments', async () => {
+      const segments = await entrypoint.getSegments();
+      assert.equal(segments.length, 2);
+      assert.equal(segments[0], 'airlines');
+      assert.equal(segments[1], 'hotels');
     });
   });
 });

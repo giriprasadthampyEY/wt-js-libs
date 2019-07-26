@@ -18,7 +18,8 @@ const libs = WtJsLibs.createInstance({
   offChainDataOptions: { ... },
   trustClueOptions: { ... },
 });
-const hotelDirectory = libs.getDirectory('hotels', '0x...');
+const entrypoint = libs.getEntrypoint('0x....');
+const hotelsDirectory = await entrypoint.getSegmentDirectory('hotels');
 ```
 
 ```html
@@ -54,13 +55,15 @@ const libs = window.WtJsLibs.createInstance({
     }
   },
 });
-const hotelDirectory = libs.getDirectory('hotels', '0x...');
+const entrypoint = libs.getEntrypoint('0x....');
+const hotelsDirectory = await entrypoint.getSegmentDirectory('hotels');
+const factory = await entrypoint.getOrganizationFactory();
 </script>
 ```
 
 ## Usage
 
-For more examples, see `test/usage.spec.js` file. The public interface of this library
+For more examples, see `test/usage/integration.spec.js` file. The public interface of this library
 should always be the same regardless of what kind of implementation is used
 under the hood.
 
@@ -107,7 +110,8 @@ const libs = WtJsLibs.createInstance({
 });
 
 
-const directory = libs.getDirectory('hotels', '0x...');
+const entrypoint = libs.getEntrypoint('0x....');
+const directory = await entrypoint.getSegmentDirectory('hotels');
 const hotel = await directory.getOrganization('0x...');
 
 // You can get all the off-chain data at once
@@ -134,7 +138,7 @@ const orgJsonContents = await orgJson.contents;
 wallet = libs.createWallet({/*...Your wallet in a JSON format..*/});
 wallet.unlock('with-password');
 try {
-  const factory = libs.getFactory('0x...');
+  const factory = entrypoint.getOrganizationFactory();
   const createHotel = await factory.createAndAddOrganization({
     orgJsonUri: 'https://example.com/my-hotel-data.json',
     owner: '0x...',
@@ -149,11 +153,11 @@ try {
 }
 
 // Working with airline data is very similar. Just change the segment and a few method names:
-const directory = libs.getDirectory('airlines', '0x...');
+const directory = entrypoint.getSegmentDirectory('airlines');
 const airline = await directory.getOrganization('0x...');
 
 try {
-  const factory = libs.getFactory('0x...');
+  const factory = entrypoint.getOrganizationFactory('0x...');
   const createAirline = await factory.createAndAddOrganization({
     orgJsonUri: 'https://example.com/my-airline-data.json',
     owner: '0x...',
