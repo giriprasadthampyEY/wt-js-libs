@@ -27,19 +27,19 @@ describe('WtJsLibs usage - hotels', () => {
   it('create and add, update and remove a hotel', async () => {
     const jsonClient = libs.getOffChainDataClient('in-memory');
     // hotel description
-    const descUri = await jsonClient.upload({
+    const descUri = await jsonClient.upload(JSON.stringify({
       name: 'Premium hotel',
       description: 'Great hotel',
       location: {
         latitude: 'lat',
         longitude: 'long',
       },
-    });
-    const dataUri = await jsonClient.upload({
+    }));
+    const dataUri = await jsonClient.upload(JSON.stringify({
       descriptionUri: descUri,
-    });
+    }));
       // ORG.ID json
-    const orgJsonData = {
+    const orgJsonData = JSON.stringify({
       dataFormatVersion: '0.0.0',
       name: 'Premium hotel',
       hotel: {
@@ -55,12 +55,12 @@ describe('WtJsLibs usage - hotels', () => {
           },
         ],
       },
-    };
+    });
     const orgJsonUri = await jsonClient.upload(orgJsonData);
     const createHotel = await factory.createAndAddOrganization({
       owner: hotelOwner,
       orgJsonUri: orgJsonUri,
-      orgJsonHash: web3utils.soliditySha3(JSON.stringify(orgJsonData)),
+      orgJsonHash: web3utils.soliditySha3(orgJsonData),
     }, directory.address);
     const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
     const hotel = await createHotel.organization;
@@ -107,19 +107,19 @@ describe('WtJsLibs usage - hotels', () => {
   it('should create, add, update and remove a hotel', async () => {
     const jsonClient = libs.getOffChainDataClient('in-memory');
     // hotel description
-    const descUri = await jsonClient.upload({
+    const descUri = await jsonClient.upload(JSON.stringify({
       name: 'Premium hotel',
       description: 'Great hotel',
       location: {
         latitude: 'lat',
         longitude: 'long',
       },
-    });
-    const dataUri = await jsonClient.upload({
+    }));
+    const dataUri = await jsonClient.upload(JSON.stringify({
       descriptionUri: descUri,
-    });
-      // ORG.ID json
-    const orgJsonData = {
+    }));
+    // ORG.ID json
+    const orgJsonData = JSON.stringify({
       dataFormatVersion: '0.0.0',
       name: 'Premium hotel',
       hotel: {
@@ -135,12 +135,12 @@ describe('WtJsLibs usage - hotels', () => {
           },
         ],
       },
-    };
+    });
     const orgJsonUri = await jsonClient.upload(orgJsonData);
     const createHotel = await factory.createOrganization({
       owner: hotelOwner,
       orgJsonUri: orgJsonUri,
-      orgJsonHash: web3utils.soliditySha3(JSON.stringify(orgJsonData)),
+      orgJsonHash: web3utils.soliditySha3(orgJsonData),
     });
     const result = await wallet.signAndSendTransaction(createHotel.transactionData, createHotel.eventCallbacks);
     const hotel = await createHotel.organization;

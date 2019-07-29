@@ -221,8 +221,8 @@ export class StoragePointer {
       this._downloading = (async () => {
         const adapter = this._getOffChainDataClient();
         try {
-          const data = (await adapter.download(this.ref)) || {};
-          this._initFromStorage(data);
+          const data = await adapter.download(this.ref);
+          this._initFromStorage(data ? JSON.parse(data) : {});
           this._downloaded = true;
         } catch (err) {
           if (err instanceof StoragePointerError) {
@@ -243,7 +243,9 @@ export class StoragePointer {
   async downloadRaw () {
     const adapter = this._getOffChainDataClient();
     try {
-      return (await adapter.downloadRaw(this.ref)) || {};
+      // await here to properly catch errors
+      const data = await adapter.download(this.ref);
+      return data;
     } catch (err) {
       if (err instanceof StoragePointerError) {
         throw err;
