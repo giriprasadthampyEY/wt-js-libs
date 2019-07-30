@@ -129,7 +129,11 @@ export class OnChainOrganization {
    */
   async validateOrgJsonHash () {
     const orgJson = await this.orgJson;
-    const hash = this.web3Utils.getSoliditySha3Hash(await orgJson.downloadRaw());
+    const contents = await orgJson.downloadRaw();
+    if (!contents) {
+      return false;
+    }
+    const hash = this.web3Utils.getSoliditySha3Hash(contents);
     return hash === await this.orgJsonHash;
   }
 
