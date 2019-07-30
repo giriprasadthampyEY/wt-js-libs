@@ -163,7 +163,7 @@ describe('WTLibs.StoragePointer', () => {
     it('should throw when the adapter throws on download', async () => {
       const pointer = StoragePointer.createInstance('in-memory://url-1234');
       sinon.stub(OffChainDataClient, 'getAdapter').returns({
-        downloadRaw: sinon.stub().rejects(),
+        download: sinon.stub().rejects(),
       });
       try {
         await pointer.downloadRaw();
@@ -180,7 +180,7 @@ describe('WTLibs.StoragePointer', () => {
       const pointer = StoragePointer.createInstance('in-memory://url-1234');
       const rawStub = sinon.stub().resolves('some data');
       sinon.stub(OffChainDataClient, 'getAdapter').returns({
-        downloadRaw: rawStub,
+        download: rawStub,
       });
       let data = await pointer.downloadRaw();
       assert.equal(data, 'some data');
@@ -196,9 +196,9 @@ describe('WTLibs.StoragePointer', () => {
     it('should recursively instantiate another StoragePointer', async () => {
       const pointer = StoragePointer.createInstance('in-memory://url', { sp: {} });
       sinon.stub(pointer, '_getOffChainDataClient').returns({
-        download: sinon.stub().returns({
+        download: sinon.stub().returns(JSON.stringify({
           sp: 'in-memory://point',
-        }),
+        })),
       });
       assert.equal(pointer.ref, 'in-memory://url');
       const recursivePointer = (await pointer.contents).sp;
@@ -210,12 +210,12 @@ describe('WTLibs.StoragePointer', () => {
     it('should work well with nested storage pointers', async () => {
       const pointer = StoragePointer.createInstance('in-memory://url', { sp: { nested: true } });
       sinon.stub(pointer, '_getOffChainDataClient').returns({
-        download: sinon.stub().returns({
+        download: sinon.stub().returns(JSON.stringify({
           sp: {
             key1: 'in-memory://point1',
             key2: 'in-memory://point2',
           },
-        }),
+        })),
       });
       assert.equal(pointer.ref, 'in-memory://url');
       const sp = (await pointer.contents).sp;
@@ -232,7 +232,7 @@ describe('WTLibs.StoragePointer', () => {
         sp: { required: false },
       });
       sinon.stub(pointer, '_getOffChainDataClient').returns({
-        download: sinon.stub().returns({}),
+        download: sinon.stub().returns('{}'),
       });
       await pointer.contents;
     });
@@ -251,9 +251,9 @@ describe('WTLibs.StoragePointer', () => {
       try {
         const pointer = StoragePointer.createInstance('in-memory://url', { sp: {} });
         sinon.stub(pointer, '_getOffChainDataClient').returns({
-          download: sinon.stub().returns({
+          download: sinon.stub().returns(JSON.stringify({
             sp: { some: 'field' },
-          }),
+          })),
         });
         await pointer.contents;
         throw new Error('should have never been called');
@@ -266,12 +266,12 @@ describe('WTLibs.StoragePointer', () => {
       try {
         const pointer = StoragePointer.createInstance('in-memory://url', { sp: { nested: true } });
         sinon.stub(pointer, '_getOffChainDataClient').returns({
-          download: sinon.stub().returns({
+          download: sinon.stub().returns(JSON.stringify({
             sp: {
               key1: { dummy: 'dummy' },
               key2: { dummy: 'dummy' },
             },
-          }),
+          })),
         });
         await pointer.contents;
         throw new Error('should have never been called');
@@ -284,9 +284,9 @@ describe('WTLibs.StoragePointer', () => {
       try {
         const pointer = StoragePointer.createInstance('in-memory://url', { sp: {} });
         sinon.stub(pointer, '_getOffChainDataClient').returns({
-          download: sinon.stub().returns({
+          download: sinon.stub().returns(JSON.stringify({
             sp: 'random://point',
-          }),
+          })),
         });
         assert.equal(pointer.ref, 'in-memory://url');
         const contents = await pointer.contents;

@@ -1,6 +1,6 @@
 {
   "name": "@windingtree/wt-js-libs",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "Javascript libraries to interact with the Winding Tree contracts",
   "main": "dist/cjs/wt-js-libs.js",
   "browser": "dist/umd/wt-js-libs.js",
@@ -50,7 +50,7 @@
     "@babel/polyfill": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "@babel/register": "^7.0.0",
-    "@windingtree/off-chain-adapter-in-memory": "^5.1.1",
+    "@windingtree/off-chain-adapter-in-memory": "^6.0.0",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.0",
     "babel-plugin-transform-builtin-extend": "^1.1.2",
