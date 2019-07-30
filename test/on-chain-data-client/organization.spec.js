@@ -141,7 +141,12 @@ describe('WTLibs.on-chain-data.Organization', () => {
       assert.equal(await organization.validateOrgJsonHash(), true);
     });
 
+    it('should return false if the ORG.JSON contents is unreachable', async () => {
+      assert.equal(await organization.validateOrgJsonHash(), false);
+    });
+
     it('should return false if the published hash does not match the ORG.JSON contents', async () => {
+      (await organization.orgJson).downloadRaw = sinon.stub().resolves('1234');
       assert.equal(await organization.validateOrgJsonHash(), false);
     });
   });
