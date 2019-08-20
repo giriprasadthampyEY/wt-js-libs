@@ -59,7 +59,8 @@ describe('WTLibs.Contracts', () => {
   });
 
   it('should work properly for real anonymous events', async () => {
-    const decodedLogs = await contracts.decodeLogs([{ logIndex: 0,
+    const decodedLogs = await contracts.decodeLogs([{
+      logIndex: 0,
       transactionIndex: 0,
       transactionHash: '0x6458dd74c57a4c102784eabadccfdd1fa46f0d09d96561f63aa0a92393b6cfbe',
       blockHash: '0x99546e6a42f2c9856c0c87134f85b42170302fcd4a65a96f50c71d85d4bc6d63',
@@ -70,7 +71,8 @@ describe('WTLibs.Contracts', () => {
      ['0x424a91ecdb11da88654837a0ff14d402e92593aabef26295b0a7257f44bb2b22',
        '0x0000000000000000000000000c4c734f0ecb92270d1ebe7b04aec4440eb05caa'],
       type: 'mined',
-      id: 'log_43221c70' }]
+      id: 'log_43221c70',
+    }]
     );
 
     assert.equal(decodedLogs.length, 1);
