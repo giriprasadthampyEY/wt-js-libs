@@ -117,12 +117,12 @@ export class UpdateableOnChainOrganization extends Organization {
   set orgJsonUri (newOrgJsonUri) {
     if (!newOrgJsonUri) {
       throw new InputDataError(
-        'Cannot update Organization: Cannot set orgJsonUri when it is not provided'
+        'Cannot update Organization: Cannot set orgJsonUri when it is not provided',
       );
     }
     if (typeof newOrgJsonUri === 'string' && !newOrgJsonUri.match(/([a-z-]+):\/\//)) {
       throw new InputDataError(
-        'Cannot update Organization: Cannot set orgJsonUri with invalid format'
+        'Cannot update Organization: Cannot set orgJsonUri with invalid format',
       );
     }
     if (newOrgJsonUri !== this._orgJsonUri) {
@@ -135,12 +135,12 @@ export class UpdateableOnChainOrganization extends Organization {
   set orgJsonHash (newOrgJsonHash) {
     if (!newOrgJsonHash) {
       throw new InputDataError(
-        'Cannot update Organization: Cannot set orgJsonHash when it is not provided'
+        'Cannot update Organization: Cannot set orgJsonHash when it is not provided',
       );
     }
     if (typeof newOrgJsonHash === 'string' && !newOrgJsonHash.match(/^0x/)) {
       throw new InputDataError(
-        'Cannot update Organization: Cannot set orgJsonHash with invalid format'
+        'Cannot update Organization: Cannot set orgJsonHash with invalid format',
       );
     }
     this._orgJsonHash = newOrgJsonHash;

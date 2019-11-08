@@ -72,7 +72,7 @@ describe('WTLibs.Contracts', () => {
        '0x0000000000000000000000000c4c734f0ecb92270d1ebe7b04aec4440eb05caa'],
       type: 'mined',
       id: 'log_43221c70',
-    }]
+    }],
     );
 
     assert.equal(decodedLogs.length, 1);
