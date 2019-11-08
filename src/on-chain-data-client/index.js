@@ -81,7 +81,7 @@ export class OnChainDataClient {
     for (const receipt of receipts) {
       if (!receipt) { continue; }
       const decodedLogs = OnChainDataClient.web3Contracts.decodeLogs(receipt.logs);
-      const originalTxData = txData.find((tx) => tx.hash === receipt.transactionHash);
+      const originalTxData = txData.find((tx) => tx && tx.hash === receipt.transactionHash);
       results[receipt.transactionHash] = {
         transactionHash: receipt.transactionHash,
         blockAge: (await currentBlockNumber) - receipt.blockNumber,
